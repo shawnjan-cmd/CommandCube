@@ -5,28 +5,79 @@
   },
   "build": {
     "base": {
-      "android": { "image": "latest" },
+      "android": {
+        "image": "latest"
+      },
       "env": {
         "NODE_ENV": "production",
-        "EXPO_PUBLIC_APP_ENV": "production"
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "NODE_OPTIONS": "--max-old-space-size=8192",
+        "EXPO_NO_TELEMETRY": "1",
+        "EAS_NO_VCS": "1",
+        "GRADLE_OPTS": "-Xmx6g -Xms2g -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=false",
+        "EXPO_USE_HERMES": "1"
       }
     },
     "development": {
       "extends": "base",
+      "developmentClient": true,
       "distribution": "internal",
-      "android": { "buildType": "apk", "gradleCommand": ":app:assembleDebug" },
-      "env": { "NODE_ENV": "development", "EXPO_PUBLIC_APP_ENV": "development" },
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "env": {
+        "NODE_ENV": "development",
+        "EXPO_PUBLIC_APP_ENV": "development"
+      },
       "ios": { "simulator": true }
     },
     "preview": {
       "extends": "base",
       "distribution": "internal",
-      "android": { "buildType": "apk", "gradleCommand": ":app:assembleRelease" }
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease --stacktrace --no-daemon"
+      }
+    },
+    "preview-safe": {
+      "extends": "base",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease --stacktrace --no-daemon -PreactNativeArchitectures=arm64-v8a"
+      },
+      "env": {
+        "EXPO_NO_PROGUARD": "1",
+        "EXPO_NO_R8": "1"
+      }
+    },
+    "preview-debug": {
+      "extends": "base",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease --stacktrace --info --no-daemon"
+      }
     },
     "production": {
       "extends": "base",
       "autoIncrement": true,
-      "android": { "buildType": "app-bundle", "gradleCommand": ":app:bundleRelease" }
+      "android": {
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease --stacktrace --no-daemon"
+      }
+    },
+    "production-safe": {
+      "extends": "base",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease --stacktrace --no-daemon"
+      },
+      "env": {
+        "EXPO_NO_PROGUARD": "1"
+      }
     }
   },
   "submit": {

@@ -27,9 +27,17 @@
       "backgroundColor": "#050202"
     },
     "assetBundlePatterns": [
-      "assets/images/*",
       "assets/icon.png",
-      "assets/adaptive-icon.png"
+      "assets/adaptive-icon.png",
+      "assets/favicon.png",
+      "assets/fonts/**/*",
+      "assets/images/authenticate-device-bg.jpg",
+      "assets/images/butler-robot-tux.jpg",
+      "assets/back-icon.png",
+      "assets/back-icon-mask.png",
+      "assets/clear-icon.png",
+      "assets/close-icon.png",
+      "assets/search-icon.png"
     ],
     "ios": {
       "supportsTablet": false,
@@ -59,21 +67,7 @@
       "proguardRules": "./android/proguard-rules.pro",
       "autolinking": {
         "exclude": [
-          "expo-video",
-          "expo-gl",
-          "expo-sensors",
-          "lottie-react-native",
-          "expo-three",
-          "@stripe/stripe-react-native",
-          "react-native-webrtc",
-          "react-native-maps",
-          "@shopify/react-native-skia",
-          "@apollo/client",
-          "react-native-dynamic",
-          "nativewind",
-          "lucide-react-native",
-          "react-redux",
-          "react-dev-inspector"
+          "expo-video"
         ]
       },
       "blockedPermissions": [
@@ -108,11 +102,12 @@
             "minSdkVersion": 26,
             "targetSdkVersion": 35,
             "compileSdkVersion": 35,
-            "enableProguardInReleaseBuilds": true,
-            "enableShrinkResourcesInReleaseBuilds": true,
+            "enableProguardInReleaseBuilds": false,
+            "enableShrinkResourcesInReleaseBuilds": false,
             "networkInspector": false,
             "newArchEnabled": false,
-            "extraMavenRepos": []
+            "extraMavenRepos": [],
+            "extraProguardRules": "-keep class com.facebook.hermes.unicode.** { *; }\n-keep class com.facebook.jni.** { *; }"
           },
           "ios": {
             "newArchEnabled": false,
@@ -148,9 +143,6 @@
           }
         }
       ]
-    ],
-    "ignoredDependencies": [
-      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true

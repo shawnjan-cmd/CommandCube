@@ -1,0 +1,69 @@
+# ─── .easignore ─────────────────────────────────────────────────────────────
+# Files in this list will NOT be uploaded to EAS Build servers.
+# This reduces upload size, speeds up builds, and prevents the
+# "Gradle daemon disappeared" error caused by huge tarballs.
+
+# Build artifacts / caches
+node_modules/.cache/
+.expo/
+dist/
+web-build/
+.metro-cache/
+.gradle/
+
+# Native build outputs
+android/build/
+android/app/build/
+android/.gradle/
+ios/build/
+ios/Pods/
+ios/DerivedData/
+*.xcuserstate
+
+# Dev tooling & reports
+test_reports/
+.eslintcache
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test files
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Source-control & editor
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Documentation that doesn't belong in a build
+docs/
+*.md
+!README.md
+
+# Backups & temp
+*.bak
+*.tmp
+*.orig
+scripts.preserve/
+scripts/scripts.preserve/
+
+# Playstore listing assets (do NOT belong in the APK/AAB)
+playstore_assets/
+fastlane/
+fastlane/metadata/
+fastlane/screenshots/
+
+# Local environment overrides — keep .env in the build for EXPO_PUBLIC_* vars
+.env.local
+.env.development
+.env.test
+.env.*.local

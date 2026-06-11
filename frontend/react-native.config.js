@@ -26,6 +26,6 @@ module.exports = {
         ios: null,     // Exclude from iOS auto-linking as well (unused)
       },
     },
-    // expo-av is kept — used for audio playback throughout the app
+    // expo-av removed in v1.0.0 — no longer in dependencies
   },
 };

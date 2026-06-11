@@ -21,7 +21,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { ButlerScript } from './butlerScripts';
 
 const INDEX_KEY   = '@bs_index_v2';

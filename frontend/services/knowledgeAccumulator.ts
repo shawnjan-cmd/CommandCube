@@ -5,7 +5,12 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { KnowledgeDomain } from './butlerKnowledge';
+// KnowledgeDomain type inlined here (legacy ./butlerKnowledge module removed)
+type KnowledgeDomain = {
+  name: string;
+  findings: any[];
+  [key: string]: any;
+};
 import { kbGrowthTracker } from './kbGrowthTracker';
 import { serverConnection } from './serverConnection';
 

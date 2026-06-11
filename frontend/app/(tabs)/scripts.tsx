@@ -12,7 +12,7 @@ import {
   FlatList, KeyboardAvoidingView, PanResponder, RefreshControl,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';

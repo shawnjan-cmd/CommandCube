@@ -35,7 +35,7 @@ import { PYTHON_AUTOMATION_SCRIPTS } from '@/services/pythonAutomationKnowledge'
 import { BUNDLE_MANIFEST, BUNDLE_SOURCES, buildAllFilesExport, buildExportJson, DETAILED_AI_PROMPT, computeSourceHash } from '@/constants/appSourceBundle';
 import { BUTLER_STARTER_KNOWLEDGE, BUTLER_KNOWLEDGE_COMPACT } from '@/constants/butlerKnowledge';
 import '@/constants/tabSourcesBundle'; // registers nexushome/knowledge/builder/settings sources
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { processPowerhouseJson, generateCurrentStateJson, getImportLog, clearImportLog } from '@/services/powerhouseImport';

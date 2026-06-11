@@ -22,7 +22,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { knowledgeAccumulator, CompressedKnowledge } from './knowledgeAccumulator';
 import { kbGrowthTracker } from './kbGrowthTracker';
 import { serverConnection } from './serverConnection';
