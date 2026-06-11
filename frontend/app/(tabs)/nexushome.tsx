@@ -9,6 +9,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useCosmetic } from '@/contexts/CosmeticContext';
 import { useFocusEffect } from 'expo-router';
 import {
+
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Platform, ActivityIndicator, Animated, Dimensions, TextInput, Alert, Modal,
 } from 'react-native';
@@ -1837,3 +1838,7 @@ const pvb = StyleSheet.create({
   footer:  { flexDirection:'row', alignItems:'center', gap:6, marginTop:10, paddingTop:10, borderTopWidth:StyleSheet.hairlineWidth, borderTopColor:D.green+'20' },
   footerTxt:{ fontSize:10, fontFamily:MONO, color:D.green+'80' },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

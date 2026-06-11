@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
+
   View, Text, TextInput, TouchableOpacity, ScrollView,
   StyleSheet, Platform, ActivityIndicator, KeyboardAvoidingView,
   Alert, Animated, Dimensions, Modal, Image, Easing,
@@ -1271,3 +1272,7 @@ export default function ButlerScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

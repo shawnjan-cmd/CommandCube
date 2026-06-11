@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCosmetic, PACK_THEMES, AppTheme } from '@/contexts/CosmeticContext';
 import { haptics } from '@/services/haptics';
 
+
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const TIER_LABEL: Record<string, string> = {
@@ -235,3 +236,7 @@ const styles = StyleSheet.create({
   },
   footerTxt: { flex: 1, fontSize: 11, lineHeight: 16 },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

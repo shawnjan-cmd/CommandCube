@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
+
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Platform, Alert, ActivityIndicator, TextInput, Animated, Dimensions, Modal,
 } from 'react-native';
@@ -1382,3 +1383,7 @@ const ftc = StyleSheet.create({
   actionBtn:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, borderRadius: 8, paddingVertical: 9, marginHorizontal: 10, marginBottom: 10 },
   actionTxt:  { fontSize: 10, fontWeight: '900', color: '#000', fontFamily: MONO, letterSpacing: 0.3 },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

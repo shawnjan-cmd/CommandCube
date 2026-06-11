@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
+
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, Alert, TextInput, Switch,
   Platform, Animated, Linking, Modal, KeyboardAvoidingView,
@@ -4071,3 +4072,7 @@ const devs = StyleSheet.create({
   footer:         { textAlign: 'center', fontSize: 8, color: N.text + '55', fontFamily: MONO, lineHeight: 16, marginTop: 4, marginBottom: 8, paddingHorizontal: 16 },
 });
 
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

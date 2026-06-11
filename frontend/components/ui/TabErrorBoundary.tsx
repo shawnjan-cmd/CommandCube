@@ -84,6 +84,37 @@ export class TabErrorBoundary extends Component<Props, State> {
   }
 }
 
+// ──────────────────────────────────────────────────────────────────────────
+// Expo Router compatible ErrorBoundary — accepts { error, retry } signature.
+// Re-export from each tab file as `export { ErrorBoundary } from '...'` to
+// give that route its own isolated crash surface.
+// ──────────────────────────────────────────────────────────────────────────
+export function ErrorBoundary({ error, retry }: { error: Error; retry: () => Promise<void> }) {
+  return (
+    <View style={s.container}>
+      <View style={[s.corner, { top: 24, left: 24, borderTopWidth: 2, borderLeftWidth: 2 }]} />
+      <View style={[s.corner, { top: 24, right: 24, borderTopWidth: 2, borderRightWidth: 2 }]} />
+      <View style={[s.corner, { bottom: 24, left: 24, borderBottomWidth: 2, borderLeftWidth: 2 }]} />
+      <View style={[s.corner, { bottom: 24, right: 24, borderBottomWidth: 2, borderRightWidth: 2 }]} />
+
+      <View style={s.iconBox}><Text style={s.iconTxt}>⚠</Text></View>
+
+      <Text style={s.tabName}>
+        SCREEN <Text style={s.tabNameAccent}>RECOVERY MODE</Text>
+      </Text>
+      <Text style={s.errMsg} numberOfLines={4}>{error.message}</Text>
+
+      <TouchableOpacity style={s.reloadBtn} onPress={() => { try { retry(); } catch {} }} activeOpacity={0.8}>
+        <Text style={s.reloadTxt}>↻ RELOAD TAB</Text>
+      </TouchableOpacity>
+
+      <Text style={s.hint}>
+        Other tabs are unaffected · This tab will reload cleanly
+      </Text>
+    </View>
+  );
+}
+
 const s = StyleSheet.create({
   container: {
     flex: 1,

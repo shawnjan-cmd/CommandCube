@@ -1,9 +1,11 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import QuickButlerBar from '@/components/ui/QuickButlerBar';
 import FuturisticTabBar from '@/components/ui/FuturisticTabBar';
+import ConnectionBadge from '@/components/ui/ConnectionBadge';
 
 type MCName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 type MIName = React.ComponentProps<typeof MaterialIcons>['name'];
@@ -27,6 +29,7 @@ const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = 
 };
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
   return (
     <View style={{ flex: 1 }}>
       <Tabs
@@ -48,6 +51,22 @@ export default function TabLayout() {
         <Tabs.Screen name="fileshare" options={{ href: null }} />
         <Tabs.Screen name="support"   options={{ href: null }} />
       </Tabs>
+
+      {/* Global persistent connection status — visible on every tab.
+          Floats at the top-right edge of the screen, respecting safe area.
+          Tappable so users can manually retry the LAN handshake. */}
+      <View
+        pointerEvents="box-none"
+        style={{
+          position: 'absolute',
+          top: (insets.top || (Platform.OS === 'ios' ? 44 : 12)) + 6,
+          right: 12,
+          zIndex: 100,
+        }}
+      >
+        <ConnectionBadge tappable />
+      </View>
+
       {/* Persistent Ask-Butler composer floating above the tab bar */}
       <QuickButlerBar />
     </View>

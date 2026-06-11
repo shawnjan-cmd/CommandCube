@@ -134,7 +134,20 @@
       "expo-localization",
       "expo-mail-composer",
       "expo-secure-store",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#030810",
+          "image": "./assets/icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "dark": {
+            "backgroundColor": "#030810",
+            "image": "./assets/icon.png"
+          }
+        }
+      ]
     ],
     "ignoredDependencies": [
       "expo-video"

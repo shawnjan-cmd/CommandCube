@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
+
   View, Text, StyleSheet, Platform, TouchableOpacity,
   ScrollView, Animated, ActivityIndicator, Alert, Dimensions,
 } from 'react-native';
@@ -1578,3 +1579,7 @@ const s = StyleSheet.create({
   autoStatus:  { flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 4, flexShrink: 0 },
   stepBadge:   { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

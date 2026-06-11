@@ -7,6 +7,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useFocusEffect } from 'expo-router';
 import {
+
   View, Text, TextInput, TouchableOpacity, ScrollView,
   StyleSheet, Platform, Alert, ActivityIndicator, Animated, Modal, Dimensions, FlatList,
 } from 'react-native';
@@ -3396,3 +3397,7 @@ const arch = StyleSheet.create({
   pathTxt:     { fontSize: 12, fontWeight: '900', fontFamily: MONO },
   endpointDesc:{ fontSize: 11, fontWeight: '600', color: N.textMid },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

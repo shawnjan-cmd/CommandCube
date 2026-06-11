@@ -22,6 +22,7 @@
  */
 
 import React, {
+
   useState,
   useEffect,
   useRef,
@@ -894,3 +895,7 @@ const st = StyleSheet.create({
     marginBottom: 2,
   },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

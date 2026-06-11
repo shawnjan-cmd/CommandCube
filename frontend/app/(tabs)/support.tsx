@@ -4,6 +4,7 @@
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
+
   View, Text, TouchableOpacity, ScrollView, StyleSheet,
   Platform, Animated, Easing, Dimensions, Modal, StatusBar, Alert, Linking,
 } from 'react-native';
@@ -1504,3 +1505,7 @@ const s = StyleSheet.create({
   },
   toastTxt: { fontSize: 11, fontFamily: MONO, fontWeight: '900', letterSpacing: 0.4, flex: 1 },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';

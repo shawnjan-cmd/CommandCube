@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
+
   View, Text, StyleSheet, TouchableOpacity, TextInput,
   Modal, ScrollView, Platform, Alert, ActivityIndicator, Animated, Dimensions,
   FlatList, KeyboardAvoidingView, PanResponder, RefreshControl,
@@ -3638,3 +3639,7 @@ const s = StyleSheet.create({
   libSearchName:{ fontSize: 14, fontWeight: '700', color: N.text, fontFamily: MONO, marginBottom: 5 },
   libSearchDesc:{ fontSize: 12, color: N.textDim, lineHeight: 17 },
 });
+
+
+// Expo Router per-route ErrorBoundary — isolates crashes to this tab
+export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';
