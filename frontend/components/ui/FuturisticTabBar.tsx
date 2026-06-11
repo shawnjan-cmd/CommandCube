@@ -107,6 +107,21 @@ function TabButton({
   );
 }
 
+// Friendly aliases used across the app → actual route names.
+const TAB_ALIASES: Record<string, string> = {
+  home: 'nexushome', nexushome: 'nexushome',
+  scripts: 'scripts',
+  butler: 'butler', ai: 'butler', chat: 'butler',
+  knowledge: 'knowledge', kb: 'knowledge',
+  logs: 'logs', pc: 'logs',
+  builder: 'builder', build: 'builder',
+  skins: 'skins',
+  settings: 'settings', config: 'settings',
+  fileshare: 'fileshare', tools: 'fileshare',
+  support: 'support',
+  terminal: 'terminal',
+};
+
 export default function FuturisticTabBar(
   props: BottomTabBarProps & {
     iconMap?: Record<string, (color: string, size: number) => React.ReactNode>;
@@ -115,6 +130,15 @@ export default function FuturisticTabBar(
   const { state, descriptors, navigation, iconMap = {} } = props;
   const insets = useSafeAreaInsets();
   const sweep = useRef(new Animated.Value(0)).current;
+
+  // Global tab switcher — used by Quick Access tiles, settings shortcuts, etc.
+  useEffect(() => {
+    (global as any).__butlerSwitchTab = (tab: string) => {
+      const route = TAB_ALIASES[String(tab || '').toLowerCase()] || tab;
+      try { navigation.navigate(route as never); } catch {}
+    };
+    return () => { delete (global as any).__butlerSwitchTab; };
+  }, [navigation]);
 
   useEffect(() => {
     Animated.loop(Animated.sequence([

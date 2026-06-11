@@ -217,7 +217,7 @@ export default function QuickSendCard({ isConnected }: { isConnected: boolean })
       {/* Header */}
       <View style={styles.header}>
         <View style={[styles.headerIcon, { borderColor: PAL.cyan + '88', backgroundColor: PAL.cyan + '14' }]}>
-          <MaterialCommunityIcons name="rocket-launch-outline" size={18} color={PAL.cyan} />
+          <MaterialCommunityIcons name="rocket-launch-outline" size={15} color={PAL.cyan} />
         </View>
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -278,43 +278,43 @@ export default function QuickSendCard({ isConnected }: { isConnected: boolean })
 const styles = StyleSheet.create({
   card: {
     backgroundColor: PAL.bg,
-    borderRadius: 18,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: PAL.border,
     overflow: 'hidden',
-    padding: 14,
-    marginVertical: 8,
+    padding: 11,
+    marginVertical: 0,
     position: 'relative',
     ...(Platform.OS === 'ios'
-      ? { shadowColor: PAL.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.18, shadowRadius: 16 }
+      ? { shadowColor: PAL.cyan, shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.18, shadowRadius: 14 }
       : { elevation: 6 }),
   },
   bgOrbA: { position: 'absolute', top: -50, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: PAL.cyan,   opacity: 0.10 },
   bgOrbB: { position: 'absolute', bottom: -60, right: -50, width: 180, height: 180, borderRadius: 90, backgroundColor: PAL.purple, opacity: 0.10 },
   gridLine: { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.05)' },
 
-  header:     { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  headerIcon: { width: 36, height: 36, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  label:      { fontSize: 9.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.8, color: PAL.cyan },
-  sub:        { fontSize: 8.5, fontWeight: '800', fontFamily: MONO, letterSpacing: 1, color: PAL.textMid },
+  header:     { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  headerIcon: { width: 30, height: 30, borderRadius: 9, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  label:      { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.8, color: PAL.cyan },
+  sub:        { fontSize: 8, fontWeight: '800', fontFamily: MONO, letterSpacing: 1, color: PAL.textMid },
   dot:        { width: 3, height: 3, borderRadius: 1.5, backgroundColor: PAL.textMid },
-  title:      { fontSize: 16, fontWeight: '900', fontFamily: MONO, color: PAL.textHi, letterSpacing: 1, marginTop: 2 },
-  statusPill: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 14, paddingHorizontal: 7, paddingVertical: 3 },
+  title:      { fontSize: 13, fontWeight: '900', fontFamily: MONO, color: PAL.textHi, letterSpacing: 0.8, marginTop: 1 },
+  statusPill: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 12, paddingHorizontal: 6, paddingVertical: 2.5 },
   pillDot:    { width: 5, height: 5, borderRadius: 2.5 },
-  pillTxt:    { fontSize: 8.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
+  pillTxt:    { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
 
-  tilesGrid:  { flexDirection: 'row', gap: 8, marginBottom: 6 },
+  tilesGrid:  { flexDirection: 'row', gap: 7, marginBottom: 4 },
   tileWrap:   { flex: 1 },
-  tile:       { borderWidth: 1, borderRadius: 12, padding: 9, gap: 6, alignItems: 'center', justifyContent: 'center', minHeight: 78 },
-  tileIconWrap: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  tileLabel:  { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.6, textAlign: 'center' },
+  tile:       { borderWidth: 1, borderRadius: 10, padding: 7, gap: 5, alignItems: 'center', justifyContent: 'center', minHeight: 58 },
+  tileIconWrap: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  tileLabel:  { fontSize: 8.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.4, textAlign: 'center' },
 
   inputRow:   { flexDirection: 'row', alignItems: 'flex-end', gap: 6, marginTop: 8, borderWidth: 1, borderColor: PAL.borderBrt, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 4, backgroundColor: PAL.bgInner },
   input:      { flex: 1, color: PAL.textHi, fontSize: 13, fontFamily: MONO, paddingVertical: 6, maxHeight: 80 },
   inputSend:  { width: 28, height: 28, borderRadius: 14, backgroundColor: PAL.cyan, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
 
-  footer:     { flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'center', marginTop: 10 },
-  footerTxt:  { fontSize: 9, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.4, color: PAL.textDim },
+  footer:     { flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'center', marginTop: 8 },
+  footerTxt:  { fontSize: 8.5, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.4, color: PAL.textDim },
 
   toast:      { position: 'absolute', left: 14, right: 14, bottom: 8, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1 },
   toastTxt:   { flex: 1, fontSize: 11, fontWeight: '800', fontFamily: MONO, letterSpacing: 0.5 },

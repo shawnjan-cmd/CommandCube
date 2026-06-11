@@ -1,5 +1,4 @@
-<svg version="1.1" viewBox="0 0 1696 1096" width="424" height="274" xmlns="http://www.w3.org/2000/svg">
-<path transform="translate(0)" d="m0 0h1696v1096h-1696z" fill="#04080F"></path>
+export const BUTLER_LOGO_XML = `<svg version="1.1" viewBox="0 0 1696 1096" width="424" height="274" xmlns="http://www.w3.org/2000/svg">
 <path transform="translate(376,323)" d="m0 0h157l61 1 15 4 14 7 10 8 8 10 7 14 3 11 1 7v225l-3 14-5 13-8 11-9 9-13 8-18 6h-235l-12-3-16-8-11-9-9-12-5-11-4-17v-227l3-15 8-16 7-9 10-9 14-7 14-4z" fill="#050910"></path>
 <path transform="translate(1220,323)" d="m0 0h174l44 1 15 4 14 7 10 8 8 10 7 15 3 11 1 8v219l-3 17-6 16-8 10-8 8-13 8-18 6h-234l-12-3-12-5-11-8-5-5-7-8-6-12-4-14-1-7v-224l3-15 5-12 8-12 7-7 10-7 12-5 11-3z" fill="#04080F"></path>
 <path transform="translate(796,323)" d="m0 0h174l46 1 15 4 14 7 10 8 8 10 7 14 2 7 1 10v226l-2 15-5 12-7 10-5 6-14 10-11 5-11 3h-235l-14-4-14-7-12-11-6-7-7-14-3-12v-237l3-13 8-15 12-13 13-8 18-6z" fill="#04080F"></path>
@@ -114,3 +113,4 @@
 <path transform="translate(309,334)" d="m0 0v3l-2 2-1 4-3 3h-2l1-4z" fill="#0F1826"></path>
 <path transform="translate(1029,941)" d="m0 0h3l1 5-3 3-2-3z" fill="#04080F"></path>
 </svg>
+`;

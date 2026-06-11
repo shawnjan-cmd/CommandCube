@@ -32,16 +32,17 @@ import { OmegaLearningLoop } from '@/components/cyber/OmegaLearningLoop';
 import QuickSendCard from '@/components/cards/QuickSendCard';
 import { FileShareClipboardCard } from '@/components/ui/FileShareClipboardCard';
 import { uiConfig, UIConfig, DEFAULT_UI_CONFIG, UIStrings } from '@/services/uiConfig';
+import { ButlerWordmark } from '@/components/ui/ButlerWordmark';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────
 const D = {
-  bg:         '#010306',
-  surface:    '#060D18',
-  surfaceHi:  '#0A1522',
-  surfaceMid: '#081020',
+  bg:         '#000000',
+  surface:    '#04070C',
+  surfaceHi:  '#070D15',
+  surfaceMid: '#05090F',
   border:     'rgba(0,229,255,0.14)',
   borderHi:   'rgba(0,229,255,0.32)',
   borderGlow: 'rgba(0,229,255,0.55)',
@@ -294,22 +295,40 @@ function NexusCard({
   return (
     <View style={[
       nc.card,
-      { borderColor: accentColor + '45' },
+      { borderColor: accentColor + '40' },
       Platform.OS === 'ios'
-        ? { shadowColor: accentColor, shadowOffset:{width:0,height:0}, shadowOpacity: glowIntensity, shadowRadius:18 }
-        : { elevation:5 },
+        ? { shadowColor: accentColor, shadowOffset:{width:0,height:6}, shadowOpacity: glowIntensity, shadowRadius:16 }
+        : { elevation:6 },
       style,
     ]}>
-      {topBar && <View style={[nc.topBar, { backgroundColor: accentColor }]} />}
-      <ScanLines opacity={0.018} />
-      <HudCorners color={accentColor + '60'} size={14} thickness={1.5} />
+      {topBar && (
+        <View style={nc.topBarRow}>
+          <View style={[nc.topBarMain, { backgroundColor: accentColor }]} />
+          <View style={nc.topBarGap} />
+          <View style={[nc.topBarTail, { backgroundColor: accentColor + '66' }]} />
+        </View>
+      )}
+      {/* 3D bevel: light catch on top edge, shade on bottom edge */}
+      <View pointerEvents="none" style={nc.bevelTop} />
+      <View pointerEvents="none" style={nc.bevelBottom} />
+      <View pointerEvents="none" style={nc.sheen} />
+      <ScanLines opacity={0.016} />
+      <HudCorners color={accentColor + '70'} size={13} thickness={1.5} />
       {children}
+      <View pointerEvents="none" style={[nc.footerNotch, { backgroundColor: accentColor + '55' }]} />
     </View>
   );
 }
 const nc = StyleSheet.create({
-  card: { backgroundColor: D.surface, borderRadius: 18, borderWidth: 1.5, overflow:'hidden', position:'relative' },
-  topBar: { height: 3, width:'100%' },
+  card:        { backgroundColor: D.surface, borderRadius: 15, borderWidth: 1, overflow:'hidden', position:'relative' },
+  topBarRow:   { flexDirection:'row', alignItems:'center', height: 2.5, width:'100%' },
+  topBarMain:  { flex: 1, height: '100%' },
+  topBarGap:   { width: 8 },
+  topBarTail:  { width: 30, height: '100%' },
+  bevelTop:    { position:'absolute', top: 2.5, left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
+  bevelBottom: { position:'absolute', bottom: 0, left: 0, right: 0, height: 1.5, backgroundColor: 'rgba(0,0,0,0.65)' },
+  sheen:       { position:'absolute', top: 0, left: 0, right: 0, height: '38%', backgroundColor: 'rgba(255,255,255,0.018)' },
+  footerNotch: { position:'absolute', bottom: 0, alignSelf:'center', width: 44, height: 2, borderTopLeftRadius: 2, borderTopRightRadius: 2 },
 });
 
 // ─── SECTION DIVIDER ──────────────────────────────────────────────
@@ -334,7 +353,6 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
 }) {
   const shieldPulse = useRef(new Animated.Value(0)).current;
   const sweep       = useRef(new Animated.Value(0)).current;
-  const orbitAnim   = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(Animated.sequence([
@@ -342,11 +360,9 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
       Animated.timing(shieldPulse, { toValue: 0, duration: 1800, useNativeDriver: true }),
     ])).start();
     Animated.loop(Animated.timing(sweep, { toValue: 1, duration: 4200, useNativeDriver: true })).start();
-    Animated.loop(Animated.timing(orbitAnim, { toValue: 1, duration: 11000, useNativeDriver: true })).start();
   }, []);
 
   const sweepTranslate = sweep.interpolate({ inputRange: [0, 1], outputRange: [-220, 360] });
-  const orbitRotate    = orbitAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
   const shieldHalo     = shieldPulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.95] });
 
   const kbDisplay     = kbFindings > 0 ? (kbFindings > 1000000 ? `${(kbFindings/1000000).toFixed(1)}M` : kbFindings > 1000 ? `${(kbFindings/1000).toFixed(1)}K` : String(kbFindings)) : '—';
@@ -400,60 +416,18 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
         </View>
       </View>
 
-      {/* Holographic core — concentric arcs, hex grid, pulsing nucleus.
-          Replaces the literal robot mascot for a sci-fi command-deck vibe. */}
-      <View style={hero.coreWrap}>
-        {/* Animated orbit ring (outer) */}
-        <Animated.View style={[hero.orbit, { transform: [{ rotate: orbitRotate }] }]} pointerEvents="none">
-          <View style={[hero.orbitDot, { backgroundColor: D.cyan,   shadowColor: D.cyan,   top:  -3, left: '50%' }]} />
-          <View style={[hero.orbitDot, { backgroundColor: D.purple, shadowColor: D.purple, bottom: -3, left: '50%' }]} />
-          <View style={[hero.orbitDot, { backgroundColor: D.amber,  shadowColor: D.amber,  top: '50%', left: -3 }]} />
-          <View style={[hero.orbitDot, { backgroundColor: D.green,  shadowColor: D.green,  top: '50%', right: -3 }]} />
-        </Animated.View>
-        {/* Counter-rotating mid ring */}
-        <Animated.View
-          style={[
-            hero.midRing,
-            { transform: [{ rotate: orbitAnim.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] }) }] },
-          ]}
-          pointerEvents="none"
-        >
-          {[0, 60, 120, 180, 240, 300].map(deg => (
-            <View
-              key={deg}
-              style={[
-                hero.midTick,
-                {
-                  transform: [{ rotate: `${deg}deg` }, { translateY: -64 }],
-                },
-              ]}
-            />
-          ))}
-        </Animated.View>
-        {/* Static hex frame */}
-        <View style={hero.hexFrame} pointerEvents="none">
-          <View style={[hero.hexEdge, { transform: [{ rotate:   '30deg' }] }]} />
-          <View style={[hero.hexEdge, { transform: [{ rotate:  '-30deg' }] }]} />
-          <View style={[hero.hexEdge, { transform: [{ rotate:   '90deg' }] }]} />
-        </View>
-        {/* Pulsing nucleus halo */}
-        <Animated.View style={[hero.halo, { opacity: shieldHalo }]} pointerEvents="none" />
-        {/* Glowing core */}
-        <View style={hero.core}>
-          <View style={hero.coreInner}>
-            <View style={hero.coreDot} />
-            <Text style={hero.coreLabel}>NXS</Text>
-          </View>
-        </View>
+      {/* BUTLER AI wordmark — user-supplied vector logo, HD at any size,
+          blends seamlessly into the pure-black hero deck. */}
+      <View style={hero.logoWrap}>
+        <Animated.View style={[hero.logoGlow, { opacity: shieldHalo }]} pointerEvents="none" />
+        <ButlerWordmark width={Math.min(SW - 110, 290)} />
+        <Animated.View style={[hero.logoUnderline, { opacity: shieldHalo }]} />
         {/* Corner tick readouts */}
-        <View style={[hero.readout, { top: 6,  left: 6  }]}><Text style={hero.readoutTxt}>SYS·01</Text></View>
-        <View style={[hero.readout, { top: 6,  right: 6 }]}><Text style={[hero.readoutTxt, { color: D.purple }]}>NEURAL</Text></View>
-        <View style={[hero.readout, { bottom: 6, left: 6  }]}><Text style={[hero.readoutTxt, { color: D.amber  }]}>MESH·OK</Text></View>
-        <View style={[hero.readout, { bottom: 6, right: 6 }]}><Text style={[hero.readoutTxt, { color: D.green  }]}>LINK·LAN</Text></View>
+        <View style={[hero.readout, { top: 2,  left: 2  }]}><Text style={hero.readoutTxt}>SYS·01</Text></View>
+        <View style={[hero.readout, { top: 2,  right: 2 }]}><Text style={[hero.readoutTxt, { color: D.purple }]}>NEURAL</Text></View>
+        <View style={[hero.readout, { bottom: 2, left: 2  }]}><Text style={[hero.readoutTxt, { color: D.amber  }]}>MESH·OK</Text></View>
+        <View style={[hero.readout, { bottom: 2, right: 2 }]}><Text style={[hero.readoutTxt, { color: D.green  }]}>LINK·LAN</Text></View>
       </View>
-
-      {/* Wordmark + tagline */}
-      <Text style={hero.brand}>BUTLER AI</Text>
       <View style={hero.subRow}>
         <View style={[hero.bullet, { backgroundColor: D.cyan }]} />
         <Text style={hero.sub}>NEXUS COMMAND CENTER</Text>
@@ -495,75 +469,57 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
 
 const hero = StyleSheet.create({
   wrap: {
-    backgroundColor: '#020812',
-    borderRadius: 22,
+    backgroundColor: '#000004',
+    borderRadius: 18,
     borderWidth: 1.5,
     borderColor: D.cyan + '38',
     overflow: 'hidden',
-    paddingTop: 18,
-    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingHorizontal: 14,
     paddingBottom: 0,
     position: 'relative',
-    minHeight: 470,
     ...(Platform.OS === 'ios'
       ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.28, shadowRadius: 28 }
       : { elevation: 10 }),
   },
-  bgFill:      { ...StyleSheet.absoluteFillObject, backgroundColor: '#020812' },
-  bgBlueOrb:   { position: 'absolute', top: -80,  left: -80,  width: 260, height: 260, borderRadius: 130, backgroundColor: '#5B9CF6', opacity: 0.18 },
-  bgCyanOrb:   { position: 'absolute', top: 40,   right: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: D.cyan,    opacity: 0.16 },
-  bgPurpleOrb: { position: 'absolute', bottom: -100, left: '15%' as any, width: 240, height: 240, borderRadius: 120, backgroundColor: D.purple, opacity: 0.14 },
+  bgFill:      { ...StyleSheet.absoluteFillObject, backgroundColor: '#01030A' },
+  bgBlueOrb:   { position: 'absolute', top: -80,  left: -80,  width: 260, height: 260, borderRadius: 130, backgroundColor: '#5B9CF6', opacity: 0.10 },
+  bgCyanOrb:   { position: 'absolute', top: 40,   right: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: D.cyan,    opacity: 0.09 },
+  bgPurpleOrb: { position: 'absolute', bottom: -100, left: '15%' as any, width: 240, height: 240, borderRadius: 120, backgroundColor: D.purple, opacity: 0.08 },
   gridH:       { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.06)' },
   gridV:       { position: 'absolute', top: 0, bottom: 0, width: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.05)' },
   sweep:       { position: 'absolute', top: 0, bottom: 0, width: 160, backgroundColor: D.cyan, opacity: 0.05, transform: [{ skewX: '-18deg' }] },
 
   cornerTR: { position: 'absolute', top: 0, right: 0, width: 26, height: 26, borderTopWidth: 2, borderRightWidth: 2 },
-  cornerBL: { position: 'absolute', bottom: 90, left: 0, width: 26, height: 26, borderBottomWidth: 2, borderLeftWidth: 2 },
-  cornerBR: { position: 'absolute', bottom: 90, right: 0, width: 26, height: 26, borderBottomWidth: 2, borderRightWidth: 2 },
+  cornerBL: { position: 'absolute', bottom: 78, left: 0, width: 26, height: 26, borderBottomWidth: 2, borderLeftWidth: 2 },
+  cornerBR: { position: 'absolute', bottom: 78, right: 0, width: 26, height: 26, borderBottomWidth: 2, borderRightWidth: 2 },
 
-  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignSelf: 'center', justifyContent: 'center', marginBottom: 14 },
-  pill:    { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 22, paddingHorizontal: 10, paddingVertical: 4 },
-  pillTxt: { fontSize: 9.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
+  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignSelf: 'center', justifyContent: 'center', marginBottom: 8 },
+  pill:    { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 22, paddingHorizontal: 9, paddingVertical: 3.5 },
+  pillTxt: { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
 
-  mascotWrap: { alignItems: 'center', justifyContent: 'center', height: 200, marginBottom: 4, position: 'relative' },
-  coreWrap:   { alignItems: 'center', justifyContent: 'center', height: 200, marginBottom: 4, position: 'relative' },
-  halo:       { position: 'absolute', width: 160, height: 160, borderRadius: 80, backgroundColor: D.cyan, opacity: 0.22, ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 60 } : {}) },
-  orbit:      { position: 'absolute', width: 180, height: 180, borderRadius: 90, borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '38' },
-  orbitDot:   { position: 'absolute', width: 6, height: 6, borderRadius: 3, marginLeft: -3, marginTop: -3, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 6 },
-  midRing:    { position: 'absolute', width: 140, height: 140, borderRadius: 70, borderWidth: StyleSheet.hairlineWidth, borderColor: D.purple + '40', alignItems: 'center', justifyContent: 'center' },
-  midTick:    { position: 'absolute', width: 2, height: 8, backgroundColor: D.purple + 'B0', borderRadius: 1 },
-  hexFrame:   { position: 'absolute', width: 110, height: 110, alignItems: 'center', justifyContent: 'center' },
-  hexEdge:    { position: 'absolute', width: 110, height: 2, backgroundColor: D.cyan + '38' },
-  core:       { width: 78, height: 78, borderRadius: 39, alignItems: 'center', justifyContent: 'center',
-                backgroundColor: '#02101D',
-                borderWidth: 1.5, borderColor: D.cyan,
-                ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.95, shadowRadius: 20 } : { elevation: 14 }) },
-  coreInner:  { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center',
-                backgroundColor: D.cyan + '14',
-                borderWidth: 1, borderColor: D.cyan + '80' },
-  coreDot:    { width: 12, height: 12, borderRadius: 6, backgroundColor: D.cyan,
-                ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 10 } : {}) },
-  coreLabel:  { fontSize: 8, fontWeight: '900', fontFamily: MONO, color: D.cyan, letterSpacing: 2, marginTop: 4 },
+  logoWrap:      { alignItems: 'center', justifyContent: 'center', paddingVertical: 8, marginBottom: 2, position: 'relative' },
+  logoGlow:      { position: 'absolute', width: 240, height: 130, borderRadius: 70, backgroundColor: 'rgba(0,229,255,0.10)',
+                   ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.55, shadowRadius: 46 } : {}) },
+  logoUnderline: { marginTop: 4, width: 150, height: 2, borderRadius: 1, backgroundColor: D.cyan,
+                   ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 8 } : {}) },
   readout:    { position: 'absolute', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4,
                 backgroundColor: 'rgba(0,229,255,0.06)', borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '40' },
   readoutTxt: { fontSize: 7, fontWeight: '900', fontFamily: MONO, color: D.cyan, letterSpacing: 1.4 },
-  mascot:     { width: 190, height: 190, borderRadius: 16 },
 
-  brand: { fontSize: 30, fontWeight: '900', fontFamily: MONO, color: '#E8F8FF', letterSpacing: 7, textAlign: 'center', lineHeight: 36,
-           ...(Platform.OS === 'ios' ? { textShadowColor: D.cyan, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16 } : {}) },
-  subRow:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4, marginBottom: 18 },
-  sub:     { fontSize: 10, fontWeight: '800', fontFamily: MONO, color: D.cyan + 'BB', letterSpacing: 4 },
+  subRow:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 2, marginBottom: 12 },
+  sub:     { fontSize: 9.5, fontWeight: '800', fontFamily: MONO, color: D.cyan + 'BB', letterSpacing: 4 },
   bullet:  { width: 4, height: 4, borderRadius: 2 },
 
-  statsRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: 'rgba(0,229,255,0.18)', marginHorizontal: -18 },
-  statCell: { flex: 1, alignItems: 'center', paddingVertical: 14, gap: 4 },
-  statVal:  { fontSize: 22, fontWeight: '900', fontFamily: MONO, lineHeight: 24 },
-  statLbl:  { fontSize: 8, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center', lineHeight: 10 },
+  statsRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: 'rgba(0,229,255,0.18)', marginHorizontal: -14 },
+  statCell: { flex: 1, alignItems: 'center', paddingVertical: 10, gap: 3 },
+  statVal:  { fontSize: 18, fontWeight: '900', fontFamily: MONO, lineHeight: 20 },
+  statLbl:  { fontSize: 7.5, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center', lineHeight: 9 },
 
   qrBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-           marginHorizontal: -18, paddingVertical: 14, backgroundColor: D.cyan,
-           borderBottomLeftRadius: 20, borderBottomRightRadius: 20 },
-  qrTxt: { fontSize: 14, fontWeight: '900', fontFamily: MONO, color: D.bg, letterSpacing: 2 },
+           marginHorizontal: -14, paddingVertical: 12, backgroundColor: D.cyan,
+           borderBottomLeftRadius: 16, borderBottomRightRadius: 16 },
+  qrTxt: { fontSize: 13, fontWeight: '900', fontFamily: MONO, color: '#001018', letterSpacing: 2 },
 });
 
 // ─── CONNECTED PC CARD — upgraded with ring gauges + sparklines ───
@@ -606,15 +562,15 @@ function ConnectedPCCard({ isConnected, serverAddr, metrics, ollamaOnline, cpuHi
       {/* Ring gauges row */}
       <View style={pcc.ringsRow}>
         <View style={pcc.ringWrap}>
-          <RingGauge value={isConnected ? metrics.cpu : 0} color={D.cyan} size={76} label="CPU" />
+          <RingGauge value={isConnected ? metrics.cpu : 0} color={D.cyan} size={64} label="CPU" />
           <MetricLineChart history={cpuHistory} color={D.cyan} height={32} label="cpu" />
         </View>
         <View style={[pcc.ringWrap, { borderLeftWidth:1, borderRightWidth:1, borderColor:'rgba(0,229,255,0.08)' }]}>
-          <RingGauge value={isConnected ? metrics.ram : 0} color={D.green} size={76} label="RAM" />
+          <RingGauge value={isConnected ? metrics.ram : 0} color={D.green} size={64} label="RAM" />
           <MetricLineChart history={ramHistory} color={D.green} height={32} label="ram" />
         </View>
         <View style={pcc.ringWrap}>
-          <RingGauge value={isConnected ? metrics.disk : 0} color={D.amber} size={76} label="DISK" />
+          <RingGauge value={isConnected ? metrics.disk : 0} color={D.amber} size={64} label="DISK" />
           <MetricLineChart history={diskHistory} color={D.amber} height={32} label="disk" />
         </View>
       </View>
@@ -641,21 +597,21 @@ function ConnectedPCCard({ isConnected, serverAddr, metrics, ollamaOnline, cpuHi
   );
 }
 const pcc = StyleSheet.create({
-  header:      { flexDirection:'row', alignItems:'flex-start', gap:14, paddingHorizontal:16, paddingTop:14, paddingBottom:10 },
-  iconBox:     { width:52, height:52, borderRadius:12, borderWidth:1.5, alignItems:'center', justifyContent:'center', position:'relative' },
-  iconLed:     { position:'absolute', bottom:6, right:6, width:8, height:8, borderRadius:4, opacity:0.9 },
-  sectionLabel:{ fontSize:9, fontWeight:'700', fontFamily:MONO, letterSpacing:2 },
-  pcName:      { fontSize:16, fontWeight:'900', fontFamily:MONO, color:'#FFFFFF', letterSpacing:0.5 },
-  connDetail:  { fontSize:10, fontFamily:MONO },
-  statusPill:  { borderWidth:1.5, borderRadius:8, paddingHorizontal:10, paddingVertical:6, flexShrink:0 },
-  statusTxt:   { fontSize:10, fontWeight:'900', fontFamily:MONO, letterSpacing:1.2 },
-  ringsRow:    { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.10)', paddingVertical:14, paddingHorizontal:4 },
-  ringWrap:    { flex:1, alignItems:'center', gap:6, paddingHorizontal:4 },
+  header:      { flexDirection:'row', alignItems:'flex-start', gap:12, paddingHorizontal:14, paddingTop:12, paddingBottom:9 },
+  iconBox:     { width:44, height:44, borderRadius:11, borderWidth:1.5, alignItems:'center', justifyContent:'center', position:'relative' },
+  iconLed:     { position:'absolute', bottom:5, right:5, width:7, height:7, borderRadius:3.5, opacity:0.9 },
+  sectionLabel:{ fontSize:8.5, fontWeight:'700', fontFamily:MONO, letterSpacing:2 },
+  pcName:      { fontSize:14, fontWeight:'900', fontFamily:MONO, color:'#FFFFFF', letterSpacing:0.5 },
+  connDetail:  { fontSize:9.5, fontFamily:MONO },
+  statusPill:  { borderWidth:1.5, borderRadius:8, paddingHorizontal:8, paddingVertical:5, flexShrink:0 },
+  statusTxt:   { fontSize:9.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.2 },
+  ringsRow:    { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.10)', paddingVertical:10, paddingHorizontal:4 },
+  ringWrap:    { flex:1, alignItems:'center', gap:5, paddingHorizontal:4 },
   bottomRow:   { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.10)' },
-  uptimeBox:   { paddingHorizontal:16, paddingVertical:10, gap:2 },
+  uptimeBox:   { paddingHorizontal:14, paddingVertical:8, gap:2 },
   uptimeLabel: { fontSize:8, fontWeight:'700', fontFamily:MONO, color:D.textDim, letterSpacing:1.5 },
-  ollamaStrip: { flex:1, flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:16, paddingVertical:9 },
-  ollamaTxt:   { fontSize:10, fontWeight:'700', fontFamily:MONO, letterSpacing:1 },
+  ollamaStrip: { flex:1, flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingVertical:8 },
+  ollamaTxt:   { fontSize:9.5, fontWeight:'700', fontFamily:MONO, letterSpacing:1 },
 });
 
 // ─── TERMINAL FEED CARD ───────────────────────────────────────────
@@ -985,7 +941,7 @@ const SPG_ROW_COLORS: Record<number, string[]> = {
 };
 
 function SecurityProtocolsGrid({ isConnected, canaryStatus }: { isConnected: boolean; canaryStatus: { deployed: number; allIntact: boolean } | null }) {
-  const CELL_W = (SW - 32 - 2) / 3;
+  const CELL_W = (SW - 28 - 2) / 3;
   const rows = [0, 1];
 
   return (
@@ -1022,9 +978,9 @@ function SecurityProtocolsGrid({ isConnected, canaryStatus }: { isConnected: boo
                 return (
                   <View key={i} style={[spg.cell, { width: CELL_W }, i < rowItems.length-1 && spg.cellDividerRight]}>
                     <View style={[spg.iconBadge, { backgroundColor: item.iconBg }]}>
-                      <Icon name={item.icon as any} size={34} color={item.iconColor} />
-                      <View style={[spg.corner, { top:6, left:6, borderTopWidth:1.5, borderLeftWidth:1.5, borderColor:item.col+'60' }]} />
-                      <View style={[spg.corner, { bottom:6, right:6, borderBottomWidth:1.5, borderRightWidth:1.5, borderColor:item.col+'60' }]} />
+                      <Icon name={item.icon as any} size={22} color={item.iconColor} />
+                      <View style={[spg.corner, { top:4, left:4, borderTopWidth:1.5, borderLeftWidth:1.5, borderColor:item.col+'60' }]} />
+                      <View style={[spg.corner, { bottom:4, right:4, borderBottomWidth:1.5, borderRightWidth:1.5, borderColor:item.col+'60' }]} />
                     </View>
                     <Text style={[spg.cellLabel, { color: item.col }]}>{item.label}</Text>
                   </View>
@@ -1044,19 +1000,19 @@ function SecurityProtocolsGrid({ isConnected, canaryStatus }: { isConnected: boo
   );
 }
 const spg = StyleSheet.create({
-  outerCard:       { marginHorizontal:0, backgroundColor:'#030C16', borderWidth:1.5, borderColor:'#00E5FF28', borderRadius:0, overflow:'hidden' },
-  header:          { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingTop:14, paddingBottom:12, borderBottomWidth:StyleSheet.hairlineWidth, borderBottomColor:'#00E5FF20' },
-  headerDot:       { width:10, height:10, borderRadius:5, backgroundColor:'#00E5FF', shadowColor:'#00E5FF', shadowRadius:6, shadowOpacity:0.9, shadowOffset:{width:0,height:0} },
-  headerTitle:     { fontSize:14, fontWeight:'900', color:'#00E5FF', fontFamily:MONO, letterSpacing:1.2 },
-  headerSub:       { fontSize:9, fontWeight:'700', color:'#00E5FF99', fontFamily:MONO, letterSpacing:0.8, marginTop:1 },
-  row:             { flexDirection:'row', backgroundColor:'#030C16' },
-  cell:            { paddingVertical:22, paddingHorizontal:8, alignItems:'center', gap:12, backgroundColor:'#030C16' },
+  outerCard:       { marginHorizontal:0, backgroundColor:'#02070D', borderWidth:1, borderColor:'#00E5FF28', borderRadius:14, overflow:'hidden' },
+  header:          { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:12, paddingTop:12, paddingBottom:10, borderBottomWidth:StyleSheet.hairlineWidth, borderBottomColor:'#00E5FF20' },
+  headerDot:       { width:9, height:9, borderRadius:4.5, backgroundColor:'#00E5FF', shadowColor:'#00E5FF', shadowRadius:6, shadowOpacity:0.9, shadowOffset:{width:0,height:0} },
+  headerTitle:     { fontSize:13, fontWeight:'900', color:'#00E5FF', fontFamily:MONO, letterSpacing:1.2 },
+  headerSub:       { fontSize:8.5, fontWeight:'700', color:'#00E5FF99', fontFamily:MONO, letterSpacing:0.8, marginTop:1 },
+  row:             { flexDirection:'row', backgroundColor:'#02070D' },
+  cell:            { paddingVertical:12, paddingHorizontal:6, alignItems:'center', gap:8, backgroundColor:'#02070D' },
   cellDividerRight:{ borderRightWidth:StyleSheet.hairlineWidth, borderRightColor:'#00E5FF18' },
-  iconBadge:       { width:76, height:76, borderRadius:18, alignItems:'center', justifyContent:'center', position:'relative' },
-  corner:          { position:'absolute', width:10, height:10 },
-  cellLabel:       { fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:0.6, textAlign:'center', lineHeight:15 },
-  footer:          { borderTopWidth:StyleSheet.hairlineWidth, borderTopColor:'#00E5FF18', paddingVertical:10, paddingHorizontal:14, backgroundColor:'#020A12' },
-  footerTxt:       { fontSize:10, color:'#3A6070', fontFamily:MONO, textAlign:'center', lineHeight:16, letterSpacing:0.3 },
+  iconBadge:       { width:52, height:52, borderRadius:13, alignItems:'center', justifyContent:'center', position:'relative' },
+  corner:          { position:'absolute', width:8, height:8 },
+  cellLabel:       { fontSize:9.5, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5, textAlign:'center', lineHeight:13 },
+  footer:          { borderTopWidth:StyleSheet.hairlineWidth, borderTopColor:'#00E5FF18', paddingVertical:8, paddingHorizontal:12, backgroundColor:'#01050A' },
+  footerTxt:       { fontSize:9, color:'#3A6070', fontFamily:MONO, textAlign:'center', lineHeight:14, letterSpacing:0.3 },
 });
 
 // ─── QUICK ACCESS GRID ────────────────────────────────────────────
@@ -1068,28 +1024,33 @@ const QUICK_ITEMS = [
 ];
 
 function QuickAccessGrid({ goToTab }: { goToTab: (t: string) => void }) {
-  const ITEM_W = (SW - 32 - 8) / 2;
+  const ITEM_W = (SW - 28 - 8) / 2;
   return (
     <View>
       <SectionDivider label="QUICK ACCESS" color={D.cyan} />
-      <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginTop:10 }}>
+      <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginTop:8 }}>
         {QUICK_ITEMS.map((item, i) => {
           const Icon = item.lib === 'community' ? MaterialCommunityIcons : MaterialIcons;
           return (
-            <TouchableOpacity key={i} onPress={() => { haptics.light(); goToTab(item.tab); }} activeOpacity={0.8}
-              style={{ width:ITEM_W, backgroundColor:D.surface, borderRadius:14, borderWidth:1.5, borderColor:item.lCol+'30', overflow:'hidden', padding:14,
-                ...(Platform.OS==='ios'?{shadowColor:item.lCol, shadowOffset:{width:0,height:0}, shadowOpacity:0.12, shadowRadius:10}:{elevation:3}) }}>
-              <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
-                <View style={{ width:38, height:38, borderRadius:10, backgroundColor:item.lCol+'18', alignItems:'center', justifyContent:'center', borderWidth:1, borderColor:item.lCol+'30' }}>
-                  <Icon name={item.icon as any} size={20} color={item.lCol} />
+            <TouchableOpacity key={i} testID={`quick-access-${item.tab}`} onPress={() => { haptics.light(); goToTab(item.tab); }} activeOpacity={0.8}
+              style={{ width:ITEM_W, backgroundColor:D.surface, borderRadius:12, borderWidth:1, borderColor:item.lCol+'38', overflow:'hidden', padding:11,
+                ...(Platform.OS==='ios'?{shadowColor:item.lCol, shadowOffset:{width:0,height:5}, shadowOpacity:0.16, shadowRadius:10}:{elevation:4}) }}>
+              {/* 3D bevel edges + chamfer corners */}
+              <View pointerEvents="none" style={{ position:'absolute', top:0, left:0, right:0, height:1, backgroundColor:'rgba(255,255,255,0.08)' }} />
+              <View pointerEvents="none" style={{ position:'absolute', bottom:0, left:0, right:0, height:1.5, backgroundColor:'rgba(0,0,0,0.65)' }} />
+              <View pointerEvents="none" style={{ position:'absolute', top:0, left:0, width:11, height:11, borderTopWidth:1.5, borderLeftWidth:1.5, borderColor:item.lCol+'66' }} />
+              <View pointerEvents="none" style={{ position:'absolute', bottom:0, right:0, width:11, height:11, borderBottomWidth:1.5, borderRightWidth:1.5, borderColor:item.lCol+'66' }} />
+              <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+                <View style={{ width:32, height:32, borderRadius:9, backgroundColor:item.lCol+'16', alignItems:'center', justifyContent:'center', borderWidth:1, borderColor:item.lCol+'40' }}>
+                  <Icon name={item.icon as any} size={17} color={item.lCol} />
                 </View>
-                <View style={{ borderWidth:1, borderRadius:8, borderColor:item.tagCol+'50', backgroundColor:item.tagCol+'12', paddingHorizontal:6, paddingVertical:2 }}>
+                <View style={{ borderWidth:1, borderRadius:7, borderColor:item.tagCol+'50', backgroundColor:item.tagCol+'12', paddingHorizontal:5, paddingVertical:2 }}>
                   <Text style={{ fontSize:7, fontWeight:'900', fontFamily:MONO, color:item.tagCol, letterSpacing:0.5 }}>{item.tag}</Text>
                 </View>
               </View>
-              <Text style={{ fontSize:13, fontWeight:'900', fontFamily:MONO, color:D.text, marginBottom:3 }}>{item.label}</Text>
-              <Text style={{ fontSize:10, fontFamily:MONO, color:D.textMid, lineHeight:14 }}>{item.desc}</Text>
-              <View style={{ marginTop:8, height:2, borderRadius:1, backgroundColor:item.lCol+'30' }}>
+              <Text style={{ fontSize:12, fontWeight:'900', fontFamily:MONO, color:D.text, marginBottom:2 }}>{item.label}</Text>
+              <Text style={{ fontSize:9, fontFamily:MONO, color:D.textMid, lineHeight:13 }} numberOfLines={1}>{item.desc}</Text>
+              <View style={{ marginTop:7, height:2, borderRadius:1, backgroundColor:item.lCol+'28' }}>
                 <View style={{ height:'100%', width:'60%', borderRadius:1, backgroundColor:item.lCol }} />
               </View>
             </TouchableOpacity>
@@ -1438,6 +1399,39 @@ function SigmaNetCrawlerHomeCard({ isConnected }: { isConnected:boolean }) {
   );
 }
 
+// ─── FULL-PAGE BACKDROP (pure black + circuit grid + drifting scan beam) ──
+function HomeBackdrop() {
+  const beam = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(beam, { toValue: 1, duration: 7000, useNativeDriver: true }),
+      Animated.delay(1200),
+      Animated.timing(beam, { toValue: 0, duration: 0, useNativeDriver: true }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, []);
+  const { height: SH } = Dimensions.get('window');
+  const beamY = beam.interpolate({ inputRange: [0, 1], outputRange: [-40, SH + 40] });
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      {/* ambient orbs */}
+      <View style={{ position:'absolute', top:-120, right:-100, width:300, height:300, borderRadius:150, backgroundColor:D.cyan, opacity:0.045 }} />
+      <View style={{ position:'absolute', bottom:-140, left:-110, width:320, height:320, borderRadius:160, backgroundColor:D.purple, opacity:0.04 }} />
+      {/* vertical circuit grid */}
+      {[10, 26, 42, 58, 74, 90].map((p, i) => (
+        <View key={`v${i}`} style={{ position:'absolute', top:0, bottom:0, left:`${p}%` as any, width:StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.035)' }} />
+      ))}
+      {/* horizontal scanlines */}
+      {Array.from({ length: 14 }).map((_, i) => (
+        <View key={`h${i}`} style={{ position:'absolute', left:0, right:0, top:`${(i + 1) * 7}%` as any, height:StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.022)' }} />
+      ))}
+      {/* drifting scan beam */}
+      <Animated.View style={{ position:'absolute', left:0, right:0, height:90, opacity:0.05, backgroundColor:D.cyan, transform:[{ translateY: beamY }] }} />
+    </View>
+  );
+}
+
 // ─── MAIN HOME SCREEN ─────────────────────────────────────────────
 export default function NexusHomeScreen() {
   const cosmetic = useCosmetic();
@@ -1603,8 +1597,10 @@ export default function NexusHomeScreen() {
   const goToTab = (tab: string) => { haptics.light(); (global as any).__butlerSwitchTab?.(tab); };
 
   return (
-    <ScrollView ref={scrollRef} style={s.root} contentContainerStyle={s.content}
-      showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+    <View style={s.root}>
+      <HomeBackdrop />
+      <ScrollView ref={scrollRef} style={s.scroll} contentContainerStyle={s.content}
+        showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
       <NexusQRModal visible={showQR} onClose={() => setShowQR(false)}
         onConnect={(ip, port) => { setIsConnected(true); setServerAddr(`${ip}:${port}`); }} />
 
@@ -1665,24 +1661,40 @@ export default function NexusHomeScreen() {
               return <TerminalFeedCard key={card.id} isConnected={isConnected} liveTermLogs={liveTermLogs} />;
             case 'crawlers_graph':
               return <CrawlersGraphCard key={card.id} isConnected={isConnected} kbFindings={kbFindings} />;
+            case 'kb_graph':
             case 'knowledgebank_graph':
               return <KnowledgebankGraphCard key={card.id} isConnected={isConnected} kbFindings={kbFindings} />;
             case 'scripts_graph':
               return <ScriptsGraphCard key={card.id} isConnected={isConnected} goToTab={goToTab} />;
             case 'smart_alerts':
               return <SmartAlertsHomeCard key={card.id} isConnected={isConnected} metrics={metrics} />;
+            case 'security_grid':
             case 'security_protocols':
               return <SecurityProtocolsGrid key={card.id} isConnected={isConnected} canaryStatus={canaryStatus} />;
             case 'quick_access':
               return <QuickAccessGrid key={card.id} goToTab={goToTab} />;
+            case 'kb_articles':
             case 'kb_articles_feed':
               return <KBArticlesFeed key={card.id} goToTab={goToTab} isConnected={isConnected} />;
             case 'recent_activity':
               return <RecentActivity key={card.id} goToTab={goToTab} />;
             case 'server_setup':
               return <ServerSetupSection key={card.id} onScanQR={() => setShowQR(true)} isConnected={isConnected} />;
+            case 'sigma_net':
             case 'sigma_net_crawler':
               return <SigmaNetCrawlerHomeCard key={card.id} isConnected={isConnected} />;
+            case 'omega_loop': {
+              if (!isConnected) return null;
+              try {
+                return (
+                  <OmegaLearningLoop key={card.id}
+                    serverIp={serverConnection.getIP()}
+                    serverPort={serverConnection.getPort()}
+                    token={serverConnection.getToken()}
+                    compact />
+                );
+              } catch { return null; }
+            }
             default:
               return null;
           }
@@ -1705,14 +1717,16 @@ export default function NexusHomeScreen() {
       )}
 
       <InlineWidgetSlot pageId="home" position="inline-bottom" />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 // ─── BASE STYLES ──────────────────────────────────────────────────
 const s = StyleSheet.create({
   root:    { flex:1, backgroundColor:D.bg },
-  content: { paddingHorizontal:16, paddingTop:56, paddingBottom:40, gap:14 },
+  scroll:  { flex:1, backgroundColor:'transparent' },
+  content: { paddingHorizontal:14, paddingTop:46, paddingBottom:158, gap:10 },
 });
 
 const pvb = StyleSheet.create({
