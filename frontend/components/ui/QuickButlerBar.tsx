@@ -82,19 +82,15 @@ export default function QuickButlerBar() {
             shadowColor: '#00E5FF',
             shadowOffset: { width: 0, height: 0 },
             shadowOpacity,
-            shadowRadius: 12,
-            elevation: 8,
+            shadowRadius: 10,
+            elevation: 6,
           },
         ]}
       >
-        <TouchableOpacity
-          testID="quickbar-mascot"
-          activeOpacity={0.7}
-          onPress={handleTapBar}
-          style={styles.avatar}
-        >
-          <MaterialCommunityIcons name="robot-happy" size={18} color="#00E5FF" />
-        </TouchableOpacity>
+        {/* Left status LED — replaces the robot avatar with a discrete cyan dot */}
+        <View style={styles.led}>
+          <View style={styles.ledInner} />
+        </View>
 
         <TextInput
           ref={inputRef}
@@ -124,7 +120,7 @@ export default function QuickButlerBar() {
         >
           <MaterialCommunityIcons
             name={text.trim().length > 0 ? 'send' : 'arrow-right'}
-            size={15}
+            size={13}
             color={text.trim().length > 0 ? '#001018' : '#00E5FF'}
           />
         </TouchableOpacity>
@@ -136,39 +132,46 @@ export default function QuickButlerBar() {
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    left: 8,
-    right: 8,
-    bottom: Platform.OS === 'ios' ? 96 : 74,
+    left: 12,
+    right: 12,
+    bottom: Platform.OS === 'ios' ? 96 : 76,
     zIndex: 50,
   },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    backgroundColor: 'rgba(6,13,18,0.92)',
-    backdropFilter: 'blur(8px)' as any,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 18,
+    borderWidth: 1,
+    backgroundColor: '#060D18',
   },
-  avatar: {
-    width: 32, height: 32, borderRadius: 16,
-    borderWidth: 1.5, borderColor: 'rgba(0,229,255,0.45)',
-    backgroundColor: 'rgba(0,229,255,0.10)',
+  led: {
+    width: 14, height: 14, borderRadius: 7,
     alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(0,229,255,0.15)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(0,229,255,0.45)',
+  },
+  ledInner: {
+    width: 6, height: 6, borderRadius: 3,
+    backgroundColor: '#00E5FF',
+    ...(Platform.OS === 'ios'
+      ? { shadowColor: '#00E5FF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 4 }
+      : {}),
   },
   input: {
     flex: 1,
     color: '#D7F6FF',
-    fontSize: 14,
+    fontSize: 12.5,
     fontWeight: '600',
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 2,
   },
   sendBtn: {
-    width: 32, height: 32, borderRadius: 16,
-    borderWidth: 1.5,
+    width: 26, height: 26, borderRadius: 13,
+    borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },
 });

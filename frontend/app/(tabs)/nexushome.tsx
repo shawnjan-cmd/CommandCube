@@ -331,99 +331,188 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
   isConnected: boolean; serverAddr: string; onScanQR: () => void;
   kbFindings: number; scriptCount: number;
 }) {
-  const shimmer = useRef(new Animated.Value(0)).current;
-  const pulse   = useRef(new Animated.Value(0.4)).current;
+  const shieldPulse = useRef(new Animated.Value(0)).current;
+  const sweep       = useRef(new Animated.Value(0)).current;
+  const orbitAnim   = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(Animated.sequence([
-      Animated.timing(pulse, { toValue:1, duration:1200, useNativeDriver:true }),
-      Animated.timing(pulse, { toValue:0.2, duration:1200, useNativeDriver:true }),
+      Animated.timing(shieldPulse, { toValue: 1, duration: 1800, useNativeDriver: true }),
+      Animated.timing(shieldPulse, { toValue: 0, duration: 1800, useNativeDriver: true }),
     ])).start();
-    Animated.loop(Animated.sequence([
-      Animated.timing(shimmer, { toValue:1, duration:3000, useNativeDriver:true }),
-      Animated.timing(shimmer, { toValue:0, duration:3000, useNativeDriver:true }),
-    ])).start();
+    Animated.loop(Animated.timing(sweep, { toValue: 1, duration: 4200, useNativeDriver: true })).start();
+    Animated.loop(Animated.timing(orbitAnim, { toValue: 1, duration: 11000, useNativeDriver: true })).start();
   }, []);
 
-  const kbDisplay     = kbFindings > 0 ? (kbFindings > 1000000 ? `${(kbFindings/1000000).toFixed(1)}M` : kbFindings > 1000 ? `${(kbFindings/1000).toFixed(1)}K` : String(kbFindings)) : '--';
-  const scriptDisplay = scriptCount > 0 ? String(scriptCount) : '--';
+  const sweepTranslate = sweep.interpolate({ inputRange: [0, 1], outputRange: [-220, 360] });
+  const orbitRotate    = orbitAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const shieldHalo     = shieldPulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.95] });
+
+  const kbDisplay     = kbFindings > 0 ? (kbFindings > 1000000 ? `${(kbFindings/1000000).toFixed(1)}M` : kbFindings > 1000 ? `${(kbFindings/1000).toFixed(1)}K` : String(kbFindings)) : '—';
+  const scriptDisplay = scriptCount > 0 ? String(scriptCount) : '—';
 
   const stats = [
-    { val: kbDisplay,     lbl:'VECTORS\nINDEXED',  col: D.cyan   },
-    { val: scriptDisplay, lbl:'SCRIPTS\nFORGED',   col: D.teal   },
-    { val: isConnected ? 'LIVE' : 'LOCAL', lbl:'AI\nMODE', col: D.green  },
-    { val: 'LOCAL',       lbl:'RUNTIME\nMODE',     col: D.amber  },
+    { val: kbDisplay,                       lbl: 'VECTORS',  col: D.cyan },
+    { val: scriptDisplay,                   lbl: 'SCRIPTS',  col: D.teal },
+    { val: isConnected ? 'LIVE' : 'IDLE',   lbl: 'STATUS',   col: isConnected ? D.green : D.amber },
+    { val: 'LOCAL',                         lbl: 'RUNTIME',  col: D.purple },
   ];
 
   return (
     <View style={hero.wrap}>
+      {/* Layered backdrop — radial blue → black, scan grid, color spots */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        {[10,20,30,40,50,60,70,80,90].map((p,i) => (
-          <View key={`h${i}`} style={{ position:'absolute', left:0, right:0, top:`${p}%` as any, height:StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.04)' }} />
+        <View style={hero.bgFill} />
+        <View style={hero.bgBlueOrb} />
+        <View style={hero.bgCyanOrb} />
+        <View style={hero.bgPurpleOrb} />
+        {[8, 22, 36, 50, 64, 78, 92].map((p, i) => (
+          <View key={`gh${i}`} style={[hero.gridH, { top: `${p}%` as any }]} />
         ))}
-        {[16,33,50,66,83].map((p,i) => (
-          <View key={`v${i}`} style={{ position:'absolute', top:0, bottom:0, left:`${p}%` as any, width:StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.03)' }} />
+        {[12, 28, 44, 60, 76].map((p, i) => (
+          <View key={`gv${i}`} style={[hero.gridV, { left: `${p}%` as any }]} />
         ))}
-        <View style={{ position:'absolute', top:-70, left:-70, width:240, height:240, borderRadius:120, backgroundColor:D.purple, opacity:0.14 }} />
-        <View style={{ position:'absolute', top:-50, right:-60, width:220, height:220, borderRadius:110, backgroundColor:D.cyan, opacity:0.10 }} />
-        <View style={{ position:'absolute', bottom:-90, left:'25%' as any, width:260, height:260, borderRadius:130, backgroundColor:D.amber, opacity:0.08 }} />
+        {/* Diagonal sweep */}
+        <Animated.View style={[hero.sweep, { transform: [{ translateX: sweepTranslate }] }]} />
       </View>
 
-      <HudCorners color={D.cyan} size={22} thickness={2} />
-      <View style={{ position:'absolute', top:0, right:0, width:22, height:22, borderTopWidth:2, borderRightWidth:2, borderColor:D.purple }} />
-      <View style={{ position:'absolute', bottom:0, left:0, width:22, height:22, borderBottomWidth:2, borderLeftWidth:2, borderColor:D.amber }} />
-      <View style={{ position:'absolute', bottom:0, right:0, width:22, height:22, borderBottomWidth:2, borderRightWidth:2, borderColor:D.green }} />
+      {/* HUD frame */}
+      <HudCorners color={D.cyan} size={26} thickness={2} />
+      <View style={[hero.cornerTR, { borderColor: D.purple + 'CC' }]} />
+      <View style={[hero.cornerBL, { borderColor: D.amber + 'CC' }]} />
+      <View style={[hero.cornerBR, { borderColor: D.green + 'CC' }]} />
 
-      <View style={{ flexDirection:'row', alignItems:'center', gap:8, alignSelf:'center', marginBottom:12, flexWrap:'wrap', justifyContent:'center' }}>
-        <View style={[hero.pill, { borderColor:(isConnected ? D.green : D.red)+'50', backgroundColor:(isConnected ? D.green : D.red)+'0C' }]}>
+      {/* Connection / mode pills (top row) */}
+      <View style={hero.pillRow}>
+        <View style={[hero.pill, { borderColor: (isConnected ? D.green : D.red) + '70', backgroundColor: (isConnected ? D.green : D.red) + '14' }]}>
           <PulseDot color={isConnected ? D.green : D.red} size={6} />
-          <Text style={[hero.pillTxt, { color:isConnected ? D.green : D.red }]}>{isConnected ? '✦ PC LINKED' : '◈ LOCAL MODE'}</Text>
+          <Text style={[hero.pillTxt, { color: isConnected ? D.green : D.red }]}>
+            {isConnected ? 'PC LINKED' : 'LOCAL MODE'}
+          </Text>
         </View>
-        <View style={[hero.pill, { borderColor:D.purple+'40', backgroundColor:D.purple+'08' }]}>
-          <Text style={[hero.pillTxt, { color:D.purple }]}>OLLAMA LOCAL</Text>
+        <View style={[hero.pill, { borderColor: D.purple + '60', backgroundColor: D.purple + '12' }]}>
+          <MaterialCommunityIcons name="brain" size={9} color={D.purple} />
+          <Text style={[hero.pillTxt, { color: D.purple }]}>OLLAMA LOCAL</Text>
         </View>
-        <View style={[hero.pill, { borderColor:D.cyan+'30', backgroundColor:D.cyan+'06' }]}>
-          <Text style={[hero.pillTxt, { color:D.cyan }]}>v21.0.0</Text>
+        <View style={[hero.pill, { borderColor: D.cyan + '60', backgroundColor: D.cyan + '0E' }]}>
+          <Text style={[hero.pillTxt, { color: D.cyan }]}>v21.0.0</Text>
         </View>
       </View>
 
-      <Text style={hero.brand}>BUTLER AI</Text>
-      <Text style={hero.sub}>NEXUS COMMAND CENTER</Text>
+      {/* Mascot centerpiece */}
+      <View style={hero.mascotWrap}>
+        {/* Animated orbit ring */}
+        <Animated.View style={[hero.orbit, { transform: [{ rotate: orbitRotate }] }]} pointerEvents="none">
+          <View style={[hero.orbitDot, { backgroundColor: D.cyan,   shadowColor: D.cyan,   top:  -3, left: '50%' }]} />
+          <View style={[hero.orbitDot, { backgroundColor: D.purple, shadowColor: D.purple, bottom: -3, left: '50%' }]} />
+          <View style={[hero.orbitDot, { backgroundColor: D.amber,  shadowColor: D.amber,  top: '50%', left: -3 }]} />
+          <View style={[hero.orbitDot, { backgroundColor: D.green,  shadowColor: D.green,  top: '50%', right: -3 }]} />
+        </Animated.View>
+        {/* Soft pulsing halo behind the shield */}
+        <Animated.View style={[hero.halo, { opacity: shieldHalo }]} />
+        {/* The shield mascot */}
+        <ExpoImage
+          source={require('@/assets/butler-ai-shield-hero.jpg')}
+          style={hero.mascot}
+          contentFit="contain"
+          transition={400}
+        />
+      </View>
 
+      {/* Wordmark + tagline */}
+      <Text style={hero.brand}>BUTLER AI</Text>
+      <View style={hero.subRow}>
+        <View style={[hero.bullet, { backgroundColor: D.cyan }]} />
+        <Text style={hero.sub}>NEXUS COMMAND CENTER</Text>
+        <View style={[hero.bullet, { backgroundColor: D.cyan }]} />
+      </View>
+
+      {/* Stats grid */}
       <View style={hero.statsRow}>
         {stats.map((st, i) => (
-          <View key={i} style={hero.statCell}>
-            <Text style={[hero.statVal, { color: st.col }, Platform.OS==='ios' ? { textShadowColor:st.col, textShadowOffset:{width:0,height:0}, textShadowRadius:10 } : {}]}>
+          <View key={i} style={[hero.statCell, i < stats.length - 1 && { borderRightWidth: 1, borderRightColor: 'rgba(0,229,255,0.10)' }]}>
+            <Text
+              style={[
+                hero.statVal,
+                { color: st.col },
+                Platform.OS === 'ios' ? { textShadowColor: st.col, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 } : {},
+              ]}
+            >
               {st.val}
             </Text>
-            <Text style={[hero.statLbl, { color: st.col+'80' }]}>{st.lbl}</Text>
+            <Text style={[hero.statLbl, { color: st.col + 'A8' }]}>{st.lbl}</Text>
           </View>
         ))}
       </View>
 
-      <TouchableOpacity onPress={() => { haptics.medium(); onScanQR(); }} style={hero.qrBtn} activeOpacity={0.8}>
-        <MaterialIcons name="qr-code-scanner" size={18} color={D.bg} />
+      {/* Primary CTA */}
+      <TouchableOpacity
+        testID="hero-scan-qr"
+        onPress={() => { haptics.medium(); onScanQR(); }}
+        style={hero.qrBtn}
+        activeOpacity={0.85}
+      >
+        <MaterialIcons name="qr-code-scanner" size={20} color={D.bg} />
         <Text style={hero.qrTxt}>{isConnected ? 'RE-PAIR PC' : 'SCAN QR TO PAIR'}</Text>
+        <MaterialCommunityIcons name="chevron-right" size={20} color={D.bg} />
       </TouchableOpacity>
     </View>
   );
 }
 
 const hero = StyleSheet.create({
-  wrap:     { backgroundColor:D.surface, borderRadius:20, borderWidth:1.5, borderColor:D.cyan+'30', overflow:'hidden', padding:20, position:'relative',
-              ...(Platform.OS==='ios' ? { shadowColor:D.cyan, shadowOffset:{width:0,height:0}, shadowOpacity:0.18, shadowRadius:24 } : { elevation:8 }) },
-  pill:     { flexDirection:'row', alignItems:'center', gap:5, borderWidth:1, borderRadius:20, paddingHorizontal:10, paddingVertical:4 },
-  pillTxt:  { fontSize:9, fontWeight:'900', fontFamily:MONO, letterSpacing:1 },
-  brand:    { fontSize:34, fontWeight:'900', fontFamily:MONO, color:'#FFFFFF', letterSpacing:6, textAlign:'center', lineHeight:38,
-              ...(Platform.OS==='ios' ? { textShadowColor:D.cyan, textShadowOffset:{width:0,height:0}, textShadowRadius:14 } : {}) },
-  sub:      { fontSize:10, fontWeight:'700', fontFamily:MONO, color:D.cyan+'80', letterSpacing:4, textAlign:'center', marginBottom:20, marginTop:2 },
-  statsRow: { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.12)', marginTop:4, marginHorizontal:-20, paddingHorizontal:4 },
-  statCell: { flex:1, alignItems:'center', paddingVertical:14, gap:4 },
-  statVal:  { fontSize:22, fontWeight:'900', fontFamily:MONO, lineHeight:24 },
-  statLbl:  { fontSize:7, fontWeight:'700', fontFamily:MONO, letterSpacing:0.5, textAlign:'center', lineHeight:10 },
-  qrBtn:    { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:8, marginTop:14, marginHorizontal:-20, paddingVertical:12,
-              backgroundColor:D.cyan, borderBottomLeftRadius:18, borderBottomRightRadius:18 },
-  qrTxt:    { fontSize:13, fontWeight:'900', fontFamily:MONO, color:D.bg, letterSpacing:1.5 },
+  wrap: {
+    backgroundColor: '#020812',
+    borderRadius: 22,
+    borderWidth: 1.5,
+    borderColor: D.cyan + '38',
+    overflow: 'hidden',
+    paddingTop: 18,
+    paddingHorizontal: 18,
+    paddingBottom: 0,
+    position: 'relative',
+    minHeight: 470,
+    ...(Platform.OS === 'ios'
+      ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.28, shadowRadius: 28 }
+      : { elevation: 10 }),
+  },
+  bgFill:      { ...StyleSheet.absoluteFillObject, backgroundColor: '#020812' },
+  bgBlueOrb:   { position: 'absolute', top: -80,  left: -80,  width: 260, height: 260, borderRadius: 130, backgroundColor: '#5B9CF6', opacity: 0.18 },
+  bgCyanOrb:   { position: 'absolute', top: 40,   right: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: D.cyan,    opacity: 0.16 },
+  bgPurpleOrb: { position: 'absolute', bottom: -100, left: '15%' as any, width: 240, height: 240, borderRadius: 120, backgroundColor: D.purple, opacity: 0.14 },
+  gridH:       { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.06)' },
+  gridV:       { position: 'absolute', top: 0, bottom: 0, width: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.05)' },
+  sweep:       { position: 'absolute', top: 0, bottom: 0, width: 160, backgroundColor: D.cyan, opacity: 0.05, transform: [{ skewX: '-18deg' }] },
+
+  cornerTR: { position: 'absolute', top: 0, right: 0, width: 26, height: 26, borderTopWidth: 2, borderRightWidth: 2 },
+  cornerBL: { position: 'absolute', bottom: 90, left: 0, width: 26, height: 26, borderBottomWidth: 2, borderLeftWidth: 2 },
+  cornerBR: { position: 'absolute', bottom: 90, right: 0, width: 26, height: 26, borderBottomWidth: 2, borderRightWidth: 2 },
+
+  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignSelf: 'center', justifyContent: 'center', marginBottom: 14 },
+  pill:    { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 22, paddingHorizontal: 10, paddingVertical: 4 },
+  pillTxt: { fontSize: 9.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
+
+  mascotWrap: { alignItems: 'center', justifyContent: 'center', height: 200, marginBottom: 4, position: 'relative' },
+  halo:       { position: 'absolute', width: 220, height: 220, borderRadius: 110, backgroundColor: D.cyan, opacity: 0.30, ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 50 } : {}) },
+  orbit:      { position: 'absolute', width: 200, height: 200, borderRadius: 100, borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '35' },
+  orbitDot:   { position: 'absolute', width: 6, height: 6, borderRadius: 3, marginLeft: -3, marginTop: -3, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 6 },
+  mascot:     { width: 190, height: 190, borderRadius: 16 },
+
+  brand: { fontSize: 30, fontWeight: '900', fontFamily: MONO, color: '#E8F8FF', letterSpacing: 7, textAlign: 'center', lineHeight: 36,
+           ...(Platform.OS === 'ios' ? { textShadowColor: D.cyan, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16 } : {}) },
+  subRow:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4, marginBottom: 18 },
+  sub:     { fontSize: 10, fontWeight: '800', fontFamily: MONO, color: D.cyan + 'BB', letterSpacing: 4 },
+  bullet:  { width: 4, height: 4, borderRadius: 2 },
+
+  statsRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: 'rgba(0,229,255,0.18)', marginHorizontal: -18 },
+  statCell: { flex: 1, alignItems: 'center', paddingVertical: 14, gap: 4 },
+  statVal:  { fontSize: 22, fontWeight: '900', fontFamily: MONO, lineHeight: 24 },
+  statLbl:  { fontSize: 8, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center', lineHeight: 10 },
+
+  qrBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+           marginHorizontal: -18, paddingVertical: 14, backgroundColor: D.cyan,
+           borderBottomLeftRadius: 20, borderBottomRightRadius: 20 },
+  qrTxt: { fontSize: 14, fontWeight: '900', fontFamily: MONO, color: D.bg, letterSpacing: 2 },
 });
 
 // ─── CONNECTED PC CARD — upgraded with ring gauges + sparklines ───
@@ -1322,7 +1411,10 @@ export default function NexusHomeScreen() {
   const [diskHistory, setDiskHistory]   = useState<number[]>([]);
 
   useEffect(() => {
-    AsyncStorage.getItem(PRIVACY_KEY).then(v => { if (!v) setShowPrivacy(true); }).catch(() => {});
+    // Privacy banner is intentionally not auto-shown anymore — users already
+    // see the full privacy disclosure during onboarding (10 screens). Keeping
+    // the dismiss flag write logic intact for any code path that re-opens it.
+    AsyncStorage.setItem(PRIVACY_KEY,'1').catch(() => {});
     uiConfig.load().then(c => setUiCfg(c)).catch(() => {});
   }, []);
 
