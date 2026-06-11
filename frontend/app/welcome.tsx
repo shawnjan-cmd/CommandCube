@@ -1066,7 +1066,7 @@ function Screen9Download({ onNext, onBack }: { onNext: () => void; onBack: () =>
             </Text>
             <TouchableOpacity
               activeOpacity={0.82}
-              onPress={() => { safeHaptics.medium(); Linking.openURL('https://github.com/shawnjan-cmd/CommandCube').catch(() => {}); }}
+              onPress={() => { safeHaptics.medium(); Linking.openURL('https://github.com/shawnjan-cmd/butler-server').catch(() => {}); }}
               style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 14, paddingHorizontal: 20, borderRadius: 12, backgroundColor: C.amber }}
             >
               <MaterialIcons name="download" size={20} color="#000" />
@@ -1157,23 +1157,24 @@ function Screen10Ready({ onBack }: { onBack: () => void }) {
 
   const attemptNav = (): boolean => {
     if (navigatedRef.current) return true;
-    let fired = false;
-    try { const fn = (global as any).__setNeedsOnboarding; if (typeof fn === 'function') { fn(false); fired = true; } } catch {}
-    try { const fn = (global as any).__onboardingComplete;  if (typeof fn === 'function') { fn();      fired = true; } } catch {}
-    try { router.replace('/(tabs)/nexushome' as any); fired = true; } catch {}
-    try { router.replace('/main-menu' as any);        fired = true; } catch {}
-    try { router.navigate('/(tabs)/nexushome' as any); fired = true; } catch {}
-    try { router.replace('/(tabs)/nexushome' as any); fired = true; } catch {}
+    navigatedRef.current = true;
+
+    // 1. Persist the gate flag synchronously (best-effort) so a cold restart
+    //    during navigation still lands on the tabs.
+    AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
+
+    // 2. Flip the in-memory gate in _layout.tsx so it stops rendering <welcome />.
+    try { (global as any).__setNeedsOnboarding?.(false); } catch {}
+
+    // 3. Hand off to the tabs. ONE call, not five.
     try {
-      AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
-      Promise.resolve().then(() => {
-        try { (global as any).__setNeedsOnboarding?.(false); } catch {}
-        try { (global as any).__onboardingComplete?.();       } catch {}
-      });
-      fired = true;
-    } catch {}
-    if (fired) navigatedRef.current = true;
-    return fired;
+      router.replace('/(tabs)/nexushome' as any);
+    } catch (e) {
+      logger.warn('[Screen10] router.replace threw:', e);
+      // Last-ditch: let the _layout gate take over on the next render tick.
+      try { (global as any).__onboardingComplete?.(); } catch {}
+    }
+    return true;
   };
 
   const doLaunch = useCallback(async () => {

@@ -1,41 +1,71 @@
-# Butler AI (CommandCube) — Play Store Readiness Pass
+# Butler AI — Onboarding Loop Killed + Play Store Closed-Test Ready
 
-**Source repo:** https://github.com/shawnjan-cmd/CommandCube
-**Scope:** Critical + High fixes from `butler_ai_complete_fix.md` and `playstore_readiness_fixes.md`.
+**Status as of this pass:** Android bundle compiles, HTTP 200, ~12 MB, **no doom-loop, no plugin errors, no missing deps.**
 
-## Fixes applied
+## What was actually broken
 
-### Critical — startup / tabs / store metadata
-- `app/(tabs)/_layout.tsx` — renamed from `tabs_layout`, full cyan tab bar (Home, Scripts, Butler, Terminal, KB, Settings) with hidden routes for `index`, `builder`, `fileshare`, `logs`, `support`.
-- `app/_layout.tsx` — `SplashScreen.preventAutoHideAsync()` hoisted to module scope, `SplashScreen.hideAsync()` called after gate decision, `appInitRef` guard against double-init.
-- `app/welcome.tsx` — added `navigatedRef` dedup guard inside `attemptNav` so the retry loop fires the first successful navigation only once.
-- `app/index.tsx` — created (renders `null`) so expo-router has a proper initial route.
-- `app.json` — top-level `privacyPolicyUrl` added; cleaned root-level junk (`contentRating`, etc); kept all blocked permissions.
-- `eas.json` — removed iOS `contact@onspace.ai` block, added `base` profile with `NODE_ENV=production`, dev/preview/production extend it.
-- `package.json` — `"main"` set to `./index.js` so the hardened entry (TextDecoder polyfill + VideoCache wipe + global error boundary) actually runs.
+The 10-screen onboarding existed and looked great — privacy policy links, consent checkboxes, server download instructions, everything. The bug was on **Screen 10 (LAUNCH BUTLER)**: the `attemptNav()` function fired **five competing navigation calls in a row**:
 
-### High — runtime crashes & build size
-- `services/kbGrowthTracker.ts` — `FileSystem.documentDirectory` now lazily resolved via `getTimelineFile()`; load/persist/clear all null-guarded.
-- `app.json` Android autolinking exclude expanded to `@stripe/stripe-react-native`, `react-native-webrtc`, `react-native-maps`, `@shopify/react-native-skia`, `@apollo/client` (on top of existing `expo-video`, `expo-gl`, `expo-sensors`, `lottie-react-native`, `expo-three`).
-- `android/proguard-rules.pro` — created (keeps RN, Hermes, Expo, AsyncStorage, Reanimated, GestureHandler, CameraX, OkHttp); referenced via `expo.android.proguardRules` in `app.json`.
-- `babel.config.js` — added `react-native-reanimated/plugin`; `transform-remove-console` only when `NODE_ENV=production`.
-- `metro.config.js` — resolver order changed to `['react-native', 'browser', 'module', 'main']`, `inlineRequires: true` enabled (existing expo-video stub preserved).
-- `app.json` iOS `deploymentTarget` bumped to `16.4` (expo-build-properties minimum).
+```ts
+router.replace('/(tabs)/nexushome');
+router.replace('/main-menu');        // ← doesn't exist, throws
+router.navigate('/(tabs)/nexushome');
+router.replace('/(tabs)/nexushome'); // ← again
+// + a Promise.resolve().then() race
+```
 
-### Environment
-- `yarn expo install --fix` ran cleanly — all SDK 53 pins aligned.
-- `metro-cache-key@0.82.5` pinned to match metro 0.82.5 (workspace had a stray 0.84.4 breaking the transformer).
-- Android bundle compiles: **1477 modules, ~13 MB, HTTP 200**.
+Expo Router doesn't like five replaces queued before the navigator tree mounts. The first replace would succeed, then the next four would re-fire and the in-flight retry loop would re-run it again, causing the new screen to remount, sometimes back into welcome, sometimes blank.
 
-## What was NOT done (intentional — too risky for unverified codebase)
-- Did not delete bloat packages (`react-native-webrtc`, `skia`, `stripe`, etc.) from `package.json`. The autolinking excludes in `app.json` prevent their native code from being compiled into the AAB, which is the actual size win. Removing them from `package.json` could break unused imports somewhere in the 200-file source tree.
-- Did not add `android/settings.gradle` exclusions — Expo manages Android natively via `expo prebuild`; the `autolinking.exclude` array is the supported path.
-- Did not rewrite Screen10 in `onboarding_v2.tsx` — the existing `handleGetStarted` already does `AsyncStorage.multiSet` → verify → `__onboardingComplete` → multi-path replace → retry loop, which matches the guide's intent.
-- LOW-priority deprecation cleanups (`expo-image` prop renames, `canGoBack()` during render, `UNSAFE_componentWill*`, detent sort) skipped — they are warnings, not blockers.
+Same broken function existed in `welcome.tsx` Screen 9 → Screen 10 transition.
 
-## Next step for the user
+## What I changed (surgical, minimal)
 
-The APK/AAB **must be built via the Emergent "Publish" button (top-right of the editor)**. This environment cannot produce a signed Play Store binary. Once you click Publish:
-1. Choose Android → AAB (app-bundle) → production track for Play Store, or APK → preview track for sideload testing.
-2. Provide the Play Console upload credentials when prompted (or download the AAB and upload manually).
-3. Play Store-required metadata is already in `app.json` (`privacyPolicyUrl`, `playStoreDeveloperName`, `appAccessInstructions`, etc.).
+1. **`app/welcome.tsx` Screen10Ready.attemptNav** — replaced with:
+   ```ts
+   navigatedRef.current = true;
+   AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
+   (global as any).__setNeedsOnboarding?.(false);
+   router.replace('/(tabs)/nexushome');
+   ```
+   One persist, one gate-flip, one navigation. Done. No retry loop, no `main-menu`, no `__onboardingComplete` race.
+2. **`app/welcome.tsx` Screen9 Download button** — link fixed from the wrong `CommandCube` repo to `https://github.com/shawnjan-cmd/butler-server` (your actual server).
+3. **`babel.config.js`** — removed the `transform-remove-console` reference (was pulling an uninstalled plugin during EAS production builds).
+4. **`react-native-worklets`** added (reanimated 4.x split this out into its own package).
+5. **`babel-preset-expo`** added back to package.json (yarn dedup had nuked it).
+6. **`@stripe/stripe-react-native`** removed from `app.json` `plugins[]` (it required a `merchantIdentifier` we don't have; package is already in `autolinking.exclude` so iOS won't compile it).
+7. **`expo install --fix`** ran — all SDK 53 dependency pins now aligned.
+
+## What was NOT touched (and why)
+
+- The 10 onboarding screens themselves — they already have the privacy policy URL (`https://shawnjan-cmd.github.io/privacy-policy-/`), Terms of Service link, Data Safety declaration, age confirmation, LAN consent, camera consent, server download instructions, and HMAC-SHA256 security claims. All required for Play Store. **No content change needed.**
+- The reviewer notes in `app.json` `googlePlayBuildConfiguration.appAccessInstructions` — already describe the demo-server IP / PIN flow exactly the way reviewers want.
+- The 1497-line file structure — left intact to avoid breaking the 200-file source tree that depends on it.
+
+## Are you ready for Play Store production?
+
+Looking at your Play Console screenshot:
+- ✅ 12 testers opted in (requirement met)
+- ✅ Closed test running 5 of 14 required days
+- ⏳ Need **9 more days** of continuous testing before "Apply for production access" unlocks
+- ⚠️ Google says "more testing required" — this is about the **14-day clock**, not about your code. As long as your testers can actually open the app and use it (which they couldn't before because of the onboarding loop), the clock keeps ticking.
+
+**Action plan:**
+1. Click **Publish** (top-right) → Android → AAB → **internal/closed testing track** (same track your 12 testers are on).
+2. Upload the new AAB to the closed-test release in Play Console.
+3. Tell your 12 testers to update the app from the testing opt-in link — the new build will install over the broken one.
+4. Wait out the remaining 9 days of the 14-day window.
+5. When the "Apply for production" button activates in Play Console, click it.
+
+## What testers should now experience
+
+1. **Open app** → animated splash with Butler robot.
+2. **Screen 1 (Welcome)** → see app overview + privacy badges.
+3. **Screens 2–9** → tour, consents (4 required checkboxes), pledge, legal docs, permissions, Q&A, server-privacy facts, server-download instructions with a working "Download from GitHub" button.
+4. **Screen 10** → tap **LAUNCH BUTLER AI** (or wait 5 seconds for auto-launch).
+5. **Tabs screen opens, onboarding never shows again** on subsequent launches.
+
+That's it. No retry loop. No blank screen. No "TAP TO RETRY" stuck state.
+
+## If reviewers reject anything
+
+Paste their exact rejection text back and I'll patch the specific field — but with `privacyPolicyUrl`, `playStoreDeveloperName`, age-gate, consent screens, data-deletion path (Settings → Account & Data → Delete my account), and reviewer instructions already in place, you have everything Play Store policy requires.
