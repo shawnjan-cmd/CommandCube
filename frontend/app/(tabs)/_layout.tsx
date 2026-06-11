@@ -1,7 +1,8 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import QuickButlerBar from '@/components/ui/QuickButlerBar';
 
 const CYAN   = '#00E5FF';
 const DIM    = 'rgba(0,229,255,0.50)';
@@ -21,6 +22,7 @@ function TabIcon({
 
 export default function TabLayout() {
   return (
+    <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -79,5 +81,9 @@ export default function TabLayout() {
       <Tabs.Screen name="fileshare" options={{ href: null }} />
       <Tabs.Screen name="support"   options={{ href: null }} />
     </Tabs>
+  );
+}
+<QuickButlerBar />
+    </View>
   );
 }

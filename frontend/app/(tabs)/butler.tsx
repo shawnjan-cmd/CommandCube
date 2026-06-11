@@ -863,6 +863,27 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
   const sendRef  = useRef(onSend);
   useEffect(() => { sendRef.current = onSend; }, [onSend]);
 
+  // Pick up any prompt typed in the floating QuickButlerBar on another tab.
+  // Drains the AsyncStorage handoff key once and pre-fills the composer.
+  useEffect(() => {
+    let active = true;
+    const drainPrefill = async () => {
+      try {
+        const v = await AsyncStorage.getItem('@butler_prefill_prompt');
+        if (active && v && v.trim()) {
+          setInputText(v);
+          await AsyncStorage.removeItem('@butler_prefill_prompt');
+          try { haptics.success(); } catch {}
+          // Auto-focus so the user can just tap send (or edit first)
+          setTimeout(() => inputRef.current?.focus(), 250);
+        }
+      } catch {}
+    };
+    drainPrefill();
+    const id = setInterval(drainPrefill, 1500);
+    return () => { active = false; clearInterval(id); };
+  }, []);
+
   const handleSend = useCallback(() => {
     const t = inputText.trim();
     if (!t) return;
