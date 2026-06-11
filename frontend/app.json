@@ -47,7 +47,6 @@
         "backgroundColor": "#050202"
       },
       "package": "com.butlerai.pc.automation",
-      "versionCode": 77,
       "jsEngine": "hermes",
       "permissions": [
         "android.permission.INTERNET",
@@ -130,8 +129,7 @@
       "expo-localization",
       "expo-mail-composer",
       "expo-secure-store",
-      "expo-sqlite",
-      "expo-video"
+      "expo-sqlite"
     ],
     "ignoredDependencies": [
       "expo-video"
