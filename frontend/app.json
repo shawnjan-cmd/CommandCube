@@ -124,7 +124,6 @@
       ],
       "@react-native-community/datetimepicker",
       "expo-web-browser",
-      "@stripe/stripe-react-native",
       "expo-asset",
       "expo-audio",
       "expo-font",
