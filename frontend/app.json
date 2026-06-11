@@ -2,7 +2,7 @@
   "expo": {
     "name": "Butler AI: PC Automation",
     "slug": "com.butlerai.pc.automation",
-    "version": "7.3.0",
+    "version": "1.0.0",
     "privacyPolicyUrl": "https://shawnjan-cmd.github.io/privacy-policy-/#privacy",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,7 +34,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.butlerai.pc.automation",
-      "buildNumber": "73",
+      "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "Butler AI uses the camera exclusively to scan QR codes displayed on your PC screen for instant pairing. No photos are taken, stored, or transmitted.",
         "NSLocalNetworkUsageDescription": "Butler AI connects to a Python server running on your own PC over your local WiFi network to execute scripts and monitor system performance. No data leaves your home network.",
