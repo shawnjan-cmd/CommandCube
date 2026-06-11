@@ -400,24 +400,56 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
         </View>
       </View>
 
-      {/* Mascot centerpiece */}
-      <View style={hero.mascotWrap}>
-        {/* Animated orbit ring */}
+      {/* Holographic core — concentric arcs, hex grid, pulsing nucleus.
+          Replaces the literal robot mascot for a sci-fi command-deck vibe. */}
+      <View style={hero.coreWrap}>
+        {/* Animated orbit ring (outer) */}
         <Animated.View style={[hero.orbit, { transform: [{ rotate: orbitRotate }] }]} pointerEvents="none">
           <View style={[hero.orbitDot, { backgroundColor: D.cyan,   shadowColor: D.cyan,   top:  -3, left: '50%' }]} />
           <View style={[hero.orbitDot, { backgroundColor: D.purple, shadowColor: D.purple, bottom: -3, left: '50%' }]} />
           <View style={[hero.orbitDot, { backgroundColor: D.amber,  shadowColor: D.amber,  top: '50%', left: -3 }]} />
           <View style={[hero.orbitDot, { backgroundColor: D.green,  shadowColor: D.green,  top: '50%', right: -3 }]} />
         </Animated.View>
-        {/* Soft pulsing halo behind the shield */}
-        <Animated.View style={[hero.halo, { opacity: shieldHalo }]} />
-        {/* The shield mascot */}
-        <ExpoImage
-          source={require('@/assets/butler-ai-shield-hero.jpg')}
-          style={hero.mascot}
-          contentFit="contain"
-          transition={400}
-        />
+        {/* Counter-rotating mid ring */}
+        <Animated.View
+          style={[
+            hero.midRing,
+            { transform: [{ rotate: orbitAnim.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] }) }] },
+          ]}
+          pointerEvents="none"
+        >
+          {[0, 60, 120, 180, 240, 300].map(deg => (
+            <View
+              key={deg}
+              style={[
+                hero.midTick,
+                {
+                  transform: [{ rotate: `${deg}deg` }, { translateY: -64 }],
+                },
+              ]}
+            />
+          ))}
+        </Animated.View>
+        {/* Static hex frame */}
+        <View style={hero.hexFrame} pointerEvents="none">
+          <View style={[hero.hexEdge, { transform: [{ rotate:   '30deg' }] }]} />
+          <View style={[hero.hexEdge, { transform: [{ rotate:  '-30deg' }] }]} />
+          <View style={[hero.hexEdge, { transform: [{ rotate:   '90deg' }] }]} />
+        </View>
+        {/* Pulsing nucleus halo */}
+        <Animated.View style={[hero.halo, { opacity: shieldHalo }]} pointerEvents="none" />
+        {/* Glowing core */}
+        <View style={hero.core}>
+          <View style={hero.coreInner}>
+            <View style={hero.coreDot} />
+            <Text style={hero.coreLabel}>NXS</Text>
+          </View>
+        </View>
+        {/* Corner tick readouts */}
+        <View style={[hero.readout, { top: 6,  left: 6  }]}><Text style={hero.readoutTxt}>SYS·01</Text></View>
+        <View style={[hero.readout, { top: 6,  right: 6 }]}><Text style={[hero.readoutTxt, { color: D.purple }]}>NEURAL</Text></View>
+        <View style={[hero.readout, { bottom: 6, left: 6  }]}><Text style={[hero.readoutTxt, { color: D.amber  }]}>MESH·OK</Text></View>
+        <View style={[hero.readout, { bottom: 6, right: 6 }]}><Text style={[hero.readoutTxt, { color: D.green  }]}>LINK·LAN</Text></View>
       </View>
 
       {/* Wordmark + tagline */}
@@ -494,9 +526,27 @@ const hero = StyleSheet.create({
   pillTxt: { fontSize: 9.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
 
   mascotWrap: { alignItems: 'center', justifyContent: 'center', height: 200, marginBottom: 4, position: 'relative' },
-  halo:       { position: 'absolute', width: 220, height: 220, borderRadius: 110, backgroundColor: D.cyan, opacity: 0.30, ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 50 } : {}) },
-  orbit:      { position: 'absolute', width: 200, height: 200, borderRadius: 100, borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '35' },
+  coreWrap:   { alignItems: 'center', justifyContent: 'center', height: 200, marginBottom: 4, position: 'relative' },
+  halo:       { position: 'absolute', width: 160, height: 160, borderRadius: 80, backgroundColor: D.cyan, opacity: 0.22, ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 60 } : {}) },
+  orbit:      { position: 'absolute', width: 180, height: 180, borderRadius: 90, borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '38' },
   orbitDot:   { position: 'absolute', width: 6, height: 6, borderRadius: 3, marginLeft: -3, marginTop: -3, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 6 },
+  midRing:    { position: 'absolute', width: 140, height: 140, borderRadius: 70, borderWidth: StyleSheet.hairlineWidth, borderColor: D.purple + '40', alignItems: 'center', justifyContent: 'center' },
+  midTick:    { position: 'absolute', width: 2, height: 8, backgroundColor: D.purple + 'B0', borderRadius: 1 },
+  hexFrame:   { position: 'absolute', width: 110, height: 110, alignItems: 'center', justifyContent: 'center' },
+  hexEdge:    { position: 'absolute', width: 110, height: 2, backgroundColor: D.cyan + '38' },
+  core:       { width: 78, height: 78, borderRadius: 39, alignItems: 'center', justifyContent: 'center',
+                backgroundColor: '#02101D',
+                borderWidth: 1.5, borderColor: D.cyan,
+                ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.95, shadowRadius: 20 } : { elevation: 14 }) },
+  coreInner:  { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center',
+                backgroundColor: D.cyan + '14',
+                borderWidth: 1, borderColor: D.cyan + '80' },
+  coreDot:    { width: 12, height: 12, borderRadius: 6, backgroundColor: D.cyan,
+                ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 10 } : {}) },
+  coreLabel:  { fontSize: 8, fontWeight: '900', fontFamily: MONO, color: D.cyan, letterSpacing: 2, marginTop: 4 },
+  readout:    { position: 'absolute', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4,
+                backgroundColor: 'rgba(0,229,255,0.06)', borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '40' },
+  readoutTxt: { fontSize: 7, fontWeight: '900', fontFamily: MONO, color: D.cyan, letterSpacing: 1.4 },
   mascot:     { width: 190, height: 190, borderRadius: 16 },
 
   brand: { fontSize: 30, fontWeight: '900', fontFamily: MONO, color: '#E8F8FF', letterSpacing: 7, textAlign: 'center', lineHeight: 36,
