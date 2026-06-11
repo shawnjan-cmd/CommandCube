@@ -523,7 +523,7 @@ function Screen1Welcome({ onNext, allAccepted }: { onNext: () => void; allAccept
           </Text>
         </View>
 
-        <TouchableOpacity style={st.primaryBtn} onPress={() => { safeHaptics.medium(); onNext(); }} activeOpacity={0.85}>
+        <TouchableOpacity testID="onboarding-screen1-next" style={st.primaryBtn} onPress={() => { safeHaptics.medium(); onNext(); }} activeOpacity={0.85}>
           <MaterialIcons name="arrow-forward" size={20} color="#000" />
           <Text style={st.primaryBtnTxt}>{allAccepted ? 'REVIEW AGAIN' : 'GET STARTED'}</Text>
         </TouchableOpacity>
@@ -1297,6 +1297,7 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
             opacity: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.06, state === 'error' ? 0.7 : 0.4] }),
           }} />
           <TouchableOpacity
+            testID="onboarding-screen10-launch"
             onPress={() => {
               if (state === 'error' || state === 'retry') {
                 inFlightRef.current = false;
