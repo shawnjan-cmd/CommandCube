@@ -68,7 +68,12 @@
           "react-native-webrtc",
           "react-native-maps",
           "@shopify/react-native-skia",
-          "@apollo/client"
+          "@apollo/client",
+          "react-native-dynamic",
+          "nativewind",
+          "lucide-react-native",
+          "react-redux",
+          "react-dev-inspector"
         ]
       },
       "blockedPermissions": [
