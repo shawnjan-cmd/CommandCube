@@ -1,43 +1,150 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
-    "version": "1.0.0",
+    "name": "Butler AI: PC Automation",
+    "slug": "com.butlerai.pc.automation",
+    "version": "7.3.0",
+    "privacyPolicyUrl": "https://shawnjan-cmd.github.io/privacy-policy-/#privacy",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "butlerai",
+    "description": "Butler AI is a Remote PC Automation System. Run Python scripts on your PC from your phone, chat with a local Ollama AI model, automate tasks, manage files, and monitor your system — all over your home WiFi network. 100% self-hosted. No cloud, no accounts, no data collection. Everything runs on your own hardware.",
+    "keywords": [
+      "remote pc",
+      "python automation",
+      "local ai",
+      "ollama",
+      "self-hosted",
+      "pc control",
+      "script runner",
+      "system monitor"
+    ],
+    "category": "TOOLS",
+    "contentRating": "Teen",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#050202"
+    },
+    "assetBundlePatterns": [
+      "assets/images/*",
+      "assets/icon.png",
+      "assets/adaptive-icon.png"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.butlerai.pc.automation",
+      "buildNumber": "73",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Butler AI uses the camera exclusively to scan QR codes displayed on your PC screen for instant pairing. No photos are taken, stored, or transmitted.",
+        "NSLocalNetworkUsageDescription": "Butler AI connects to a Python server running on your own PC over your local WiFi network to execute scripts and monitor system performance. No data leaves your home network.",
+        "NSPhotoLibraryUsageDescription": "Butler AI allows you to upload a custom avatar image from your photo library for display in the AI chat. Images are stored only on this device."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#050202"
       },
-      "edgeToEdgeEnabled": true
+      "package": "com.butlerai.pc.automation",
+      "versionCode": 77,
+      "jsEngine": "hermes",
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.VIBRATE"
+      ],
+      "networkSecurityConfig": "@xml/network_security_config",
+      "proguardRules": "./android/proguard-rules.pro",
+      "autolinking": {
+        "exclude": [
+          "expo-video",
+          "expo-gl",
+          "expo-sensors",
+          "lottie-react-native",
+          "expo-three",
+          "@stripe/stripe-react-native",
+          "react-native-webrtc",
+          "react-native-maps",
+          "@shopify/react-native-skia",
+          "@apollo/client"
+        ]
+      },
+      "blockedPermissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO",
+        "RECORD_AUDIO",
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.ACTIVITY_RECOGNITION",
+        "android.permission.BODY_SENSORS",
+        "android.permission.BODY_SENSORS_BACKGROUND",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS",
+        "android.permission.READ_CALENDAR",
+        "android.permission.WRITE_CALENDAR"
+      ]
     },
     "web": {
-      "bundler": "metro",
-      "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/icon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
       [
-        "expo-splash-screen",
+        "expo-build-properties",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#000"
+          "android": {
+            "minSdkVersion": 26,
+            "targetSdkVersion": 35,
+            "compileSdkVersion": 35,
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "networkInspector": false,
+            "newArchEnabled": false,
+            "extraMavenRepos": []
+          },
+          "ios": {
+            "newArchEnabled": false,
+            "deploymentTarget": "16.4"
+          }
         }
       ],
-      "expo-font"
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Butler AI uses the camera exclusively to scan QR codes displayed on your PC screen for instant pairing. No photos are taken, stored, or transmitted."
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      "expo-web-browser"
+    ],
+    "ignoredDependencies": [
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "privacyPolicyUrl": "https://shawnjan-cmd.github.io/privacy-policy-/#privacy",
+      "termsOfServiceUrl": "https://shawnjan-cmd.github.io/privacy-policy-/#terms",
+      "dataSafetyUrl": "https://shawnjan-cmd.github.io/privacy-policy-/#data-safety",
+      "dataDeletionUrl": "https://shawnjan-cmd.github.io/privacy-policy-/#delete",
+      "supportEmail": "andrejsladkovic1992@gmail.com",
+      "appStoreId": "com.butlerai.pc.automation",
+      "storeListingShortDescription": "Remote PC control from your phone. Local AI, no cloud.",
+      "storeListingFullDescription": "Butler AI is a Remote PC Automation System that lets you control your Windows, Mac, or Linux computer from your Android phone over your home WiFi.\n\nSCANS YOUR LOCAL WI-FI NETWORK to find your PC automatically. EXECUTES PYTHON SCRIPTS AND TERMINAL COMMANDS on your own PC over your local network. No cloud services — all execution happens on hardware you own and control.\n\nFEATURES:\n- Run any Python script on your PC — one tap from your phone\n- Chat with local Ollama AI (qwen2.5-coder, Mistral, etc.) — no API key needed\n- Monitor CPU, RAM, Disk, and network in real time\n- Scan QR code for instant pairing — PIN-protected\n- Full Python script library with 70+ built-in automation scripts\n- File transfer between phone and PC\n- Knowledge Base that learns from your PC data\n\nPRIVACY FIRST:\n- 100% self-hosted — runs on YOUR PC over YOUR WiFi\n- No cloud — data never leaves your local network\n- No accounts or subscriptions required\n- No analytics, no tracking, no data collection\n- Camera only used for QR pairing — nothing stored\n\nRequires Python 3.10+ installed on your PC.\nThis app is intended for developers and technical users aged 18 and above.",
+      "playStoreCategory": "TOOLS",
+      "playStoreContentRating": "Mature 17+",
+      "playStoreDeveloperName": "Andrej Sladkovic",
+      "playStoreDeveloperWebsite": "https://shawnjan-cmd.github.io/",
+      "appAccessInstructions": "Butler AI requires a paired PC server. TESTING WITHOUT A PC: tap 'Demo Mode' on the connection screen (if enabled) for simulated data. TESTING WITH LIVE SERVER: 1. Open app and tap CONTINUE through all 10 welcome screens (all consents must be ticked to proceed). 2. On Home screen, tap SCAN QR TO PAIR. 3. Tap MANUAL IP tab. 4. Enter the demo server IP supplied in Play Console reviewer notes. 5. Port: 8766. 6. Enter the 6-digit pairing PIN displayed in the PC terminal (also supplied in reviewer notes). 7. Tap CONNECT. Camera permission is QR-scan only; no photos stored or transmitted. Every script run requires a manual tap. Server- and client-side safety scanners reject destructive commands. Account deletion: Settings → Account & Data → Delete my account. Web deletion: shawnjan-cmd.github.io/privacy-policy-/#delete. LAN scan is shown before first use with explicit consent. Zero cloud, zero telemetry."
     }
   }
 }

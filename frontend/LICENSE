@@ -1,0 +1,138 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright © 2026 Shawn Jan. All Rights Reserved.
+
+NOTICE: ALL INFORMATION CONTAINED HEREIN IS, AND REMAINS THE PROPERTY OF
+SHAWN JAN. THE INTELLECTUAL AND TECHNICAL CONCEPTS CONTAINED HEREIN ARE
+PROPRIETARY TO SHAWN JAN AND MAY BE COVERED BY INTELLECTUAL PROPERTY LAWS.
+DISSEMINATION OF THIS INFORMATION OR REPRODUCTION OF THIS MATERIAL IS
+STRICTLY FORBIDDEN UNLESS PRIOR WRITTEN PERMISSION IS OBTAINED FROM SHAWN JAN.
+
+================================================================================
+
+SOFTWARE: Butler AI — PC Automation / CommandCube
+OWNER:    Shawn Jan
+CONTACT:  andrejsladkovic1992@gmail.com
+WEBSITE:  https://onspace.ai
+
+================================================================================
+
+GRANT OF LICENSE
+
+Subject to the terms and conditions of this License, Shawn Jan ("Owner") grants
+you ("User") a limited, non-exclusive, non-transferable, revocable license to:
+
+  1. Download and run butler_server.py on a single personal computer that you
+     own or control, solely for use in conjunction with the official Butler AI
+     application obtained through authorized distribution channels (Google Play
+     Store or official GitHub releases).
+
+  2. View the source code for personal review and security audit purposes only.
+
+================================================================================
+
+RESTRICTIONS
+
+You MAY NOT, under any circumstances:
+
+  (a) Copy, reproduce, duplicate, or mirror this software or any portion thereof,
+      including but not limited to uploading to any repository, file host, or
+      distribution platform without express written permission.
+
+  (b) Modify, adapt, translate, create derivative works of, or otherwise alter
+      this software or any component thereof.
+
+  (c) Distribute, sell, sublicense, rent, lease, lend, or transfer this software
+      or any rights therein to any third party.
+
+  (d) Reverse engineer, decompile, disassemble, or attempt to derive the source
+      code, algorithms, trade secrets, or underlying ideas from this software.
+
+  (e) Remove, alter, or obscure any copyright notices, proprietary legends,
+      trademark notices, or other ownership notices within this software.
+
+  (f) Use this software to develop, build, or deploy any competing product or
+      service that replicates or is substantially similar to Butler AI.
+
+  (g) Use this software on behalf of any organization, company, or commercial
+      entity without a separate written commercial license from the Owner.
+
+================================================================================
+
+PROPRIETARY INNOVATIONS
+
+The following systems and inventions embedded in this software are proprietary
+trade secrets of Shawn Jan protected under applicable intellectual property law:
+
+  • Phi-NEXUS Bridge Protocol (DELTA+SIGMA+FUSE+OMEGA fused pipeline)
+  • SIGMA-NET Relay Crawler (phone-to-PC teleport crawl architecture)
+  • Quantum Link Harvester (entangled graph traversal URL discovery)
+  • OMEGA Loop Auto-Growth Engine (3-layer 24/7 knowledge base expansion)
+  • Lambda Scan (remote PC filesystem scanner)
+  • Omega Scanner Daemon (self-healing 8-minute cycle monitor)
+  • Persistent Checkpoint System (SQLite resume-on-restart architecture)
+  • Behavioural Profiling Engine (user_topics priority queue)
+  • Nexus Cosmetic Pack System (full app re-skin via CosmeticContext)
+  • Zero Hardcode Discovery (4-method IP + 20-port auto-detection)
+  • Auto-Save AI Scripts (silent Python code detection from chat)
+  • Pip Auto-Install + Retry Engine (ModuleNotFoundError auto-recovery)
+  • OmegaFingerprint Execution Learning (imports posted to KB per run)
+
+Unauthorized use of these innovations constitutes misappropriation of trade
+secrets and is subject to civil and criminal penalties.
+
+================================================================================
+
+COPYRIGHT PROTECTION
+
+This software is protected by copyright law and international treaty provisions.
+You acknowledge that no title to the intellectual property in the software is
+transferred to you. You further acknowledge that title and full ownership rights
+to the software will remain the exclusive property of Shawn Jan, and you will
+not acquire any rights to the software except as expressly set forth in this
+License.
+
+Willful infringement of copyright may result in statutory damages of up to
+$150,000 per work infringed under 17 U.S.C. § 504(c)(2), as well as attorney's
+fees and injunctive relief.
+
+================================================================================
+
+DISCLAIMER OF WARRANTIES
+
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL
+SHAWN JAN BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE THEREOF.
+
+================================================================================
+
+GOVERNING LAW
+
+This License shall be governed by and construed in accordance with applicable
+law. Any dispute arising from this License shall be subject to the exclusive
+jurisdiction of the courts of competent jurisdiction.
+
+================================================================================
+
+ENTIRE AGREEMENT
+
+This License constitutes the entire agreement between you and Shawn Jan with
+respect to the software and supersedes all prior or contemporaneous
+understandings regarding such subject matter.
+
+If any provision of this License is held to be unenforceable, such provision
+shall be modified only to the extent necessary to make it enforceable, and the
+remaining provisions shall remain in full force and effect.
+
+================================================================================
+
+By downloading, installing, copying, or using this software, you acknowledge
+that you have read this License, understand it, and agree to be bound by its
+terms and conditions.
+
+IF YOU DO NOT AGREE TO THE TERMS OF THIS LICENSE, DO NOT DOWNLOAD, INSTALL,
+COPY, OR USE THIS SOFTWARE.
+
+================================================================================

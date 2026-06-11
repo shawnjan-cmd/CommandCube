@@ -1,0 +1,55 @@
+name: Deploy Privacy Policy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/privacy-policy.html'
+      - '.github/workflows/deploy-privacy-policy.yml'
+  workflow_dispatch: # Allow manual trigger from GitHub Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Pages content
+        run: |
+          mkdir -p _site
+          cp docs/privacy-policy.html _site/index.html
+          echo "✅ Privacy policy copied to _site/index.html"
+          echo "📄 File size: $(wc -c < _site/index.html) bytes"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Print live URL
+        run: |
+          echo "🚀 Privacy policy is live at:"
+          echo "${{ steps.deployment.outputs.page_url }}"
+          echo ""
+          echo "📋 Paste this URL into Play Console:"
+          echo "   Play Console → Policy → App content → Privacy policy"

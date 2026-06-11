@@ -1,30 +1,11 @@
-import { Text, View, StyleSheet, Image } from "react-native";
-
-const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-
+/**
+ * Bootstrap route — `/`
+ *
+ * Renders nothing; the root layout (`app/_layout.tsx`) reads onboarding
+ * state from AsyncStorage and calls `router.replace('/welcome' | '/(tabs)/nexushome')`
+ * exactly once. Keeping this file as an empty component avoids the
+ * expo-router warning about a missing initial route.
+ */
 export default function Index() {
-  console.log(EXPO_PUBLIC_BACKEND_URL, "EXPO_PUBLIC_BACKEND_URL");
-
-  return (
-    <View style={styles.container}>
-      <Image
-        source={require("../assets/images/app-image.png")}
-        style={styles.image}
-      />
-    </View>
-  );
+  return null;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0c0c0c",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
-  },
-});

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Butler AI — UI Preview for Lovable</title>
+<style>
+  :root {
+    --bg:       #040C14;
+    --surface:  #060F18;
+    --card:     #071018;
+    --border:   #0D1A24;
+    --cyan:     #00CCDD;
+    --green:    #00FF88;
+    --amber:    #FF8C00;
+    --red:      #FF3300;
+    --purple:   #BB33FF;
+    --blue:     #4488FF;
+    --teal:     #10d9a0;
+    --text:     #336677;
+    --textbrt:  #88AACC;
+    --mono:     'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--textbrt); font-family: var(--mono); min-height: 100vh; }
+
+  /* ── LAYOUT ── */
+  .app-shell { display: flex; flex-direction: column; max-width: 420px; margin: 0 auto; min-height: 100vh; position: relative; background: var(--bg); box-shadow: 0 0 60px rgba(0,204,221,0.08); }
+
+  /* ── HEADER ── */
+  .header { background: #08090e; border-bottom: 1px solid #1a2235; padding: 14px 14px 10px; display: flex; align-items: center; gap: 10px; position: relative; }
+  .header::before { content: ''; position: absolute; top: 0; left: 0; width: 14px; height: 14px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+  .header::after  { content: ''; position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border-bottom: 1.5px solid rgba(0,204,221,.25); border-right: 1.5px solid rgba(0,204,221,.25); }
+  .header-logo { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--cyan); display: flex; align-items: center; justify-content: center; font-size: 20px; position: relative; flex-shrink: 0; }
+  .conn-dot { position: absolute; bottom: 1px; right: 1px; width: 9px; height: 9px; border-radius: 50%; background: var(--green); border: 1.5px solid #08090e; }
+  .conn-dot.off { background: var(--red); }
+  .header-center { flex: 1; text-align: center; }
+  .header-title { font-size: 18px; font-weight: 800; letter-spacing: 2px; color: #fff; }
+  .header-sub { font-size: 9px; letter-spacing: 1px; color: rgba(0,204,221,.67); margin-top: 2px; }
+  .header-btn { border: 1.5px solid rgba(0,204,221,.7); border-radius: 18px; padding: 6px 10px; background: rgba(0,204,221,.15); display: flex; align-items: center; gap: 4px; cursor: pointer; flex-shrink: 0; }
+  .header-btn span { font-size: 9px; font-weight: 900; color: var(--cyan); letter-spacing: .5px; }
+  .header-bar { height: 1px; background: rgba(0,204,221,.35); }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; overflow-y: auto; padding: 14px; padding-bottom: 120px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ── CARDS ── */
+  .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; }
+  .card.cyan   { border-color: rgba(0,204,221,.55); }
+  .card.green  { border-color: rgba(0,255,136,.4); }
+  .card.amber  { border-color: rgba(255,140,0,.6); }
+  .card.red    { border-color: rgba(255,51,0,.4); }
+  .card.purple { border-color: rgba(187,51,255,.55); }
+  .card.teal   { border-color: var(--teal); border-width: 2px; }
+  .card.glow-cyan { box-shadow: 0 0 20px rgba(0,204,221,.08); }
+
+  .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .icon-box { width: 44px; height: 44px; border-radius: 10px; border: 2px solid var(--cyan); background: rgba(0,204,221,.08); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .icon-box.green  { border-color: var(--green);  background: rgba(0,255,136,.08); }
+  .icon-box.amber  { border-color: var(--amber);  background: rgba(255,140,0,.08); }
+  .icon-box.red    { border-color: var(--red);    background: rgba(255,51,0,.08); }
+  .icon-box.purple { border-color: var(--purple); background: rgba(187,51,255,.08); }
+  .icon-box.teal   { border-color: var(--teal);   background: rgba(16,217,160,.08); }
+
+  .card-title { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--cyan); }
+  .card-title.green  { color: var(--green); }
+  .card-title.amber  { color: var(--amber); }
+  .card-title.red    { color: var(--red); }
+  .card-title.purple { color: var(--purple); }
+  .card-title.teal   { color: var(--teal); }
+  .card-sub { font-size: 8px; letter-spacing: .5px; color: var(--text); margin-top: 2px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--cyan); display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+
+  /* ── STAT PILLS ── */
+  .stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .stat-pill { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 9px 4px; text-align: center; }
+  .stat-val { font-size: 15px; font-weight: 700; color: var(--cyan); }
+  .stat-val.green  { color: var(--green); }
+  .stat-val.amber  { color: var(--amber); }
+  .stat-val.blue   { color: var(--blue); }
+  .stat-val.orange { color: #FF9900; }
+  .stat-lbl { font-size: 7px; color: var(--text); letter-spacing: .5px; margin-top: 3px; }
+
+  /* ── TOGGLE ROW ── */
+  .toggle-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-icon { font-size: 20px; flex-shrink: 0; width: 22px; text-align: center; }
+  .toggle-text { flex: 1; }
+  .toggle-title { font-size: 13px; font-weight: 600; color: var(--textbrt); margin-bottom: 2px; }
+  .toggle-sub { font-size: 10px; color: var(--text); line-height: 14px; }
+  .toggle { width: 46px; height: 26px; border-radius: 13px; border: 2px solid var(--border); background: var(--surface); display: flex; align-items: center; padding: 2px; flex-shrink: 0; cursor: pointer; transition: all .2s; }
+  .toggle.on { background: rgba(0,204,221,.28); border-color: var(--cyan); }
+  .toggle .thumb { width: 18px; height: 18px; border-radius: 9px; background: var(--text); transition: all .2s; }
+  .toggle.on .thumb { background: var(--cyan); margin-left: auto; }
+
+  /* ── BUTTON ── */
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 9px; padding: 12px; font-family: var(--mono); font-weight: 700; font-size: 12px; cursor: pointer; letter-spacing: .8px; border: none; }
+  .btn-primary  { background: var(--cyan); color: #000; }
+  .btn-green    { background: var(--green); color: #000; }
+  .btn-red      { background: var(--red); color: #000; }
+  .btn-blue     { background: var(--blue); color: #000; }
+  .btn-teal     { background: var(--teal); color: #000; }
+  .btn-outline  { background: rgba(0,204,221,.0A); border: 1.5px solid rgba(0,204,221,.55); color: var(--cyan); }
+
+  /* ── ACTION BUTTONS ── */
+  .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .action-btn { flex: 1; min-width: 80px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1.5px solid; border-radius: 8px; padding: 10px; font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: .8px; cursor: pointer; background: transparent; }
+  .action-btn.cyan   { border-color: rgba(0,204,221,.6);  color: var(--cyan);   background: rgba(0,204,221,.12); }
+  .action-btn.green  { border-color: rgba(0,255,136,.55); color: var(--green);  background: rgba(0,255,136,.1); }
+  .action-btn.amber  { border-color: rgba(255,140,0,.55); color: var(--amber);  background: rgba(255,140,0,.08); }
+  .action-btn.red    { border-color: rgba(255,51,0,.4);   color: var(--red);    background: rgba(255,51,0,.08); }
+  .action-btn.purple { border-color: rgba(187,51,255,.6); color: var(--purple); background: rgba(187,51,255,.12); }
+  .action-btn.teal   { border-color: rgba(16,217,160,.55);color: var(--teal);   background: rgba(16,217,160,.0A); }
+  .action-btn.blue   { border-color: rgba(68,136,255,.55);color: var(--blue);   background: rgba(68,136,255,.0A); }
+
+  /* ── INFO BANNER ── */
+  .info-banner { display: flex; align-items: flex-start; gap: 8px; border: 1px solid; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+  .info-banner.cyan   { border-color: rgba(0,204,221,.3);  background: rgba(0,204,221,.06); }
+  .info-banner.amber  { border-color: rgba(255,140,0,.35); background: rgba(255,140,0,.08); }
+  .info-banner.green  { border-color: rgba(0,255,136,.3);  background: rgba(0,255,136,.06); }
+  .info-banner.red    { border-color: rgba(255,51,0,.35);  background: rgba(255,51,0,.08); }
+  .info-banner .icon  { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .info-banner .text  { font-size: 10px; line-height: 14px; color: var(--text); }
+  .info-banner .text.amber { color: rgba(255,140,0,.8); }
+  .info-banner .text.cyan  { color: rgba(0,204,221,.8); }
+
+  /* ── STATUS BADGE ── */
+  .status-badge { display: inline-flex; align-items: center; gap: 4px; border: 1px solid; border-radius: 5px; padding: 4px 7px; }
+  .status-badge .dot { width: 5px; height: 5px; border-radius: 50%; }
+  .status-badge .txt { font-size: 7px; font-weight: 700; letter-spacing: .8px; }
+  .status-badge.connected    { border-color: rgba(0,255,136,.6);  }
+  .status-badge.connected    .dot { background: var(--green); }
+  .status-badge.connected    .txt { color: var(--green); }
+  .status-badge.disconnected { border-color: rgba(255,51,0,.5); }
+  .status-badge.disconnected .dot { background: var(--red); }
+  .status-badge.disconnected .txt { color: var(--red); }
+  .status-badge.idle         { border-color: rgba(136,170,204,.3); }
+  .status-badge.idle         .dot { background: var(--textbrt); }
+  .status-badge.idle         .txt { color: var(--textbrt); }
+
+  /* ── EDITABLE FIELD ── */
+  .editable-row { padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .editable-row:last-child { border-bottom: none; }
+  .editable-header { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+  .editable-label { flex: 1; font-size: 11px; font-weight: 700; color: var(--textbrt); letter-spacing: .3px; }
+  .edit-chip { display: flex; align-items: center; gap: 3px; border: 1px solid rgba(0,204,221,.4); border-radius: 5px; padding: 3px 7px; background: rgba(0,204,221,.06); cursor: pointer; }
+  .edit-chip span { font-size: 8px; font-weight: 900; color: var(--cyan); letter-spacing: .5px; }
+  .editable-value { font-size: 13px; color: var(--textbrt); line-height: 19px; }
+  .editable-input { width: 100%; background: var(--surface); border: 1.5px solid rgba(0,204,221,.55); border-radius: 9px; padding: 11px 12px; font-family: var(--mono); font-size: 14px; color: #c8d8f0; margin-bottom: 8px; }
+  .editable-actions { display: flex; gap: 8px; }
+  .btn-cancel { flex: 1; text-align: center; padding: 10px; border-radius: 8px; background: var(--surface); border: 1px solid #1a2235; font-size: 10px; font-weight: 700; color: var(--text); cursor: pointer; font-family: var(--mono); }
+  .btn-save   { flex: 2; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 10px; border-radius: 8px; background: var(--cyan); font-size: 11px; font-weight: 900; color: #000; cursor: pointer; font-family: var(--mono); }
+
+  /* ── TERMINAL / CODE BOX ── */
+  .code-box { background: #030810; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 9px; color: #A8D8B8; line-height: 18px; }
+  .code-comment { color: #4a607a; }
+  .code-green   { color: var(--green); }
+  .code-amber   { color: var(--amber); }
+
+  /* ── QUICK RUN GRID ── */
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 12px; position: relative; cursor: pointer; }
+  .quick-card::after { content: ''; position: absolute; bottom: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; }
+  .quick-card.cyan::after   { background: var(--cyan);   box-shadow: 0 0 6px var(--cyan); }
+  .quick-card.green::after  { background: var(--green);  box-shadow: 0 0 6px var(--green); }
+  .quick-card.amber::after  { background: var(--amber);  box-shadow: 0 0 6px var(--amber); }
+  .quick-card.purple::after { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+  .quick-icon { font-size: 28px; margin-bottom: 6px; }
+  .quick-name { font-size: 12px; font-weight: 700; color: var(--textbrt); margin-bottom: 3px; }
+  .quick-sub  { font-size: 9px; color: var(--text); }
+  .quick-tags { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+  .tag { font-size: 7px; border: 1px solid; border-radius: 3px; padding: 2px 5px; font-weight: 700; }
+  .tag.cyan   { border-color: rgba(0,204,221,.4);  color: var(--cyan); }
+  .tag.green  { border-color: rgba(0,255,136,.4);  color: var(--green); }
+  .tag.amber  { border-color: rgba(255,140,0,.4);  color: var(--amber); }
+  .tag.purple { border-color: rgba(187,51,255,.4); color: var(--purple); }
+
+  /* ── CONNECTIVITY BAR ── */
+  .conn-bar { display: flex; align-items: center; gap: 10px; background: rgba(0,255,136,.06); border: 1px solid rgba(0,255,136,.2); border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+  .conn-bar.offline { background: rgba(255,51,0,.04); border-color: rgba(255,51,0,.2); }
+  .conn-bar-icon { font-size: 26px; flex-shrink: 0; }
+  .conn-bar-text { flex: 1; }
+  .conn-bar-title { font-size: 13px; font-weight: 700; color: var(--green); }
+  .conn-bar-title.offline { color: var(--text); }
+  .conn-bar-sub { font-size: 9px; color: var(--text); margin-top: 1px; }
+  .conn-bar-arrow { font-size: 16px; color: var(--text); }
+
+  /* ── CHART / GRAPH ── */
+  .chart-wrap { position: relative; height: 80px; background: rgba(0,0,0,.3); border-radius: 6px; overflow: hidden; margin: 10px 0; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 3px; height: 100%; padding: 8px 8px 0; }
+  .chart-bar  { flex: 1; border-radius: 3px 3px 0 0; opacity: .8; min-height: 4px; }
+
+  /* ── KB GRAPH CANVAS ── */
+  .kb-graph { position: relative; height: 120px; background: rgba(0,0,0,.3); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+  .kb-node { position: absolute; width: 12px; height: 12px; border-radius: 50%; border: 2px solid; }
+  .kb-edge { position: absolute; height: 1.5px; transform-origin: left center; }
+
+  /* ── PERFORMANCE CIRCLES ── */
+  .perf-circles { display: flex; gap: 10px; justify-content: center; margin: 10px 0; }
+  .perf-circle  { width: 70px; height: 70px; border-radius: 50%; border: 4px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .perf-pct { font-size: 15px; font-weight: 700; }
+  .perf-lbl { font-size: 7px; letter-spacing: .5px; color: var(--text); margin-top: 1px; }
+
+  /* ── HEATMAP ── */
+  .heatmap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
+  .heatmap-cell { height: 10px; border-radius: 2px; }
+
+  /* ── AI CHAT BAR ── */
+  .chat-bar { position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%); width: min(392px, calc(100vw - 28px)); background: #050C14; border: 1.5px solid rgba(0,204,221,.25); border-radius: 18px; overflow: hidden; z-index: 100; }
+  .chat-bar-top { height: 2px; background: var(--teal); }
+  .chat-bar-row { display: flex; align-items: center; gap: 10px; padding: 11px 12px 8px; }
+  .chat-orb { width: 36px; height: 36px; border-radius: 11px; border: 1.5px solid rgba(0,255,136,.55); background: rgba(0,255,136,.08); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .chat-divider { width: 1px; height: 22px; background: rgba(0,204,221,.18); }
+  .chat-input { flex: 1; background: transparent; border: none; outline: none; font-family: var(--mono); font-size: 15px; color: var(--textbrt); }
+  .chat-send { width: 36px; height: 36px; border-radius: 11px; border: 1.5px solid rgba(0,204,221,.55); background: rgba(0,204,221,.18); display: flex; align-items: center; justify-content: center; font-size: 17px; cursor: pointer; }
+  .chat-footer { display: flex; align-items: center; gap: 6px; padding: 0 14px 9px; }
+  .chat-status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+  .chat-status-txt { font-size: 10px; color: rgba(0,204,221,.6); letter-spacing: .4px; }
+
+  /* ── BOTTOM TAB BAR ── */
+  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(420px, 100vw); background: #08090e; border-top: 1px solid #1a2235; display: flex; padding: 6px 0 10px; z-index: 200; }
+  .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 2px 0; position: relative; }
+  .tab-item.active::before { content: ''; position: absolute; top: -6px; left: 8%; right: 8%; height: 3px; border-radius: 0; background: var(--cyan); }
+  .tab-item.active.green::before { background: var(--green); }
+  .tab-item.active.purple::before { background: var(--purple); }
+  .tab-icon { width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 21px; border-radius: 6px; color: #3A4A55; }
+  .tab-item.active .tab-icon { color: var(--cyan); background: rgba(0,204,221,.1); }
+  .tab-item.active.green .tab-icon { color: var(--green); background: rgba(0,255,136,.1); }
+  .tab-item.active.purple .tab-icon { color: var(--purple); background: rgba(187,51,255,.1); }
+  .tab-lbl { font-size: 8px; letter-spacing: 1px; font-weight: 700; color: #3A4A55; }
+  .tab-item.active .tab-lbl { color: var(--cyan); }
+  .tab-item.active.green .tab-lbl { color: var(--green); }
+
+  /* ── PAGE TABS ── */
+  .page-selector { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 4px; margin-bottom: 16px; scrollbar-width: none; }
+  .page-selector::-webkit-scrollbar { display: none; }
+  .page-btn { flex-shrink: 0; padding: 8px 14px; border-radius: 20px; font-family: var(--mono); font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); letter-spacing: .5px; }
+  .page-btn.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+
+  /* ── INFO ROW ── */
+  .info-row { display: flex; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { width: 110px; font-size: 10px; color: var(--text); flex-shrink: 0; }
+  .info-val { flex: 1; font-size: 10px; font-weight: 600; color: var(--textbrt); text-align: right; }
+
+  /* ── PKG ROW ── */
+  .pkg-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .pkg-row:last-child { border-bottom: none; }
+  .pkg-name { flex: 1; font-size: 10px; color: var(--textbrt); }
+  .pkg-ver  { font-size: 9px; color: var(--text); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; }
+
+  /* ── DIVIDER ── */
+  .section-divider { display: flex; align-items: center; gap: 8px; margin: 4px 0 14px; }
+  .div-line { flex: 1; height: 1px; background: var(--border); }
+  .div-badge { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); }
+  .div-badge-txt { font-size: 8px; font-weight: 900; color: var(--text); letter-spacing: 1.5px; }
+
+  /* ── OVERLAY MODAL ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 500; display: flex; align-items: flex-end; justify-content: center; }
+  .modal-sheet { background: var(--bg); border-radius: 16px 16px 0 0; width: min(420px, 100%); padding: 20px; max-height: 80vh; overflow-y: auto; }
+
+  /* ── SCROLLABLE PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── ACCENT TOP BAR ── */
+  .accent-top { height: 2px; margin: -14px -14px 14px; border-radius: 10px 10px 0 0; }
+
+  /* ── RESPONSIVE DESKTOP LAYOUT ── */
+  @media (min-width: 860px) {
+    body { background: #020810; }
+    .page-selector-outer { display: flex; gap: 16px; max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .sidebar { width: 220px; flex-shrink: 0; }
+    .sidebar-btn { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--text); letter-spacing: .5px; }
+    .sidebar-btn:hover { background: var(--surface); color: var(--textbrt); }
+    .sidebar-btn.active { background: rgba(0,204,221,.12); color: var(--cyan); }
+    .main-area { flex: 1; }
+    .app-shell { max-width: 100%; box-shadow: none; }
+    .tab-bar { width: 100%; left: 0; transform: none; }
+    .chat-bar { width: calc(100% - 28px); left: 14px; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     BUTLER AI — UI PREVIEW  |  Edit freely in Lovable
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="app-shell">
+
+  <!-- ── HEADER ── -->
+  <div class="header" id="header">
+    <div class="header-logo">
+      🤖
+      <div class="conn-dot" id="conn-dot"></div>
+    </div>
+    <div class="header-center">
+      <div class="header-title" id="header-title">NEXUS HOME</div>
+      <div class="header-sub" id="header-sub">PC Automation · Command Center</div>
+    </div>
+    <div class="header-btn" id="header-btn">
+      <span id="header-btn-label">QR SCAN</span>
+    </div>
+  </div>
+  <div class="header-bar" id="header-bar"></div>
+
+  <!-- ── PAGE SELECTOR (mobile scroll chips) ── -->
+  <div style="padding:10px 14px 0; overflow-x:auto; scrollbar-width:none;">
+    <div class="page-selector">
+      <div class="page-btn active" onclick="showPage('home',this)">HOME</div>
+      <div class="page-btn" onclick="showPage('scripts',this)">SCRIPTS</div>
+      <div class="page-btn" onclick="showPage('butler',this)">AI CHAT</div>
+      <div class="page-btn" onclick="showPage('knowledge',this)">KNOWLEDGE</div>
+      <div class="page-btn" onclick="showPage('tools',this)">TOOLS</div>
+      <div class="page-btn" onclick="showPage('settings',this)">CONFIG</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE: HOME
+  ══════════════════════════════════════════════════ -->
+  <div class="content page active" id="page-home">
+
+    <!-- Connected PC card -->
+    <div class="conn-bar">
+      <div class="conn-bar-icon">🖥️</div>
+      <div class="conn-bar-text">
+        <div class="conn-bar-title">CONNECTED PC</div>
+        <div class="conn-bar-sub">192.168.1.100:8766 · 24ms · Online</div>
+      </div>
+      <div class="status-badge connected"><div class="dot"></div><div class="txt">LIVE</div></div>
+    </div>
+
+    <!-- Stat row -->
+    <div class="stat-row">
+      <div class="stat-pill"><div class="stat-val" style="color:var(--teal)">99.97%</div><div class="stat-lbl">UPTIME</div></div>
+      <div class="stat-pill"><div class="stat-val green">342</div><div class="stat-lbl">KB ITEMS</div></div>
+      <div class="stat-pill"><div class="stat-val amber">24ms</div><div class="stat-lbl">PING</div></div>
+      <div class="stat-pill"><div class="stat-val" style="color:var(--blue)">4</div><div class="stat-lbl">SCRIPTS</div></div>
+    </div>
+
+    <!-- Quick Run grid -->
+    <div class="card cyan glow-cyan">
+      <div class="section-label">⚡ QUICK RUN</div>
+      <div class="quick-grid">
+        <div class="quick-card cyan">
+          <div class="quick-icon">🐍</div>
+          <div class="quick-name">Python Scripts</div>
+          <div class="quick-sub">Run any .py file</div>
+          <div class="quick-tags"><span class="tag cyan">.py</span><span class="tag cyan">library</span></div>
+        </div>
+        <div class="quick-card purple">
+          <div class="quick-icon">🤖</div>
+          <div class="quick-name">Nexus Bot</div>
+          <div class="quick-sub">Ollama local AI</div>
+          <div class="quick-tags"><span class="tag purple">ollama</span><span class="tag purple">local</span></div>
+        </div>
+        <div class="quick-card green">
+          <div class="quick-icon">💻</div>
+          <div class="quick-name">Live Terminal</div>
+          <div class="quick-sub">SSH · exec</div>
+          <div class="quick-tags"><span class="tag green">ssh</span><span class="tag green">exec</span></div>
+        </div>
+        <div class="quick-card amber">
+          <div class="quick-icon">🛠️</div>
+          <div class="quick-name">Tools Hub</div>
+          <div class="quick-sub">file · clipboard</div>
+          <div class="quick-tags"><span class="tag amber">file</span><span class="tag amber">clip</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KB Growth chart -->
+    <div class="card">
+      <div class="card-header">
+        <div class="icon-box amber" style="width:36px;height:36px;border-radius:8px;font-size:16px;">📊</div>
+        <div>
+          <div class="card-title amber">KB GROWTH</div>
+          <div class="card-sub">Last 8 sessions</div>
+        </div>
+        <div class="status-badge connected"><div class="dot"></div><div class="txt">LIVE</div></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-bars">
+          <div class="chart-bar" style="background:var(--amber);height:35%"></div>
+          <div class="chart-bar" style="background:var(--amber);height:48%"></div>
+          <div class="chart-bar" style="background:var(--amber);height:42%"></div>
+          <div class="chart-bar" style="background:var(--amber);height:67%"></div>
+          <div class="chart-bar" style="background:var(--amber);height:55%"></div>
+          <div class="chart-bar" style="background:var(--amber);height:78%"></div>
+          <div class="chart-bar" style="background:var(--amber);height:88%"></div>
+          <div class="chart-bar" style="background:var(--teal);height:100%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connect PC offline bar -->
+    <div class="conn-bar offline">
+      <div class="conn-bar-icon">🤖</div>
+      <div class="conn-bar-text">
+        <div class="conn-bar-title offline">Connect to your PC first</div>
+        <div class="conn-bar-sub">● Offline — go to Home tab to connect your PC</div>
+      </div>
+      <div class="conn-bar-arrow">›</div>
+    </div>
+
+  </div><!-- /page-home -->
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE: SCRIPTS
+  ══════════════════════════════════════════════════ -->
+  <div class="content page" id="page-scripts">
+
+    <div class="stat-row">
+      <div class="stat-pill"><div class="stat-val" style="color:var(--blue)">95</div><div class="stat-lbl">SHOWN</div></div>
+      <div class="stat-pill"><div class="stat-val green">16</div><div class="stat-lbl">RUNNING</div></div>
+      <div class="stat-pill"><div class="stat-val amber">4</div><div class="stat-lbl">FAVED</div></div>
+      <div class="stat-pill"><div class="stat-val" style="color:var(--teal)">1.2k</div><div class="stat-lbl">RUNS TODAY</div></div>
+    </div>
+
+    <!-- Filter chips -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <div class="page-btn active" style="padding:6px 12px;">ALL</div>
+      <div class="page-btn" style="padding:6px 12px;">AI GENERATED</div>
+      <div class="page-btn" style="padding:6px 12px;">FILES</div>
+      <div class="page-btn" style="padding:6px 12px;">SYSTEM</div>
+    </div>
+
+    <!-- Script card group -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="width:26px;height:26px;background:rgba(0,255,136,.2);border-radius:6px;border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;">⭐</div>
+        <div class="card-title green" style="margin-bottom:0;">NEXUS EXCLUSIVE · 12 SCRIPTS</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:8px;border:1.5px solid rgba(0,204,221,.6);background:rgba(0,204,221,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🕐</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--textbrt);">Smart Decay Detector</div>
+            <div style="font-size:9px;color:var(--text);margin-top:2px;">Predicts file staleness &amp; suggests archival</div>
+            <div style="display:flex;gap:6px;margin-top:5px;">
+              <span class="tag" style="border-color:rgba(0,255,136,.4);color:var(--green);font-size:6px;">● ACTIVE</span>
+              <span style="font-size:7px;color:var(--text);">PY</span>
+            </div>
+          </div>
+          <div style="font-size:18px;cursor:pointer;">⭐</div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:8px;border:1.5px solid rgba(16,217,160,.6);background:rgba(16,217,160,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🕒</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--textbrt);">Time Machine Browser</div>
+            <div style="font-size:9px;color:var(--text);margin-top:2px;">Visual timeline of all file system changes</div>
+            <div style="display:flex;gap:6px;margin-top:5px;">
+              <span class="tag" style="border-color:rgba(68,136,255,.4);color:var(--blue);font-size:6px;">● READY</span>
+              <span style="font-size:7px;color:var(--text);">GO</span>
+            </div>
+          </div>
+          <div style="font-size:18px;cursor:pointer;">☆</div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:8px;border:1.5px solid rgba(187,51,255,.6);background:rgba(187,51,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🔗</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--textbrt);">Dependency Mapper</div>
+            <div style="font-size:9px;color:var(--text);margin-top:2px;">Visual graph of all installed package deps</div>
+            <div style="display:flex;gap:6px;margin-top:5px;">
+              <span class="tag" style="border-color:rgba(255,140,0,.4);color:var(--amber);font-size:6px;">● BETA</span>
+              <span style="font-size:7px;color:var(--text);">RS</span>
+            </div>
+          </div>
+          <div style="font-size:18px;cursor:pointer;">☆</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-scripts -->
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE: BUTLER AI CHAT
+  ══════════════════════════════════════════════════ -->
+  <div class="content page" id="page-butler">
+
+    <div class="info-banner cyan" style="margin-bottom:12px;">
+      <div class="icon">🤖</div>
+      <div class="text cyan">Butler AI fully online. Local Ollama · qwen2.5-coder:7b · Zero cloud.</div>
+    </div>
+
+    <!-- Suggested prompts -->
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+      <div class="tag cyan" style="padding:5px 9px;cursor:pointer;font-size:9px;">Summarize today's crawler harvest</div>
+      <div class="tag cyan" style="padding:5px 9px;cursor:pointer;font-size:9px;">Find duplicate files over 50MB</div>
+      <div class="tag cyan" style="padding:5px 9px;cursor:pointer;font-size:9px;">Generate a port-knock script</div>
+      <div class="tag cyan" style="padding:5px 9px;cursor:pointer;font-size:9px;">Explain the brain-DB script</div>
+    </div>
+
+    <!-- Chat messages -->
+    <div style="display:flex;flex-direction:column;gap:10px;padding-bottom:10px;">
+      <div style="background:rgba(0,204,221,.06);border:1px solid rgba(0,204,221,.2);border-radius:10px;padding:12px;">
+        <div style="font-size:9px;color:var(--cyan);font-weight:900;letter-spacing:1px;margin-bottom:5px;">● BUTLER AI</div>
+        <div style="font-size:13px;color:var(--textbrt);line-height:20px;">Hello! I have full context of your scripts, KB, network, and flows. How can I help you today?</div>
+      </div>
+      <div style="align-self:flex-end;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:10px;padding:12px;max-width:85%;">
+        <div style="font-size:13px;color:var(--textbrt);line-height:20px;">Show me the top 5 anomalies from today's scan</div>
+      </div>
+      <div style="background:rgba(0,204,221,.06);border:1px solid rgba(0,204,221,.2);border-radius:10px;padding:12px;">
+        <div style="font-size:9px;color:var(--cyan);font-weight:900;letter-spacing:1px;margin-bottom:5px;">● BUTLER AI</div>
+        <div style="font-size:13px;color:var(--textbrt);line-height:20px;">I found 5 anomalies worth reviewing. The most critical is a 2.4GB log file that has been growing at 340MB/hour since midnight...</div>
+      </div>
+    </div>
+  </div><!-- /page-butler -->
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE: KNOWLEDGE BASE
+  ══════════════════════════════════════════════════ -->
+  <div class="content page" id="page-knowledge">
+
+    <!-- Neural KB Graph -->
+    <div class="card amber">
+      <div class="card-header">
+        <div class="icon-box amber" style="width:36px;height:36px;border-radius:8px;font-size:16px;">🧠</div>
+        <div style="flex:1;"><div class="card-title amber">NEURAL KB GRAPH</div><div class="card-sub">12 nodes · 18 connections</div></div>
+        <div class="status-badge connected"><div class="dot"></div><div class="txt">LIVE</div></div>
+      </div>
+      <!-- SVG graph -->
+      <div class="kb-graph">
+        <svg width="100%" height="120" viewBox="0 0 340 120" style="position:absolute;top:0;left:0;">
+          <!-- edges -->
+          <line x1="60" y1="30" x2="140" y2="60" stroke="#FF8C00" stroke-width="1.5" opacity=".5"/>
+          <line x1="60" y1="30" x2="110" y2="90" stroke="#FF8C00" stroke-width="1.5" opacity=".5"/>
+          <line x1="140" y1="60" x2="230" y2="30" stroke="#FF8C00" stroke-width="1.5" opacity=".5"/>
+          <line x1="140" y1="60" x2="200" y2="90" stroke="#FF8C00" stroke-width="1.5" opacity=".5"/>
+          <line x1="230" y1="30" x2="300" y2="70" stroke="#00CCDD" stroke-width="1.5" opacity=".5"/>
+          <line x1="200" y1="90" x2="300" y2="70" stroke="#00FF88" stroke-width="1.5" opacity=".5"/>
+          <line x1="110" y1="90" x2="200" y2="90" stroke="#BB33FF" stroke-width="1.5" opacity=".5"/>
+          <!-- nodes -->
+          <circle cx="60"  cy="30"  r="8" fill="#FF5733" stroke="#FF5733" stroke-width="2"/>
+          <circle cx="140" cy="60"  r="10" fill="#FF8C00" stroke="#FF8C00" stroke-width="2"/>
+          <circle cx="230" cy="30"  r="7" fill="#00FF88" stroke="#00FF88" stroke-width="2"/>
+          <circle cx="110" cy="90"  r="9" fill="#BB33FF" stroke="#BB33FF" stroke-width="2"/>
+          <circle cx="200" cy="90"  r="8" fill="#00CCDD" stroke="#00CCDD" stroke-width="2"/>
+          <circle cx="300" cy="70"  r="7" fill="#FFD700" stroke="#FFD700" stroke-width="2"/>
+          <circle cx="50"  cy="80"  r="6" fill="#4488FF" stroke="#4488FF" stroke-width="2"/>
+          <circle cx="270" cy="55"  r="6" fill="#FF6EB4" stroke="#FF6EB4" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="stat-row" style="margin-bottom:0;">
+        <div class="stat-pill"><div class="stat-val amber">342</div><div class="stat-lbl">FINDINGS</div></div>
+        <div class="stat-pill"><div class="stat-val green">89</div><div class="stat-lbl">LAST 15</div></div>
+        <div class="stat-pill"><div class="stat-val" style="color:var(--teal)">98%</div><div class="stat-lbl">SESSIONS</div></div>
+        <div class="stat-pill"><div class="stat-val" style="color:var(--textbrt)">0</div><div class="stat-lbl">WARNINGS</div></div>
+      </div>
+    </div>
+
+    <!-- Filter row -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <div class="page-btn active" style="padding:5px 10px;font-size:9px;">SIGMA-NET</div>
+      <div class="page-btn" style="padding:5px 10px;font-size:9px;">ΩLOOP</div>
+      <div class="page-btn" style="padding:5px 10px;font-size:9px;">QLH</div>
+      <div class="page-btn" style="padding:5px 10px;font-size:9px;">MANUAL</div>
+    </div>
+
+    <!-- OMEGA scanner -->
+    <div class="card green">
+      <div class="card-header">
+        <div class="icon-box green" style="width:36px;height:36px;border-radius:8px;font-size:14px;">✨</div>
+        <div style="flex:1;"><div class="card-title green">OMEGA SCANNER</div><div class="card-sub">Self-healing · 8-min cycles</div></div>
+        <div class="status-badge connected"><div class="dot"></div><div class="txt">HEALTHY</div></div>
+      </div>
+      <div class="stat-row" style="margin-bottom:12px;">
+        <div class="stat-pill"><div class="stat-val green">87/100</div><div class="stat-lbl">SCORE</div></div>
+        <div class="stat-pill"><div class="stat-val" style="color:var(--cyan)">342</div><div class="stat-lbl">FINDINGS</div></div>
+        <div class="stat-pill"><div class="stat-val" style="color:var(--cyan)">8</div><div class="stat-lbl">DOMAINS</div></div>
+        <div class="stat-pill"><div class="stat-val green">3</div><div class="stat-lbl">FIXED</div></div>
+      </div>
+      <div class="action-row">
+        <div class="action-btn green">🔍 FORCE SCAN</div>
+        <div class="action-btn red">🗑 CLEAR LOGS</div>
+      </div>
+    </div>
+
+  </div><!-- /page-knowledge -->
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE: TOOLS HUB
+  ══════════════════════════════════════════════════ -->
+  <div class="content page" id="page-tools">
+
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <div class="page-btn active" style="padding:5px 10px;font-size:9px;">ALL</div>
+      <div class="page-btn" style="padding:5px 10px;font-size:9px;">SYSTEM</div>
+      <div class="page-btn" style="padding:5px 10px;font-size:9px;">NETWORK</div>
+      <div class="page-btn" style="padding:5px 10px;font-size:9px;">FILES</div>
+    </div>
+
+    <div class="quick-grid">
+      <div class="quick-card cyan">
+        <div style="font-size:8px;font-weight:900;color:var(--cyan);letter-spacing:.5px;margin-bottom:4px;">SYSTEM</div>
+        <div class="quick-icon">📊</div>
+        <div class="quick-name">PERFORMANCE</div>
+        <div class="quick-sub">CPU + disk live</div>
+      </div>
+      <div class="quick-card green">
+        <div style="font-size:8px;font-weight:900;color:var(--green);letter-spacing:.5px;margin-bottom:4px;">SYSTEM</div>
+        <div class="quick-icon">📋</div>
+        <div class="quick-name">SYS SNAPSHOT</div>
+        <div class="quick-sub">Full system info</div>
+      </div>
+      <div class="quick-card amber">
+        <div style="font-size:8px;font-weight:900;color:var(--amber);letter-spacing:.5px;margin-bottom:4px;">NETWORK</div>
+        <div class="quick-icon">🗺️</div>
+        <div class="quick-name">LAN MAP</div>
+        <div class="quick-sub">Network scan</div>
+      </div>
+      <div class="quick-card purple">
+        <div style="font-size:8px;font-weight:900;color:var(--red);letter-spacing:.5px;margin-bottom:4px;">NETWORK</div>
+        <div class="quick-icon">🛡️</div>
+        <div class="quick-name">PORT SCAN</div>
+        <div class="quick-sub">Open port audit</div>
+      </div>
+      <div class="quick-card cyan" style="--card-col:var(--green);">
+        <div style="font-size:8px;font-weight:900;color:var(--blue);letter-spacing:.5px;margin-bottom:4px;">FILES</div>
+        <div class="quick-icon">🗄️</div>
+        <div class="quick-name">BACKUP DOCS</div>
+        <div class="quick-sub">Zip documents</div>
+      </div>
+      <div class="quick-card green">
+        <div style="font-size:8px;font-weight:900;color:var(--green);letter-spacing:.5px;margin-bottom:4px;">FILES</div>
+        <div class="quick-icon">🧹</div>
+        <div class="quick-name">CACHE CLEAN</div>
+        <div class="quick-sub">Clear temp files</div>
+      </div>
+      <div class="quick-card amber">
+        <div style="font-size:8px;font-weight:900;color:var(--amber);letter-spacing:.5px;margin-bottom:4px;">SYSTEM</div>
+        <div class="quick-icon">⚡</div>
+        <div class="quick-name">BENCHMARK</div>
+        <div class="quick-sub">CPU/disk speed</div>
+      </div>
+      <div class="quick-card cyan">
+        <div style="font-size:8px;font-weight:900;color:var(--cyan);letter-spacing:.5px;margin-bottom:4px;">NETWORK</div>
+        <div class="quick-icon">🌐</div>
+        <div class="quick-name">WEB SCRAPER</div>
+        <div class="quick-sub">Fetch + parse site</div>
+      </div>
+    </div>
+
+    <div class="info-banner amber" style="margin-top:14px;">
+      <div class="icon">ℹ️</div>
+      <div class="text amber">All scripts run via Python subprocess on your PC · 30s timeout per tool</div>
+    </div>
+
+    <div class="conn-bar offline" style="margin-top:14px;">
+      <div class="conn-bar-icon">🤖</div>
+      <div class="conn-bar-text">
+        <div class="conn-bar-title offline">Connect to your PC first</div>
+        <div class="conn-bar-sub">● Offline — go to Home tab to connect your PC</div>
+      </div>
+      <div class="conn-bar-arrow">›</div>
+    </div>
+
+  </div><!-- /page-tools -->
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE: SETTINGS / CONFIG
+  ══════════════════════════════════════════════════ -->
+  <div class="content page" id="page-settings">
+
+    <!-- Server address card -->
+    <div class="card cyan">
+      <div class="card-header" style="margin-bottom:4px;">
+        <span style="font-size:16px;">🖥️</span>
+        <div class="card-title" style="flex:1;margin-bottom:0;">SERVER ADDRESS</div>
+        <div style="display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;background:rgba(0,255,136,.15);border:1px solid rgba(0,255,136,.4);">
+          <span style="font-size:11px;">✓</span>
+          <span style="font-size:8px;font-weight:900;color:var(--green);">SAVED</span>
+        </div>
+      </div>
+      <div class="card-sub" style="margin-bottom:8px;">Tap a field to edit — persists across app restarts</div>
+      <div class="editable-row">
+        <div class="editable-header">
+          <span style="font-size:14px;">📡</span>
+          <div class="editable-label">IP Address</div>
+          <div class="edit-chip"><span>✏ EDIT</span></div>
+        </div>
+        <div class="editable-value">192.168.1.100</div>
+      </div>
+      <div class="editable-row" style="border-bottom:none;">
+        <div class="editable-header">
+          <span style="font-size:14px;">⇄</span>
+          <div class="editable-label">Port</div>
+          <div class="edit-chip"><span>✏ EDIT</span></div>
+        </div>
+        <div class="editable-value">8766</div>
+      </div>
+    </div>
+
+    <!-- Performance mode -->
+    <div class="card amber">
+      <div class="section-label" style="color:var(--amber);">⚡ PERFORMANCE MODE</div>
+      <div class="toggle-row">
+        <div class="toggle-icon">🎞</div>
+        <div class="toggle-text"><div class="toggle-title">Pause All Animations</div><div class="toggle-sub">Stops glow loops — saves CPU on slow phones</div></div>
+        <div class="toggle"><div class="thumb"></div></div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-icon">🔋</div>
+        <div class="toggle-text"><div class="toggle-title" style="color:var(--red);">Bare Minimum Mode</div><div class="toggle-sub">Disables HUD effects — max performance</div></div>
+        <div class="toggle"><div class="thumb"></div></div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-icon">📳</div>
+        <div class="toggle-text"><div class="toggle-title">Disable Haptics</div><div class="toggle-sub">Turn off vibration feedback</div></div>
+        <div class="toggle on"><div class="thumb"></div></div>
+      </div>
+    </div>
+
+    <!-- Connection and behavior -->
+    <div class="card">
+      <div class="section-label">📶 CONNECTION AND BEHAVIOR</div>
+      <div class="toggle-row">
+        <div class="toggle-icon">📶</div>
+        <div class="toggle-text"><div class="toggle-title">Auto-connect on startup</div><div class="toggle-sub">Connect to last server when app opens</div></div>
+        <div class="toggle on"><div class="thumb"></div></div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-icon">▶</div>
+        <div class="toggle-text"><div class="toggle-title">Auto-run on startup</div><div class="toggle-sub">Execute saved script when connected</div></div>
+        <div class="toggle"><div class="thumb"></div></div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-icon">🔔</div>
+        <div class="toggle-text"><div class="toggle-title">Notifications</div><div class="toggle-sub">Show execution result alerts</div></div>
+        <div class="toggle on"><div class="thumb"></div></div>
+      </div>
+    </div>
+
+    <!-- Export All Files card -->
+    <div class="card teal">
+      <div style="height:2px;background:var(--teal);margin:-14px -14px 14px;border-radius:10px 10px 0 0;"></div>
+      <div class="card-header">
+        <div class="icon-box teal" style="width:44px;height:44px;border-radius:10px;font-size:22px;">📦</div>
+        <div>
+          <div class="card-title teal">EXPORT ALL FILES</div>
+          <div class="card-sub">Copies the full app manifest + embedded sources to clipboard</div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-pill"><div class="stat-val" style="color:var(--teal)">20</div><div class="stat-lbl">FILES</div></div>
+        <div class="stat-pill"><div class="stat-val green">2</div><div class="stat-lbl">EMBEDDED</div></div>
+        <div class="stat-pill"><div class="stat-val" style="color:var(--blue)">JS/TS</div><div class="stat-lbl">FORMAT</div></div>
+        <div class="stat-pill"><div class="stat-val orange">CLIP</div><div class="stat-lbl">OUTPUT</div></div>
+      </div>
+      <button class="btn btn-teal" style="width:100%;margin-bottom:8px;">📋 COPY ALL FILES</button>
+      <div class="action-row">
+        <div class="action-btn teal">👁 PREVIEW</div>
+        <div class="action-btn" style="border-color:rgba(139,92,246,.55);color:#8b5cf6;background:rgba(139,92,246,.0A);">📤 SHARE</div>
+        <div class="action-btn amber">💾 SAVE JSON</div>
+        <div class="action-btn teal">📥 IMPORT JSON</div>
+      </div>
+    </div>
+
+    <!-- About info section -->
+    <div class="section-divider">
+      <div class="div-line"></div>
+      <div class="div-badge"><span style="font-size:11px;">👨‍💻</span><span class="div-badge-txt">DEVELOPER INFO</span></div>
+      <div class="div-line"></div>
+    </div>
+
+    <div class="card" style="opacity:.85;">
+      <div class="section-label" style="color:var(--text);">ℹ ABOUT</div>
+      <div class="info-row"><div class="info-key">App Version</div><div class="info-val">Butler AI v6.0</div></div>
+      <div class="info-row"><div class="info-key">Package</div><div class="info-val">com.butlerai.pc.automation</div></div>
+      <div class="info-row"><div class="info-key">AI Engine</div><div class="info-val">Ollama Local (no cloud)</div></div>
+      <div class="info-row"><div class="info-key">Platform</div><div class="info-val">React Native / Expo SDK 53</div></div>
+      <div class="info-row" style="border:none;"><div class="info-key">License</div><div class="info-val">Proprietary © 2026</div></div>
+    </div>
+
+  </div><!-- /page-settings -->
+
+</div><!-- /app-shell -->
+
+<!-- ── AI CHAT BAR (fixed) ── -->
+<div class="chat-bar" id="chat-bar">
+  <div class="chat-bar-top"></div>
+  <div class="chat-bar-row">
+    <div class="chat-orb">🤖</div>
+    <div class="chat-divider"></div>
+    <input class="chat-input" placeholder="Ask Butler AI anything..." id="chat-input"/>
+    <div class="chat-send">›</div>
+  </div>
+  <div class="chat-footer">
+    <div class="chat-status-dot"></div>
+    <div class="chat-status-txt">Butler AI  ·  Local  ·  Private  ·  Zero Cloud</div>
+  </div>
+</div>
+
+<!-- ── BOTTOM TAB BAR (fixed) ── -->
+<div class="tab-bar" id="tab-bar">
+  <div class="tab-item active" onclick="switchTab('home',this)">
+    <div class="tab-icon">🏠</div>
+    <div class="tab-lbl">HOME</div>
+  </div>
+  <div class="tab-item" onclick="switchTab('scripts',this)">
+    <div class="tab-icon">‹›</div>
+    <div class="tab-lbl">SCRIPTS</div>
+  </div>
+  <div class="tab-item" onclick="switchTab('butler',this,'green')">
+    <div class="tab-icon">🤖</div>
+    <div class="tab-lbl">AI</div>
+  </div>
+  <div class="tab-item" onclick="switchTab('knowledge',this)">
+    <div class="tab-icon">📚</div>
+    <div class="tab-lbl">KB</div>
+  </div>
+  <div class="tab-item" onclick="switchTab('tools',this)">
+    <div class="tab-icon">🛠</div>
+    <div class="tab-lbl">TOOLS</div>
+  </div>
+  <div class="tab-item" onclick="switchTab('settings',this)">
+    <div class="tab-icon">⚙</div>
+    <div class="tab-lbl">CONFIG</div>
+  </div>
+</div>
+
+<script>
+// ── PAGE SWITCHER ──────────────────────────────────────────
+const PAGE_META = {
+  home:      { title:'NEXUS HOME',     sub:'PC Automation · Command Center',    btn:'QR SCAN',  accent:'#00CCDD' },
+  scripts:   { title:'SCRIPT LIBRARY', sub:'Python Automation · 70+ Scripts',   btn:'REFRESH',  accent:'#4488FF' },
+  butler:    { title:'BUTLER AI',      sub:'Local Ollama · Private · Zero Cloud',btn:'CLEAR',    accent:'#BB33FF' },
+  knowledge: { title:'KNOWLEDGE BASE', sub:'SIGMA-NET · Live Crawler · KB Graph',btn:'SYNC',     accent:'#FF8C00' },
+  tools:     { title:'TOOLS HUB',      sub:'File Share · Clipboard · Terminal', btn:'REFRESH',  accent:'#00CCDD' },
+  settings:  { title:'SYSTEM CONFIG',  sub:'App Settings · Preferences',        btn:'SAVE',     accent:'#CC7755' },
+};
+
+function showPage(pageId, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + pageId)?.classList.add('active');
+  document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  updateHeader(pageId);
+  // hide chat bar on butler page
+  document.getElementById('chat-bar').style.display = pageId === 'butler' ? 'none' : 'block';
+}
+
+function switchTab(pageId, el, colorClass) {
+  showPage(pageId, null);
+  // sync chip bar
+  const chips = document.querySelectorAll('.page-btn');
+  chips.forEach(c => c.classList.remove('active'));
+  // update tab bar
+  document.querySelectorAll('.tab-item').forEach(t => {
+    t.className = 'tab-item';
+    t.onclick.toString();
+  });
+  el.className = 'tab-item active' + (colorClass ? ' ' + colorClass : '');
+}
+
+function updateHeader(pageId) {
+  const meta = PAGE_META[pageId] || PAGE_META.home;
+  document.getElementById('header-title').textContent = meta.title;
+  document.getElementById('header-sub').textContent = meta.sub;
+  document.getElementById('header-btn-label').textContent = meta.btn;
+  document.getElementById('header-btn').style.borderColor = meta.accent + '99';
+  document.getElementById('header-btn').style.background = meta.accent + '22';
+  document.getElementById('header-btn-label').style.color = meta.accent;
+  document.getElementById('header-bar').style.background = meta.accent + '44';
+}
+
+// Toggle interaction
+document.querySelectorAll('.toggle').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('on'));
+});
+</script>
+</body>
+</html>

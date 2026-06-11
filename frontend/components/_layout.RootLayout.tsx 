@@ -1,0 +1,197 @@
+// ┌─────────────────────────────────────────────────────────────────────────┐
+// │  Butler AI · app/_layout.tsx  —  RootLayout patch                      │
+// │                                                                         │
+// │  Replace the existing RootLayout function (lines ~340–461).            │
+// │  Everything outside that function block stays as-is.                   │
+// │                                                                         │
+// │  Changes vs. original                                                   │
+// │  ─────────────────────────────────────────────────────────────────────  │
+// │  ✦ Removed global.__onboardingComplete                                 │
+// │  ✦ Removed postOnboardingRef race guard                                │
+// │  ✦ initApp effect now runs EXACTLY ONCE (didInitRef)                   │
+// │  ✦ Navigation after onboarding is owned exclusively by                 │
+// │    services/onboardingExit.ts — no competing routes                    │
+// └─────────────────────────────────────────────────────────────────────────┘
+
+// ─── Required additions to the top of _layout.tsx ────────────────────────────
+//
+//   import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
+//
+// (All other imports — AsyncStorage, Platform, Stack, useRouter, etc. —
+//  are assumed to be present in the original file.)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Key used to suppress the one-time Android splash screen. */
+const FIRST_LAUNCH_KEY = '@butler_first_launch_v1'; // ← keep your existing constant
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RootLayout
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function RootLayout() {
+  const router = useRouter();
+
+  // ── Splash & onboarding state ──────────────────────────────────────────
+  const [showSplash,       setShowSplash]       = useState(false);
+  const [splashDone,       setSplashDone]       = useState(false);
+  const [needsOnboarding,  setNeedsOnboarding]  = useState<boolean | null>(null);
+
+  /**
+   * Guard that ensures initApp's routing logic executes only once per mount.
+   *
+   * Why a ref and not a state flag?
+   * — state updates are async and might allow a second render to slip through
+   *   before the flag is committed; refs are synchronous.
+   */
+  const didInitRef = useRef(false);
+
+  useAppSync();
+
+  // ── 1. Bootstrap: read storage, decide splash ─────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const [onboardingDone, firstLaunch] = await Promise.all([
+        AsyncStorage.getItem(ONBOARDING_DONE_KEY).catch(() => null),
+        AsyncStorage.getItem(FIRST_LAUNCH_KEY).catch(() => null),
+      ]);
+
+      if (cancelled) return;
+
+      setNeedsOnboarding(onboardingDone !== '1');
+
+      if (Platform.OS === 'android' && !firstLaunch) {
+        setShowSplash(true);
+        // Fire-and-forget — failure just means splash might show again.
+        AsyncStorage.setItem(FIRST_LAUNCH_KEY, String(Date.now())).catch(() => {});
+      } else {
+        setSplashDone(true);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, []); // intentionally empty: runs once on mount
+
+  // ── 2. Initial route — fires EXACTLY ONCE ─────────────────────────────
+  //
+  //  The `didInitRef` guard is the key change from the original layout:
+  //  it prevents this effect from re-running if `needsOnboarding` or
+  //  `splashDone` change later (e.g., after Screen10Ready calls
+  //  exitOnboarding and the tabs mount). Without this guard,
+  //  router.replace('/welcome') could fire again and undo the exit.
+  useEffect(() => {
+    if (didInitRef.current)                    return; // already ran
+    if (!splashDone || needsOnboarding === null) return; // not ready yet
+
+    didInitRef.current = true; // lock — no subsequent runs
+
+    (async () => {
+      try {
+        // Identify device for analytics / crash reporting (non-blocking).
+        await deviceIdentifier.getDeviceId().catch(() => {});
+
+        // Route to the correct first screen.
+        if (needsOnboarding) {
+          router.replace('/welcome' as any);
+        } else {
+          router.replace('/(tabs)/nexushome' as any);
+        }
+
+        // Start background connectivity scanning.
+        autoConnectEngine.start().catch(() => {});
+
+        // Once a LAN connection is established, queue a health scan.
+        const unsubScan = autoConnectEngine.onEvent(async (evt) => {
+          if (evt.status !== 'connected' || !evt.ip) return;
+          unsubScan(); // one-shot
+
+          setTimeout(async () => {
+            try {
+              const { appScanner } = require('@/services/appScanner');
+              const report = await appScanner.runFullScan();
+              if (report.overallStatus !== 'ok') {
+                console.log(
+                  '[AutoScan] Health score:',
+                  report.score,
+                  '—',
+                  report.summary,
+                );
+              }
+            } catch {
+              // Non-critical — scan failure should never surface to the user.
+            }
+          }, 8_000);
+        });
+      } catch {
+        // Last-resort fallback: at minimum, get the user to a navigable screen.
+        router.replace('/(tabs)/nexushome' as any);
+      }
+    })();
+  }, [splashDone, needsOnboarding, router]);
+
+  // ── Render ─────────────────────────────────────────────────────────────
+  return (
+    <GlobalErrorBoundary>
+      <CosmeticProvider>
+        <TabBarProvider>
+          {/* Android one-time splash — hides itself once done */}
+          {showSplash && !splashDone ? (
+            <NexusSplash
+              onDone={() => {
+                setShowSplash(false);
+                setSplashDone(true);
+              }}
+            />
+          ) : null}
+
+          <StatusBar style="light" />
+
+          <View style={s.container}>
+            <Stack
+              screenOptions={{
+                headerShown:  false,
+                contentStyle: { backgroundColor: '#050202' },
+              }}
+            >
+              {/* ── Core screens ─────────────────────────────────────── */}
+              <Stack.Screen name="welcome"    options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)"     options={{ headerShown: false }} />
+              <Stack.Screen name="main-menu"  options={{ headerShown: false }} />
+              <Stack.Screen name="tutorial"   options={{ headerShown: false }} />
+
+              {/* ── Modal screens ────────────────────────────────────── */}
+              <Stack.Screen
+                name="privacy-policy"
+                options={{
+                  headerShown:  false,
+                  presentation: 'modal',
+                  animation:    'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="terms"
+                options={{
+                  headerShown:  false,
+                  presentation: 'modal',
+                  animation:    'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="data-safety"
+                options={{
+                  headerShown:  false,
+                  presentation: 'modal',
+                  animation:    'slide_from_bottom',
+                }}
+              />
+
+              {/* ── Dynamic segments ─────────────────────────────────── */}
+              <Stack.Screen name="category/[id]" options={{ headerShown: false }} />
+            </Stack>
+          </View>
+        </TabBarProvider>
+      </CosmeticProvider>
+    </GlobalErrorBoundary>
+  );
+}

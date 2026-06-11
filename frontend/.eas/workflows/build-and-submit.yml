@@ -1,0 +1,34 @@
+name: Build and submit
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  quality:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm ci
+      - name: TypeScript check
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npx expo lint || true
+
+  build_android:
+    name: Build Android app
+    needs: [quality]
+    type: build
+    params:
+      platform: android
+      profile: production
+
+  submit_android:
+    name: Submit Android to Play Store
+    type: submit
+    needs: [build_android]
+    params:
+      platform: android
+      profile: production

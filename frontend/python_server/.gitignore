@@ -1,0 +1,55 @@
+# ==========================================
+# ONESPACE.AI - BOTLER PYTHON BACKEND
+# ==========================================
+
+# 1. Environment Variables & Cryptographic Secrets (CRITICAL)
+.env
+.env.local
+.env.*
+*.pem
+*.key
+
+# 2. Proprietary N.S.D.L. Vector Databases (CRITICAL)
+botler_knowledge_vault/
+nsdl_reflexes/
+chroma.sqlite3
+*.db
+*.sqlite3
+
+# 3. Chrono-State Sandbox (Prevents uploading user's private files!)
+.botler_vault/
+undo_*.json
+
+# 4. Standard Python Caches & Build Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 5. Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# 6. IDEs and OS Hidden Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

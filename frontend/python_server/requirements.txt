@@ -1,0 +1,37 @@
+# ╔══════════════════════════════════════════════════════════╗
+# ║  BUTLER SERVER v4.2 — Python Dependencies               ║
+# ║  Install all: pip install -r requirements.txt           ║
+# ╚══════════════════════════════════════════════════════════╝
+
+# ── Core / always required ────────────────────────────────
+psutil>=5.9.8            # CPU, RAM, Disk, Network, Process metrics
+requests>=2.31.0         # HTTP client for Gemini, web enrichment, PyPI
+
+# ── HTML parsing (SIGMA-NET crawl quality) ────────────────
+beautifulsoup4>=4.12.0   # HTML stripping for SIGMA-NET relay crawl
+lxml>=5.0.0              # Fast HTML parser used by BeautifulSoup
+
+# ── QR Code pairing (optional but recommended) ────────────
+qrcode[pil]>=7.4.2       # QR code generation
+Pillow>=10.2.0           # Image handling (required by qrcode + GUI)
+
+# ── GUI (optional — auto-detected, uses system tkinter) ───
+# tkinter ships with Python on Windows/macOS.
+# On Ubuntu/Debian: sudo apt-get install python3-tk
+# On Fedora: sudo dnf install python3-tkinter
+
+# ── Development / optional extras ─────────────────────────
+# colorama>=0.4.6        # Colored terminal output (Windows)
+# pywin32>=306           # Windows API access in scripts (Windows only)
+# pyautogui>=0.9.54      # GUI automation in scripts
+# selenium>=4.18.0       # Browser automation in scripts
+# playwright>=1.42.0     # Headless browser in scripts (run: playwright install)
+# pandas>=2.2.0          # Data processing in scripts
+# openpyxl>=3.1.2        # Excel file handling in scripts
+# schedule>=1.2.1        # Simple task scheduling in scripts
+# APScheduler>=3.10.4    # Advanced scheduling in scripts
+# watchdog>=4.0.0        # File system monitoring in scripts
+# paramiko>=3.4.0        # SSH client in scripts
+# cryptography>=42.0.0   # Encryption in scripts
+# loguru>=0.7.2          # Advanced logging in scripts
+# rich>=13.7.0           # Pretty terminal output in scripts

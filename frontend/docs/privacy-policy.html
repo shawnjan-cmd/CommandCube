@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Butler AI Privacy Policy - Zero data collection, no cloud, fully local Android app for remote PC automation." />
+  <meta name="robots" content="index, follow" />
+  <title>Privacy Policy – Butler AI Automation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #0a0f1a;
+      color: #c8d8e8;
+      line-height: 1.7;
+      padding: 0 16px 60px;
+    }
+    .wrap { max-width: 780px; margin: 0 auto; }
+    header {
+      background: linear-gradient(135deg, #001a28 0%, #003344 100%);
+      border-bottom: 3px solid #00ccdd;
+      padding: 36px 16px 28px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #00eeff;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    header p { font-size: 13px; color: #336677; letter-spacing: 0.5px; }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .badge {
+      background: rgba(0,204,221,0.12);
+      border: 1px solid rgba(0,204,221,0.4);
+      color: #00ccdd;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 4px;
+      letter-spacing: 0.8px;
+    }
+    .badge.green { background: rgba(68,255,136,0.10); border-color: rgba(68,255,136,0.4); color: #44ff88; }
+    .badge.amber { background: rgba(255,140,0,0.10); border-color: rgba(255,140,0,0.4); color: #ff8c00; }
+    main { padding-top: 32px; }
+    .summary-box {
+      background: rgba(0,204,221,0.07);
+      border: 1.5px solid rgba(0,204,221,0.35);
+      border-radius: 10px;
+      padding: 22px 24px;
+      margin-bottom: 32px;
+    }
+    .summary-box h2 { color: #44ff88; font-size: 15px; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px; }
+    .summary-box p { font-size: 14px; color: #99bbcc; line-height: 1.8; }
+    h2.section {
+      font-size: 13px;
+      font-weight: 900;
+      color: #00ccdd;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      padding-left: 12px;
+      border-left: 3px solid #00ccdd;
+      margin: 32px 0 14px;
+    }
+    .card {
+      background: #060f18;
+      border: 1px solid #0d1a24;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+    }
+    .card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #88aacc;
+      margin-bottom: 10px;
+    }
+    .card p, .card li { font-size: 13px; color: #668899; line-height: 1.75; }
+    .card ul { padding-left: 18px; }
+    .card li { margin-bottom: 5px; }
+    .check-list { list-style: none !important; padding-left: 0 !important; }
+    .check-list li::before { content: "✓ "; color: #44ff88; font-weight: 700; }
+    .cross-list { list-style: none !important; padding-left: 0 !important; }
+    .cross-list li::before { content: "✗ "; color: #ff3300; font-weight: 700; }
+    .perm-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid #0d1a24;
+    }
+    .perm-row:last-child { border-bottom: none; }
+    .perm-name {
+      font-size: 11px;
+      font-weight: 900;
+      color: #ff8c00;
+      letter-spacing: 0.8px;
+      min-width: 180px;
+      padding-top: 2px;
+    }
+    .perm-desc { font-size: 12px; color: #668899; line-height: 1.65; }
+    .contact-box {
+      background: rgba(0,221,255,0.07);
+      border: 1.5px solid rgba(0,221,255,0.35);
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 32px;
+      text-align: center;
+    }
+    .contact-box h2 { color: #00ddff; font-size: 16px; margin-bottom: 8px; }
+    .contact-box a { color: #00eeff; font-weight: 700; font-size: 15px; text-decoration: none; }
+    .contact-box a:hover { text-decoration: underline; }
+    .contact-box p { font-size: 12px; color: #336677; margin-top: 8px; }
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #336677;
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid #0d1a24;
+      letter-spacing: 0.6px;
+    }
+    @media (max-width: 520px) {
+      header h1 { font-size: 20px; }
+      .perm-name { min-width: 130px; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>🔒 PRIVACY POLICY</h1>
+      <p>Butler AI Automation &nbsp;·&nbsp; Android App &nbsp;·&nbsp; Effective April 1, 2026</p>
+      <div class="badge-row">
+        <span class="badge green">ZERO DATA COLLECTION</span>
+        <span class="badge green">NO CLOUD SERVERS</span>
+        <span class="badge">LAN ONLY</span>
+        <span class="badge">NO ACCOUNTS</span>
+        <span class="badge amber">CAMERA: QR SCAN ONLY</span>
+        <span class="badge">OPEN SOURCE SERVER</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main>
+      <!-- TL;DR summary -->
+      <div class="summary-box" style="margin-top:28px;">
+        <h2>PLAIN ENGLISH SUMMARY</h2>
+        <p>
+          Butler AI is a <strong>100% self-hosted</strong> remote PC automation tool. It connects your Android phone to a Python server running on <em>your own PC</em> over your local Wi-Fi. <strong>We collect zero personal data. We have no servers. Your scripts, settings, and chat history never leave your home network.</strong> The Camera permission is used exclusively when you tap the QR scan button to pair with your PC — nothing is photographed or stored.
+        </p>
+      </div>
+
+      <!-- 1. Information We Collect -->
+      <h2 class="section">1. Information We Collect</h2>
+      <div class="card">
+        <h3>Data Stored Locally on Your Device</h3>
+        <p>The following data is stored only in your phone's private app storage (Android AsyncStorage). It is <strong>never uploaded, transmitted, or shared</strong> with any external server, company, or third party:</p>
+        <ul class="check-list" style="margin-top:12px;">
+          <li>Your PC's local IP address and port number</li>
+          <li>Session pairing token (cryptographic HMAC hash, not a password)</li>
+          <li>App settings and preferences</li>
+          <li>Python scripts you save in the Script Library</li>
+          <li>Execution history (command logs)</li>
+          <li>Knowledge Base entries (auto-generated Python reference notes)</li>
+          <li>Chat history with the local AI (stored only on-device)</li>
+        </ul>
+      </div>
+
+      <!-- 2. Data We Do NOT Collect -->
+      <h2 class="section">2. Data We Never Collect</h2>
+      <div class="card">
+        <p>We <strong>explicitly do not collect, access, store, or transmit</strong> any of the following:</p>
+        <ul class="cross-list" style="margin-top:12px;">
+          <li>Name, email address, phone number, or any personal identity</li>
+          <li>GPS location or network-based location data</li>
+          <li>Device contacts, calendar entries, or call logs</li>
+          <li>Photos, camera images, or gallery content</li>
+          <li>Microphone audio or voice recordings</li>
+          <li>SMS messages or notification content</li>
+          <li>Advertising IDs or device fingerprints</li>
+          <li>Browser history, cookies, or web tracking data</li>
+          <li>Health, financial, or biometric data</li>
+          <li>Crash reports or diagnostic telemetry</li>
+          <li>Usage analytics, heatmaps, or session recordings</li>
+        </ul>
+      </div>
+
+      <!-- 3. Camera Permission -->
+      <h2 class="section">3. Camera Permission</h2>
+      <div class="card">
+        <h3>CAMERA — Used Only for QR Code Pairing</h3>
+        <p>
+          Butler AI requests the <code>android.permission.CAMERA</code> permission for <strong>one purpose only</strong>: scanning a QR code displayed by the <code>butler_server.py</code> Python script running on your PC. This QR code contains your PC's local IP address and a pairing token so you do not need to type them manually.
+        </p>
+        <br />
+        <ul class="check-list">
+          <li>Camera is <strong>only activated</strong> when you tap the "Scan QR" button on the Home screen</li>
+          <li>Camera is <strong>never activated in the background</strong></li>
+          <li>No photos, screenshots, or images are captured, saved, or transmitted</li>
+          <li>QR scan data stays on-device only (the IP and token are saved locally)</li>
+          <li>You can pair manually by typing your IP — camera is optional</li>
+        </ul>
+      </div>
+
+      <!-- 4. All Permissions -->
+      <h2 class="section">4. All Android Permissions</h2>
+      <div class="card">
+        <div class="perm-row">
+          <div class="perm-name">INTERNET</div>
+          <div class="perm-desc">Required to communicate with your <code>butler_server.py</code> over your local Wi-Fi. Only LAN traffic — no internet endpoints are contacted during normal use.</div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-name">CAMERA</div>
+          <div class="perm-desc">Used <strong>only</strong> when you tap "Scan QR Code" to pair with your PC. No images stored. Never activated in background.</div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-name">ACCESS_NETWORK_STATE</div>
+          <div class="perm-desc">Checks if you are connected to Wi-Fi before attempting to reach your PC server. Prevents wasted connection attempts over cellular.</div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-name">NEARBY_WIFI_DEVICES<br/>(Android 12+)</div>
+          <div class="perm-desc">Enables the optional LAN Auto-Discover feature, which scans your local subnet via UDP broadcast to find your PC server automatically. Manual IP entry always works without this.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Permissions NOT Requested</h3>
+        <p style="font-family:monospace; font-size:11px; color:#336677; line-height:2;">
+          READ_CONTACTS &nbsp;·&nbsp; WRITE_CONTACTS &nbsp;·&nbsp; ACCESS_FINE_LOCATION &nbsp;·&nbsp; ACCESS_COARSE_LOCATION &nbsp;·&nbsp; RECORD_AUDIO &nbsp;·&nbsp; READ_SMS &nbsp;·&nbsp; SEND_SMS &nbsp;·&nbsp; READ_CALL_LOG &nbsp;·&nbsp; GET_ACCOUNTS &nbsp;·&nbsp; READ_PHONE_STATE &nbsp;·&nbsp; WRITE_EXTERNAL_STORAGE &nbsp;·&nbsp; READ_MEDIA_VIDEO &nbsp;·&nbsp; READ_MEDIA_AUDIO
+        </p>
+      </div>
+
+      <!-- 5. Data Transmission -->
+      <h2 class="section">5. How Data Is Transmitted</h2>
+      <div class="card">
+        <p>
+          All communication occurs exclusively between your Android phone and your personal PC over your <strong>local home or office Wi-Fi network</strong> (192.168.x.x, 10.x.x.x, or similar private ranges). No data is routed through the internet, our servers, or any third-party relay during standard operation.
+        </p>
+        <br />
+        <p>
+          <strong>Optional AI Relay (Φ-NEXUS Bridge):</strong> If you explicitly enable the optional cloud AI relay in Settings, Butler AI may send your typed question text to a Supabase Edge Function, which queries Google Gemini. This feature is <strong>disabled by default</strong>. No personal identity, IP address, scripts, or location is included in these requests. You can permanently disable this under Settings → Φ-NEXUS Bridge → Local-Only Mode.
+        </p>
+      </div>
+
+      <!-- 6. Third-Party Services -->
+      <h2 class="section">6. Third-Party Services</h2>
+      <div class="card">
+        <h3>Ollama Local AI (Optional, 100% Local)</h3>
+        <p>If you install Ollama on your PC, your AI chat conversations are processed entirely on your own hardware. No data leaves your local network. Ollama is open source (MIT License). <a href="https://ollama.com/privacy" style="color:#00ccdd;">Ollama Privacy Policy →</a></p>
+        <br />
+        <h3>Supabase / Google Gemini (Optional, Opt-In Only)</h3>
+        <p>Used only if you enable the Φ-NEXUS Bridge relay. Only anonymized query text is sent — no personal data. <a href="https://supabase.com/privacy" style="color:#00ccdd;">Supabase Privacy →</a> &nbsp; <a href="https://policies.google.com/privacy" style="color:#00ccdd;">Google Privacy →</a></p>
+        <br />
+        <h3>No Analytics SDKs</h3>
+        <p>Butler AI contains <strong>zero</strong> analytics, crash reporting, or advertising SDKs. No Firebase Analytics, Crashlytics, Facebook SDK, Amplitude, Mixpanel, Sentry, or any tracking library is included.</p>
+      </div>
+
+      <!-- 7. Data Security -->
+      <h2 class="section">7. Data Security</h2>
+      <div class="card">
+        <ul class="check-list">
+          <li>Device pairing uses HMAC-SHA256 cryptographic signatures — no plain-text passwords</li>
+          <li>Session tokens expire automatically after 30 days</li>
+          <li>Your PC server locks to one device at a time — new pairing revokes old one</li>
+          <li>All app data is stored in Android's private app sandbox — other apps cannot read it</li>
+          <li>Data is automatically wiped when you uninstall the app</li>
+          <li>Python scripts are executed in isolated subprocesses with a 30-second timeout</li>
+          <li>Built-in Safety Guard scans scripts for dangerous patterns before execution</li>
+        </ul>
+      </div>
+
+      <!-- 8. Children's Privacy -->
+      <h2 class="section">8. Children's Privacy</h2>
+      <div class="card">
+        <p>Butler AI is a developer productivity tool and is not directed at children under 13. We do not knowingly collect any personal information from children. Since we collect no personal information from anyone, this policy applies uniformly to all users.</p>
+      </div>
+
+      <!-- 9. Your Rights -->
+      <h2 class="section">9. Your Rights &amp; Data Control</h2>
+      <div class="card">
+        <ul class="check-list">
+          <li><strong>Access:</strong> All data is on your device — view it in-app at any time</li>
+          <li><strong>Delete:</strong> Settings → Data &amp; Storage → Clear App Cache, or simply uninstall the app</li>
+          <li><strong>Export:</strong> Settings → Butler AI Knowledge Base → Export Knowledge Base (JSON)</li>
+          <li><strong>Correction:</strong> Edit scripts and settings directly in the app</li>
+          <li><strong>No Account:</strong> No account exists to delete — we have no user database</li>
+        </ul>
+      </div>
+
+      <!-- 10. Changes -->
+      <h2 class="section">10. Changes to This Policy</h2>
+      <div class="card">
+        <p>We may update this Privacy Policy when we add new features. The "Effective" date at the top will be updated. Significant changes will be noted in the app's changelog. Continued use of the app after changes constitutes acceptance of the updated policy.</p>
+      </div>
+
+      <!-- Contact -->
+      <div class="contact-box">
+        <h2>Questions or Privacy Requests?</h2>
+        <a href="mailto:contact@onspace.ai">contact@onspace.ai</a>
+        <p>We respond within 48 hours. Butler AI is developed by Butler AI Dev / OnSpace AI.</p>
+      </div>
+
+      <footer>
+        <p>Butler AI Automation &nbsp;·&nbsp; Package: com.butlerai.pc.automation &nbsp;·&nbsp; Privacy Policy v1.2 &nbsp;·&nbsp; Effective April 1, 2026</p>
+        <p style="margin-top:6px;">This app is 100% self-hosted. Zero data collection. Zero cloud. Zero tracking.</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

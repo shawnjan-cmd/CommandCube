@@ -5,7 +5,7 @@
  * It deletes or moves the /app, /components, /hooks, /scripts, and /constants directories to /app-example based on user input and creates a new /app directory with an index.tsx and _layout.tsx file.
  * You can remove the `reset-project` script from package.json and safely delete this file after running it.
  */
-
+// https://0xmonkey458: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@github.com/MetapeAI/ai_image_hub.git
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
