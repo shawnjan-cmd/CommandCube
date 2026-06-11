@@ -18,7 +18,25 @@ Goal: Play Store-ready, futuristic robot-script-themed UI.
 - IMPORTANT (dev env): expo runs with CI=true → Metro file-watching is OFF.
   After editing frontend files run: sudo supervisorctl restart expo (wait ~20s).
 
-## Implemented (Feb 11, 2026 — this session: Homepage Overhaul v2)
+## Implemented (Feb 11, 2026 — session: Homepage Overhaul v2 + App-Wide Theme Unification)
+### Phase 2 (theme unification, tested iteration_3.json ALL PASS)
+- Removed hero version pill; Quick Access pinned directly below the BUTLER AI hero
+  (renderer pins hero+quick_access above config-driven cards in nexushome.tsx).
+- MASS palette unification (~180 hex replacements, 24+ files): roots → #000003,
+  panels → #02070D (Security-Protocols tone), raised → #071120. Applied to all tab pages,
+  shared components, PageBackgrounds bases, uiConfig color defaults.
+- Hero is a SPG-style panel: bg #02070D + tri-color top accent strip (cyan/green/purple).
+- Tab bar rethemed like the AI chat frame: steel #5E7186 + neon #3EC8FF double top edge,
+  center plateau notch, hazard dashes, labels 10.5px.
+- New robot-themed tab icons: view-dashboard-variant / code-braces-box / robot-happy /
+  head-cog-outline / desktop-tower-monitor / hammer-screwdriver / palette-swatch-outline / cog-box.
+- Security grid icons → MCI (shield-key, eye-off-outline, robot-angry-outline,
+  cloud-off-outline, server-security, account-cancel-outline).
+- QuickButlerBar more compact (52px, badge r15); fonts bumped app-wide on home
+  (titles 12.5+, stats 20, quick-access labels 13.5, SPG labels 11).
+- Fixed stray syntax fragment at EOF of nexushome.tsx (was breaking tsc/eslint).
+
+### Phase 1 (homepage overhaul)
 - Pure-black homepage (#000) + HomeBackdrop (circuit grid, scanlines, drifting scan beam,
   ambient orbs) so user-uploaded black-background images blend seamlessly.
 - Hero logo: replaced holographic core + text with user-supplied BUTLER AI SVG
@@ -46,9 +64,10 @@ Goal: Play Store-ready, futuristic robot-script-themed UI.
 - Animated uploads (GIF/WebP) supported via expo-image.
 
 ## Testing Status
-- iteration_2.json (Feb 11, 2026): ALL PASS — home render, 4 Quick Access navigations,
-  8 tabs no-crash, QR modal, QuickSend unpaired toasts, quickbar send→butler,
-  onboarding regression. "Prefill null" finding = by-design consumption, manually verified.
+- iteration_3.json (Feb 11, 2026): ALL PASS — 8/8 tabs no-crash after palette change,
+  quick access order + navigation, quickbar send, icons render, 0 console errors.
+- iteration_2.json: ALL PASS — home render, navigations, QR modal, quick send toasts,
+  onboarding regression.
 
 ## Backlog (P1→P3)
 - P1: Extend new card chrome/theme to PC, KB, Scripts tab screens (visual parity with home).
