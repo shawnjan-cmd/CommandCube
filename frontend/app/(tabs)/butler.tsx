@@ -25,6 +25,7 @@ import { InlineWidgetSlot, WidgetLayer } from '@/components/ui/WidgetLayer';
 import { useCosmetic } from '@/contexts/CosmeticContext';
 import * as ImagePicker from 'expo-image-picker';
 
+import ButlerWelcomeHub from '@/components/ui/ButlerWelcomeHub';
 import { useChatHistory } from '@/hooks/useChatHistory';
 import { buildHistoryOnly } from '@/utils/contextManager';
 import { BUTLER_STARTER_KNOWLEDGE, BUTLER_KNOWLEDGE_COMPACT } from '@/constants/butlerKnowledge';
@@ -1213,25 +1214,13 @@ export default function ButlerScreen() {
         keyboardDismissMode="on-drag"
       >
         {messages.length === 0 ? (
-          <>
-            <QuickSuggestionChips
-              onTap={sendMessage}
-              onBuildScript={() => setShowScriptBuilder(true)}
-              accentColor={pr}
-            />
-            <View style={{ alignItems: 'center', paddingVertical: 20, gap: 8 }}>
-              <View style={{ width: 64, height: 64, borderRadius: 18, borderWidth: 2,
-                borderColor: pr + '40', backgroundColor: pr + '0C',
-                alignItems: 'center', justifyContent: 'center' }}>
-                <MaterialIcons name="smart-toy" size={32} color={pr} />
-              </View>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: C.textBright, fontFamily: BODY_FONT }}>Butler AI</Text>
-              <Text style={{ fontSize: 12, color: C.textDim, fontFamily: MONO, textAlign: 'center',
-                paddingHorizontal: 32, lineHeight: 18 }}>
-                {`Local · Private · On your PC\nAsk me anything or try a quick action above`}
-              </Text>
-            </View>
-          </>
+          <ButlerWelcomeHub
+            accentColor={pr}
+            isConnected={isConnected}
+            modelName={null}
+            onSendPrompt={sendMessage}
+            onBuildScript={() => setShowScriptBuilder(true)}
+          />
         ) : (
           messages.map((msg, idx) => (
             <React.Fragment key={msg.id}>
