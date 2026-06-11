@@ -429,11 +429,64 @@ export default function RootLayout() {
   // dismisses the overlay. No router navigation needed; the tabs are already
   // mounted underneath this modal.
   const handleOnboardingComplete = React.useCallback(async () => {
-    try { await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch {}
+    console.log('[_layout] onboarding complete — persisting and dismissing overlay');
+    // Belt-and-suspenders: write twice (multiSet + setItem) with verification.
+    try {
+      await AsyncStorage.multiSet([
+        ['@butler_onboarding_done_v2', '1'],
+        ['@butler_consent_v2',         '1'],
+        ['@butler_terms_accepted_v1',  '1'],
+        ['@butler_privacy_accepted_v1','1'],
+        ['@butler_age_confirmed_v1',   '1'],
+        ['@butler_lan_consent_v1',     '1'],
+        ['@butler_server_privacy_accepted_v1', '1'],
+      ]);
+      // Verify the critical key actually landed. Some devices silently drop
+      // multiSet under memory pressure during first launch.
+      const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY);
+      if (v !== '1') {
+        console.warn('[_layout] verify miss, rewriting ONBOARDING_DONE_KEY');
+        await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1');
+      }
+    } catch (e) {
+      console.warn('[_layout] persistence threw, falling through anyway:', e);
+    }
     setNeedsOnboarding(false);
     // Kick off background services that were gated on completion.
     autoConnectEngine.start().catch(() => {});
   }, []);
+
+  // ─── BULLETPROOF GUARDS ───────────────────────────────────────────────────
+  // Guard 1: hard timeout. If AsyncStorage hangs forever (corrupt iCloud sync,
+  // failed migration, low-memory kill), force the gate to "needs onboarding"
+  // after 8 s so the user is NEVER stuck on the holding screen forever.
+  useEffect(() => {
+    if (needsOnboarding !== null) return;
+    const t = setTimeout(() => {
+      console.warn('[_layout] AsyncStorage gate timed out after 8s — assuming first launch');
+      setNeedsOnboarding(true);
+      setSplashDone(true);
+    }, 8000);
+    return () => clearTimeout(t);
+  }, [needsOnboarding]);
+
+  // Guard 2: every time the app comes back to the foreground, re-check the
+  // onboarding flag. If the user completed onboarding on another install and
+  // restored state from a backup, the in-memory flag may be stale.
+  useEffect(() => {
+    const { AppState } = require('react-native');
+    const sub = AppState.addEventListener('change', async (s: string) => {
+      if (s !== 'active') return;
+      try {
+        const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY);
+        if (v === '1' && needsOnboarding === true) {
+          console.log('[_layout] foreground re-check: flag set, closing overlay');
+          setNeedsOnboarding(false);
+        }
+      } catch {}
+    });
+    return () => sub?.remove?.();
+  }, [needsOnboarding]);
 
   // Render a dark holding screen while AsyncStorage is being read
   // to prevent the white/black flash before navigation fires
