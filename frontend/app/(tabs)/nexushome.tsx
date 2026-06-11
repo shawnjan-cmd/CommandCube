@@ -19,6 +19,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Linking, Share } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { haptics } from '@/services/haptics';
 import { Image as ExpoImage } from 'expo-image';
 import { kbGrowthTracker, ChartBucket } from '@/services/kbGrowthTracker';
@@ -494,6 +495,7 @@ const hero = StyleSheet.create({
   sweep:       { position: 'absolute', top: 0, bottom: 0, width: 160, backgroundColor: D.cyan, opacity: 0.05, transform: [{ skewX: '-18deg' }] },
 
   cornerTR: { position: 'absolute', top: 0, right: 0, width: 26, height: 26, borderTopWidth: 2, borderRightWidth: 2 },
+  accentRow: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, flexDirection: 'row', zIndex: 5 },
   cornerBL: { position: 'absolute', bottom: 78, left: 0, width: 26, height: 26, borderBottomWidth: 2, borderLeftWidth: 2 },
   cornerBR: { position: 'absolute', bottom: 78, right: 0, width: 26, height: 26, borderBottomWidth: 2, borderRightWidth: 2 },
 
@@ -1402,6 +1404,101 @@ function SigmaNetCrawlerHomeCard({ isConnected }: { isConnected:boolean }) {
   );
 }
 
+// ─── NEW-USER SECTIONS: server download + how it works ────────────
+const SERVER_REPO_URL = 'https://github.com/shawnjan-cmd/butler-server';
+
+function ServerDownloadCard() {
+  const [copied, setCopied] = useState(false);
+  return (
+    <View>
+      <SectionDivider label="PC SERVER · DOWNLOAD" color={D.green} />
+      <NexusCard accentColor={D.green} style={{ marginTop: 8 }}>
+        <View style={dlc.row}>
+          <View style={dlc.iconBox}>
+            <MaterialCommunityIcons name="download-box-outline" size={24} color={D.green} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={dlc.title}>GET THE PC SERVER</Text>
+            <Text style={dlc.body}>
+              Butler AI pairs with a tiny Python server running on your PC. Download it, run it, then scan the QR code it shows.
+            </Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          testID="download-server-btn" activeOpacity={0.85}
+          style={dlc.btn}
+          onPress={() => { haptics.medium(); Linking.openURL(SERVER_REPO_URL).catch(() => {}); }}>
+          <MaterialCommunityIcons name="github" size={17} color="#001008" />
+          <Text style={dlc.btnTxt}>DOWNLOAD ON GITHUB</Text>
+          <MaterialCommunityIcons name="open-in-new" size={13} color="#001008" />
+        </TouchableOpacity>
+        <View style={dlc.cmdRow}>
+          <Text style={dlc.cmdPrompt}>$</Text>
+          <Text style={dlc.cmd} numberOfLines={1}>python butler_server.py</Text>
+          <TouchableOpacity
+            testID="copy-server-cmd" hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            onPress={async () => {
+              haptics.light();
+              try { await Clipboard.setStringAsync('python butler_server.py'); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch {}
+            }}>
+            <MaterialCommunityIcons name={copied ? 'check-bold' : 'content-copy'} size={14} color={copied ? D.green : D.green + '99'} />
+          </TouchableOpacity>
+        </View>
+      </NexusCard>
+    </View>
+  );
+}
+const dlc = StyleSheet.create({
+  row:       { flexDirection: 'row', gap: 11, padding: 12, paddingBottom: 8, alignItems: 'flex-start' },
+  iconBox:   { width: 42, height: 42, borderRadius: 11, backgroundColor: D.green + '14', borderWidth: 1, borderColor: D.green + '45', alignItems: 'center', justifyContent: 'center' },
+  title:     { fontSize: 13.5, fontWeight: '900', fontFamily: MONO, color: D.green, letterSpacing: 1.2, marginBottom: 3 },
+  body:      { fontSize: 10.5, fontFamily: MONO, color: D.textMid, lineHeight: 15.5 },
+  btn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: D.green, borderRadius: 10, paddingVertical: 11, marginHorizontal: 12, marginBottom: 8 },
+  btnTxt:    { fontSize: 12.5, fontWeight: '900', fontFamily: MONO, color: '#001008', letterSpacing: 1.2 },
+  cmdRow:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 12, marginBottom: 12, backgroundColor: '#000003', borderWidth: 1, borderColor: D.green + '30', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 },
+  cmdPrompt: { fontSize: 11, fontWeight: '900', fontFamily: MONO, color: D.green },
+  cmd:       { flex: 1, fontSize: 11, fontFamily: MONO, color: D.text },
+});
+
+const HOW_STEPS = [
+  { n: '01', icon: 'download-box-outline', col: D.green,  title: 'RUN THE SERVER',  sub: 'python butler_server.py on your PC' },
+  { n: '02', icon: 'qrcode-scan',          col: D.cyan,   title: 'SCAN THE QR',     sub: 'Pair phone + PC on the same Wi-Fi' },
+  { n: '03', icon: 'robot-happy',          col: D.purple, title: 'COMMAND YOUR PC', sub: 'Run scripts, send files, chat with local AI' },
+] as const;
+
+function HowItWorksCard() {
+  return (
+    <View>
+      <SectionDivider label="INFO · HOW IT WORKS" color={D.cyan} />
+      <NexusCard accentColor={D.cyan} style={{ marginTop: 8 }}>
+        <View style={{ paddingVertical: 4 }}>
+          {HOW_STEPS.map((st, i) => (
+            <View key={st.n} style={[hiw.row, i < HOW_STEPS.length - 1 && hiw.rowDivider]}>
+              <Text style={[hiw.num, { color: st.col }]}>{st.n}</Text>
+              <View style={[hiw.iconBox, { borderColor: st.col + '45', backgroundColor: st.col + '12' }]}>
+                <MaterialCommunityIcons name={st.icon as any} size={17} color={st.col} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[hiw.title, { color: st.col }]}>{st.title}</Text>
+                <Text style={hiw.sub}>{st.sub}</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={16} color={st.col + '60'} />
+            </View>
+          ))}
+        </View>
+      </NexusCard>
+    </View>
+  );
+}
+const hiw = StyleSheet.create({
+  row:        { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 9 },
+  rowDivider: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(0,229,255,0.12)' },
+  num:        { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 1, width: 22 },
+  iconBox:    { width: 32, height: 32, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  title:      { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
+  sub:        { fontSize: 10, fontFamily: MONO, color: D.textMid, marginTop: 1.5 },
+});
+
 // ─── FULL-PAGE BACKDROP (pure black + circuit grid + drifting scan beam) ──
 function HomeBackdrop() {
   const beam = useRef(new Animated.Value(0)).current;
@@ -1636,11 +1733,13 @@ export default function NexusHomeScreen() {
       <WidgetLayer pageId="home" />
       <InlineWidgetSlot pageId="home" position="inline-top" />
 
-      {/* Hero + Quick Access pinned to the top (user-requested order) */}
+      {/* Hero + new-user sections + Quick Access pinned to the top */}
       <ButlerAIHero
         isConnected={isConnected} serverAddr={serverAddr}
         onScanQR={() => setShowQR(true)}
         kbFindings={kbFindings} scriptCount={scriptCount} />
+      <ServerDownloadCard />
+      <HowItWorksCard />
       <QuickAccessGrid goToTab={goToTab} />
 
       {/* Config-driven card renderer (hero & quick_access pinned above) */}
