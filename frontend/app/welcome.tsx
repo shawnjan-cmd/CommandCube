@@ -1158,23 +1158,27 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
   const attemptNav = (): boolean => {
     if (navigatedRef.current) return true;
     navigatedRef.current = true;
+    logger.log('[Screen10] LAUNCH pressed — firing all dismissal channels');
 
-    // 1. Persist the gate flag (best-effort).
+    // Channel 1: write the gate flag to AsyncStorage (the source of truth).
     AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
 
-    // 2. Prefer the overlay-close callback when present (no navigation needed —
-    //    the tabs are already mounted underneath the onboarding modal).
+    // Channel 2: set a synchronous global so the _layout poller picks it up.
+    try { (global as any).__butler_onboarding_just_completed = true; } catch {}
+
+    // Channel 3: call the explicit overlay-close callback if provided.
     if (typeof onComplete === 'function') {
-      try { onComplete(); return true; } catch (e) {
-        logger.warn('[Screen10] onComplete threw, falling back to router:', e);
+      try { onComplete(); } catch (e) {
+        logger.warn('[Screen10] onComplete threw:', e);
       }
     }
 
-    // 3. Legacy fallback when Welcome is rendered as a stand-alone route.
+    // Channel 4: flip the legacy global setter (for the stand-alone /welcome route).
     try { (global as any).__setNeedsOnboarding?.(false); } catch {}
-    try {
-      router.replace('/(tabs)/nexushome' as any);
-    } catch (e) {
+
+    // Channel 5: as a final fallback, navigate. Tabs may not be mounted if the
+    // user reached /welcome as a standalone route; this covers that case.
+    try { router.replace('/(tabs)/nexushome' as any); } catch (e) {
       logger.warn('[Screen10] router.replace threw:', e);
       try { (global as any).__onboardingComplete?.(); } catch {}
     }
@@ -1373,7 +1377,7 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
 // ─────────────────────────────────────────────────────────────────
 // MAIN WELCOME SCREEN
 // ─────────────────────────────────────────────────────────────────
-export default function WelcomeScreen() {
+export default function WelcomeScreen({ onComplete }: { onComplete?: () => void } = {}) {
   const [step, setStep] = useState(0);
   const [consents, setConsents] = useState<Record<string, boolean>>({});
   const [serverAccepts, setServerAccepts] = useState<Record<string, boolean>>({});

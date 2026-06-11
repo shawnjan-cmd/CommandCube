@@ -488,6 +488,35 @@ export default function RootLayout() {
     return () => sub?.remove?.();
   }, [needsOnboarding]);
 
+  // Guard 3: while the onboarding modal is open, poll the gate flag every
+  // 750 ms. ANY independent write to AsyncStorage (Screen 10, debug menu,
+  // settings reset, ANY code path) immediately closes the modal — no matter
+  // whether onComplete fired correctly or not. This is the "no more onboarding
+  // navigation issues, solve it in any way" insurance policy.
+  useEffect(() => {
+    if (needsOnboarding !== true) return;
+    let cancelled = false;
+    const tick = async () => {
+      if (cancelled) return;
+      try {
+        // Synchronous global wins if it's been flipped this turn of the loop.
+        if ((global as any).__butler_onboarding_just_completed === true) {
+          console.log('[_layout] poller: global completion flag detected');
+          (global as any).__butler_onboarding_just_completed = false;
+          setNeedsOnboarding(false);
+          return;
+        }
+        const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY);
+        if (v === '1' && !cancelled) {
+          console.log('[_layout] poller: AsyncStorage flag detected, closing overlay');
+          setNeedsOnboarding(false);
+        }
+      } catch {}
+    };
+    const id = setInterval(tick, 750);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [needsOnboarding]);
+
   // Render a dark holding screen while AsyncStorage is being read
   // to prevent the white/black flash before navigation fires
   const showHoldingScreen = needsOnboarding === null && !showSplash;
