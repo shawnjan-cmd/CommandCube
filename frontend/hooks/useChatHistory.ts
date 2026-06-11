@@ -25,9 +25,11 @@ interface UseChatHistoryOptions {
 }
 
 export function useChatHistory(
-  messages: Message[],
-  { onLoad }: UseChatHistoryOptions,
+  messages?: Message[],
+  options?: UseChatHistoryOptions,
 ) {
+  const { onLoad } = options ?? { onLoad: () => {} };
+  const _messages = messages ?? [];
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLoaded  = useRef(false);
 
@@ -57,19 +59,19 @@ export function useChatHistory(
   // ── Debounced save whenever messages array changes ───────────
   useEffect(() => {
     if (!isLoaded.current) return;   // don't save before load completes
-    if (messages.length === 0) return;
+    if (!_messages || _messages.length === 0) return;
 
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       try {
-        const toSave = messages
+        const toSave = _messages
           .filter(m => !m.streaming)   // exclude live-streaming bubbles
           .slice(-MAX_STORED);
         await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(toSave));
       } catch {
         // Storage full — trim aggressively and retry once
         try {
-          const trimmed = messages.filter(m => !m.streaming).slice(-50);
+          const trimmed = _messages.filter(m => !m.streaming).slice(-50);
           await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
         } catch { /* never crash UI */ }
       }
@@ -86,5 +88,15 @@ export function useChatHistory(
     await AsyncStorage.removeItem(HISTORY_KEY).catch(() => {});
   }, []);
 
-  return { clearHistory };
+  /** Append-only persistence helper kept for legacy call sites. */
+  const addEntry = useCallback(async (msg: Message) => {
+    try {
+      const raw = await AsyncStorage.getItem(HISTORY_KEY);
+      const arr: Message[] = raw ? (JSON.parse(raw) || []) : [];
+      arr.push(msg);
+      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(-MAX_STORED)));
+    } catch { /* never crash UI */ }
+  }, []);
+
+  return { clearHistory, addEntry };
 }

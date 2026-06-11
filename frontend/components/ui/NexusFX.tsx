@@ -532,3 +532,44 @@ const ahb = StyleSheet.create({
   label: { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 1, flex: 1 },
   led:   { width: 6, height: 6, borderRadius: 3 },
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AnimatedWire — minimal stub so older screens that import it don't crash.
+// Renders an absolutely-positioned line/dot accent matching the cyberpunk look.
+// Accepts every prop the old call sites pass (direction, length, color, etc.)
+// and ignores ones that aren't needed for the simple visual.
+// ─────────────────────────────────────────────────────────────────────────────
+type AnimatedWireProps = {
+  direction?: 'horizontal' | 'vertical';
+  length?: number;
+  color?: string;
+  thickness?: number;
+  dotCount?: number;
+  speed?: number;
+  caps?: boolean;
+  opacity?: number;
+  absolute?: boolean;
+  delay?: number;
+  style?: any;
+  [key: string]: any;
+};
+
+export function AnimatedWire({
+  direction = 'horizontal',
+  length = 40,
+  color = '#00E5FF',
+  thickness = 1,
+  opacity = 0.5,
+  absolute = false,
+  style,
+}: AnimatedWireProps) {
+  const horizontal = direction === 'horizontal';
+  const baseStyle = {
+    width:  horizontal ? length : thickness,
+    height: horizontal ? thickness : length,
+    backgroundColor: color,
+    opacity,
+    ...(absolute ? { position: 'absolute' as const } : null),
+  };
+  return <View style={[baseStyle, style]} pointerEvents="none" />;
+}

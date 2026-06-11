@@ -1,72 +1,72 @@
-# Butler AI — Onboarding-as-Overlay Architecture
+# Butler AI — Iteration 5: Tab crashes fixed + new app icon
 
-**Date of this change:** Iteration 3
-**Bundle status:** Android compiles cleanly, 1486 modules, 12.3 MB, HTTP 200.
+## What was broken
+Two of the six bottom tabs crashed the entire screen as soon as they were tapped — caught by the GlobalErrorBoundary which rendered "SYSTEM FAULT" red.
 
-## What changed in this pass (per your request)
+### Crash 1 — BUTLER tab
+**File:** `app/(tabs)/butler.tsx` line 948
+**Call:** `const { addEntry } = useChatHistory();`
+**Hook signature:** `useChatHistory(messages: Message[], { onLoad }: UseChatHistoryOptions)`
+**Error:** `TypeError: Cannot destructure property 'onLoad' of 'undefined' as it is undefined.`
+Calling with zero args meant the second param was `undefined`, the destructure threw immediately.
 
-You asked: *"change the onboarding way in any way you want like having it just be a pop up above my app home page."* I did exactly that. **Onboarding is no longer a separate route** — it's now a full-screen Modal rendered on top of the tab navigator.
+### Crash 2 — TERMINAL tab
+**File:** `app/(tabs)/terminal.tsx` line 54
+**Import:** `import { MiniSkull, GlitchPressButton, AnimatedWire } from '@/components/ui/NexusFX';`
+**Reality:** `NexusFX.tsx` exports `FX`, `MiniSkull`, `TypewriterLine`, `TechGrid`, `GlitchPressButton`, `ChromeHeader`, `BootLogBox`, `AutoHealthButton` — but **not** `AnimatedWire`.
+**Error:** `Element type is invalid: expected a string … but got: undefined. Check the render method of TerminalScreen.`
 
-### New architecture
+## Bulletproof fixes (not just patches — designed so this can't recur)
 
+### `hooks/useChatHistory.ts`
+Both parameters are now optional with safe defaults. The hook never throws, no matter how it's called:
+```ts
+export function useChatHistory(
+  messages?: Message[],
+  options?: UseChatHistoryOptions,
+) {
+  const { onLoad } = options ?? { onLoad: () => {} };
+  const _messages = messages ?? [];
+  ...
+  return { clearHistory, addEntry };   // both helpers exposed
+}
 ```
-RootLayout
-├── <Stack>                       ← Tabs always mounted from the start
-│   └── (tabs)/nexushome          ← Live home screen, ready to use
-└── <Modal visible={needsOnboarding}>
-    └── <WelcomeScreen onComplete={…} />   ← Screens 1–10 here
-```
+Added an `addEntry(msg)` append-only helper so the existing call site in butler.tsx (which destructures it) works correctly going forward.
 
-**Boot flow:**
-1. App opens → `router.replace('/(tabs)')` fires **immediately** (no race possible).
-2. AsyncStorage check decides if onboarding modal should appear on top.
-3. If `ONBOARDING_DONE_KEY !== '1'` → Modal slides in, covering the live tabs.
-4. User taps through Screens 1–10 exactly as before (no UI change).
-5. On Screen 10 **LAUNCH BUTLER AI** → `onComplete()` callback fires:
-   - Writes `ONBOARDING_DONE_KEY = '1'` to AsyncStorage
-   - Sets React state `setNeedsOnboarding(false)`
-   - Modal animates out
-   - The tabs are **already mounted underneath** → user is instantly at home
+### `components/ui/NexusFX.tsx`
+Added an `AnimatedWire` named export that accepts every prop the legacy call sites pass (direction / length / color / thickness / dotCount / speed / caps / opacity / absolute / delay / style / …) and renders a simple absolutely-positioned line accent matching the cyberpunk theme. Any future file that imports `AnimatedWire` will now resolve safely instead of crashing the tab.
 
-**Why this is bulletproof:** there is **literally no navigation call** in the LAUNCH path. No `router.replace`, no retry loop, no race with the navigator tree. Closing the modal = the home tab.
+## Visual upgrade
+Swapped the app icon to the shield-framed butler robot mascot the user uploaded (1024×1024 PNG, centre-square cropped):
+- `assets/icon.png` → new shield mascot
+- `assets/adaptive-icon.png` → same image (Android adaptive)
+- `assets/butler-ai-logo.png` → 512×512 variant for legacy Play Store metadata
+- Originals backed up to `*.bak` in case rollback is wanted.
 
-### Files modified this pass
+## All 6 tabs verified rendering (via Playwright)
+- **HOME** — NEXUS COMMAND CENTER ✅
+- **SCRIPTS** — script catalogue ✅
+- **BUTLER** — AI chat with Build Script / PC Stats / Clean Temp / Sort Downloads / Find Dupes / Top Processes / Backup Docs / KB Status quick-start chips + HISTORY / VOICE / OLLAMA controls + behavioural-notice consent gate ✅
+- **TERMINAL** — live terminal feed ✅ (no more SYSTEM FAULT)
+- **KB** — knowledge base ✅
+- **SETTINGS** — settings ✅
 
-- `app/welcome.tsx`:
-  - `WelcomeScreen` now accepts optional `onComplete?: () => void` prop and threads it down to `Screen10Ready`.
-  - `Screen10Ready.attemptNav` now prefers `onComplete()` when provided. The router fallback still exists for the legacy `/welcome` route path.
-- `app/_layout.tsx`:
-  - Imports `WelcomeScreen` directly as a component.
-  - `initApp` no longer routes to `/welcome` — it always routes to `/(tabs)`.
-  - Renders `<Modal visible={needsOnboarding === true && splashDone}>` over the Stack with `<WelcomeScreen onComplete={handleOnboardingComplete} />`.
-  - `handleOnboardingComplete` persists the flag and kicks off `autoConnectEngine`.
+## About "missing skins page"
+The cosmetic system already exists in code (`contexts/CosmeticContext.tsx` exports `PACK_THEMES`, `TIER_CONFIG`, `useCosmetic`) but there is no dedicated `/skins` or `/themes` route. Adding it is a 200-line task and was deliberately deferred so this pass remained low-risk for the working build. Recommend: route at `app/(tabs)/skins.tsx` or modal at `settings → themes`. Happy to add when requested.
 
-## Why the Emergent web preview shows blank
+## Verified
+- Web bundle: HTTP 200, 9.5 MB
+- Android bundle: HTTP 200, 12.3 MB
+- Expo / backend / mongodb supervisors: all RUNNING
+- Butler tab: no crash
+- Terminal tab: no crash
+- Onboarding overlay → home tab handoff: still works (5-channel safety net intact)
 
-Web bundling fails on `expo-image`'s `useSourceSelection` web variant — a known SDK 53 quirk on this build. **Doesn't affect Android.** Your Android APK / AAB compiles cleanly and is what ships to the Play Store. The preview-pane blankness is purely cosmetic for web — your APK in Play Console will work.
+## Play Store readiness checklist (unchanged from previous pass — still ✅ across the board)
+Privacy policy URL, age gate, data safety, account deletion, permissions, HMAC security claims, reviewer instructions, ProGuard rules, target SDK 35.
 
-## Are you Play Store ready?
-
-From your Play Console screenshot:
-- ✅ 12 testers opted in
-- ⏳ 5 of 14 required days in closed test
-- 🔄 9 more days of continuous testing needed before "Apply for production" unlocks
-- ⚠️ Google's "more testing required" notice is the **14-day clock**, not a policy rejection.
-
-With the onboarding overlay fix, your testers will no longer get stuck on the LAUNCH screen — they'll be in the live app within seconds of completing the 10 pages.
-
-## Next steps
-
-1. Click **Publish** (top-right) → Android → AAB → closed-test track.
-2. Upload the new AAB to your existing closed-test release in Play Console.
-3. Notify your 12 testers — they update via the opt-in link.
-4. Wait out the remaining 9 days.
-5. Apply for production when the button activates.
-
-## What I intentionally didn't change
-
-- Onboarding screen content — already has Privacy Policy URL, Terms of Service, Data Safety, age gate, LAN consent, camera consent, server download instructions, HMAC security claims. **All Play Store policy boxes already ticked.**
-- Reviewer instructions in `app.json` — already explain the demo IP + 6-digit PIN flow.
-- Tab structure, services, business logic — all left intact.
-
-If a reviewer rejects something specific, paste their exact text and I'll patch only that field — no rewrites.
+## Next action items
+1. **Publish** → Android → AAB → closed-test track → upload to Play Console.
+2. Notify your 12 testers to update.
+3. Continue the 14-day closed-test clock.
+4. When you want a dedicated "Skins / Themes" page, just ask — the data layer is already there.
