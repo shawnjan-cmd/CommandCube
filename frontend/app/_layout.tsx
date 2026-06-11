@@ -8,7 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, { Component, useEffect, useState, useRef, ReactNode } from 'react';
 import { useAppSync } from '@/hooks/useAppSync';
 import { SPLASH_CONFIG } from '@/constants/HeaderConstants';
-import { View, Text, StyleSheet, Platform, Animated, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Platform, Animated, Dimensions, TouchableOpacity, Modal } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +20,7 @@ import { autoConnectEngine } from '@/services/autoConnectEngine';
 import { connectionPersistence } from '@/services/connectionPersistence';
 import { proLicense } from '@/services/proLicense';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
+import WelcomeScreen from './welcome';
 import '@/services/imageRegistry';
 
 // Keep the native splash visible until the gate check + first navigation are done.
@@ -387,33 +388,34 @@ export default function RootLayout() {
       try {
         await deviceIdentifier.getDeviceId().catch(() => {});
 
-        if (needsOnboarding) {
-          router.replace('/welcome' as any);
-          setAppReady(true);
-          return;
-        }
-
+        // Always land on the tabs. Onboarding is rendered as an overlay Modal
+        // on top of the tab navigator (see <Modal> below), so the navigator
+        // tree is always mounted and there's no replace-race possible.
         router.replace('/(tabs)' as any);
         setAppReady(true);
 
-        autoConnectEngine.start().catch(() => {});
+        // Background services only run once the user has accepted onboarding.
+        if (!needsOnboarding) {
+          autoConnectEngine.start().catch(() => {});
 
-        const unsubScan = autoConnectEngine.onEvent(async (evt) => {
-          if (evt.status === 'connected' && evt.ip) {
-            unsubScan();
-            setTimeout(async () => {
-              try {
-                const { appScanner } = require('@/services/appScanner');
-                const report = await appScanner.runFullScan();
-                if (report.overallStatus !== 'ok') {
-                  console.log('[AutoScan] Health score:', report.score, '-', report.summary);
-                }
-              } catch {}
-            }, 8000);
-          }
-        });
-      } catch {
-        router.replace('/welcome' as any);
+          const unsubScan = autoConnectEngine.onEvent(async (evt) => {
+            if (evt.status === 'connected' && evt.ip) {
+              unsubScan();
+              setTimeout(async () => {
+                try {
+                  const { appScanner } = require('@/services/appScanner');
+                  const report = await appScanner.runFullScan();
+                  if (report.overallStatus !== 'ok') {
+                    console.log('[AutoScan] Health score:', report.score, '-', report.summary);
+                  }
+                } catch {}
+              }, 8000);
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('[_layout] initApp failed:', e);
+        try { router.replace('/(tabs)' as any); } catch {}
         setAppReady(true);
       }
     };
@@ -422,6 +424,16 @@ export default function RootLayout() {
     // Hide the native splash once we've decided where to go.
     SplashScreen.hideAsync().catch(() => {});
   }, [splashDone, needsOnboarding]);
+
+  // Triggered by Screen10 "LAUNCH BUTLER AI" — persists the gate flag and
+  // dismisses the overlay. No router navigation needed; the tabs are already
+  // mounted underneath this modal.
+  const handleOnboardingComplete = React.useCallback(async () => {
+    try { await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch {}
+    setNeedsOnboarding(false);
+    // Kick off background services that were gated on completion.
+    autoConnectEngine.start().catch(() => {});
+  }, []);
 
   // Render a dark holding screen while AsyncStorage is being read
   // to prevent the white/black flash before navigation fires
@@ -456,6 +468,17 @@ export default function RootLayout() {
               <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
             </Stack>
           </View>
+          {/* Onboarding overlay — full-screen Modal rendered on top of the tabs.
+              The tabs are always mounted underneath, so dismissing this modal
+              instantly drops the user into the live app. No router race. */}
+          <Modal
+            visible={needsOnboarding === true && splashDone}
+            animationType="fade"
+            statusBarTranslucent
+            onRequestClose={() => { /* hardware back is handled by Screen back buttons */ }}
+          >
+            <WelcomeScreen onComplete={handleOnboardingComplete} />
+          </Modal>
         </TabBarProvider>
       </CosmeticProvider>
     </GlobalErrorBoundary>

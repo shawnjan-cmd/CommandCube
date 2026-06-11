@@ -1116,7 +1116,7 @@ function Screen9Download({ onNext, onBack }: { onNext: () => void; onBack: () =>
 // ─────────────────────────────────────────────────────────────────
 type LaunchState = 'idle' | 'saving' | 'navigating' | 'retry' | 'error';
 
-function Screen10Ready({ onBack }: { onBack: () => void }) {
+function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?: () => void }) {
   const router = useRouter();
   const [state, setState] = useState<LaunchState>('idle');
   const [countdown, setCountdown] = useState(5);
@@ -1159,19 +1159,23 @@ function Screen10Ready({ onBack }: { onBack: () => void }) {
     if (navigatedRef.current) return true;
     navigatedRef.current = true;
 
-    // 1. Persist the gate flag synchronously (best-effort) so a cold restart
-    //    during navigation still lands on the tabs.
+    // 1. Persist the gate flag (best-effort).
     AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
 
-    // 2. Flip the in-memory gate in _layout.tsx so it stops rendering <welcome />.
-    try { (global as any).__setNeedsOnboarding?.(false); } catch {}
+    // 2. Prefer the overlay-close callback when present (no navigation needed —
+    //    the tabs are already mounted underneath the onboarding modal).
+    if (typeof onComplete === 'function') {
+      try { onComplete(); return true; } catch (e) {
+        logger.warn('[Screen10] onComplete threw, falling back to router:', e);
+      }
+    }
 
-    // 3. Hand off to the tabs. ONE call, not five.
+    // 3. Legacy fallback when Welcome is rendered as a stand-alone route.
+    try { (global as any).__setNeedsOnboarding?.(false); } catch {}
     try {
       router.replace('/(tabs)/nexushome' as any);
     } catch (e) {
       logger.warn('[Screen10] router.replace threw:', e);
-      // Last-ditch: let the _layout gate take over on the next render tick.
       try { (global as any).__onboardingComplete?.(); } catch {}
     }
     return true;
@@ -1421,7 +1425,7 @@ export default function WelcomeScreen() {
       case 6:  return <Screen7QA onNext={goNext} onBack={goBack} />;
       case 7:  return <Screen8ServerPrivacy onNext={goNext} onBack={goBack} serverAccepts={serverAccepts} setServerAccepts={setServerAccepts} />;
       case 8:  return <Screen9Download onNext={goNext} onBack={goBack} />;
-      case 9:  return <Screen10Ready onBack={goBack} />;
+      case 9:  return <Screen10Ready onBack={goBack} onComplete={onComplete} />;
       default: return <Screen1Welcome onNext={goNext} allAccepted={allPreviouslyAccepted} />;
     }
   };
