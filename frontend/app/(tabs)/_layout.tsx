@@ -20,7 +20,6 @@ const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = 
   scripts:    mc('script-text-outline'),
   butler:     mc('robot-happy-outline'),
   knowledge:  mc('brain'),
-  terminal:   mc('console-line'),
   logs:       mc('monitor-dashboard'),
   builder:    mc('hammer-wrench'),
   skins:      mc('palette-swatch'),
@@ -38,13 +37,13 @@ export default function TabLayout() {
         <Tabs.Screen name="scripts"   options={{ title: 'SCRIPTS' }} />
         <Tabs.Screen name="butler"    options={{ title: 'AI'      }} />
         <Tabs.Screen name="knowledge" options={{ title: 'KB'      }} />
-        <Tabs.Screen name="terminal"  options={{ title: 'TOOLS'   }} />
         <Tabs.Screen name="logs"      options={{ title: 'PC'      }} />
         <Tabs.Screen name="builder"   options={{ title: 'BUILD'   }} />
         <Tabs.Screen name="skins"     options={{ title: 'SKINS'   }} />
         <Tabs.Screen name="settings"  options={{ title: 'CONFIG'  }} />
 
         {/* Hidden routes — accessible via navigation but not shown in the bar */}
+        <Tabs.Screen name="terminal"  options={{ href: null }} />
         <Tabs.Screen name="index"     options={{ href: null }} />
         <Tabs.Screen name="fileshare" options={{ href: null }} />
         <Tabs.Screen name="support"   options={{ href: null }} />

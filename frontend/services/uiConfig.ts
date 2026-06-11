@@ -199,12 +199,11 @@ export const DEFAULT_UI_CONFIG: UIConfig = {
   home: {
     cards: [
       { id: 'hero',               visible: true,  order: 1  },
-      { id: 'connected_pc',       visible: true,  order: 2  },
-      { id: 'terminal_feed',      visible: true,  order: 3  },
+      { id: 'fileshare_clipboard',visible: true,  order: 2  },
+      { id: 'connected_pc',       visible: true,  order: 3  },
       { id: 'crawlers_graph',     visible: true,  order: 4  },
       { id: 'kb_graph',           visible: true,  order: 5  },
       { id: 'scripts_graph',      visible: true,  order: 6  },
-      { id: 'fileshare_clipboard',visible: true,  order: 7  },
       { id: 'sigma_net',          visible: true,  order: 8  },
       { id: 'smart_alerts',       visible: true,  order: 9  },
       { id: 'omega_loop',         visible: true,  order: 10 },

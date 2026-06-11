@@ -29,6 +29,7 @@ import { quickScan, ScanProgress } from '@/services/lanScanner';
 import { parseQRConnection } from '@/services/qrParser';
 import { WidgetLayer, InlineWidgetSlot } from '@/components/ui/WidgetLayer';
 import { OmegaLearningLoop } from '@/components/cyber/OmegaLearningLoop';
+import QuickSendCard from '@/components/cards/QuickSendCard';
 import { FileShareClipboardCard } from '@/components/ui/FileShareClipboardCard';
 import { uiConfig, UIConfig, DEFAULT_UI_CONFIG, UIStrings } from '@/services/uiConfig';
 
@@ -1599,6 +1600,9 @@ export default function NexusHomeScreen() {
                   onScanQR={() => setShowQR(true)}
                   kbFindings={kbFindings} scriptCount={scriptCount} />
               );
+            case 'quick_send':
+            case 'fileshare_clipboard':
+              return <QuickSendCard key={card.id} isConnected={isConnected} />;
             case 'connected_pc':
               return (
                 <ConnectedPCCard key={card.id}
