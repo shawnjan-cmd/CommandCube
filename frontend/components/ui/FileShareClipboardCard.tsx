@@ -435,7 +435,7 @@ export function FileShareClipboardCard({ isConnected, goToTab }: Props) {
 }
 
 const s = StyleSheet.create({
-  card:          { backgroundColor: '#030810', borderRadius: 16, borderWidth: 1.5, borderColor: 'rgba(0,255,255,0.22)', overflow: 'hidden', position: 'relative',
+  card:          { backgroundColor: '#000003', borderRadius: 16, borderWidth: 1.5, borderColor: 'rgba(0,255,255,0.22)', overflow: 'hidden', position: 'relative',
     ...Platform.select({ ios:{ shadowColor:'#00FFFF', shadowOffset:{width:0,height:0}, shadowOpacity:0.22, shadowRadius:22 }, android:{elevation:8} }) },
   topLine:       { height: 2 },
   cornerTL:      { position:'absolute', top:4, left:8, width:14, height:14, borderTopWidth:1.5, borderLeftWidth:1.5, zIndex:4 },
@@ -463,7 +463,7 @@ const s = StyleSheet.create({
   clipTitle:     { fontSize:10, fontWeight:'900', fontFamily:MONO, letterSpacing:1 },
   clipDivider:   { flex:1, height:1 },
   clipTime:      { fontSize:8, fontFamily:MONO, letterSpacing:0.3 },
-  inputWrap:     { flexDirection:'row', alignItems:'center', gap:8, borderWidth:1.5, borderRadius:10, paddingHorizontal:12, paddingVertical:10, marginBottom:10, backgroundColor:'#010204' },
+  inputWrap:     { flexDirection:'row', alignItems:'center', gap:8, borderWidth:1.5, borderRadius:10, paddingHorizontal:12, paddingVertical:10, marginBottom:10, backgroundColor:'#000003' },
   inputPrompt:   { fontSize:12, fontFamily:MONO, flexShrink:0 },
   input:         { flex:1, fontSize:13, fontFamily:MONO, paddingVertical:0, includeFontPadding:false },
   pasteBtn:      { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:6, borderRadius:10, borderWidth:1.5, paddingVertical:12, overflow:'hidden' },

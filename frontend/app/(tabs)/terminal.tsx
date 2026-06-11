@@ -57,8 +57,8 @@ import NexusTips, { TERMINAL_TIPS } from '@/components/ui/NexusTips';
 
 // ─── Theme constants ──────────────────────────────────────────────────────────
 const C = {
-  bg: '#020407',
-  bgPanel: '#070D16',
+  bg: '#000003',
+  bgPanel: '#02070D',
   green: '#00FF88',
   greenDim: '#00FF8822',
   cyan: '#00FFFF',

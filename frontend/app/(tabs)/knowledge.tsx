@@ -37,10 +37,10 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // ─── NEXUS COMMAND CENTER PALETTE ─────────────────────────────
 const N = {
-  bg:        '#020407',
-  surface:   '#070D16',
-  surfaceHi: '#0C1420',
-  surfaceMd: '#0A1018',
+  bg:        '#000003',
+  surface:   '#02070D',
+  surfaceHi: '#071120',
+  surfaceMd: '#02070D',
   border:    'rgba(0,255,255,0.12)',
   borderHi:  'rgba(0,255,255,0.28)',
   text:      '#D8E8F4',
@@ -238,7 +238,7 @@ const nke = StyleSheet.create({
   liveBadge:   { flexDirection:'row', alignItems:'center', gap:5, borderWidth:1.5, borderRadius:8, paddingHorizontal:9, paddingVertical:5 },
   liveTxt:     { fontSize:9, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5 },
   statGrid:    { flexDirection:'row', flexWrap:'wrap', paddingHorizontal:12, gap:8, marginBottom:14 },
-  statCard:    { width:(SW - 32 - 24 - 16) / 3, backgroundColor:'#06101E', borderRadius:10, borderWidth:1.5, borderBottomWidth:3,
+  statCard:    { width:(SW - 32 - 24 - 16) / 3, backgroundColor:'#02070D', borderRadius:10, borderWidth:1.5, borderBottomWidth:3,
     paddingHorizontal:10, paddingTop:12, paddingBottom:10, minHeight:80, position:'relative', overflow:'hidden' },
   miniCorner:  { position:'absolute', width:8, height:8 },
   statVal:     { fontSize:22, fontWeight:'900', fontFamily:MONO, lineHeight:26, marginBottom:5 },
@@ -249,7 +249,7 @@ const nke = StyleSheet.create({
   catCard:     { width:(SW - 32 - 24 - 6) / 3, borderWidth:1, borderRadius:8, overflow:'hidden' },
   catTrack:    { height:4, backgroundColor:'rgba(255,255,255,0.05)', borderRadius:2, overflow:'hidden' },
   catFill:     { height:'100%', borderRadius:2 },
-  terminalBox: { backgroundColor:'#030710', borderTopWidth:1, borderBottomWidth:1, borderColor:'rgba(255,255,255,0.06)', marginBottom:12, paddingHorizontal:14 },
+  terminalBox: { backgroundColor:'#000003', borderTopWidth:1, borderBottomWidth:1, borderColor:'rgba(255,255,255,0.06)', marginBottom:12, paddingHorizontal:14 },
   termRow:     { flexDirection:'row', alignItems:'center', gap:8, paddingVertical:8 },
   termTime:    { fontSize:9, fontFamily:MONO, fontWeight:'700', width:42, flexShrink:0 },
   termDot:     { width:4, height:4, borderRadius:2, flexShrink:0 },
@@ -538,12 +538,12 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
 }
 
 const kbid = StyleSheet.create({
-  kpiCard:   { backgroundColor: '#07101A', borderWidth: 1.5, borderRadius: 14, padding: 14, minHeight: 96, position: 'relative', overflow: 'hidden' },
+  kpiCard:   { backgroundColor: '#02070D', borderWidth: 1.5, borderRadius: 14, padding: 14, minHeight: 96, position: 'relative', overflow: 'hidden' },
   kpiLabel:  { fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.8 },
   kpiVal:    { fontSize: 32, fontWeight: '900', fontFamily: MONO, lineHeight: 38 },
   kpiSub:    { fontSize: 10, fontWeight: '600', fontFamily: MONO, letterSpacing: 0.3, marginTop: 4 },
   kpiAccent: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 2 },
-  chartCard: { backgroundColor: '#07101A', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', borderRadius: 14, padding: 16 },
+  chartCard: { backgroundColor: '#02070D', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', borderRadius: 14, padding: 16 },
   chartTitle:{ fontSize: 13, fontWeight: '900', color: '#8A9BAB', fontFamily: MONO, letterSpacing: 1.2, marginBottom: 0 },
 });
 
@@ -2198,7 +2198,7 @@ function NexusBridgeFullTab({ relayAddr, isConnected, qlhStats, kbStats }: {
       <Animated.View style={[nbft.qlhCard, {
         borderColor: ringAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: [TEAL + '40', TEAL + 'BB', TEAL + '40'] })
       }]}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#010C14', borderRadius: 14 }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000003', borderRadius: 14 }]} />
         {/* Header */}
         <View style={nbft.cardHeader}>
           <View style={[nbft.qlhOrb, { borderColor: TEAL, backgroundColor: TEAL + '20' }]}>
@@ -2653,7 +2653,7 @@ function NexusBotFullTab({ kbStats, qlhStats, isConnected }: {
       <Animated.View style={[nbot.qlhCard, {
         borderColor: dotPulse.interpolate({ inputRange:[0.2,1], outputRange:[N.teal+'40', N.teal+'BB'] })
       }]}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#010C14', borderRadius: 14 }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000003', borderRadius: 14 }]} />
         <View style={[nbot.headerTopBar, { backgroundColor: N.teal }]} />
         <View style={nbot.headerRow}>
           <View style={[nbot.qlhOrb, { borderColor: N.teal, backgroundColor: N.teal + '20' }]}>
@@ -3330,11 +3330,11 @@ export default function KnowledgeScreen() {
 }
 
 const s = StyleSheet.create({
-  container:  { flex: 1, backgroundColor: '#020407' },
+  container:  { flex: 1, backgroundColor: '#000003' },
   statusStrip:{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: N.border, backgroundColor: N.surface },
   kbPill:     { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1.5, borderRadius: 20, paddingHorizontal: 9, paddingVertical: 5 },
   kbPillTxt:  { fontSize: 13, fontWeight: '900', fontFamily: MONO },
-  tabBarScroll: { backgroundColor: '#010204', borderBottomWidth: 1.5, borderBottomColor: 'rgba(0,255,255,0.14)', flexGrow: 0 },
+  tabBarScroll: { backgroundColor: '#000003', borderBottomWidth: 1.5, borderBottomColor: 'rgba(0,255,255,0.14)', flexGrow: 0 },
   tabBarContent: { flexDirection: 'row', alignItems: 'stretch' },
   tabBtn:     { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 3, position: 'relative', minHeight: 52, borderTopColor: 'transparent', borderLeftColor: 'transparent', borderRightColor: 'transparent' },
   tabTxt:     { fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.5 },
@@ -3362,7 +3362,7 @@ const s = StyleSheet.create({
   targetChip: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: N.surface, borderRadius: 10, borderWidth: 1, borderColor: N.border, padding: 12, marginBottom: 8 },
   targetLabel:{ fontSize: 14, fontWeight: '900', color: N.text, fontFamily: MONO },
   targetUrl:  { fontSize: 9, color: N.textDim, fontFamily: MONO, marginTop: 2 },
-  textArea:   { backgroundColor: '#070D16', borderWidth: 2, borderColor: 'rgba(0,255,255,0.35)', borderRadius: 12, padding: 14, color: '#D8E8F4', fontSize: 14, fontFamily: MONO, minHeight: 160, lineHeight: 23 },
+  textArea:   { backgroundColor: '#02070D', borderWidth: 2, borderColor: 'rgba(0,255,255,0.35)', borderRadius: 12, padding: 14, color: '#D8E8F4', fontSize: 14, fontFamily: MONO, minHeight: 160, lineHeight: 23 },
   dbToolbar:  { padding: 14, gap: 10, borderBottomWidth: 1, borderBottomColor: N.border, backgroundColor: N.surface },
   searchRow:  { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: N.surfaceHi, borderRadius: 10, borderWidth: 1, borderColor: N.border, paddingHorizontal: 12, paddingVertical: 10 },
   searchInput:{ flex: 1, fontSize: 14, fontWeight: '600', color: '#D8E8F4', fontFamily: MONO },

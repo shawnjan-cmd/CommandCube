@@ -38,9 +38,9 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW, height: SH } = Dimensions.get('window');
 
 const C = {
-  bg:        '#060A10',
-  surface:   '#0A1018',
-  surfaceHi: '#0F1822',
+  bg:        '#02070D',
+  surface:   '#02070D',
+  surfaceHi: '#071120',
   border:    'rgba(255,255,255,0.07)',
   text:      '#D0DDE8',
   textDim:   '#3A5060',
@@ -103,7 +103,7 @@ var label = 'CPU LOAD';
 var color = '#00CCDD';
 return React.createElement(View, {
   style: {
-    backgroundColor: '#0A1018', borderRadius: 12, borderWidth: 1.5,
+    backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1.5,
     borderColor: color + '55', borderLeftWidth: 4, borderLeftColor: color,
     padding: 16, minWidth: 120, alignItems: 'center',
   }
@@ -119,7 +119,7 @@ return React.createElement(View, {
 var color = '#BB33FF';
 var label = 'MEMORY';
 return React.createElement(View, {
-  style: { backgroundColor: '#0A1018', borderRadius: 10, borderWidth: 1, borderColor: '#1a2235', padding: 14, gap: 8 }
+  style: { backgroundColor: '#02070D', borderRadius: 10, borderWidth: 1, borderColor: '#1a2235', padding: 14, gap: 8 }
 },
   React.createElement(View, { style: { flexDirection: 'row', justifyContent: 'space-between' } },
     React.createElement(Text, { style: { fontSize: 10, fontWeight: '700', color: color, fontFamily: 'monospace', letterSpacing: 1 } }, label),
@@ -141,7 +141,7 @@ return React.createElement(View, {
 ];
 var color = '#00CCDD';
 return React.createElement(View, {
-  style: { backgroundColor: '#0A1018', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235', borderLeftWidth: 3, borderLeftColor: color, overflow: 'hidden' }
+  style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235', borderLeftWidth: 3, borderLeftColor: color, overflow: 'hidden' }
 },
   ...rows.map(function(row, i) {
     return React.createElement(View, {
@@ -197,7 +197,7 @@ return React.createElement(View, {
   { id: '3', name: 'Net Scanner',    col: '#FF9900' },
   { id: '4', name: 'Script Builder', col: '#BB33FF' },
 ];
-return React.createElement(View, { style: { backgroundColor: '#0A1018', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235', overflow: 'hidden', maxHeight: 200 } },
+return React.createElement(View, { style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235', overflow: 'hidden', maxHeight: 200 } },
   React.createElement(FlatList, {
     data: items,
     keyExtractor: function(item) { return item.id; },
@@ -227,13 +227,13 @@ return React.createElement(View, { style: { backgroundColor: '#0A1018', borderRa
   { label: 'NET',    value: '12ms', color: '#BB33FF' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#0A1018', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235',
+  style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235',
     padding: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }
 },
   ...metrics.map(function(m) {
     return React.createElement(View, {
       key: m.label,
-      style: { width: (SW - 80) / 2, backgroundColor: '#060A10', borderRadius: 8,
+      style: { width: (SW - 80) / 2, backgroundColor: '#02070D', borderRadius: 8,
         borderWidth: 1, borderColor: m.color + '35', borderLeftWidth: 3, borderLeftColor: m.color,
         padding: 10, gap: 2 }
     },
@@ -254,7 +254,7 @@ return React.createElement(View, {
   { label: 'NET',  val: 55, color: '#4488FF' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#060A10', borderRadius: 14, borderWidth: 1.5,
+  style: { backgroundColor: '#02070D', borderRadius: 14, borderWidth: 1.5,
     borderColor: '#00CCDD22', padding: 14, gap: 10,
     borderLeftWidth: 3, borderLeftColor: '#00CCDD' }
 },
@@ -285,7 +285,7 @@ return React.createElement(View, {
   { pct: 40, color: '#00FF88', label: 'AI',  size: 68 },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#060A10', borderRadius: 14, borderWidth: 1.5,
+  style: { backgroundColor: '#02070D', borderRadius: 14, borderWidth: 1.5,
     borderColor: '#00CCDD18', padding: 14, borderLeftWidth: 3, borderLeftColor: '#00CCDD' }
 },
   React.createElement(View, { style: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 14 } },
@@ -329,7 +329,7 @@ return React.createElement(View, {
   { label: '12ms',     color: '#FF9900', dot: false },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#060A10', borderRadius: 12, borderWidth: 1,
+  style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1,
     borderColor: '#00CCDD15', padding: 12, gap: 8 }
 },
   React.createElement(Text, { style: { fontSize: 9, fontWeight: '900', color: '#4a607a',
@@ -361,7 +361,7 @@ return React.createElement(View, {
   { label: 'AI CHAT',   icon: 'smart-toy',  color: '#BB33FF', action: 'Opening AI...' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#060A10', borderRadius: 14, borderWidth: 1, borderColor: '#1a2235', overflow: 'hidden' }
+  style: { backgroundColor: '#02070D', borderRadius: 14, borderWidth: 1, borderColor: '#1a2235', overflow: 'hidden' }
 },
   React.createElement(View, { style: { height: 2, backgroundColor: '#00CCDD40' } }),
   React.createElement(View, { style: { flexDirection: 'row', flexWrap: 'wrap', padding: 10, gap: 8 } },
@@ -385,7 +385,7 @@ return React.createElement(View, {
     desc: 'Midpoint-based line chart',
     code: `var pts = [18, 32, 28, 45, 52, 41, 67, 58, 74, 63, 82, 71];
 var color = '#00CCDD';
-var BG = '#060A10';
+var BG = '#02070D';
 var CHART_H = 72;
 var W = SW - 88;
 var maxPt = Math.max.apply(null, pts);
@@ -439,7 +439,7 @@ return React.createElement(View, {
   { label: 'AI',      val: 12, color: '#FF4488' },
 ];
 var total = segs.reduce(function(a,s){return a+s.val;},0);
-var SIZE = 90; var RW = 14; var BG = '#060A10';
+var SIZE = 90; var RW = 14; var BG = '#02070D';
 return React.createElement(View, {
   style: { backgroundColor: BG, borderRadius: 14, borderWidth: 1,
     borderColor: '#1a2235', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }
@@ -482,11 +482,11 @@ return React.createElement(View, {
   { time: '08:18', msg: 'KB updated +12 items', col: '#BB33FF' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#030810', borderRadius: 12,
+  style: { backgroundColor: '#000003', borderRadius: 12,
     borderWidth: 1.5, borderColor: '#00FF8825', overflow: 'hidden' }
 },
   React.createElement(View, { style: { flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#060A10',
+    paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#02070D',
     borderBottomWidth: 1, borderBottomColor: '#00FF8820' } },
     React.createElement(View, { style: { flexDirection: 'row', gap: 5 } },
       ['#FF5F57','#FEBC2E','#28C840'].map(function(c,i) {
@@ -517,7 +517,7 @@ return React.createElement(View, {
 var value = '99.97%';
 var sublabel = 'UPTIME - ALL SYSTEMS';
 var color = '#00CCDD';
-var BG = '#060A10';
+var BG = '#02070D';
 return React.createElement(View, { style: { position:'relative', paddingBottom:6, paddingRight:6 } },
   React.createElement(View, { style: { position:'absolute', top:6, left:6, right:0, bottom:0,
     backgroundColor: color + '18', borderRadius:14, borderWidth:1, borderColor:color+'20' } }),
@@ -545,7 +545,7 @@ var cells = [];
 for (var i = 0; i < 56; i++) { cells.push(rnd(5)); }
 var cols = ['#0d1117','#00FF8840','#00FF8870','#00FF88AA','#00FF88'];
 return React.createElement(View, {
-  style: { backgroundColor:'#060A10', borderRadius:12, borderWidth:1,
+  style: { backgroundColor:'#02070D', borderRadius:12, borderWidth:1,
     borderColor:'#00FF8820', padding:12 }
 },
   React.createElement(View, { style:{flexDirection:'row',alignItems:'center',gap:6,marginBottom:10} },
@@ -718,7 +718,7 @@ function PinToPageModal({ visible, code, currentX, currentY, onClose, onPinned }
 
 const ptp = StyleSheet.create({
   overlay:      { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'flex-end' },
-  sheet:        { backgroundColor: '#060A10', borderTopLeftRadius: 20, borderTopRightRadius: 20,
+  sheet:        { backgroundColor: '#02070D', borderTopLeftRadius: 20, borderTopRightRadius: 20,
                   overflow: 'hidden', maxHeight: '90%',
                   ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:-8}, shadowOpacity:0.6, shadowRadius:20 }, android:{ elevation:24 } }) },
   topBar:       { height: 3 },
@@ -726,19 +726,19 @@ const ptp = StyleSheet.create({
   title:        { fontSize: 18, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, textAlign: 'center', letterSpacing: 1 },
   sub:          { fontSize: 10, color: '#3A5060', fontFamily: MONO, textAlign: 'center', marginTop: 4, marginBottom: 14, paddingHorizontal: 20, lineHeight: 16 },
   labelRow:     { paddingHorizontal: 16, marginBottom: 14 },
-  labelInput:   { backgroundColor: '#0A1018', borderWidth: 1.5, borderColor: '#00FF8855', borderRadius: 9,
+  labelInput:   { backgroundColor: '#02070D', borderWidth: 1.5, borderColor: '#00FF8855', borderRadius: 9,
                   paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#D0DDE8', fontFamily: MONO },
   sectionLabel: { fontSize: 8, fontWeight: '900', color: '#3A5060', fontFamily: MONO, letterSpacing: 2,
                   paddingHorizontal: 16, marginBottom: 8 },
   placementCard:{ flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderRadius: 10,
-                  paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#0A1018' },
+                  paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#02070D' },
   placementIcon:{ width: 40, height: 40, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   placementLabel:{ fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
   placementDesc:{ fontSize: 9, color: '#3A5060', fontFamily: MONO, marginTop: 2, lineHeight: 13 },
   grid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingBottom: 10 },
   pageCard:     { width: '46%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 8,
                   borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 11,
-                  backgroundColor: '#0A1018', position: 'relative' },
+                  backgroundColor: '#02070D', position: 'relative' },
   pageLabel:    { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
   check:        { position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: 3 },
   pinBtn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
@@ -816,12 +816,12 @@ function DraggableWidget({ children, onClose, onEdit, onPin }: {
 }
 
 const dw = StyleSheet.create({
-  container:  { position:'absolute', zIndex:9999, backgroundColor:'#050C14', borderRadius:14, borderWidth:1.5, borderColor:'#BB33FF55', overflow:'hidden', minWidth:140 },
-  handleBar:  { flexDirection:'row', alignItems:'center', gap:6, paddingHorizontal:10, paddingVertical:7, backgroundColor:'#0A1018', borderBottomWidth:1, borderBottomColor:'#BB33FF30' },
+  container:  { position:'absolute', zIndex:9999, backgroundColor:'#02070D', borderRadius:14, borderWidth:1.5, borderColor:'#BB33FF55', overflow:'hidden', minWidth:140 },
+  handleBar:  { flexDirection:'row', alignItems:'center', gap:6, paddingHorizontal:10, paddingVertical:7, backgroundColor:'#02070D', borderBottomWidth:1, borderBottomColor:'#BB33FF30' },
   handleDots: { flexDirection:'row', flexWrap:'wrap', width:18, gap:2 },
   dot:        { width:3, height:3, borderRadius:1.5 },
   handleLabel:{ flex:1, fontSize:8, fontWeight:'900', color:'#BB33FF80', fontFamily:MONO, letterSpacing:1.2 },
-  iconBtn:    { width:26, height:26, borderRadius:6, backgroundColor:'#0F1822', alignItems:'center', justifyContent:'center' },
+  iconBtn:    { width:26, height:26, borderRadius:6, backgroundColor:'#071120', alignItems:'center', justifyContent:'center' },
   pinHint:    { flexDirection:'row', alignItems:'center', gap:5, paddingHorizontal:10, paddingVertical:5, backgroundColor:'#00FF8806', borderBottomWidth:1, borderBottomColor:'#00FF8818' },
   pinHintTxt: { fontSize:8, color:'#00FF8870', fontFamily:MONO },
   content:    { padding:12 },
@@ -958,7 +958,7 @@ const cem = StyleSheet.create({
                       backgroundColor:C.red+'12', borderBottomWidth:1, borderBottomColor:C.red+'40' },
   errorText:        { flex:1, fontSize:10, color:C.red, fontFamily:MONO, lineHeight:15 },
   codeInput:        { flex:1, padding:14, fontSize:13, color:'#A8D8B8', fontFamily:MONO, lineHeight:21,
-                      minHeight:400, backgroundColor:'#030810' },
+                      minHeight:400, backgroundColor:'#000003' },
   bottomBar:        { flexDirection:'row', gap:10, paddingHorizontal:14, paddingVertical:14,
                       borderTopWidth:1, borderTopColor:C.border, backgroundColor:C.surface,
                       paddingBottom: Platform.OS === 'ios' ? 28 : 14 },
@@ -991,7 +991,7 @@ export function LiveWidgetStudio() {
         catch (e: any) {
           const safeLabel = w.label.replace(/[`'"]/g, '');
           const fallback = `return React.createElement(View,{
-  style:{backgroundColor:'#0A1018',borderRadius:10,borderWidth:1.5,
+  style:{backgroundColor:'#02070D',borderRadius:10,borderWidth:1.5,
     borderColor:'#FF334455',padding:14,gap:6}
 },
   React.createElement(MaterialIcons,{name:'warning',size:18,color:'#FF9900'}),
@@ -1228,7 +1228,7 @@ export function LiveWidgetStudio() {
 }
 
 const lws = StyleSheet.create({
-  card:           { backgroundColor:'#0A1018', borderRadius:14, borderWidth:1.5, borderColor:'#BB33FF40',
+  card:           { backgroundColor:'#02070D', borderRadius:14, borderWidth:1.5, borderColor:'#BB33FF40',
                     overflow:'hidden', marginBottom:14,
                     ...Platform.select({ ios:{ shadowColor:'#BB33FF', shadowOffset:{width:0,height:4}, shadowOpacity:0.3, shadowRadius:12 }, android:{ elevation:8 } }) },
   topAccent:      { height:3 },

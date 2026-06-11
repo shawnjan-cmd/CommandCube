@@ -25,9 +25,9 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // ─── PALETTE ─────────────────────────────────────────────────
 const C = {
-  bg:         '#020407',
-  surface:    '#070D16',
-  surfaceHi:  '#0C1420',
+  bg:         '#000003',
+  surface:    '#02070D',
+  surfaceHi:  '#071120',
   border:     'rgba(0,255,255,0.12)',
   text:       '#D8E8F4',
   textDim:    '#3A5068',
@@ -718,7 +718,7 @@ function NodeDetailModal({ node, onClose, onAdd }: {
 const ndm = StyleSheet.create({
   overlay:    { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'flex-end' },
   sheet:      {
-    backgroundColor: '#060A10', borderTopLeftRadius: 18, borderTopRightRadius: 18,
+    backgroundColor: '#02070D', borderTopLeftRadius: 18, borderTopRightRadius: 18,
     overflow: 'hidden', position: 'relative',
     ...Platform.select({
       ios: { shadowColor: '#000', shadowOffset: { width: 0, height: -8 }, shadowOpacity: 0.6, shadowRadius: 20 },
@@ -739,7 +739,7 @@ const ndm = StyleSheet.create({
   infoDiv:    { width: 1, height: 28 },
   infoLabel:  { fontSize: 7.5, fontWeight: '700', fontFamily: MONO, letterSpacing: 1, flexShrink: 0 },
   infoVal:    { fontSize: 10, fontWeight: '900', fontFamily: MONO },
-  codeWrap:   { marginHorizontal: 16, marginBottom: 12, borderRadius: 10, overflow: 'hidden', borderWidth: 1, backgroundColor: '#040810' },
+  codeWrap:   { marginHorizontal: 16, marginBottom: 12, borderRadius: 10, overflow: 'hidden', borderWidth: 1, backgroundColor: '#000003' },
   codeHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 9, borderBottomWidth: 1 },
   codeFilename:{ flex: 1, fontSize: 9, fontFamily: MONO, textAlign: 'center', letterSpacing: 0.5 },
   copyBtn:    { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
@@ -935,7 +935,7 @@ function ExecuteResultPanel({ output, error, running, onClose }: { output: strin
   );
 }
 const erp = StyleSheet.create({
-  wrap:      { backgroundColor: '#050D10', borderTopWidth: 1.5, borderTopColor: C.teal + '40' },
+  wrap:      { backgroundColor: '#02070D', borderTopWidth: 1.5, borderTopColor: C.teal + '40' },
   header:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1 },
   headerTxt: { flex: 1, fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.8 },
 });
@@ -1352,7 +1352,7 @@ export default function BuilderScreen() {
 }
 
 const s = StyleSheet.create({
-  root:         { flex: 1, backgroundColor: '#020407' },
+  root:         { flex: 1, backgroundColor: '#000003' },
   header:       { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.surface },
   titleMain:    { fontSize: 22, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, letterSpacing: -0.5 },
   titleAccent:  { fontSize: 22, fontWeight: '900', fontFamily: MONO, letterSpacing: -0.5 },

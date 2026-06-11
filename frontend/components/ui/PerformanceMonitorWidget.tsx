@@ -491,7 +491,7 @@ const pms = StyleSheet.create({
 
   // Feed
   feedSection:  { paddingHorizontal: 14, paddingBottom: 12 },
-  feedWrap:     { backgroundColor: '#030810', borderRadius: 8, overflow: 'hidden' },
+  feedWrap:     { backgroundColor: '#000003', borderRadius: 8, overflow: 'hidden' },
   feedRow:      { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
   feedTime:     { fontSize: 9, fontFamily: MONO, fontWeight: '700', width: 56, flexShrink: 0 },
   feedDot:      { width: 4, height: 4, borderRadius: 2, flexShrink: 0 },

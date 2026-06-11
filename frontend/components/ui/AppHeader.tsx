@@ -19,7 +19,7 @@ const { width: SW } = Dimensions.get('window');
 
 // ── Teal Design Tokens ──────────────────────────────────────────
 const C = {
-  bg:        '#030A0E',
+  bg:        '#000003',
   panel:     '#071218',
   panelBrt:  '#0A1A22',
   teal:      '#00CCDD',
@@ -65,7 +65,7 @@ function HUDCorners({ size = 10, color = C.teal, thickness = 1.5 }: {
 function CircuitBg() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'#030A0E' }} />
+      <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'#000003' }} />
       {[16, 32, 48, 64, 80, 96, 112].map((y, i) => (
         <View key={`h${i}`} style={{ position:'absolute', left:0, right:0, top:y, height: i%3===0 ? 1.5 : 0.8,
           backgroundColor: i%3===0 ? 'rgba(0,200,220,0.09)' : 'rgba(0,160,180,0.04)' }} />
@@ -281,7 +281,7 @@ function KBLiveGraph({ isOnline }: { isOnline: boolean }) {
   return (
     <View style={rp.wrap}>
       {/* Dark navy bg */}
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#040C14' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#02070D' }} />
       {/* Circuit trace lines */}
       {[0.2, 0.45, 0.7, 0.9].map((p, i) => (
         <View key={i} style={{ position:'absolute', left:0, right:0, top:`${p*100}%` as any, height:1, backgroundColor:'#00CCDD0A' }} pointerEvents="none" />
@@ -546,7 +546,7 @@ export default function AppHeader({
 
 const hdr = StyleSheet.create({
   container: {
-    backgroundColor: '#030A0E', zIndex:50, overflow:'hidden', position:'relative',
+    backgroundColor: '#000003', zIndex:50, overflow:'hidden', position:'relative',
     ...Platform.select({ ios:{ shadowColor:C.teal, shadowOffset:{width:0,height:6}, shadowOpacity:0.4, shadowRadius:14 }, android:{elevation:12} }),
   },
   scanBeam: { position:'absolute', left:0, right:0, height:2.5, backgroundColor:C.tealBrt, opacity:0.2, zIndex:8 },

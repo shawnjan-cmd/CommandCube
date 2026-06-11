@@ -539,7 +539,7 @@ export default function RootLayout() {
           ) : null}
           <StatusBar style="light" />
           <View style={[s.container, showHoldingScreen && { opacity: 0 }]}>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050202' } }}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000003' } }}>
               <Stack.Screen name="welcome"        options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
               <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
@@ -568,7 +568,7 @@ export default function RootLayout() {
 }
 
 const s = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: '#060D12' },
+  container:    { flex: 1, backgroundColor: '#000003' },
   holdingScreen: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#010306',

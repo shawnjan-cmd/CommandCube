@@ -34,7 +34,7 @@ const SW = _W > 0 ? _W : 375;
 const SH = _H > 0 ? _H : 720;
 
 const C = {
-  bg: '#020407', card: '#0C1420', cyan: '#00FFFF', green: '#00FF88',
+  bg: '#000003', card: '#071120', cyan: '#00FFFF', green: '#00FF88',
   amber: '#F5A623', purple: '#BF00FF', text: '#D8E8F4', textDim: '#7A9AB8',
   border: 'rgba(0,255,255,0.18)',
 };
@@ -253,13 +253,13 @@ const s = StyleSheet.create({
   scanLine: { position: 'absolute', left: 0, right: 0, height: 1.5, backgroundColor: 'rgba(0,255,255,0.35)', shadowColor: C.cyan, shadowOpacity: 1, shadowRadius: 8 },
   core: { width: 96, height: 96, alignItems: 'center', justifyContent: 'center', marginTop: 30 },
   coreHalo: { position: 'absolute', width: 96, height: 96, borderRadius: 48, borderWidth: 2, borderColor: C.cyan, shadowColor: C.cyan, shadowOpacity: 1, shadowRadius: 16 },
-  coreInner: { width: 76, height: 76, borderRadius: 38, backgroundColor: '#020407', borderWidth: 1.5, borderColor: C.cyan + '70', alignItems: 'center', justifyContent: 'center' },
+  coreInner: { width: 76, height: 76, borderRadius: 38, backgroundColor: '#000003', borderWidth: 1.5, borderColor: C.cyan + '70', alignItems: 'center', justifyContent: 'center' },
 
   brand: { marginTop: 18, fontSize: 30, fontWeight: '900', color: C.text, letterSpacing: 6, fontFamily: MONO },
   brandUnderline: { width: 80, height: 2, backgroundColor: C.cyan, marginTop: 6, shadowColor: C.cyan, shadowOpacity: 1, shadowRadius: 6 },
   kicker: { marginTop: 10, fontSize: 12, color: C.textDim, fontFamily: MONO, letterSpacing: 0.5, paddingHorizontal: 14, textAlign: 'center' },
 
-  term: { borderRadius: 10, borderWidth: 1, borderColor: C.border, backgroundColor: '#010204', overflow: 'hidden' },
+  term: { borderRadius: 10, borderWidth: 1, borderColor: C.border, backgroundColor: '#000003', overflow: 'hidden' },
   termHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: 'rgba(0,255,255,0.04)' },
   termDot: { width: 8, height: 8, borderRadius: 4 },
   termTitle: { marginLeft: 6, color: C.textDim, fontSize: 10, fontFamily: MONO, fontWeight: '700' },

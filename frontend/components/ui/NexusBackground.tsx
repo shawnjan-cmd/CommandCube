@@ -175,7 +175,7 @@ export default function NexusBackground({
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {/* Base background */}
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#010306' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
 
       {/* Radial glows */}
       <View style={{

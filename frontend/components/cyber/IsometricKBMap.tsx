@@ -10,7 +10,7 @@ const { width: SW } = Dimensions.get('window');
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const CYAN    = '#00FFFF';
-const SURFACE = '#070D16';
+const SURFACE = '#02070D';
 const BORDER  = 'rgba(0,255,255,0.12)';
 const TEXTDIM = '#3A5068';
 
@@ -110,7 +110,7 @@ export function IsometricKBShardMap({ totalFindings, sessions }: Props) {
 
         {/* Shards */}
         {shards.map(({ idx, filled, anim, sx, sy, hw, hh }) => {
-          const topBg   = filled ? '#00CCDD' : '#1A2535';
+          const topBg   = filled ? '#00CCDD' : '#0A1828';
           const leftBg  = filled ? '#006677' : '#0E1820';
           const rightBg = filled ? '#008899' : '#111E2A';
           return (

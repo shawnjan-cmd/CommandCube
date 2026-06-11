@@ -382,7 +382,7 @@ export function ChromeHeader({
   );
 }
 const ch = StyleSheet.create({
-  wrap:       { backgroundColor: '#040C14', borderBottomWidth: 3, borderBottomColor: '#00CCDD', paddingHorizontal: 12, paddingVertical: 9, overflow: 'hidden', position: 'relative' },
+  wrap:       { backgroundColor: '#02070D', borderBottomWidth: 3, borderBottomColor: '#00CCDD', paddingHorizontal: 12, paddingVertical: 9, overflow: 'hidden', position: 'relative' },
   row:        { flexDirection: 'row', alignItems: 'center', gap: 8 },
   tBox:       { width: 30, height: 30, borderRadius: 5, backgroundColor: '#00CCDD', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#00EEFF' },
   tTxt:       { fontSize: 18, fontWeight: '900', color: '#000', fontFamily: MONO },
@@ -521,7 +521,7 @@ export function AutoHealthButton({
 const ahb = StyleSheet.create({
   inner: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: '#040C14', borderRadius: 6, borderWidth: 1.5,
+    backgroundColor: '#02070D', borderRadius: 6, borderWidth: 1.5,
     paddingHorizontal: 12, paddingVertical: 9, overflow: 'hidden',
     ...Platform.select({
       ios: { shadowOffset: { width: 0, height: 0 }, shadowRadius: 6 },

@@ -32,7 +32,7 @@ import { haptics } from '@/services/haptics';
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
-  scrim: 'rgba(2,4,7,0.86)', card: '#0C1420', surface: '#070D16',
+  scrim: 'rgba(2,4,7,0.86)', card: '#071120', surface: '#02070D',
   cyan: '#00FFFF', green: '#00FF88', amber: '#F5A623',
   text: '#D8E8F4', textDim: '#7A9AB8', border: 'rgba(0,255,255,0.20)',
 };

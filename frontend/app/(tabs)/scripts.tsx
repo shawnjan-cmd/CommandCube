@@ -84,10 +84,10 @@ function ensureErrorHandling(c: string): string {
 }
 
 const N = {
-  bg:       '#020407',
-  surface:  '#070D16',
-  surfaceHi:'#0C1420',
-  surfaceMd:'#0A1018',
+  bg:       '#000003',
+  surface:  '#02070D',
+  surfaceHi:'#071120',
+  surfaceMd:'#02070D',
   border:   'rgba(0,255,255,0.12)',
   borderHi:  'rgba(0,255,255,0.28)',
   text:      '#D8E8F4',
@@ -875,7 +875,7 @@ function CategoryDetailModal({ cat, onClose }: { cat: CategoryDef | null; onClos
   return (
     <Modal visible={!!cat} animationType="slide" statusBarTranslucent
       onRequestClose={() => { if (selectedScript) setSelectedScript(null); else onClose(); }}>
-      <View style={{ flex: 1, backgroundColor: '#060A10', paddingTop: Math.max(insets.top, 20) }}>
+      <View style={{ flex: 1, backgroundColor: '#02070D', paddingTop: Math.max(insets.top, 20) }}>
 
         {/* Header */}
         <View style={[cdm.header, { borderBottomColor: cat.color }]}>
@@ -917,7 +917,7 @@ function CategoryDetailModal({ cat, onClose }: { cat: CategoryDef | null; onClos
             </ScrollView>
 
             {/* Code viewer */}
-            <View style={{ flex: 1, backgroundColor: '#040810', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' }}>
+            <View style={{ flex: 1, backgroundColor: '#000003', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center',
                 paddingHorizontal: 14, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
                 <Text style={{ flex: 1, fontSize: 9, color: cat.color, fontFamily: MONO, letterSpacing: 1.5 }}>
@@ -1031,7 +1031,7 @@ const cdm = StyleSheet.create({
   scriptDesc: { fontSize: 10, color: N.textDim, lineHeight: 15 },
   diffPill:   { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5, flexShrink: 0 },
   diffTxt:    { fontSize: 8, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.5 },
-  outputBox:  { borderTopWidth: 2.5, backgroundColor: '#040810', maxHeight: 200 },
+  outputBox:  { borderTopWidth: 2.5, backgroundColor: '#000003', maxHeight: 200 },
   outputLabel:{ fontSize: 9, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.8, paddingHorizontal: 14, paddingTop: 8, paddingBottom: 4 },
   outputLine: { fontSize: 11, fontFamily: MONO, lineHeight: 17, color: N.textMid, marginBottom: 2 },
   footer:     { padding: 14, borderTopWidth: 1, borderTopColor: N.border },
@@ -2851,7 +2851,7 @@ export default function ScriptsScreen() {
         {isConnected ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8,
             marginTop: 6, marginBottom: 4, borderWidth: 1, borderColor: N.borderHi,
-            borderRadius: 8, backgroundColor: '#0A1018', paddingHorizontal: 10 }}>
+            borderRadius: 8, backgroundColor: '#02070D', paddingHorizontal: 10 }}>
             <MaterialIcons name="search" size={14} color={N.textDim} />
             <TextInput
               style={{ flex: 1, fontSize: 12, color: N.text, fontFamily: MONO, paddingVertical: 7 }}
@@ -3096,7 +3096,7 @@ export default function ScriptsScreen() {
       ) : (
         <View style={{ flex: 1 }}>
           {/* ── TACTICAL ACTION ROW ── */}
-          <View style={[s.fuiActionRow, { backgroundColor: T.panel || '#080D18', borderBottomColor: PR + '20' }]}>
+          <View style={[s.fuiActionRow, { backgroundColor: T.panel || '#02070D', borderBottomColor: PR + '20' }]}>
             {/* Favorites toggle */}
             <TouchableOpacity
               onPress={() => { haptics.selection(); setViewMode('favorites'); }}
@@ -3182,7 +3182,7 @@ export default function ScriptsScreen() {
             ) : null}
             {/* AI Builder FAB */}
             <TouchableOpacity
-              style={[s.createFAB, { backgroundColor: '#100820', borderColor: '#7722BB40' }]}
+              style={[s.createFAB, { backgroundColor: '#071120', borderColor: '#7722BB40' }]}
               onPress={() => { haptics.medium(); setBuildResult(null); setBuildDesc(''); setBuildModalVisible(true); }}
               activeOpacity={0.85}
             >
@@ -3339,7 +3339,7 @@ export default function ScriptsScreen() {
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8,
                 marginTop: 6, marginBottom: 4, borderWidth: 1, borderColor: N.borderHi,
-                borderRadius: 8, backgroundColor: '#0A1018', paddingHorizontal: 10 }}>
+                borderRadius: 8, backgroundColor: '#02070D', paddingHorizontal: 10 }}>
                 <MaterialIcons name="search" size={14} color={N.textDim} />
                 <TextInput
                   style={{ flex: 1, fontSize: 12, color: N.text, fontFamily: MONO, paddingVertical: 7 }}
@@ -3581,9 +3581,9 @@ export default function ScriptsScreen() {
 }
 
 const s = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: '#020407' },
+  container:    { flex: 1, backgroundColor: '#000003' },
   // ── FUI COMMAND HEADER ──────────────────────────────────────────
-  fuiHeader:    { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, backgroundColor: '#0A0D14', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.1)' },
+  fuiHeader:    { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, backgroundColor: '#02070D', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.1)' },
   fuiTitle:     { fontSize: 18, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, letterSpacing: 1.2, lineHeight: 22 },
   fuiSub:       { fontSize: 9, color: N.blue + 'AA', fontFamily: MONO, letterSpacing: 0.8, marginTop: 1 },
   fuiRefreshBtn:{ flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1.5, borderColor: N.blue + '70',
@@ -3591,8 +3591,8 @@ const s = StyleSheet.create({
   fuiRefreshTxt:{ fontSize: 10, fontWeight: '900', color: N.blue, fontFamily: MONO, letterSpacing: 0.5 },
   // ── TACTICAL ACTION ROW ──────────────────────────────────────────
   fuiActionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 14,
-    paddingVertical: 9, backgroundColor: '#080D18', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.12)' },
-  fuiIconCircle:{ width: 36, height: 36, borderRadius: 9, backgroundColor: '#0C1420', borderWidth: 1,
+    paddingVertical: 9, backgroundColor: '#02070D', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.12)' },
+  fuiIconCircle:{ width: 36, height: 36, borderRadius: 9, backgroundColor: '#071120', borderWidth: 1,
     borderColor: 'rgba(0,255,255,0.14)', alignItems: 'center', justifyContent: 'center', position: 'relative' },
   fuiCountReadout: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: 9, paddingHorizontal: 10, paddingVertical: 7 },
   fuiCountNum:  { fontSize: 16, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.3 },
@@ -3604,7 +3604,7 @@ const s = StyleSheet.create({
   fuiModeRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 6 },
   onlineBanner: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: N.green + '20', backgroundColor: N.green + '05' },
   onlineTxt:    { flex: 1, fontSize: 10, color: N.green + 'AA', fontFamily: MONO, letterSpacing: 0.2 },
-  modeToggle:   { flex: 1, flexDirection: 'row', backgroundColor: '#030810', borderRadius: 8, padding: 2, gap: 2, borderWidth: 1, borderColor: 'rgba(0,255,255,0.10)' },
+  modeToggle:   { flex: 1, flexDirection: 'row', backgroundColor: '#000003', borderRadius: 8, padding: 2, gap: 2, borderWidth: 1, borderColor: 'rgba(0,255,255,0.10)' },
   modeBtn:      { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 7, borderRadius: 6, borderWidth: 0, borderColor: 'transparent' },
   modeBtnTxt:   { fontSize: 10, fontWeight: '700', color: N.textDim, fontFamily: MONO, letterSpacing: 0.3 },
   createBtn:    { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: N.blue, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10 },

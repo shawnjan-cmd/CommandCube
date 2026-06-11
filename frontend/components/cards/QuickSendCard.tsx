@@ -28,8 +28,8 @@ import { haptics } from '@/services/haptics';
 const MONO = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const PAL = {
-  bg:         '#060D18',
-  bgInner:    '#020812',
+  bg:         '#02070D',
+  bgInner:    '#000003',
   cyan:       '#00E5FF',
   purple:     '#A366F5',
   amber:      '#FFB341',

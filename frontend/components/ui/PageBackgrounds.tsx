@@ -38,7 +38,7 @@ export const ScriptsBackground = memo(function ScriptsBackground() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {/* Dark base */}
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#030A0E' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
       {/* Horizontal grid lines */}
       {Array.from({ length: 18 }).map((_, i) => (
         <View key={`h${i}`} style={{
@@ -82,7 +82,7 @@ export const SettingsBackground2 = memo(function SettingsBackground2() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#040C14' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#02070D' }} />
       {/* Hex grid shapes */}
       {hexPositions.map((pos, i) => (
         <Animated.View key={i} style={{
@@ -131,7 +131,7 @@ export const ButlerBackground = memo(function ButlerBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#030A0E' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
       {/* Diagonal scan lines */}
       {Array.from({ length: 20 }).map((_, i) => (
         <View key={i} style={{
@@ -163,7 +163,7 @@ export const KnowledgeBackground = memo(function KnowledgeBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050202' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
       {/* Amber horizontal data streams */}
       {[80, 200, 380, 560, 740].map((y, i) => (
         <Animated.View key={i} style={{
@@ -215,7 +215,7 @@ export const FileShareBackground = memo(function FileShareBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#04100A' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
       {/* Teal-green grid */}
       {Array.from({ length: 12 }).map((_, i) => (
         <View key={i} style={{
@@ -255,7 +255,7 @@ export const ToolsBackground = memo(function ToolsBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#040C08' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
       {/* Large gear watermark top-right */}
       <Animated.View style={{
         position: 'absolute', top: 60, right: -40, width: 100, height: 100,
@@ -311,7 +311,7 @@ export const CosmeticsBackground = memo(function CosmeticsBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#05080F' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
       {/* Color accent strips */}
       {[
         { color: '#00CCDD', y: 100 },

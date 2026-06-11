@@ -16,14 +16,14 @@ const mi = (name: MIName) => (color: string, size: number) =>
 // Map route name → icon renderer. Order doesn't matter; the Tabs definitions
 // below decide the on-screen ordering.
 const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = {
-  nexushome:  mc('home-lightning-bolt'),
-  scripts:    mc('script-text-outline'),
-  butler:     mc('robot-happy-outline'),
-  knowledge:  mc('brain'),
-  logs:       mc('monitor-dashboard'),
-  builder:    mc('hammer-wrench'),
-  skins:      mc('palette-swatch'),
-  settings:   mc('cog-outline'),
+  nexushome:  mc('view-dashboard-variant'),
+  scripts:    mc('code-braces-box'),
+  butler:     mc('robot-happy'),
+  knowledge:  mc('head-cog-outline'),
+  logs:       mc('desktop-tower-monitor'),
+  builder:    mc('hammer-screwdriver'),
+  skins:      mc('palette-swatch-outline'),
+  settings:   mc('cog-box'),
 };
 
 export default function TabLayout() {

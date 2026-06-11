@@ -40,9 +40,9 @@ const { width: SW } = Dimensions.get('window');
 // ─── DESIGN TOKENS ────────────────────────────────────────────────
 const D = {
   bg:         '#000000',
-  surface:    '#04070C',
-  surfaceHi:  '#070D15',
-  surfaceMid: '#05090F',
+  surface:    '#02070D',
+  surfaceHi:  '#071120',
+  surfaceMid: '#040B14',
   border:     'rgba(0,229,255,0.14)',
   borderHi:   'rgba(0,229,255,0.32)',
   borderGlow: 'rgba(0,229,255,0.55)',
@@ -337,7 +337,7 @@ function SectionDivider({ label, color = D.cyan }: { label: string; color?: stri
     <View style={{ flexDirection:'row', alignItems:'center', gap:8, marginTop:8, marginBottom:0 }}>
       <View style={{ width:3, height:16, borderRadius:2, backgroundColor:color,
         ...Platform.select({ ios:{shadowColor:color, shadowOffset:{width:0,height:0}, shadowOpacity:0.8, shadowRadius:6}, android:{} }) }} />
-      <Text style={{ fontSize:9, fontWeight:'900', fontFamily:MONO, letterSpacing:3.5, color }}>
+      <Text style={{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:3, color }}>
         {label}
       </Text>
       <View style={{ flex:1, height:1, backgroundColor: color + '20' }} />
@@ -377,6 +377,12 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
 
   return (
     <View style={hero.wrap}>
+      {/* Tri-color accent strip — Security-Protocols panel style */}
+      <View style={hero.accentRow} pointerEvents="none">
+        <View style={{ flex: 1, backgroundColor: D.cyan }} />
+        <View style={{ flex: 1, backgroundColor: D.green }} />
+        <View style={{ flex: 1, backgroundColor: D.purple }} />
+      </View>
       {/* Layered backdrop — radial blue → black, scan grid, color spots */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <View style={hero.bgFill} />
@@ -410,9 +416,6 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
         <View style={[hero.pill, { borderColor: D.purple + '60', backgroundColor: D.purple + '12' }]}>
           <MaterialCommunityIcons name="brain" size={9} color={D.purple} />
           <Text style={[hero.pillTxt, { color: D.purple }]}>OLLAMA LOCAL</Text>
-        </View>
-        <View style={[hero.pill, { borderColor: D.cyan + '60', backgroundColor: D.cyan + '0E' }]}>
-          <Text style={[hero.pillTxt, { color: D.cyan }]}>v21.0.0</Text>
         </View>
       </View>
 
@@ -469,7 +472,7 @@ function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCou
 
 const hero = StyleSheet.create({
   wrap: {
-    backgroundColor: '#000004',
+    backgroundColor: '#02070D',
     borderRadius: 18,
     borderWidth: 1.5,
     borderColor: D.cyan + '38',
@@ -482,7 +485,7 @@ const hero = StyleSheet.create({
       ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.28, shadowRadius: 28 }
       : { elevation: 10 }),
   },
-  bgFill:      { ...StyleSheet.absoluteFillObject, backgroundColor: '#01030A' },
+  bgFill:      { ...StyleSheet.absoluteFillObject, backgroundColor: '#02070D' },
   bgBlueOrb:   { position: 'absolute', top: -80,  left: -80,  width: 260, height: 260, borderRadius: 130, backgroundColor: '#5B9CF6', opacity: 0.10 },
   bgCyanOrb:   { position: 'absolute', top: 40,   right: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: D.cyan,    opacity: 0.09 },
   bgPurpleOrb: { position: 'absolute', bottom: -100, left: '15%' as any, width: 240, height: 240, borderRadius: 120, backgroundColor: D.purple, opacity: 0.08 },
@@ -496,7 +499,7 @@ const hero = StyleSheet.create({
 
   pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignSelf: 'center', justifyContent: 'center', marginBottom: 8 },
   pill:    { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 22, paddingHorizontal: 9, paddingVertical: 3.5 },
-  pillTxt: { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
+  pillTxt: { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
 
   logoWrap:      { alignItems: 'center', justifyContent: 'center', paddingVertical: 8, marginBottom: 2, position: 'relative' },
   logoGlow:      { position: 'absolute', width: 240, height: 130, borderRadius: 70, backgroundColor: 'rgba(0,229,255,0.10)',
@@ -505,21 +508,21 @@ const hero = StyleSheet.create({
                    ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 8 } : {}) },
   readout:    { position: 'absolute', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4,
                 backgroundColor: 'rgba(0,229,255,0.06)', borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '40' },
-  readoutTxt: { fontSize: 7, fontWeight: '900', fontFamily: MONO, color: D.cyan, letterSpacing: 1.4 },
+  readoutTxt: { fontSize: 8, fontWeight: '900', fontFamily: MONO, color: D.cyan, letterSpacing: 1.4 },
 
   subRow:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 2, marginBottom: 12 },
-  sub:     { fontSize: 9.5, fontWeight: '800', fontFamily: MONO, color: D.cyan + 'BB', letterSpacing: 4 },
+  sub:     { fontSize: 11, fontWeight: '800', fontFamily: MONO, color: D.cyan + 'BB', letterSpacing: 4 },
   bullet:  { width: 4, height: 4, borderRadius: 2 },
 
   statsRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: 'rgba(0,229,255,0.18)', marginHorizontal: -14 },
   statCell: { flex: 1, alignItems: 'center', paddingVertical: 10, gap: 3 },
-  statVal:  { fontSize: 18, fontWeight: '900', fontFamily: MONO, lineHeight: 20 },
-  statLbl:  { fontSize: 7.5, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center', lineHeight: 9 },
+  statVal:  { fontSize: 20, fontWeight: '900', fontFamily: MONO, lineHeight: 20 },
+  statLbl:  { fontSize: 9, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center', lineHeight: 9 },
 
   qrBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
            marginHorizontal: -14, paddingVertical: 12, backgroundColor: D.cyan,
            borderBottomLeftRadius: 16, borderBottomRightRadius: 16 },
-  qrTxt: { fontSize: 13, fontWeight: '900', fontFamily: MONO, color: '#001018', letterSpacing: 2 },
+  qrTxt: { fontSize: 14, fontWeight: '900', fontFamily: MONO, color: '#001018', letterSpacing: 2 },
 });
 
 // ─── CONNECTED PC CARD — upgraded with ring gauges + sparklines ───
@@ -600,18 +603,18 @@ const pcc = StyleSheet.create({
   header:      { flexDirection:'row', alignItems:'flex-start', gap:12, paddingHorizontal:14, paddingTop:12, paddingBottom:9 },
   iconBox:     { width:44, height:44, borderRadius:11, borderWidth:1.5, alignItems:'center', justifyContent:'center', position:'relative' },
   iconLed:     { position:'absolute', bottom:5, right:5, width:7, height:7, borderRadius:3.5, opacity:0.9 },
-  sectionLabel:{ fontSize:8.5, fontWeight:'700', fontFamily:MONO, letterSpacing:2 },
-  pcName:      { fontSize:14, fontWeight:'900', fontFamily:MONO, color:'#FFFFFF', letterSpacing:0.5 },
-  connDetail:  { fontSize:9.5, fontFamily:MONO },
+  sectionLabel:{ fontSize:9.5, fontWeight:'700', fontFamily:MONO, letterSpacing:2 },
+  pcName:      { fontSize:15.5, fontWeight:'900', fontFamily:MONO, color:'#FFFFFF', letterSpacing:0.5 },
+  connDetail:  { fontSize:10.5, fontFamily:MONO },
   statusPill:  { borderWidth:1.5, borderRadius:8, paddingHorizontal:8, paddingVertical:5, flexShrink:0 },
-  statusTxt:   { fontSize:9.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.2 },
+  statusTxt:   { fontSize:10.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.2 },
   ringsRow:    { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.10)', paddingVertical:10, paddingHorizontal:4 },
   ringWrap:    { flex:1, alignItems:'center', gap:5, paddingHorizontal:4 },
   bottomRow:   { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.10)' },
   uptimeBox:   { paddingHorizontal:14, paddingVertical:8, gap:2 },
-  uptimeLabel: { fontSize:8, fontWeight:'700', fontFamily:MONO, color:D.textDim, letterSpacing:1.5 },
+  uptimeLabel: { fontSize:9, fontWeight:'700', fontFamily:MONO, color:D.textDim, letterSpacing:1.5 },
   ollamaStrip: { flex:1, flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingVertical:8 },
-  ollamaTxt:   { fontSize:9.5, fontWeight:'700', fontFamily:MONO, letterSpacing:1 },
+  ollamaTxt:   { fontSize:10.5, fontWeight:'700', fontFamily:MONO, letterSpacing:1 },
 });
 
 // ─── TERMINAL FEED CARD ───────────────────────────────────────────
@@ -670,13 +673,13 @@ function TerminalFeedCard({ isConnected, liveTermLogs }: {
 }
 const tfc = StyleSheet.create({
   header:    { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingTop:14, paddingBottom:8 },
-  title:     { fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5 },
+  title:     { fontSize:12.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5 },
   livePill:  { flexDirection:'row', alignItems:'center', gap:5, borderWidth:1, borderRadius:20, paddingHorizontal:9, paddingVertical:4 },
   liveTxt:   { fontSize:8, fontWeight:'900', fontFamily:MONO, letterSpacing:1 },
   termBox:   { marginHorizontal:12, marginBottom:4, backgroundColor:'rgba(0,0,0,0.35)', borderRadius:10, borderWidth:1, borderColor:'rgba(0,229,255,0.10)', padding:10, minHeight:120 },
   logRow:    { flexDirection:'row', gap:6, alignItems:'flex-start', marginBottom:4 },
-  logTime:   { fontSize:9, fontFamily:MONO, flexShrink:0, marginTop:1 },
-  logMsg:    { flex:1, fontSize:11, fontFamily:MONO, lineHeight:16 },
+  logTime:   { fontSize:10, fontFamily:MONO, flexShrink:0, marginTop:1 },
+  logMsg:    { flex:1, fontSize:12, fontFamily:MONO, lineHeight:16 },
   dimTxt:    { fontSize:10, color:D.textDim, fontFamily:MONO },
   statusBar: { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingVertical:9, borderTopWidth:1, borderTopColor:'rgba(255,255,255,0.06)' },
   statusDot: { width:6, height:6, borderRadius:3 },
@@ -712,7 +715,7 @@ function CrawlersGraphCard({ isConnected, kbFindings }: { isConnected: boolean; 
     <NexusCard accentColor={D.teal} glowIntensity={0.13}>
       <View style={{ flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingTop:14, paddingBottom:8 }}>
         <MaterialCommunityIcons name="spider-web" size={14} color={D.teal} />
-        <Text style={{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>SIGMA-NET CRAWLERS</Text>
+        <Text style={{ fontSize:12.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>SIGMA-NET CRAWLERS</Text>
         <View style={{ flex:1 }} />
         <View style={{ flexDirection:'row', alignItems:'center', gap:5, borderWidth:1, borderRadius:20, paddingHorizontal:9, paddingVertical:4,
           borderColor:(crawlerStatus==='active'?D.teal:D.textDim)+'50', backgroundColor:(crawlerStatus==='active'?D.teal:D.textDim)+'10' }}>
@@ -785,7 +788,7 @@ function KnowledgebankGraphCard({ isConnected, kbFindings }: { isConnected: bool
     <NexusCard accentColor={D.amber} glowIntensity={0.13}>
       <View style={{ flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingTop:14, paddingBottom:10 }}>
         <MaterialCommunityIcons name="brain" size={14} color={D.amber} />
-        <Text style={{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>KNOWLEDGE BASE</Text>
+        <Text style={{ fontSize:12.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>KNOWLEDGE BASE</Text>
         <View style={{ flex:1 }} />
         {kbSize > 0 && <Text style={{ fontSize:9, fontFamily:MONO, color:D.amber+'80' }}>{kbSize}KB</Text>}
       </View>
@@ -833,7 +836,7 @@ function ScriptsGraphCard({ isConnected, goToTab }: { isConnected: boolean; goTo
     <NexusCard accentColor={D.purple} glowIntensity={0.13}>
       <View style={{ flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingTop:14, paddingBottom:10 }}>
         <MaterialCommunityIcons name="code-braces" size={14} color={D.purple} />
-        <Text style={{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>SCRIPT ENGINE</Text>
+        <Text style={{ fontSize:12.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>SCRIPT ENGINE</Text>
         <View style={{ flex:1 }} />
         <TouchableOpacity onPress={() => goToTab('scripts')} style={{ borderWidth:1, borderRadius:8, borderColor:D.purple+'50', paddingHorizontal:8, paddingVertical:3 }}>
           <Text style={{ fontSize:8, fontWeight:'900', fontFamily:MONO, color:D.purple }}>VIEW ALL</Text>
@@ -897,7 +900,7 @@ function SmartAlertsHomeCard({ isConnected, metrics }: {
     <NexusCard accentColor={accentColor} glowIntensity={topAlert.level === 'critical' ? 0.30 : 0.15}>
       <View style={{ flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingTop:14, paddingBottom:10 }}>
         <MaterialIcons name="notifications-active" size={14} color={accentColor} />
-        <Text style={{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>SMART ALERTS</Text>
+        <Text style={{ fontSize:12.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5, color:D.text }}>SMART ALERTS</Text>
         <View style={{ flex:1 }} />
         {alerts.length > 1 && (
           <View style={{ backgroundColor:D.red+'20', borderRadius:10, borderWidth:1, borderColor:D.red+'50', paddingHorizontal:7, paddingVertical:2 }}>
@@ -914,8 +917,8 @@ function SmartAlertsHomeCard({ isConnected, metrics }: {
                 <Icon name={alert.icon as any} size={18} color={alert.col} />
               </View>
               <View style={{ flex:1 }}>
-                <Text style={{ fontSize:11, fontWeight:'900', fontFamily:MONO, color:alert.col, letterSpacing:0.5 }}>{alert.msg}</Text>
-                <Text style={{ fontSize:9, fontFamily:MONO, color:D.textMid, marginTop:1 }}>{alert.sub}</Text>
+                <Text style={{ fontSize:12.5, fontWeight:'900', fontFamily:MONO, color:alert.col, letterSpacing:0.5 }}>{alert.msg}</Text>
+                <Text style={{ fontSize:10.5, fontFamily:MONO, color:D.textMid, marginTop:1 }}>{alert.sub}</Text>
               </View>
               {alert.level !== 'ok' && <PulseDot color={alert.col} size={6} />}
             </View>
@@ -928,12 +931,12 @@ function SmartAlertsHomeCard({ isConnected, metrics }: {
 
 // ─── SECURITY PROTOCOLS GRID — with live canary status ────────────
 const SECURITY_ITEMS_V2 = [
-  { icon:'vpn-key',       lib:'material',   label:'AES-256\nENCRYPT',       iconBg:'#0D3B4A', iconColor:'#00E5FF', col:'#00E5FF', row:0 },
-  { icon:'location-off',  lib:'material',   label:'NO TRAFFIC\nTRACKING',   iconBg:'#3B0D0D', iconColor:'#FF3131', col:'#FF3131', row:0 },
-  { icon:'verified-user', lib:'material',   label:'100% PRIVATE\n& LOCAL',  iconBg:'#0D3B1E', iconColor:'#00FF88', col:'#00FF88', row:0 },
-  { icon:'cloud-off',     lib:'material',   label:'NO CLOUD\nSTORAGE',      iconBg:'#3B2800', iconColor:'#FFB020', col:'#FFB020', row:1 },
-  { icon:'storage',       lib:'material',   label:'LOCAL-HOSTED\nDATA',     iconBg:'#0D3B3A', iconColor:'#00D4CC', col:'#00D4CC', row:1 },
-  { icon:'no-accounts',   lib:'material',   label:'NO ACCOUNT\nREQUIRED',   iconBg:'#2A0D3B', iconColor:'#CC00FF', col:'#CC00FF', row:1 },
+  { icon:'shield-key',            lib:'community',  label:'AES-256\nENCRYPT',       iconBg:'#0D3B4A', iconColor:'#00E5FF', col:'#00E5FF', row:0 },
+  { icon:'eye-off-outline',       lib:'community',  label:'NO TRAFFIC\nTRACKING',   iconBg:'#3B0D0D', iconColor:'#FF3131', col:'#FF3131', row:0 },
+  { icon:'robot-angry-outline',   lib:'community',  label:'100% PRIVATE\n& LOCAL',  iconBg:'#0D3B1E', iconColor:'#00FF88', col:'#00FF88', row:0 },
+  { icon:'cloud-off-outline',     lib:'community',  label:'NO CLOUD\nSTORAGE',      iconBg:'#3B2800', iconColor:'#FFB020', col:'#FFB020', row:1 },
+  { icon:'server-security',       lib:'community',  label:'LOCAL-HOSTED\nDATA',     iconBg:'#0D3B3A', iconColor:'#00D4CC', col:'#00D4CC', row:1 },
+  { icon:'account-cancel-outline',lib:'community',  label:'NO ACCOUNT\nREQUIRED',   iconBg:'#2A0D3B', iconColor:'#CC00FF', col:'#CC00FF', row:1 },
 ];
 const SPG_ROW_COLORS: Record<number, string[]> = {
   0: ['#00E5FF', '#FF3131', '#00FF88'],
@@ -1003,24 +1006,24 @@ const spg = StyleSheet.create({
   outerCard:       { marginHorizontal:0, backgroundColor:'#02070D', borderWidth:1, borderColor:'#00E5FF28', borderRadius:14, overflow:'hidden' },
   header:          { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:12, paddingTop:12, paddingBottom:10, borderBottomWidth:StyleSheet.hairlineWidth, borderBottomColor:'#00E5FF20' },
   headerDot:       { width:9, height:9, borderRadius:4.5, backgroundColor:'#00E5FF', shadowColor:'#00E5FF', shadowRadius:6, shadowOpacity:0.9, shadowOffset:{width:0,height:0} },
-  headerTitle:     { fontSize:13, fontWeight:'900', color:'#00E5FF', fontFamily:MONO, letterSpacing:1.2 },
-  headerSub:       { fontSize:8.5, fontWeight:'700', color:'#00E5FF99', fontFamily:MONO, letterSpacing:0.8, marginTop:1 },
+  headerTitle:     { fontSize:14, fontWeight:'900', color:'#00E5FF', fontFamily:MONO, letterSpacing:1.2 },
+  headerSub:       { fontSize:9.5, fontWeight:'700', color:'#00E5FF99', fontFamily:MONO, letterSpacing:0.8, marginTop:1 },
   row:             { flexDirection:'row', backgroundColor:'#02070D' },
   cell:            { paddingVertical:12, paddingHorizontal:6, alignItems:'center', gap:8, backgroundColor:'#02070D' },
   cellDividerRight:{ borderRightWidth:StyleSheet.hairlineWidth, borderRightColor:'#00E5FF18' },
   iconBadge:       { width:52, height:52, borderRadius:13, alignItems:'center', justifyContent:'center', position:'relative' },
   corner:          { position:'absolute', width:8, height:8 },
-  cellLabel:       { fontSize:9.5, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5, textAlign:'center', lineHeight:13 },
+  cellLabel:       { fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5, textAlign:'center', lineHeight:13 },
   footer:          { borderTopWidth:StyleSheet.hairlineWidth, borderTopColor:'#00E5FF18', paddingVertical:8, paddingHorizontal:12, backgroundColor:'#01050A' },
-  footerTxt:       { fontSize:9, color:'#3A6070', fontFamily:MONO, textAlign:'center', lineHeight:14, letterSpacing:0.3 },
+  footerTxt:       { fontSize:10, color:'#3A6070', fontFamily:MONO, textAlign:'center', lineHeight:14, letterSpacing:0.3 },
 });
 
 // ─── QUICK ACCESS GRID ────────────────────────────────────────────
 const QUICK_ITEMS = [
-  { icon:'code-tags',         lib:'community', label:'Python Scripts',  desc:'Automate your PC', tag:'SYSTEM', tagCol:D.green,  lCol:D.cyan,   tab:'scripts'   },
+  { icon:'code-braces-box',   lib:'community', label:'Python Scripts',  desc:'Automate your PC', tag:'SYSTEM', tagCol:D.green,  lCol:D.cyan,   tab:'scripts'   },
   { icon:'robot-excited',     lib:'community', label:'Butler AI Chat',  desc:'Ask Ollama anything', tag:'AI',  tagCol:D.purple, lCol:D.purple, tab:'butler'    },
-  { icon:'book-open-variant', lib:'community', label:'Knowledge Base',  desc:'SIGMA-NET indexed docs', tag:'KB', tagCol:D.amber, lCol:D.amber,  tab:'knowledge' },
-  { icon:'tools',             lib:'community', label:'Tools Hub',       desc:'File share & utilities', tag:'HUB', tagCol:D.blue, lCol:D.blue,   tab:'fileshare' },
+  { icon:'head-cog-outline',  lib:'community', label:'Knowledge Base',  desc:'SIGMA-NET indexed docs', tag:'KB', tagCol:D.amber, lCol:D.amber,  tab:'knowledge' },
+  { icon:'toolbox-outline',   lib:'community', label:'Tools Hub',       desc:'File share & utilities', tag:'HUB', tagCol:D.blue, lCol:D.blue,   tab:'fileshare' },
 ];
 
 function QuickAccessGrid({ goToTab }: { goToTab: (t: string) => void }) {
@@ -1045,11 +1048,11 @@ function QuickAccessGrid({ goToTab }: { goToTab: (t: string) => void }) {
                   <Icon name={item.icon as any} size={17} color={item.lCol} />
                 </View>
                 <View style={{ borderWidth:1, borderRadius:7, borderColor:item.tagCol+'50', backgroundColor:item.tagCol+'12', paddingHorizontal:5, paddingVertical:2 }}>
-                  <Text style={{ fontSize:7, fontWeight:'900', fontFamily:MONO, color:item.tagCol, letterSpacing:0.5 }}>{item.tag}</Text>
+                  <Text style={{ fontSize:8.5, fontWeight:'900', fontFamily:MONO, color:item.tagCol, letterSpacing:0.5 }}>{item.tag}</Text>
                 </View>
               </View>
-              <Text style={{ fontSize:12, fontWeight:'900', fontFamily:MONO, color:D.text, marginBottom:2 }}>{item.label}</Text>
-              <Text style={{ fontSize:9, fontFamily:MONO, color:D.textMid, lineHeight:13 }} numberOfLines={1}>{item.desc}</Text>
+              <Text style={{ fontSize:13.5, fontWeight:'900', fontFamily:MONO, color:D.text, marginBottom:3 }}>{item.label}</Text>
+              <Text style={{ fontSize:10.5, fontFamily:MONO, color:D.textMid, lineHeight:15 }} numberOfLines={1}>{item.desc}</Text>
               <View style={{ marginTop:7, height:2, borderRadius:1, backgroundColor:item.lCol+'28' }}>
                 <View style={{ height:'100%', width:'60%', borderRadius:1, backgroundColor:item.lCol }} />
               </View>
@@ -1374,7 +1377,7 @@ function SigmaNetCrawlerHomeCard({ isConnected }: { isConnected:boolean }) {
     <NexusCard accentColor={D.teal} glowIntensity={0.12}>
       <View style={{ flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingTop:12, paddingBottom:10 }}>
         <MaterialCommunityIcons name="spider-web" size={13} color={D.teal} />
-        <Text style={{ fontSize:10, fontWeight:'900', fontFamily:MONO, color:D.text, letterSpacing:1.5 }}>SIGMA-NET LIVE</Text>
+        <Text style={{ fontSize:11.5, fontWeight:'900', fontFamily:MONO, color:D.text, letterSpacing:1.5 }}>SIGMA-NET LIVE</Text>
         <View style={{ flex:1 }} />
         <PulseDot color={status.active ? D.teal : D.textDim} size={5} />
         <Text style={{ fontSize:9, fontFamily:MONO, color: status.active ? D.teal : D.textDim }}>{status.active ? 'CRAWLING' : 'IDLE'}</Text>
@@ -1633,19 +1636,19 @@ export default function NexusHomeScreen() {
       <WidgetLayer pageId="home" />
       <InlineWidgetSlot pageId="home" position="inline-top" />
 
-      {/* Config-driven card renderer */}
+      {/* Hero + Quick Access pinned to the top (user-requested order) */}
+      <ButlerAIHero
+        isConnected={isConnected} serverAddr={serverAddr}
+        onScanQR={() => setShowQR(true)}
+        kbFindings={kbFindings} scriptCount={scriptCount} />
+      <QuickAccessGrid goToTab={goToTab} />
+
+      {/* Config-driven card renderer (hero & quick_access pinned above) */}
       {uiCfg.home.cards
-        .filter(c => c.visible)
+        .filter(c => c.visible && c.id !== 'hero' && c.id !== 'quick_access')
         .sort((a, b) => a.order - b.order)
         .map(card => {
           switch (card.id) {
-            case 'hero':
-              return (
-                <ButlerAIHero key={card.id}
-                  isConnected={isConnected} serverAddr={serverAddr}
-                  onScanQR={() => setShowQR(true)}
-                  kbFindings={kbFindings} scriptCount={scriptCount} />
-              );
             case 'quick_send':
             case 'fileshare_clipboard':
               return <QuickSendCard key={card.id} isConnected={isConnected} />;
@@ -1671,8 +1674,6 @@ export default function NexusHomeScreen() {
             case 'security_grid':
             case 'security_protocols':
               return <SecurityProtocolsGrid key={card.id} isConnected={isConnected} canaryStatus={canaryStatus} />;
-            case 'quick_access':
-              return <QuickAccessGrid key={card.id} goToTab={goToTab} />;
             case 'kb_articles':
             case 'kb_articles_feed':
               return <KBArticlesFeed key={card.id} goToTab={goToTab} isConnected={isConnected} />;
@@ -1703,15 +1704,12 @@ export default function NexusHomeScreen() {
       {/* Fallbacks when no config */}
       {uiCfg.home.cards.length === 0 && (
         <>
-          <ButlerAIHero isConnected={isConnected} serverAddr={serverAddr}
-            onScanQR={() => setShowQR(true)} kbFindings={kbFindings} scriptCount={scriptCount} />
           <ConnectedPCCard isConnected={isConnected} serverAddr={serverAddr}
             metrics={metrics} ollamaOnline={ollamaOnline}
             cpuHistory={cpuHistory} ramHistory={ramHistory} diskHistory={diskHistory}
             uptimeSeconds={uptimeSeconds} />
           <SmartAlertsHomeCard isConnected={isConnected} metrics={metrics} />
           <SecurityProtocolsGrid isConnected={isConnected} canaryStatus={canaryStatus} />
-          <QuickAccessGrid goToTab={goToTab} />
           <ServerSetupSection onScanQR={() => setShowQR(true)} isConnected={isConnected} />
         </>
       )}

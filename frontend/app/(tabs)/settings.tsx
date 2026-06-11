@@ -42,9 +42,9 @@ import type { PHLog, PHResult } from '@/services/powerhouseImport';
 import { uiConfig, DEFAULT_UI_CONFIG, HomeCardId } from '@/services/uiConfig';
 
 const N = {
-  bg:       '#020407',
-  panel:    '#070D16',
-  card:     '#0A1018',
+  bg:       '#000003',
+  panel:    '#02070D',
+  card:     '#02070D',
   border:   'rgba(0,255,255,0.12)',
   cyan:     '#00FFFF',
   green:    '#00FF88',
@@ -174,7 +174,7 @@ function EditableRow({
 }
 
 const er = StyleSheet.create({
-  wrap:      { paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: '#0D1A24' },
+  wrap:      { paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: '#071120' },
   header:    { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 5 },
   label:     { flex: 1, fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.3 },
   editChip:  { flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3, borderColor: '#00CCDD40', backgroundColor: '#00CCDD0A' },
@@ -188,7 +188,7 @@ const er = StyleSheet.create({
     fontSize: 14, color: '#c8d8f0', fontFamily: MONO, lineHeight: 20,
   },
   actions:   { flexDirection: 'row', gap: 8 },
-  cancelBtn: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 8, backgroundColor: '#0D1A24', borderWidth: 1, borderColor: '#1a2235' },
+  cancelBtn: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 8, backgroundColor: '#071120', borderWidth: 1, borderColor: '#1a2235' },
   cancelTxt: { fontSize: 10, fontWeight: '700', color: '#336677', fontFamily: MONO },
   saveBtn:   { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 10, borderRadius: 8, backgroundColor: '#00CCDD' },
   saveTxt:   { fontSize: 11, fontWeight: '900', color: '#000', fontFamily: MONO },
@@ -920,7 +920,7 @@ function OmegaScannerCard({
             {showFixLog ? (
               <ScrollView style={{ maxHeight: 180 }} nestedScrollEnabled showsVerticalScrollIndicator={false}>
                 {fixLog.slice(0, 30).map((fix, i) => (
-                  <View key={i} style={[omega.fixLogRow, { borderBottomWidth: i < Math.min(fixLog.length, 30) - 1 ? 1 : 0, borderBottomColor: '#0D1A24' }]}>
+                  <View key={i} style={[omega.fixLogRow, { borderBottomWidth: i < Math.min(fixLog.length, 30) - 1 ? 1 : 0, borderBottomColor: '#071120' }]}>
                     <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: N.green, flexShrink: 0, marginTop: 4 }} />
                     <Text style={omega.fixLogTxt} numberOfLines={2}>{fix}</Text>
                   </View>
@@ -1054,7 +1054,7 @@ const omega = StyleSheet.create({
   progressFill: { height: '100%', borderRadius: 1 },
   section:      { marginHorizontal: 14, marginBottom: 10, padding: 10, backgroundColor: N.panel, borderRadius: 10, borderWidth: 1, borderColor: N.border },
   sectionLbl:   { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.5, marginBottom: 0 },
-  issueRow:     { flexDirection: 'row', alignItems: 'flex-start', gap: 9, paddingVertical: 9, borderLeftWidth: 3, paddingLeft: 8, borderBottomColor: '#0D1A24', backgroundColor: N.bg, marginBottom: 4, borderRadius: 6 },
+  issueRow:     { flexDirection: 'row', alignItems: 'flex-start', gap: 9, paddingVertical: 9, borderLeftWidth: 3, paddingLeft: 8, borderBottomColor: '#071120', backgroundColor: N.bg, marginBottom: 4, borderRadius: 6 },
   issueIconBox: { width: 26, height: 26, borderRadius: 6, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   severityPill: { borderWidth: 1, borderRadius: 5, paddingHorizontal: 5, paddingVertical: 2 },
   severityTxt:  { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.3 },
@@ -1188,7 +1188,7 @@ function ButlerKnowledgeViewer() {
             const isExp = expandedSection === sec.id;
             if (!content) return null;
             return (
-              <View key={sec.id} style={[bkv.sectionCard, { borderLeftColor: sec.color, borderBottomWidth: idx < KNOWLEDGE_SECTIONS.length - 1 ? 1 : 0, borderBottomColor: '#0D1A24' }]}>
+              <View key={sec.id} style={[bkv.sectionCard, { borderLeftColor: sec.color, borderBottomWidth: idx < KNOWLEDGE_SECTIONS.length - 1 ? 1 : 0, borderBottomColor: '#071120' }]}>
                 <TouchableOpacity
                   onPress={() => { haptics.light(); setExpandedSection(isExp ? null : sec.id); }}
                   style={bkv.sectionHeader}
@@ -1257,7 +1257,7 @@ const bkv = StyleSheet.create({
   sectionIconBox: { width: 26, height: 26, borderRadius: 6, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   sectionTitle:   { flex: 1, fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.3 },
   sectionLen:     { fontSize: 8, color: N.text, fontFamily: MONO },
-  sectionContent: { maxHeight: 280, backgroundColor: '#030810', borderTopWidth: 1, borderTopColor: '#0D1A24' },
+  sectionContent: { maxHeight: 280, backgroundColor: '#000003', borderTopWidth: 1, borderTopColor: '#071120' },
   sectionText:    { fontSize: 10, color: '#88AACC', fontFamily: MONO, lineHeight: 16, padding: 12 },
   actionRow:      { paddingHorizontal: 14, paddingTop: 10, paddingBottom: 8 },
   copyBtn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1.5, borderRadius: 10, paddingVertical: 12 },
@@ -1830,7 +1830,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
         <TouchableOpacity
           style={[{
             flexDirection: 'row', alignItems: 'center', gap: 8,
-            backgroundColor: promptCopied ? '#00FF8815' : '#0D1A24',
+            backgroundColor: promptCopied ? '#00FF8815' : '#071120',
             borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 10,
             borderWidth: 1.5, borderColor: promptCopied ? '#00FF8870' : '#1a2235',
           }]}
@@ -1871,7 +1871,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
         </View>
 
         {/* File list preview */}
-        <View style={{ backgroundColor: '#030810', borderRadius: 8, borderWidth: 1, borderColor: '#0D1A24', padding: 10, marginBottom: 12, gap: 3 }}>
+        <View style={{ backgroundColor: '#000003', borderRadius: 8, borderWidth: 1, borderColor: '#071120', padding: 10, marginBottom: 12, gap: 3 }}>
           <Text style={{ fontSize: 8, fontWeight: '900', color: '#4a607a', fontFamily: MONO, letterSpacing: 1.5, marginBottom: 5 }}>FILE MANIFEST</Text>
           {BUNDLE_MANIFEST.slice(0, 8).map((f, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
@@ -1883,7 +1883,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
           {BUNDLE_MANIFEST.length > 8 ? (
             <Text style={{ fontSize: 8, color: '#4a607a', fontFamily: MONO, marginTop: 3 }}>+ {BUNDLE_MANIFEST.length - 8} more files listed in manifest...</Text>
           ) : null}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#0D1A24' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#071120' }}>
             <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#00FF88' }} />
             <Text style={{ fontSize: 8, color: '#00FF88', fontFamily: MONO }}>green = full source embedded</Text>
             <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#4a607a', marginLeft: 8 }} />
@@ -1977,7 +1977,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
                 position: 'absolute', top: -5, right: -5,
                 width: 11, height: 11, borderRadius: 6,
                 backgroundColor: '#00FF88',
-                borderWidth: 2, borderColor: '#040C14',
+                borderWidth: 2, borderColor: '#02070D',
                 zIndex: 10,
                 ...Platform.select({ ios: { shadowColor: '#00FF88', shadowOffset:{width:0,height:0}, shadowOpacity:1, shadowRadius:5 }, android: {} }),
               }} />
@@ -2010,10 +2010,10 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
 
       {/* Import diff modal */}
       <Modal visible={showImport} animationType="slide" statusBarTranslucent onRequestClose={() => setShowImport(false)}>
-        <View style={{ flex: 1, backgroundColor: '#040C14' }}>
+        <View style={{ flex: 1, backgroundColor: '#02070D' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16,
             paddingTop: Platform.OS === 'android' ? 40 : 60, paddingBottom: 14,
-            borderBottomWidth: 1, borderBottomColor: '#0D1A24', backgroundColor: '#060F18' }}>
+            borderBottomWidth: 1, borderBottomColor: '#071120', backgroundColor: '#02070D' }}>
             <TouchableOpacity onPress={() => setShowImport(false)} hitSlop={{ top:10,bottom:10,left:10,right:10 }}>
               <MaterialIcons name="arrow-back" size={20} color="#88AACC" />
             </TouchableOpacity>
@@ -2103,7 +2103,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
                   const col       = applied ? (applied.ok ? '#00FF88' : '#ef4444') : (isSource ? '#8b5cf6' : '#10d9a0');
                   return (
                     <View key={i} style={{ paddingVertical: 8, borderBottomWidth: i < applyChanges.length - 1 ? 1 : 0,
-                      borderBottomColor: '#0D1A24' }}>
+                      borderBottomColor: '#071120' }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
                         <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: col, flexShrink: 0 }} />
                         <Text style={{ flex: 1, fontSize: 10, fontWeight: '700', color: col, fontFamily: MONO }}>{change.label}</Text>
@@ -2166,7 +2166,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
                 { label: 'MISSING', val: String(importDiff?.removed.length ?? 0),    col: '#ef4444' },
                 { label: 'SOURCE',  val: String(importDiff?.sourceFiles.length ?? 0),col: '#8b5cf6' },
               ].map(({ label, val, col }) => (
-                <View key={label} style={{ flex: 1, alignItems: 'center', backgroundColor: '#060F18',
+                <View key={label} style={{ flex: 1, alignItems: 'center', backgroundColor: '#02070D',
                   borderRadius: 8, borderWidth: 1, borderColor: col + '40', paddingVertical: 10 }}>
                   <Text style={{ fontSize: 15, fontWeight: '900', color: col, fontFamily: MONO }}>{val}</Text>
                   <Text style={{ fontSize: 6, color: '#336677', fontFamily: MONO, marginTop: 3, letterSpacing: 0.5 }}>{label}</Text>
@@ -2176,14 +2176,14 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
 
             {/* Matched files */}
             {importDiff && importDiff.same.length > 0 ? (
-              <View style={{ backgroundColor: '#030810', borderRadius: 10, borderWidth: 1,
+              <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1,
                 borderColor: '#00FF8825', padding: 12, marginBottom: 14 }}>
                 <Text style={{ fontSize: 8, fontWeight: '900', color: '#00FF88', fontFamily: MONO,
                   letterSpacing: 1.5, marginBottom: 8 }}>MATCHED FILES ({importDiff.same.length})</Text>
                 {importDiff.same.map((p, i) => (
                   <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7,
                     paddingVertical: 4, borderBottomWidth: i < importDiff.same.length - 1 ? 1 : 0,
-                    borderBottomColor: '#0D1A24' }}>
+                    borderBottomColor: '#071120' }}>
                     <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor:
                       importDiff.sourceFiles.includes(p) ? '#8b5cf6' : '#00FF8870', flexShrink: 0 }} />
                     <Text style={{ flex: 1, fontSize: 9, color: '#A8D8B8', fontFamily: MONO }}
@@ -2198,14 +2198,14 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
 
             {/* New files in import */}
             {importDiff && importDiff.added.length > 0 ? (
-              <View style={{ backgroundColor: '#030810', borderRadius: 10, borderWidth: 1,
+              <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1,
                 borderColor: '#f59e0b25', padding: 12, marginBottom: 14 }}>
                 <Text style={{ fontSize: 8, fontWeight: '900', color: '#f59e0b', fontFamily: MONO,
                   letterSpacing: 1.5, marginBottom: 8 }}>NEW IN IMPORT — NOT IN MANIFEST ({importDiff.added.length})</Text>
                 {importDiff.added.map((p, i) => (
                   <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7,
                     paddingVertical: 4, borderBottomWidth: i < importDiff.added.length - 1 ? 1 : 0,
-                    borderBottomColor: '#0D1A24' }}>
+                    borderBottomColor: '#071120' }}>
                     <MaterialIcons name="add" size={10} color="#f59e0b" />
                     <Text style={{ flex: 1, fontSize: 9, color: '#f59e0b', fontFamily: MONO }}
                       numberOfLines={1}>{p}</Text>
@@ -2216,14 +2216,14 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
 
             {/* Missing files */}
             {importDiff && importDiff.removed.length > 0 ? (
-              <View style={{ backgroundColor: '#030810', borderRadius: 10, borderWidth: 1,
+              <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1,
                 borderColor: '#ef444425', padding: 12, marginBottom: 14 }}>
                 <Text style={{ fontSize: 8, fontWeight: '900', color: '#ef4444', fontFamily: MONO,
                   letterSpacing: 1.5, marginBottom: 8 }}>IN MANIFEST — MISSING FROM IMPORT ({importDiff.removed.length})</Text>
                 {importDiff.removed.map((p, i) => (
                   <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7,
                     paddingVertical: 4, borderBottomWidth: i < importDiff.removed.length - 1 ? 1 : 0,
-                    borderBottomColor: '#0D1A24' }}>
+                    borderBottomColor: '#071120' }}>
                     <MaterialIcons name="remove" size={10} color="#ef4444" />
                     <Text style={{ flex: 1, fontSize: 9, color: '#ef4444', fontFamily: MONO }}
                       numberOfLines={1}>{p}</Text>
@@ -2261,10 +2261,10 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
 
       {/* Full preview modal */}
       <Modal visible={showModal} animationType="slide" statusBarTranslucent onRequestClose={() => setShowModal(false)}>
-        <View style={{ flex: 1, backgroundColor: '#040C14' }}>
+        <View style={{ flex: 1, backgroundColor: '#02070D' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16,
             paddingTop: Platform.OS === 'android' ? 40 : 60, paddingBottom: 14,
-            borderBottomWidth: 1, borderBottomColor: '#0D1A24', backgroundColor: '#060F18' }}>
+            borderBottomWidth: 1, borderBottomColor: '#071120', backgroundColor: '#02070D' }}>
             <TouchableOpacity onPress={() => setShowModal(false)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <MaterialIcons name="arrow-back" size={20} color="#88AACC" />
             </TouchableOpacity>
@@ -2285,7 +2285,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
             </TouchableOpacity>
           </View>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={false}>
-            <View style={{ backgroundColor: '#030810', borderRadius: 10, borderWidth: 1, borderColor: '#0D1A24', padding: 14, marginBottom: 16 }}>
+            <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1, borderColor: '#071120', padding: 14, marginBottom: 16 }}>
               <Text style={{ fontSize: 10, color: '#A8D8B8', fontFamily: MONO, lineHeight: 18 }}>
                 {exportText || buildAllFilesExport()}
               </Text>
@@ -2595,7 +2595,7 @@ function UIConfigCard() {
       {showCards ? (
         <View style={{ backgroundColor: N.panel, borderRadius: 10, borderWidth: 1, borderColor: ACCENT + '22', overflow: 'hidden', marginBottom: 12 }}>
           {Object.keys(CARD_LABELS).map((id, i, arr) => (
-            <View key={id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: '#0D1A24' }}>
+            <View key={id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: '#071120' }}>
               <Text style={{ flex: 1, fontSize: 10, color: cardToggles[id] !== false ? N.textBrt : N.textDim, fontFamily: MONO, lineHeight: 15 }} numberOfLines={1}>{CARD_LABELS[id]}</Text>
               <Switch value={cardToggles[id] !== false} onValueChange={val => toggleCard(id, val)} thumbColor={cardToggles[id] !== false ? ACCENT : N.textDim} trackColor={{ false: N.border, true: ACCENT + '55' }} ios_backgroundColor={N.border} />
             </View>
@@ -2841,7 +2841,7 @@ function PowerhouseCard({ onSettingsApplied }: { onSettingsApplied?: () => void 
     '============================================\n\n' +
     'STACK: React Native + Expo + TypeScript. StyleSheet.create() at bottom of every file.\n\n' +
     'COLOR SYSTEM (exact values — never hardcode hex elsewhere):\n' +
-    '  bg:#020407 surface:#070D16 surfaceHi:#0C1420\n' +
+    '  bg:#000003 surface:#02070D surfaceHi:#071120\n' +
     '  cyan:#00FFFF green:#00FF88 amber:#F5A623 purple:#BF00FF\n' +
     '  blue:#4A9EFF red:#FF3131 text:#D8E8F4 textMid:#7A9AB8 textDim:#3A5068\n' +
     '  border: rgba(0,255,255,0.12)\n\n' +
@@ -2901,7 +2901,7 @@ function PowerhouseCard({ onSettingsApplied }: { onSettingsApplied?: () => void 
     '    <View style={{flex:1,height:1,backgroundColor:ACCENT+"25",marginLeft:4}} />\n' +
     '  </View>\n\n' +
     'RULES:\n' +
-    '  1. NEVER white/light backgrounds — always dark obsidian (#020407 to #0C1420)\n' +
+    '  1. NEVER white/light backgrounds — always dark obsidian (#000003 to #071120)\n' +
     '  2. EVERY interactive: TouchableOpacity activeOpacity 0.8-0.85\n' +
     '  3. EVERY card: 2px colored topLine as first child\n' +
     '  4. EVERY status dot: pulse Animated.Value for opacity\n' +
@@ -2930,7 +2930,7 @@ function PowerhouseCard({ onSettingsApplied }: { onSettingsApplied?: () => void 
     '5. Keep ALL existing JSON sections unchanged — only add/modify files[] and patches[]\n' +
     '6. Patches use op: "file.replace", "file.insertAfter", "file.regex", "file.create", or "file.delete"\n' +
     '7. After I upload the JSON, a Python script auto-runs on my PC to apply all file changes\n\n' +
-    'COLOR SYSTEM: background #020407, cyan #00FFFF, green #00FF88, amber #F5A623, purple #BF00FF\n' +
+    'COLOR SYSTEM: background #000003, cyan #00FFFF, green #00FF88, amber #F5A623, purple #BF00FF\n' +
     'Cards: borderRadius 14-16, border 1.5px rgba(0,255,255,0.18), iOS shadow opacity 0.22\n' +
     'All labels: monospace font, all backgrounds dark obsidian — NO white or light surfaces';
 
@@ -3114,7 +3114,7 @@ function PowerhouseCard({ onSettingsApplied }: { onSettingsApplied?: () => void 
             </TouchableOpacity>
           </View>
           {log.slice(0, 8).map((entry, i) => (
-            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6, borderBottomWidth: i < log.length - 1 ? 1 : 0, borderBottomColor: '#0D1A24' }}>
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6, borderBottomWidth: i < log.length - 1 ? 1 : 0, borderBottomColor: '#071120' }}>
               <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: entry.warningCount === 0 ? N.green : N.amber }} />
               <Text style={{ flex: 1, fontSize: 10, color: N.textBrt, fontFamily: MONO }} numberOfLines={1}>{entry.name}</Text>
               <Text style={{ fontSize: 8, color: N.green, fontFamily: MONO }}>{entry.appliedCount}\u2713</Text>
@@ -3188,7 +3188,7 @@ const phc = StyleSheet.create({
   resultLine:    { fontSize:9, fontFamily:MONO, lineHeight:15, marginTop:3 },
   miniBtn:       { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:5, borderWidth:1.5, borderRadius:8, paddingVertical:9 },
   miniBtnTxt:    { fontSize:9, fontWeight:'900', fontFamily:MONO, letterSpacing:0.3 },
-  logPanel:      { marginHorizontal:14, marginBottom:12, backgroundColor:'#030810', borderRadius:10, borderWidth:1, borderColor:'rgba(0,255,255,0.12)', padding:12 },
+  logPanel:      { marginHorizontal:14, marginBottom:12, backgroundColor:'#000003', borderRadius:10, borderWidth:1, borderColor:'rgba(0,255,255,0.12)', padding:12 },
   importBtn:     { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:10, borderRadius:12, paddingVertical:16, marginHorizontal:14,
     ...Platform.select({ ios:{ shadowColor:'#00FFFF', shadowOffset:{width:0,height:4}, shadowOpacity:0.6, shadowRadius:14 }, android:{ elevation:7 } }) },
   importBtnTxt:  { fontSize:14, fontWeight:'900', color:'#000', fontFamily:MONO, letterSpacing:1 },
@@ -3198,7 +3198,7 @@ const phc = StyleSheet.create({
   footerTxt:     { flex:1, fontSize:8, color:N.text, fontFamily:MONO, lineHeight:13 },
   workflowStrip: { flexDirection:'row', alignItems:'center', gap:8, borderWidth:1, borderRadius:10, paddingHorizontal:12, paddingVertical:11, marginHorizontal:14, marginBottom:6, backgroundColor:N.card },
   workflowStripTxt:{ fontSize:10, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5 },
-  workflowPanel: { marginHorizontal:14, marginBottom:10, backgroundColor:'#030B14', borderRadius:10, borderWidth:1, borderColor:'rgba(0,255,255,0.18)', padding:12, gap:8 },
+  workflowPanel: { marginHorizontal:14, marginBottom:10, backgroundColor:'#000003', borderRadius:10, borderWidth:1, borderColor:'rgba(0,255,255,0.18)', padding:12, gap:8 },
   workflowStep:  { flexDirection:'row', alignItems:'flex-start', gap:9 },
   workflowNum:   { width:22, height:22, borderRadius:11, borderWidth:1.5, alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 },
   workflowNumTxt:{ fontSize:10, fontWeight:'900', fontFamily:MONO },
@@ -4027,7 +4027,7 @@ export default function SettingsScreen() {
 
 // Global Styles
 const g = StyleSheet.create({
-  root:        { flex: 1, backgroundColor: '#020407' },
+  root:        { flex: 1, backgroundColor: '#000003' },
   scrollPad:   { padding: 14, paddingTop: 12 },
   card:        { backgroundColor: N.card, borderRadius: 12, borderWidth: 1.5, borderColor: N.border, marginBottom: 14, padding: 14 },
   cardTitle:   { fontSize: 10, fontWeight: '900', color: N.cyan, fontFamily: MONO, letterSpacing: 2, marginBottom: 12 },

@@ -27,7 +27,7 @@ import { haptics } from '@/services/haptics';
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
-  bg: '#070D16', card: '#0C1420', cyan: '#00FFFF', green: '#00FF88',
+  bg: '#02070D', card: '#071120', cyan: '#00FFFF', green: '#00FF88',
   amber: '#F5A623', red: '#FF3131', text: '#D8E8F4', textDim: '#7A9AB8',
   border: 'rgba(0,255,255,0.18)',
 };
@@ -260,7 +260,7 @@ const s = StyleSheet.create({
   fabBadgeTxt: { fontSize: 9, fontWeight: '900', color: '#000', fontFamily: MONO },
 
   mdText: { color: C.text, fontSize: 14, lineHeight: 21 },
-  codeWrap: { marginVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: C.border, backgroundColor: '#020407', overflow: 'hidden' },
+  codeWrap: { marginVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: C.border, backgroundColor: '#000003', overflow: 'hidden' },
   codeHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, paddingVertical: 5, backgroundColor: 'rgba(0,255,255,0.04)', borderBottomWidth: 1, borderBottomColor: C.border },
   codeLang: { fontSize: 9, fontWeight: '900', color: C.cyan, fontFamily: MONO, letterSpacing: 1 },
   codeCopyBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },

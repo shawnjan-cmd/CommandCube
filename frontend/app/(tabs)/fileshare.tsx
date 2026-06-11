@@ -26,10 +26,10 @@ const { width: SW } = Dimensions.get('window');
 
 // ─── NEXUS COMMAND CENTER PALETTE ─────────────────────────────
 const N = {
-  bg:        '#020407',
-  surface:   '#070D16',
-  surfaceHi: '#0C1420',
-  surfaceMd: '#0A1018',
+  bg:        '#000003',
+  surface:   '#02070D',
+  surfaceHi: '#071120',
+  surfaceMd: '#02070D',
   border:    'rgba(0,255,255,0.12)',
   borderHi:  'rgba(0,255,255,0.28)',
   text:      '#D8E8F4',
@@ -1337,7 +1337,7 @@ export default function FileShareScreen() {
 }
 
 const s = StyleSheet.create({
-  container:  { flex: 1, backgroundColor: '#020407' },
+  container:  { flex: 1, backgroundColor: '#000003' },
 
   sectionBar: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: N.border, backgroundColor: N.surface },
   sectionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 13, borderBottomWidth: 2, borderBottomColor: 'transparent' },

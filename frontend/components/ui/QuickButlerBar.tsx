@@ -21,8 +21,8 @@ import { NeonChatFrame } from '@/components/ui/NeonChatFrame';
 
 export const BUTLER_PREFILL_KEY = '@butler_prefill_prompt';
 
-const BAR_H  = 64;  // total height incl. speech tail
-const TAIL_H = 11;
+const BAR_H  = 52;  // total height incl. speech tail (compact)
+const TAIL_H = 9;
 
 const safeHaptics = {
   light:  () => { try { haptics.light();  } catch {} },
@@ -67,7 +67,7 @@ export default function QuickButlerBar() {
         {/* breathing ambient halo behind the frame */}
         <Animated.View pointerEvents="none" style={[styles.halo, { opacity: haloOpacity }]} />
 
-        {barW > 0 && <NeonChatFrame width={barW} height={BAR_H} tailHeight={TAIL_H} badgeRadius={19} />}
+        {barW > 0 && <NeonChatFrame width={barW} height={BAR_H} tailHeight={TAIL_H} badgeRadius={15} />}
 
         <View style={styles.row}>
           <TextInput
@@ -110,9 +110,9 @@ export default function QuickButlerBar() {
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    left: 10,
-    right: 10,
-    bottom: Platform.OS === 'ios' ? 96 : 76,
+    left: 14,
+    right: 14,
+    bottom: Platform.OS === 'ios' ? 94 : 76,
     zIndex: 50,
   },
   bubble: {
@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
   },
   row: {
     position: 'absolute',
-    left: 50, right: 8, top: 4,
-    height: BAR_H - TAIL_H - 8,
+    left: 42, right: 8, top: 3,
+    height: BAR_H - TAIL_H - 6,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -137,13 +137,13 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     color: '#D7F6FF',
-    fontSize: 12.5,
+    fontSize: 13.5,
     fontWeight: '600',
-    paddingVertical: 4,
+    paddingVertical: 2,
     paddingHorizontal: 2,
   },
   sendBtn: {
-    width: 27, height: 27, borderRadius: 14,
+    width: 25, height: 25, borderRadius: 13,
     borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },

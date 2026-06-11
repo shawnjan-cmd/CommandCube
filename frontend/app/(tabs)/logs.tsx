@@ -21,9 +21,9 @@ const { width: SW } = Dimensions.get('window');
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
-  bg:       '#020407',
-  surface:  '#070D16',
-  surfaceHi:'#0C1420',
+  bg:       '#000003',
+  surface:  '#02070D',
+  surfaceHi:'#071120',
   border:   'rgba(0,255,255,0.12)',
   text:     '#D8E8F4',
   textMid:  '#7A9AB8',
@@ -252,7 +252,7 @@ const cup = StyleSheet.create({
   liveTxt:   { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
   row:       { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   rowLabel:  { fontSize: 9, fontWeight: '700', fontFamily: MONO, letterSpacing: 1.5, color: C.textMid, width: 62 },
-  track:     { flex: 1, height: 18, backgroundColor: '#1E2535', borderRadius: 4, overflow: 'hidden' },
+  track:     { flex: 1, height: 18, backgroundColor: '#0A1828', borderRadius: 4, overflow: 'hidden' },
   fill:      { height: '100%', borderRadius: 4 },
   pct:       { fontSize: 12, fontWeight: '900', fontFamily: MONO, width: 40, textAlign: 'right' },
 });
@@ -617,7 +617,7 @@ const MetricCard = React.memo(function MetricCard({ title, value, color }: { tit
     Animated.timing(barW, { toValue: 1, duration: 1000, useNativeDriver: false }).start();
   }, [value]);
   return (
-    <View style={[sd.metricCard, { borderColor: color + '30', backgroundColor: '#0E1520' }]}>
+    <View style={[sd.metricCard, { borderColor: color + '30', backgroundColor: '#071120' }]}>
       {/* Corner brackets */}
       <View style={[sd.cTL, { borderColor: color + '70' }]} />
       <View style={[sd.cBR, { borderColor: color + '40' }]} />
@@ -784,7 +784,7 @@ function DiskProgressBar({ pct, color }: { pct: number; color: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
       <Text style={{ fontSize: 11, fontWeight: '700', color: C.textMid, fontFamily: MONO, width: 40, letterSpacing: 1 }}>DISK</Text>
-      <View style={{ flex: 1, height: 10, backgroundColor: '#1A2535', borderRadius: 5, overflow: 'hidden' }}>
+      <View style={{ flex: 1, height: 10, backgroundColor: '#0A1828', borderRadius: 5, overflow: 'hidden' }}>
         <Animated.View style={[{
           height: '100%', borderRadius: 5, backgroundColor: color,
           width: barW.interpolate({ inputRange:[0,1], outputRange:['0%','100%'] }) as any,
@@ -919,7 +919,7 @@ function SystemDashboard({ isConnected, metrics }: {
   );
 }
 const sd = StyleSheet.create({
-  outer:       { backgroundColor: '#0B0E14', borderRadius: 16, borderWidth: 1, borderColor: '#1E2535', overflow: 'hidden',
+  outer:       { backgroundColor: '#071120', borderRadius: 16, borderWidth: 1, borderColor: '#0A1828', overflow: 'hidden',
     ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:4}, shadowOpacity:0.4, shadowRadius:14 }, android:{elevation:6} }) },
   header:      { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 6 },
   headerDot:   { width: 9, height: 9, borderRadius: 5 },
@@ -929,7 +929,7 @@ const sd = StyleSheet.create({
   sub:         { fontSize: 10, color: '#4A5568', fontFamily: MONO, paddingHorizontal: 16, marginBottom: 14, lineHeight: 15 },
   // Section 1 — metric grid
   metricGrid:  { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, gap: 8, marginBottom: 12 },
-  metricCard:  { width: METRIC_CARD_W, backgroundColor: '#0E1520', borderRadius: 10, borderWidth: 1, paddingHorizontal: 10, paddingTop: 12, paddingBottom: 14, position: 'relative', overflow: 'hidden',
+  metricCard:  { width: METRIC_CARD_W, backgroundColor: '#071120', borderRadius: 10, borderWidth: 1, paddingHorizontal: 10, paddingTop: 12, paddingBottom: 14, position: 'relative', overflow: 'hidden',
     ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.3, shadowRadius:6 }, android:{elevation:3} }) },
   metricTitle: { fontSize: 8, fontWeight: '700', color: '#6B7280', fontFamily: MONO, letterSpacing: 0.9, marginBottom: 8 },
   metricValue: { fontSize: 22, fontWeight: '900', fontFamily: MONO, marginBottom: 10, lineHeight: 26 },
@@ -938,14 +938,14 @@ const sd = StyleSheet.create({
   cBR:         { position: 'absolute', bottom: 3, right: 0, width: 8, height: 8, borderBottomWidth: 1.5, borderRightWidth: 1.5 },
   // Section 2 — charts row
   middleRow:   { flexDirection: 'row', paddingHorizontal: 12, marginBottom: 12 },
-  chartCard:   { backgroundColor: '#151822', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 12 },
+  chartCard:   { backgroundColor: '#071120', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 12 },
   chartTitle:  { fontSize: 8, fontWeight: '700', color: '#6B7280', fontFamily: MONO, letterSpacing: 0.9, marginBottom: 12 },
   // Storage donut
   donutRing:   { width: 90, height: 90, borderRadius: 45, borderWidth: 10, justifyContent: 'center', alignItems: 'center' },
   donutMain:   { fontSize: 15, fontWeight: '900', fontFamily: MONO, textAlign: 'center' },
   donutSub:    { fontSize: 7, color: '#6B7280', fontFamily: MONO, textAlign: 'center', letterSpacing: 0.5, marginTop: 2 },
   // Section 3 — performance
-  perfCard:    { backgroundColor: '#151822', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 14, marginHorizontal: 12, marginBottom: 16, gap: 0 },
+  perfCard:    { backgroundColor: '#071120', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 14, marginHorizontal: 12, marginBottom: 16, gap: 0 },
   ringsRow:    { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 24, marginTop: 8 },
 });
 
@@ -1065,7 +1065,7 @@ function QuickPCScript({ script: scriptItem, onRun, isRunning, disabled }: {
 }
 
 const qps = StyleSheet.create({
-  card:     { minHeight: 76, borderWidth: 1.5, borderTopWidth: 3, borderRadius: 10, backgroundColor: '#080F12', overflow: 'hidden',
+  card:     { minHeight: 76, borderWidth: 1.5, borderTopWidth: 3, borderRadius: 10, backgroundColor: '#02070D', overflow: 'hidden',
     position: 'relative', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 8, paddingHorizontal: 5,
     ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.25, shadowRadius:6 }, android:{elevation:3} }) },
   cornerTL: { position: 'absolute', top: 0, left: 0, width: 8, height: 8, borderTopWidth: 1.5, borderLeftWidth: 1.5 },
@@ -1550,7 +1550,7 @@ export default function PCCheckScreen() {
 }
 
 const s = StyleSheet.create({
-  root:        { flex: 1, backgroundColor: '#020407' },
+  root:        { flex: 1, backgroundColor: '#000003' },
   connBar:     { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 11, borderBottomWidth: 1 },
   connStatus:  { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.6 },
   connSub:     { fontSize: 9, color: C.textDim, fontFamily: MONO, marginTop: 1 },

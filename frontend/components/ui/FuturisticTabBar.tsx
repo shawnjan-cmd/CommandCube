@@ -16,11 +16,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { haptics } from '@/services/haptics';
 
-const CYAN     = '#00E5FF';
-const CYAN_DIM = 'rgba(0,229,255,0.55)';
-const PURPLE   = '#A366F5';
-const BG       = '#010306';
-const BORDER   = 'rgba(0,229,255,0.18)';
+const CYAN     = '#3EC8FF';
+const CYAN_HI  = '#7FE3FF';
+const CYAN_DIM = 'rgba(62,200,255,0.55)';
+const STEEL    = '#5E7186';
+const BG       = '#02070D';
+const BORDER   = 'rgba(62,200,255,0.18)';
 
 function TabButton({
   isFocused,
@@ -157,9 +158,14 @@ export default function FuturisticTabBar(
         { paddingBottom: insets.bottom > 0 ? insets.bottom : 8, height: 70 + (insets.bottom > 0 ? insets.bottom : 8) },
       ]}
     >
-      {/* Top hairline + ambient glow */}
-      <View style={styles.topLine} />
-      <View style={styles.topGlow} />
+      {/* Chat-frame style top edge: steel outer stroke + neon core + plateau */}
+      <View style={styles.topSteel} />
+      <View style={styles.topNeon} />
+      <View style={styles.plateau} />
+      <View style={styles.plateauBar} />
+      <View style={styles.hazardRow} pointerEvents="none">
+        {[0, 1, 2, 3, 4].map(i => <View key={i} style={styles.hazard} />)}
+      </View>
       {/* Diagonal sweep */}
       <Animated.View
         pointerEvents="none"
@@ -219,16 +225,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
     overflow: 'hidden',
   },
-  topLine: {
-    position: 'absolute', left: 0, right: 0, top: 0, height: 1,
-    backgroundColor: BORDER,
+  topSteel: {
+    position: 'absolute', left: 0, right: 0, top: 0, height: 3,
+    backgroundColor: STEEL, opacity: 0.85,
   },
-  topGlow: {
-    position: 'absolute', left: '20%' as any, right: '20%' as any, top: -1, height: 2,
-    backgroundColor: CYAN, opacity: 0.55,
+  topNeon: {
+    position: 'absolute', left: 0, right: 0, top: 3, height: 1.5,
+    backgroundColor: CYAN,
     ...(Platform.OS === 'ios'
       ? { shadowColor: CYAN, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 6 }
       : {}),
+  },
+  plateau: {
+    position: 'absolute', top: 0, alignSelf: 'center', width: '34%' as any, height: 5,
+    backgroundColor: BG, borderBottomWidth: 1.5, borderBottomColor: CYAN,
+    borderLeftWidth: 1.5, borderLeftColor: CYAN,
+    borderRightWidth: 1.5, borderRightColor: CYAN,
+  },
+  plateauBar: {
+    position: 'absolute', top: 1.5, alignSelf: 'center', width: '16%' as any, height: 2,
+    backgroundColor: CYAN_HI, borderRadius: 1, opacity: 0.95,
+  },
+  hazardRow: {
+    position: 'absolute', top: 7, left: 14, flexDirection: 'row', gap: 5,
+  },
+  hazard: {
+    width: 6, height: 2.5, backgroundColor: CYAN, opacity: 0.6,
+    transform: [{ skewX: '-30deg' }], borderRadius: 1,
   },
   sweep: {
     position: 'absolute', top: 0, bottom: 0, width: 100,
@@ -268,7 +291,7 @@ const styles = StyleSheet.create({
       : {}),
   },
   label: {
-    fontSize: 9,
+    fontSize: 10.5,
     marginTop: 2,
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
     textAlign: 'center',

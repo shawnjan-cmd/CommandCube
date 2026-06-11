@@ -50,10 +50,10 @@ const BODY_FONT: any = Platform.OS === 'ios' ? 'System' : 'sans-serif';
 const ROBOT_BG = require('@/assets/images/butler-robot-tux.jpg');
 
 const C = {
-  bg:          '#020407',
-  bgDeep:      '#010204',
-  surface:     '#070D16',
-  surfaceHi:   '#0C1420',
+  bg:          '#000003',
+  bgDeep:      '#000003',
+  surface:     '#02070D',
+  surfaceHi:   '#071120',
   panel:       '#050B14',
   teal:        '#00FFFF',
   tealDim:     'rgba(0,255,255,0.08)',
@@ -250,7 +250,7 @@ function NexusChatHeader({ isConnected, onClear, accentColor, onBuildScript, onT
   );
 }
 const nch = StyleSheet.create({
-  wrap:      { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,229,255,0.12)', backgroundColor: '#08111C' },
+  wrap:      { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,229,255,0.12)', backgroundColor: '#02070D' },
   iconBox:   { width: 46, height: 46, borderRadius: 13, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', overflow: 'hidden' },
   robotFace: { alignItems: 'center', gap: 3, zIndex: 2 },
   eye:       { width: 7, height: 5, borderRadius: 2.5 },
@@ -259,7 +259,7 @@ const nch = StyleSheet.create({
   title:     { fontSize: 15, fontWeight: '800', fontFamily: BODY_FONT, letterSpacing: 0.4 },
   sub:       { fontSize: 9, fontFamily: MONO, letterSpacing: 0.4, marginTop: 1 },
   iconBtn:   { width: 34, height: 34, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  toolbarRow:{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#050C14', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.10)' },
+  toolbarRow:{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#02070D', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.10)' },
   toolBtn:   { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, flexShrink: 0 },
   toolBtnTxt:{ fontSize: 9, fontWeight: '800', fontFamily: MONO, letterSpacing: 0.7 },
   toolSep:   { width: 1, height: 18, backgroundColor: 'rgba(0,255,255,0.1)', marginHorizontal: 2 },
@@ -560,7 +560,7 @@ function SynapseHealPanel({ script, onClose, accentColor }: {
   );
 }
 const shp = StyleSheet.create({
-  wrap:     { margin: 12, borderWidth: 1, borderRadius: 12, overflow: 'hidden', backgroundColor: '#070E18' },
+  wrap:     { margin: 12, borderWidth: 1, borderRadius: 12, overflow: 'hidden', backgroundColor: '#02070D' },
   header:   { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.1)' },
   title:    { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.5 },
   badge:    { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
@@ -589,7 +589,7 @@ function ScriptBuilderModal({ visible, onClose, onBuild, accentColor }: {
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: '#070D18', borderTopLeftRadius: 20, borderTopRightRadius: 20,
+        <View style={{ backgroundColor: '#02070D', borderTopLeftRadius: 20, borderTopRightRadius: 20,
           borderWidth: 1, borderColor: pr + '30', paddingBottom: 32 }}>
           <View style={{ alignItems: 'center', padding: 16 }}>
             <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: pr + '40' }} />
@@ -600,7 +600,7 @@ function ScriptBuilderModal({ visible, onClose, onBuild, accentColor }: {
             Describe what you want to automate — Butler AI will write and run it
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginBottom: 12,
-            borderWidth: 1.5, borderColor: pr + '40', borderRadius: 12, backgroundColor: '#030810', paddingHorizontal: 12 }}>
+            borderWidth: 1.5, borderColor: pr + '40', borderRadius: 12, backgroundColor: '#000003', paddingHorizontal: 12 }}>
             <TextInput
               style={{ flex: 1, fontSize: 14, color: C.textBright, paddingVertical: 12, fontFamily: BODY_FONT }}
               value={prompt}

@@ -26,8 +26,8 @@ const C = {
   text:    '#D8E8F4',
   textMid: '#7A9AB8',
   textDim: '#3A5068',
-  bg:      '#020407',
-  card:    '#0C1420',
+  bg:      '#000003',
+  card:    '#071120',
   border:  'rgba(0,255,255,0.18)',
 };
 
