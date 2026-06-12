@@ -148,10 +148,16 @@ export default function SkinsScreen() {
         {sortedCategories.map(cat => (
           <View key={cat} style={{ marginBottom: 18 }}>
             <View style={[styles.sectionHeader, { borderColor: T.borderColor + '60' }]}>
+              <View style={{ flex: 1, height: 1.5, backgroundColor: T.borderColor + '60', borderRadius: 1 }} />
               <View style={[styles.sectionDot, { backgroundColor: T.primary }]} />
-              <Text style={[styles.sectionTitle, { color: T.textAccent }]}>{cat}</Text>
-              <View style={{ flex: 1, height: 1, backgroundColor: T.borderColor + '40', marginLeft: 8 }} />
-              <Text style={[styles.sectionCount, { color: T.textDim }]}>{grouped[cat].length}</Text>
+              <View style={{ position: 'relative', alignItems: 'center', paddingBottom: 6, maxWidth: '70%' }}>
+                <Text style={[styles.sectionTitle, { position: 'absolute', top: 2, left: 0, right: 0, color: '#000000', textAlign: 'center' }]} numberOfLines={1}>{cat}</Text>
+                <Text style={[styles.sectionTitle, { color: T.textAccent, textAlign: 'center', textShadowColor: T.primary, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 }]} numberOfLines={1}>{cat}</Text>
+                <View style={{ position: 'absolute', bottom: 0, width: 30, height: 2.5, borderRadius: 1, backgroundColor: T.primary, opacity: 0.9 }} />
+              </View>
+              <View style={[styles.sectionDot, { backgroundColor: T.primary }]} />
+              <View style={{ flex: 1, height: 1.5, backgroundColor: T.borderColor + '40', borderRadius: 1 }} />
+              <Text style={[styles.sectionCount, { color: T.textDim, position: 'absolute', right: 0 }]}>{grouped[cat].length}</Text>
             </View>
             {grouped[cat].map(pack => (
               <SkinCard

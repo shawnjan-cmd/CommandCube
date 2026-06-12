@@ -22,7 +22,7 @@ import { haptics } from '@/services/haptics';
 
 export const BUTLER_PREFILL_KEY = '@butler_prefill_prompt';
 
-const BAR_H = 46;
+const BAR_H = 52;
 
 const RED      = '#FF2A1F';
 const RED_HI   = '#FF6A52';
@@ -103,7 +103,10 @@ export default function QuickButlerBar() {
           <View pointerEvents="none" style={styles.rimLight} />
 
           <View style={styles.row}>
-            {/* Prompt chevron + blinking cursor */}
+            {/* Robot badge + prompt chevron + blinking cursor */}
+            <View style={styles.robotBadge}>
+              <MaterialCommunityIcons name="robot-angry-outline" size={17} color={RED} />
+            </View>
             <View style={styles.promptBlock}>
               <Text style={styles.promptGlyph}>{'>'}</Text>
               {!focused && text.length === 0 ? (
@@ -212,9 +215,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: 12,
-    paddingRight: 6,
+    paddingLeft: 10,
+    paddingRight: 7,
     gap: 8,
+  },
+  robotBadge: {
+    width: 30, height: 30, borderRadius: 7,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,42,31,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,42,31,0.45)',
   },
   promptBlock: {
     flexDirection: 'row',
@@ -223,20 +233,20 @@ const styles = StyleSheet.create({
   },
   promptGlyph: {
     color: RED,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '900',
     fontFamily: MONO,
   },
   cursorBlock: {
     width: 8,
-    height: 14,
+    height: 15,
     backgroundColor: RED,
     opacity: 0.9,
   },
   input: {
     flex: 1,
     color: TEXT,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
     fontFamily: MONO,
     letterSpacing: 0.5,
@@ -244,7 +254,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   sendBtn: {
-    width: 34, height: 34, borderRadius: 8,
+    width: 36, height: 36, borderRadius: 8,
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 1,
   },

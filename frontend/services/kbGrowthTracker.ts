@@ -10,10 +10,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 
+let warnedNoDocDir = false;
 const getTimelineFile = (): string | null => {
   const dir = FileSystem.documentDirectory;
   if (!dir) {
-    console.warn('[kbGrowthTracker] documentDirectory unavailable');
+    if (!warnedNoDocDir) {
+      warnedNoDocDir = true;
+      console.warn('[kbGrowthTracker] documentDirectory unavailable');
+    }
     return null;
   }
   return `${dir}kb_growth_timeline_v2.json`;

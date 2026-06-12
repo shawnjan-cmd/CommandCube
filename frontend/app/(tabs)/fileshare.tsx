@@ -21,6 +21,7 @@ import { haptics } from '@/services/haptics';
 import { InlineWidgetSlot } from '@/components/ui/WidgetLayer';
 import { autoConnectEngine, EngineEvent } from '@/services/autoConnectEngine';
 import { useCosmetic } from '@/contexts/CosmeticContext';
+import SectionTitle3D from '@/components/ui/SectionTitle3D';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');
@@ -161,21 +162,8 @@ function NexusTitle({ main, accent, accentColor = N.blue }: { main: string; acce
 
 // ─── NEXUS SECTION HEADER ──────────────────────────────────────
 function SectionHeader({ label, color = N.blue, icon, right }: { label: string; color?: string; icon?: string; right?: React.ReactNode }) {
-  return (
-    <View style={sh.row}>
-      <View style={[sh.accent, { backgroundColor: color }]} />
-      {icon ? <MaterialIcons name={icon as any} size={13} color={color} /> : null}
-      <Text style={[sh.label, { color }]}>{label}</Text>
-      <View style={{ flex: 1, height: 1, backgroundColor: color + '20', marginLeft: 8 }} />
-      {right}
-    </View>
-  );
+  return <SectionTitle3D title={label} accent={color} icon={icon} right={right} />;
 }
-const sh = StyleSheet.create({
-  row:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
-  accent: { width: 3, height: 16, borderRadius: 2 },
-  label:  { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
-});
 
 // ─── NEXUS CONNECTION STATUS STRIP ────────────────────────────
 function NexusConnStrip({ isConnected, addr }: { isConnected: boolean; addr: string }) {

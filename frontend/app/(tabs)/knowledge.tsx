@@ -15,6 +15,7 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { haptics } from '@/services/haptics';
 import { InlineWidgetSlot } from '@/components/ui/WidgetLayer';
+import SectionTitle3D from '@/components/ui/SectionTitle3D';
 import { useCosmetic } from '@/contexts/CosmeticContext';
 import { knowledgeAccumulator, CompressedKnowledge, ResearchSession } from '@/services/knowledgeAccumulator';
 import { kbOrganizerBot, BotState, BotActivity } from '@/services/kbOrganizerBot';
@@ -599,20 +600,8 @@ const nsc = StyleSheet.create({
 
 // ─── NEXUS SECTION HEADER ─────────────────────────────────────
 function SectionHeader({ label, color = N.blue, icon, right }: { label: string; color?: string; icon?: string; right?: React.ReactNode }) {
-  return (
-    <View style={sh.row}>
-      {icon ? <MaterialIcons name={icon as any} size={13} color={color} /> : null}
-      <Text style={[sh.label, { color }]}>{label}</Text>
-      <View style={[sh.line, { backgroundColor: color + '30' }]} />
-      {right}
-    </View>
-  );
+  return <SectionTitle3D title={label} accent={color} icon={icon} right={right} />;
 }
-const sh = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
-  label: { fontSize: 13, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
-  line: { flex: 1, height: 1 },
-});
 
 // ─── NEXUS LOG ROW ────────────────────────────────────────────
 function LogRow({ log }: { log: CrawlLog | BotActivity }) {

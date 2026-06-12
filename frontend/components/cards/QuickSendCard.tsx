@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
 
   header:     { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   headerIcon: { width: 30, height: 30, borderRadius: 9, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  label:      { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.8, color: PAL.cyan },
+  label:      { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.8, color: PAL.cyan, textShadowColor: '#000000', textShadowOffset: { width: 0, height: 1.5 }, textShadowRadius: 1 },
   sub:        { fontSize: 8, fontWeight: '800', fontFamily: MONO, letterSpacing: 1, color: PAL.textMid },
   dot:        { width: 3, height: 3, borderRadius: 1.5, backgroundColor: PAL.textMid },
   title:      { fontSize: 13, fontWeight: '900', fontFamily: MONO, color: PAL.textHi, letterSpacing: 0.8, marginTop: 1 },

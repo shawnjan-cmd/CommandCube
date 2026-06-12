@@ -507,15 +507,20 @@ function SectHead({ icon, main, accent, accentColor, right }: {
   icon: string; main: string; accent: string; accentColor: string; right?: React.ReactNode;
 }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-      <View style={[{ width: 30, height: 30, borderRadius: 8, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', backgroundColor: accentColor + '14', borderColor: accentColor + '50' }]}>
-        <MaterialIcons name={icon as any} size={15} color={accentColor} />
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 14, position: 'relative' }}>
+      <View style={{ flex: 1, height: 1.5, backgroundColor: '#3C424D', borderRadius: 1 }} />
+      <MaterialIcons name={icon as any} size={14} color={accentColor} />
+      <View style={{ position: 'relative', alignItems: 'center', paddingBottom: 6, maxWidth: '70%' }}>
+        <Text style={{ position: 'absolute', top: 2.5, left: 0, right: 0, fontSize: 15, fontWeight: '900', color: '#000000', fontFamily: MONO, letterSpacing: 1.5, textAlign: 'center' }} numberOfLines={1}>
+          {main}{accent}
+        </Text>
+        <Text style={{ fontSize: 15, fontWeight: '900', color: '#F2F4F8', fontFamily: MONO, letterSpacing: 1.5, textAlign: 'center', textShadowColor: accentColor, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 9 }} numberOfLines={1}>
+          {main}<Text style={{ color: accentColor }}>{accent}</Text>
+        </Text>
+        <View style={{ position: 'absolute', bottom: 0, width: 34, height: 2.5, borderRadius: 1, backgroundColor: accentColor, opacity: 0.9 }} />
       </View>
-      <Text style={{ fontSize: 13, fontWeight: '900', color: C.text, fontFamily: MONO, letterSpacing: 0.5 }}>
-        {main}<Text style={{ color: accentColor }}>{accent}</Text>
-      </Text>
-      <View style={{ flex: 1, height: 1, backgroundColor: accentColor + '30', marginLeft: 4 }} />
-      {right}
+      <View style={{ flex: 1, height: 1.5, backgroundColor: '#3C424D', borderRadius: 1 }} />
+      {right ? <View style={{ position: 'absolute', right: 0 }}>{right}</View> : null}
     </View>
   );
 }
@@ -1286,22 +1291,14 @@ export default function PCCheckScreen() {
         <InlineWidgetSlot pageId="logs" position="inline-top" />
 
         {/* ── IMAGE-4 STYLE NEXUS STAT CARDS ── */}
-        <View style={s.sectionHead}>
-          <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: C.green }} />
-          <Text style={s.sectionTitle}>NEXUS INTELLIGENCE</Text>
-          <View style={{ flex: 1, height: 1, backgroundColor: C.green + '25', marginLeft: 8 }} />
-        </View>
+        <SectHead icon="hub" main="NEXUS " accent="INTELLIGENCE" accentColor={C.green} />
         <NexusStatCards isConnected={isConnected} metrics={metrics} chartW={SW - 28 - 28} />
 
         {/* ── THREAT HEATMAP ── */}
         <ThreatHeatmap isConnected={isConnected} />
 
         {/* ── SYSTEM DASHBOARD (performance rings) ── */}
-        <View style={[s.sectionHead, { marginTop: 6 }]}>
-          <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: C.teal }} />
-          <Text style={s.sectionTitle}>PERFORMANCE MONITOR</Text>
-          <View style={{ flex: 1, height: 1, backgroundColor: C.teal + '25', marginLeft: 8 }} />
-        </View>
+        <SectHead icon="speed" main="PERFORMANCE " accent="MONITOR" accentColor={C.teal} />
         <SystemDashboard isConnected={isConnected} metrics={metrics} />
 
         {/* ── QUICK PC SCRIPTS ── */}

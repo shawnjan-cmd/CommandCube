@@ -184,19 +184,29 @@ export function MechPanel({
       <View style={[mech.boltAt, { bottom: 8, left: 8  }]} pointerEvents="none"><Bolt /></View>
       <View style={[mech.boltAt, { bottom: 8, right: 8 }]} pointerEvents="none"><Bolt /></View>
 
-      {/* optional section label header */}
+      {/* optional section label header — centered 3D */}
       {!!label && (
         <View style={mech.panelHeader}>
-          <View style={[mech.panelHeaderBar, { backgroundColor: accent }]} />
-          <Text style={[mech.panelHeaderLabel, { color: accent }]}>{label}</Text>
-          {!!sublabel && (
-            <>
-              <View style={mech.panelHeaderDivider} />
-              <Text style={mech.panelHeaderSub}>{sublabel}</Text>
-            </>
-          )}
           <View style={mech.panelHeaderTail} />
           <View style={[mech.panelHeaderDot, { backgroundColor: accent }]} />
+          <View style={mech.panelHeaderStack}>
+            <Text style={[mech.panelHeaderLabel, mech.panelHeaderLabelShadow]} numberOfLines={1}>{label}</Text>
+            <Text
+              style={[mech.panelHeaderLabel, {
+                color: '#F2F4F8',
+                textShadowColor: accent,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 9,
+              }]}
+              numberOfLines={1}
+            >
+              {label}
+            </Text>
+            {!!sublabel && <Text style={mech.panelHeaderSub}>{sublabel}</Text>}
+            <View style={[mech.panelHeaderUnderline, { backgroundColor: accent }]} />
+          </View>
+          <View style={[mech.panelHeaderDot, { backgroundColor: accent }]} />
+          <View style={mech.panelHeaderTail} />
         </View>
       )}
 
@@ -553,13 +563,31 @@ export function HexCommandRing({ goToTab }: { goToTab: (t: string) => void }) {
 
   return (
     <View style={mech.cmdWrap}>
-      {/* heading bar */}
+      {/* heading bar — centered 3D */}
       <View style={mech.cmdHead}>
+        <View style={mech.cmdHeadRail} />
         <View style={[mech.cmdHeadBar, { backgroundColor: MECH.arc }]} />
-        <Text style={mech.cmdHeadTxt}>COMMAND MODULES</Text>
+        <View style={{ position: 'relative', alignItems: 'center', paddingBottom: 7, maxWidth: '68%' }}>
+          <Text
+            style={[mech.cmdHeadTxt, { position: 'absolute', top: 2.5, left: 0, right: 0, color: '#000000', textAlign: 'center' }]}
+            numberOfLines={1}
+          >
+            COMMAND MODULES
+          </Text>
+          <Text
+            style={[mech.cmdHeadTxt, {
+              color: '#F2F4F8', textAlign: 'center',
+              textShadowColor: MECH.arc, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 9,
+            }]}
+            numberOfLines={1}
+          >
+            COMMAND MODULES
+          </Text>
+          <View style={{ position: 'absolute', bottom: 0, width: 34, height: 2.5, borderRadius: 1, backgroundColor: MECH.arc, opacity: 0.9 }} />
+        </View>
         <View style={[mech.cmdHeadBar, { backgroundColor: MECH.plasma }]} />
-        <Text style={[mech.cmdHeadTxt, { color: MECH.plasma + 'CC' }]}>04 / ONLINE</Text>
-        <View style={[mech.cmdHeadBar, { backgroundColor: MECH.hazard }]} />
+        <View style={mech.cmdHeadRail} />
+        <Text style={mech.cmdHeadCountTag}>04 / ONLINE</Text>
       </View>
 
       <View style={mech.cmdGrid}>
@@ -793,30 +821,38 @@ const mech = StyleSheet.create({
     borderBottomWidth: 2, borderRightWidth: 2,
   },
   panelHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 22, paddingTop: 10, paddingBottom: 4,
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: 22, paddingTop: 12, paddingBottom: 4,
+    justifyContent: 'center',
   },
-  panelHeaderBar: { width: 3, height: 12, borderRadius: 1.5 },
+  panelHeaderStack: { position: 'relative', alignItems: 'center', paddingBottom: 7, maxWidth: '74%' },
   panelHeaderLabel: {
-    fontSize: 10.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 2,
+    fontSize: 15, fontWeight: '900', fontFamily: MONO, letterSpacing: 2, textAlign: 'center',
   },
-  panelHeaderDivider: { width: 4, height: 4, borderRadius: 2, backgroundColor: MECH.chrome },
+  panelHeaderLabelShadow: { position: 'absolute', top: 2.5, left: 0, right: 0, color: '#000000' },
+  panelHeaderUnderline: { position: 'absolute', bottom: 0, width: 34, height: 2.5, borderRadius: 1, opacity: 0.9 },
   panelHeaderSub: {
-    fontSize: 9, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.4,
-    color: MECH.textMid,
+    fontSize: 9.5, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.4,
+    color: MECH.textMid, marginTop: 3, textAlign: 'center',
   },
-  panelHeaderTail: { flex: 1, height: 1, backgroundColor: MECH.steelLo },
-  panelHeaderDot: { width: 5, height: 5, borderRadius: 2.5 },
+  panelHeaderTail: { flex: 1, height: 1.5, backgroundColor: MECH.steelLo, borderRadius: 1 },
+  panelHeaderDot: { width: 5, height: 5, transform: [{ rotate: '45deg' }] },
   panelInner: { padding: 14, paddingTop: 10 },
 
   // ── COMMAND RING ─────────────────────────────────────────
   cmdWrap: { marginTop: 8 },
   cmdHead: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 4, marginBottom: 10,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    paddingHorizontal: 4, marginBottom: 10, position: 'relative',
   },
-  cmdHeadBar: { width: 18, height: 2.5, borderRadius: 1.5 },
-  cmdHeadTxt: { fontSize: 10, fontWeight: '900', fontFamily: MONO, color: MECH.arc + 'CC', letterSpacing: 2 },
+  cmdHeadRail: { flex: 1, height: 1.5, backgroundColor: MECH.steelLo, borderRadius: 1 },
+  cmdHeadBar: { width: 5, height: 5, transform: [{ rotate: '45deg' }] },
+  cmdHeadTxt: { fontSize: 15, fontWeight: '900', fontFamily: MONO, color: MECH.arc + 'CC', letterSpacing: 2 },
+  cmdHeadCountTag: {
+    position: 'absolute', right: 4, top: -7,
+    fontSize: 7.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1,
+    color: MECH.plasma + 'CC',
+  },
   cmdGrid: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 4,
     justifyContent: 'space-between',

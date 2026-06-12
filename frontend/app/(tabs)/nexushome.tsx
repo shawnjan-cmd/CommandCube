@@ -14,6 +14,7 @@ import {
   Platform, ActivityIndicator, Animated, Dimensions, TextInput, Alert, Modal,
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import SectionTitle3D from '@/components/ui/SectionTitle3D';
 import Svg, { Circle, Path, Defs, RadialGradient, Stop, Rect, Line, Polygon, LinearGradient, G, Text as SvgText } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -318,17 +319,7 @@ const nc = StyleSheet.create({
 
 // ─── SECTION DIVIDER ──────────────────────────────────────────────
 function SectionDivider({ label, color = D.cyan }: { label: string; color?: string }) {
-  return (
-    <View style={{ flexDirection:'row', alignItems:'center', gap:8, marginTop:8, marginBottom:0 }}>
-      <View style={{ width:3, height:16, borderRadius:2, backgroundColor:color,
-        ...Platform.select({ ios:{shadowColor:color, shadowOffset:{width:0,height:0}, shadowOpacity:0.8, shadowRadius:6}, android:{} }) }} />
-      <Text style={{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:3, color }}>
-        {label}
-      </Text>
-      <View style={{ flex:1, height:1, backgroundColor: color + '20' }} />
-      <View style={{ width:4, height:4, borderRadius:2, backgroundColor: color + '50' }} />
-    </View>
-  );
+  return <SectionTitle3D title={label} accent={color} style={{ marginTop: 10, marginBottom: 2 }} />;
 }
 
 // ─── BUTLER AI HERO ────────────────────────────────────────────────
@@ -418,7 +409,7 @@ const pcc = StyleSheet.create({
   header:      { flexDirection:'row', alignItems:'flex-start', gap:12, paddingHorizontal:14, paddingTop:12, paddingBottom:9 },
   iconBox:     { width:44, height:44, borderRadius:11, borderWidth:1.5, alignItems:'center', justifyContent:'center', position:'relative' },
   iconLed:     { position:'absolute', bottom:5, right:5, width:7, height:7, borderRadius:3.5, opacity:0.9 },
-  sectionLabel:{ fontSize:9.5, fontWeight:'700', fontFamily:MONO, letterSpacing:2 },
+  sectionLabel:{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:2, textShadowColor:'#000000', textShadowOffset:{ width:0, height:1.5 }, textShadowRadius:1 },
   pcName:      { fontSize:15.5, fontWeight:'900', fontFamily:MONO, color:'#FFFFFF', letterSpacing:0.5 },
   connDetail:  { fontSize:10.5, fontFamily:MONO },
   statusPill:  { borderWidth:1.5, borderRadius:8, paddingHorizontal:8, paddingVertical:5, flexShrink:0 },

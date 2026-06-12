@@ -6,8 +6,9 @@ const path = require('path');
 const config = getDefaultConfig(__dirname);
 
 // Android optimization: Reduce module resolution overhead
-// Add .mjs support for Supabase web compatibility
-config.resolver.sourceExts = ['mjs', 'tsx', 'ts', 'jsx', 'js', 'json'];
+// Keep ALL Expo default source extensions (cjs, platform variants, …) and
+// only ensure .mjs is included — dropping defaults breaks production bundles.
+config.resolver.sourceExts = Array.from(new Set(['mjs', ...config.resolver.sourceExts]));
 
 // Ensure .mjs files are treated as source files, not assets
 config.resolver.assetExts = [

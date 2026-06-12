@@ -38,6 +38,7 @@ import '@/constants/tabSourcesBundle'; // registers nexushome/knowledge/builder/
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { uiConfig, DEFAULT_UI_CONFIG, HomeCardId } from '@/services/uiConfig';
+import SectionTitle3D from '@/components/ui/SectionTitle3D';
 
 const N = {
   bg:       '#050505',
@@ -194,12 +195,7 @@ const er = StyleSheet.create({
 
 // ─── SECTION HEADER ────────────────────────────────────────────────────────
 function SectionHeader({ title, color = N.cyan, icon }: { title: string; color?: string; icon?: string }) {
-  return (
-    <View style={sc.hdr}>
-      {icon ? <MaterialIcons name={icon as any} size={14} color={color} /> : null}
-      <Text style={[sc.hdrTxt, { color }]}>{title}</Text>
-    </View>
-  );
+  return <SectionTitle3D title={title} accent={color} icon={icon} />;
 }
 
 function ToggleRow({ icon, iconColor, title, subtitle, value, onToggle, danger, last }: {

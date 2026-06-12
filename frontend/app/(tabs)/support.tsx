@@ -347,7 +347,7 @@ function SettingsPreview({ theme }: { theme: AppTheme }) {
 }
 
 const pp = StyleSheet.create({
-  sectionLabel: { fontSize: 8, fontFamily: MONO, fontWeight: '900', letterSpacing: 2, marginBottom: 2 },
+  sectionLabel: { fontSize: 13, fontFamily: MONO, fontWeight: '900', letterSpacing: 2, marginBottom: 6, textAlign: 'center', textShadowColor: '#000000', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 1 },
   fakeHeader:   { borderBottomWidth: 1, borderRadius: 10, padding: 12 },
   fakeLogo:     { width: 38, height: 38, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   fakeLogoInner:{ width: 14, height: 14, borderRadius: 4 },
