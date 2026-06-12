@@ -35,7 +35,7 @@ import QuickSendCard from '@/components/cards/QuickSendCard';
 import { FileShareClipboardCard } from '@/components/ui/FileShareClipboardCard';
 import { uiConfig, UIConfig, DEFAULT_UI_CONFIG, UIStrings } from '@/services/uiConfig';
 import { ButlerWordmark } from '@/components/ui/ButlerWordmark';
-import { MechBayHero, HexCommandRing } from '@/components/home/MechBay';
+import { MechBayHero, HexCommandRing, MechPanel } from '@/components/home/MechBay';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');
@@ -295,34 +295,16 @@ function NexusCard({
   topBar?: boolean;
   glowIntensity?: number;
 }) {
+  // Reskinned with MECH BAY industrial frame — see /components/home/MechBay.tsx
+  // (preserves the same prop signature so all 12 call sites work unchanged)
   return (
-    <View style={[
-      nc.card,
-      { borderColor: accentColor + '40' },
-      Platform.OS === 'ios'
-        ? { shadowColor: accentColor, shadowOffset:{width:0,height:6}, shadowOpacity: glowIntensity, shadowRadius:16 }
-        : { elevation:6 },
-      style,
-    ]}>
-      {topBar && (
-        <View style={nc.topBarRow}>
-          <View style={[nc.topBarMain, { backgroundColor: accentColor }]} />
-          <View style={nc.topBarGap} />
-          <View style={[nc.topBarTail, { backgroundColor: accentColor + '66' }]} />
-        </View>
-      )}
-      {/* 3D bevel: light catch on top edge, shade on bottom edge */}
-      <View pointerEvents="none" style={nc.bevelTop} />
-      <View pointerEvents="none" style={nc.bevelBottom} />
-      <View pointerEvents="none" style={nc.sheen} />
-      <ScanLines opacity={0.016} />
-      <HudCorners color={accentColor + '70'} size={13} thickness={1.5} />
+    <MechPanel accent={accentColor} style={style}>
       {children}
-      <View pointerEvents="none" style={[nc.footerNotch, { backgroundColor: accentColor + '55' }]} />
-    </View>
+    </MechPanel>
   );
 }
 const nc = StyleSheet.create({
+  // legacy styles kept (some sub-components may still reference them via dot-access)
   card:        { backgroundColor: D.surface, borderRadius: 15, borderWidth: 1, overflow:'hidden', position:'relative' },
   topBarRow:   { flexDirection:'row', alignItems:'center', height: 2.5, width:'100%' },
   topBarMain:  { flex: 1, height: '100%' },

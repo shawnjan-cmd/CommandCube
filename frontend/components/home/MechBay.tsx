@@ -28,27 +28,28 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 // ─── MECH BAY PALETTE ────────────────────────────────────────────────────────
 export const MECH = {
   // metals
-  steel:        '#1A1D22',  // gunmetal base
-  steelHi:      '#22262C',  // raised metal
-  steelLo:      '#0E1014',  // recessed shadow
-  brushed:      '#2C3037',  // brushed titanium highlight
-  chrome:       '#5F6670',  // chrome edge
-  rivet:        '#393E47',  // bolt head
-  rivetHi:      '#52596B',  // bolt highlight
-  // signal colors
-  arc:          '#00E1FF',  // arc-reactor cyan (primary)
-  arcDim:       '#0090A8',
-  plasma:       '#FF6A1F',  // plasma orange (secondary)
+  steel:        '#0F1115',  // deeper gunmetal base (endoskeleton chassis)
+  steelHi:      '#1A1D24',  // raised metal
+  steelLo:      '#06070A',  // recessed shadow
+  brushed:      '#262A33',  // brushed titanium highlight
+  chrome:       '#7A8392',  // chrome edge (brighter for endo skeleton sheen)
+  chromeHi:     '#B8C2D0',  // mirror chrome highlight
+  rivet:        '#3C424D',  // bolt head
+  rivetHi:      '#697283',  // bolt highlight
+  // signal colors — TERMINATOR / ENDOSKELETON
+  arc:          '#FF2A1F',  // endo red (primary — the glowing-eyes color)
+  arcDim:       '#7A0F08',
+  plasma:       '#FF6A1F',  // plasma orange (secondary / standby)
   plasmaDim:    '#A03A05',
-  hazard:       '#FFD400',  // hazard yellow (warnings)
-  hazardDim:    '#A88800',
-  emerald:      '#00FF88',  // status OK green
-  bloodRed:     '#FF2244',  // status FAIL red
+  hazard:       '#FFC400',  // hazard amber-yellow (caution stripes)
+  hazardDim:    '#7A5E00',
+  emerald:      '#00FF88',  // status OK green (rarely used)
+  bloodRed:     '#FF0040',  // critical red
   // text
   text:         '#D8DFE8',  // panel readout text
   textMid:      '#8089A0',
   textDim:      '#4A5366',
-  textOnArc:    '#001218',
+  textOnArc:    '#1F0500',
   textOnHazard: '#1A1400',
 };
 
@@ -138,6 +139,75 @@ function HexShape({
     <Svg width={w} height={h}>
       <Polygon points={pts} fill={fill} stroke={stroke} strokeWidth={strokeWidth} strokeLinejoin="miter" />
     </Svg>
+  );
+}
+
+// ─── MECH PANEL — reusable frame for ANY section ─────────────────────────────
+// Brushed metal background, chrome border, 4 corner bolts, chamfered corners,
+// top accent bar, optional section label header.
+
+export function MechPanel({
+  children, accent = MECH.arc, label, sublabel, style, footerHazard = false, dense = false,
+}: {
+  children: React.ReactNode;
+  accent?: string;
+  label?: string;
+  sublabel?: string;
+  style?: any;
+  footerHazard?: boolean;
+  dense?: boolean;
+}) {
+  return (
+    <View style={[mech.panel, { borderColor: accent + '55' }, style]}>
+      {/* brushed metal background */}
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        <View style={{ flex: 1, backgroundColor: MECH.steel }} />
+      </View>
+
+      {/* top accent bar (2.5px) with notch */}
+      <View pointerEvents="none" style={[mech.panelTopBar, { backgroundColor: accent }]} />
+      <View pointerEvents="none" style={[mech.panelTopNotch, { backgroundColor: accent + 'AA' }]} />
+
+      {/* chrome inner bevel */}
+      <View pointerEvents="none" style={mech.panelBevelTop} />
+      <View pointerEvents="none" style={mech.panelBevelBottom} />
+
+      {/* chamfered corner cuts */}
+      <View pointerEvents="none" style={[mech.panelCornerTL, { borderColor: MECH.chrome }]} />
+      <View pointerEvents="none" style={[mech.panelCornerTR, { borderColor: MECH.chrome }]} />
+      <View pointerEvents="none" style={[mech.panelCornerBL, { borderColor: accent + '60' }]} />
+      <View pointerEvents="none" style={[mech.panelCornerBR, { borderColor: accent + '60' }]} />
+
+      {/* corner bolts */}
+      <View style={[mech.boltAt, { top: 8,    left: 8  }]} pointerEvents="none"><Bolt /></View>
+      <View style={[mech.boltAt, { top: 8,    right: 8 }]} pointerEvents="none"><Bolt /></View>
+      <View style={[mech.boltAt, { bottom: 8, left: 8  }]} pointerEvents="none"><Bolt /></View>
+      <View style={[mech.boltAt, { bottom: 8, right: 8 }]} pointerEvents="none"><Bolt /></View>
+
+      {/* optional section label header */}
+      {!!label && (
+        <View style={mech.panelHeader}>
+          <View style={[mech.panelHeaderBar, { backgroundColor: accent }]} />
+          <Text style={[mech.panelHeaderLabel, { color: accent }]}>{label}</Text>
+          {!!sublabel && (
+            <>
+              <View style={mech.panelHeaderDivider} />
+              <Text style={mech.panelHeaderSub}>{sublabel}</Text>
+            </>
+          )}
+          <View style={mech.panelHeaderTail} />
+          <View style={[mech.panelHeaderDot, { backgroundColor: accent }]} />
+        </View>
+      )}
+
+      {/* content area */}
+      <View style={[mech.panelInner, dense && { padding: 8 }]}>
+        {children}
+      </View>
+
+      {/* optional hazard footer */}
+      {footerHazard && <HazardStripe height={8} />}
+    </View>
   );
 }
 
@@ -478,8 +548,8 @@ const COMMAND_TILES = [
 ];
 
 export function HexCommandRing({ goToTab }: { goToTab: (t: string) => void }) {
-  const TILE_W = (SW - 16 - 24) / 2;   // 2 tiles per row, 12px gap, 8px outer margin
-  const TILE_H = TILE_W * 0.95;
+  // Compact 2x2 grid using flex: 1 + flexBasis so it adapts to any container
+  const TILE_H = 124;
 
   return (
     <View style={mech.cmdWrap}>
@@ -501,53 +571,45 @@ export function HexCommandRing({ goToTab }: { goToTab: (t: string) => void }) {
               testID={`quick-access-${t.tab}`}
               onPress={() => { haptics.light(); goToTab(t.tab); }}
               activeOpacity={0.82}
-              style={[mech.cmdTile, { width: TILE_W, height: TILE_H }]}
+              style={[mech.cmdTile, { height: TILE_H }]}
             >
-              {/* brushed metal background */}
-              <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-                <BrushedPanel width={TILE_W} height={TILE_H} color={MECH.steelHi} />
-              </View>
+              {/* solid metal background */}
+              <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: MECH.steelHi }]} />
 
               {/* accent top-bar */}
               <View style={[mech.cmdTopBar, { backgroundColor: t.accent }]} />
 
-              {/* corner bolts */}
-              <View style={[mech.boltAt, { top: 6,    left: 6  }]}><Bolt /></View>
-              <View style={[mech.boltAt, { top: 6,    right: 6 }]}><Bolt /></View>
-              <View style={[mech.boltAt, { bottom: 6, left: 6  }]}><Bolt /></View>
-              <View style={[mech.boltAt, { bottom: 6, right: 6 }]}><Bolt /></View>
+              {/* corner bolts (smaller for compact tile) */}
+              <View style={[mech.boltAt, { top: 5, left: 5  }]}><Bolt size={7} /></View>
+              <View style={[mech.boltAt, { top: 5, right: 5 }]}><Bolt size={7} /></View>
+              <View style={[mech.boltAt, { bottom: 5, left: 5  }]}><Bolt size={7} /></View>
+              <View style={[mech.boltAt, { bottom: 5, right: 5 }]}><Bolt size={7} /></View>
 
-              {/* angled chamfer corner cuts */}
+              {/* chamfered cuts */}
               <View style={mech.chamferTL} />
               <View style={mech.chamferBR} />
 
-              {/* hex icon plate */}
-              <View style={mech.cmdHexWrap}>
-                <View style={{ position: 'absolute' }}>
-                  <HexShape size={60} fill={MECH.steelLo} stroke={t.accent} strokeWidth={1.4} />
+              {/* hex icon + label inline (compact horizontal layout) */}
+              <View style={mech.cmdInner}>
+                <View style={mech.cmdHexWrap}>
+                  <View style={{ position: 'absolute' }}>
+                    <HexShape size={42} fill={MECH.steelLo} stroke={t.accent} strokeWidth={1.4} />
+                  </View>
+                  <Icon name={t.icon as any} size={20} color={t.accent} />
                 </View>
-                <Icon name={t.icon as any} size={26} color={t.accent} />
+                <View style={mech.cmdTextCol}>
+                  <Text style={[mech.cmdLabel, { color: MECH.text }]}>{t.label}</Text>
+                  <Text style={mech.cmdDesc} numberOfLines={1}>{t.desc}</Text>
+                  {/* compact gauge */}
+                  <View style={mech.cmdGauge}>
+                    <View style={[mech.cmdGaugeFill, { backgroundColor: t.accent, width: '68%' }]} />
+                    <View style={[mech.cmdGaugeTick, { left: '50%' }]} />
+                  </View>
+                </View>
               </View>
 
-              {/* labels */}
-              <Text style={[mech.cmdLabel, { color: MECH.text }]}>{t.label}</Text>
-              <Text style={mech.cmdDesc}>{t.desc}</Text>
-
-              {/* power gauge */}
-              <View style={mech.cmdGauge}>
-                <View style={[mech.cmdGaugeFill, { backgroundColor: t.accent, width: '68%' }]} />
-                <View style={[mech.cmdGaugeTick, { left: '25%' }]} />
-                <View style={[mech.cmdGaugeTick, { left: '50%' }]} />
-                <View style={[mech.cmdGaugeTick, { left: '75%' }]} />
-              </View>
-
-              {/* status LED row */}
-              <View style={mech.cmdLedRow}>
-                <View style={[mech.cmdLed, { backgroundColor: t.accent }]} />
-                <View style={[mech.cmdLed, { backgroundColor: t.accent + '70' }]} />
-                <View style={[mech.cmdLed, { backgroundColor: t.accent + '30' }]} />
-                <Text style={[mech.cmdSerial, { color: t.accent + 'AA' }]}>M-{(i + 1).toString().padStart(2, '0')}</Text>
-              </View>
+              {/* serial badge bottom-right */}
+              <Text style={[mech.cmdSerial, { color: t.accent + 'AA' }]}>M-{(i + 1).toString().padStart(2, '0')}</Text>
             </TouchableOpacity>
           );
         })}
@@ -693,6 +755,60 @@ const mech = StyleSheet.create({
   // bolt absolute positioning helper
   boltAt: { position: 'absolute' },
 
+  // ── MECH PANEL (reusable section wrapper) ────────────────
+  panel: {
+    backgroundColor: MECH.steel,
+    borderRadius: 8,
+    borderWidth: 1.2,
+    overflow: 'hidden',
+    position: 'relative',
+    ...(Platform.OS === 'ios'
+      ? { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.55, shadowRadius: 10 }
+      : { elevation: 7 }),
+  },
+  panelTopBar: { position: 'absolute', top: 0, left: 0, right: 60, height: 2.5 },
+  panelTopNotch: { position: 'absolute', top: 0, right: 16, width: 30, height: 2.5 },
+  panelBevelTop: {
+    position: 'absolute', top: 2.5, left: 0, right: 0, height: 1,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  panelBevelBottom: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  panelCornerTL: {
+    position: 'absolute', top: -1, left: -1, width: 14, height: 14,
+    borderTopWidth: 2, borderLeftWidth: 2,
+  },
+  panelCornerTR: {
+    position: 'absolute', top: -1, right: -1, width: 14, height: 14,
+    borderTopWidth: 2, borderRightWidth: 2,
+  },
+  panelCornerBL: {
+    position: 'absolute', bottom: -1, left: -1, width: 14, height: 14,
+    borderBottomWidth: 2, borderLeftWidth: 2,
+  },
+  panelCornerBR: {
+    position: 'absolute', bottom: -1, right: -1, width: 14, height: 14,
+    borderBottomWidth: 2, borderRightWidth: 2,
+  },
+  panelHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 22, paddingTop: 10, paddingBottom: 4,
+  },
+  panelHeaderBar: { width: 3, height: 12, borderRadius: 1.5 },
+  panelHeaderLabel: {
+    fontSize: 10.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 2,
+  },
+  panelHeaderDivider: { width: 4, height: 4, borderRadius: 2, backgroundColor: MECH.chrome },
+  panelHeaderSub: {
+    fontSize: 9, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.4,
+    color: MECH.textMid,
+  },
+  panelHeaderTail: { flex: 1, height: 1, backgroundColor: MECH.steelLo },
+  panelHeaderDot: { width: 5, height: 5, borderRadius: 2.5 },
+  panelInner: { padding: 14, paddingTop: 10 },
+
   // ── COMMAND RING ─────────────────────────────────────────
   cmdWrap: { marginTop: 8 },
   cmdHead: {
@@ -702,15 +818,18 @@ const mech = StyleSheet.create({
   cmdHeadBar: { width: 18, height: 2.5, borderRadius: 1.5 },
   cmdHeadTxt: { fontSize: 10, fontWeight: '900', fontFamily: MONO, color: MECH.arc + 'CC', letterSpacing: 2 },
   cmdGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 12, paddingHorizontal: 4,
+    flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 4,
+    justifyContent: 'space-between',
   },
   cmdTile: {
+    width: '48.5%',
     backgroundColor: MECH.steelHi,
     borderRadius: 8,
     borderWidth: 1.2, borderColor: MECH.chrome,
     overflow: 'hidden',
-    padding: 10,
-    paddingTop: 16,
+    paddingTop: 14,
+    paddingHorizontal: 8,
+    paddingBottom: 10,
     ...(Platform.OS === 'ios'
       ? { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8 }
       : { elevation: 6 }),
