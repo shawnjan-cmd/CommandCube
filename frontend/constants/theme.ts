@@ -5,10 +5,10 @@
  *
  * Style guide reference:
  *   --bg   oklch(0.12 0.012 265) → #0C0E14
- *   --c    oklch(0.66 0.18 258)  → #5B9CF6  (electric blue primary)
- *   --g    oklch(0.74 0.18 162)  → #2FD98B  (green)
- *   --v    oklch(0.66 0.22 305)  → #A366F5  (violet)
- *   --a    oklch(0.78 0.17 70)   → #F5A623  (amber)
+ *   --c    oklch(0.66 0.18 258)  → #FF6A1F  (electric blue primary)
+ *   --g    oklch(0.74 0.18 162)  → #00FF88  (green)
+ *   --v    oklch(0.66 0.22 305)  → #FF6A1F  (violet)
+ *   --a    oklch(0.78 0.17 70)   → #FFC400  (amber)
  *   --r    oklch(0.66 0.22 22)   → #EF4444  (red)
  */
 
@@ -34,21 +34,21 @@ export const PANEL    = SURFACE1;
 export const NCX_BG      = BG;
 export const NCX_SURFACE = SURFACE;
 export const NCX_BORDER  = '#222636';
-export const NCX_LIGHT   = 'rgba(91,156,246,0.04)';
+export const NCX_LIGHT   = 'rgba(255,106,31,0.04)';
 
-// ─── Primary — electric blue (#5B9CF6) ────────────────────────────────────────
+// ─── Primary — electric blue (#FF6A1F) ────────────────────────────────────────
 // --c oklch(0.66 0.18 258) → electric blue, slightly cyan-shifted
-export const BLUE_PRIMARY = '#5B9CF6';   // --c   primary accent
+export const BLUE_PRIMARY = '#FF6A1F';   // --c   primary accent
 export const BLUE_BRIGHT  = '#7DB5FF';   // --c2  hover / bright
 export const BLUE_DIM     = '#1E3A6E';   // --c4  scrollbar, progress track
 export const BLUE_FAINT   = '#0E1E3A';   // --c5  progress track bg
 
 // ─── Accent palette — all 7 colors ────────────────────────────────────────────
-export const GREEN  = '#2FD98B';   // --g  oklch(0.74 0.18 162)  success, online
-export const VIOLET = '#A366F5';   // --v  oklch(0.66 0.22 305)  AI, flows
-export const AMBER  = '#F5A623';   // --a  oklch(0.78 0.17 70)   warnings
+export const GREEN  = '#00FF88';   // --g  oklch(0.74 0.18 162)  success, online
+export const VIOLET = '#FF6A1F';   // --v  oklch(0.66 0.22 305)  AI, flows
+export const AMBER  = '#FFC400';   // --a  oklch(0.78 0.17 70)   warnings
 export const RED    = '#EF4444';   // --r  oklch(0.66 0.22 22)   danger
-export const BLUE   = '#5B9CF6';   // --b  oklch(0.72 0.16 245)  (same as primary)
+export const BLUE   = '#FF6A1F';   // --b  oklch(0.72 0.16 245)  (same as primary)
 export const ORANGE = '#F07B3F';   // --o  oklch(0.72 0.18 40)   secondary warm
 export const PINK   = '#F472B6';   // --pk oklch(0.72 0.20 350)  cosmetics
 
@@ -57,12 +57,12 @@ export const TEAL   = BLUE_PRIMARY;   // replaced by electric blue
 export const CYAN   = '#66B8FF';      // lighter blue for some contexts
 export const GREEN2 = '#50EDAA';
 export const AMBER2 = ORANGE;
-export const RED2   = '#FF3300';
+export const RED2   = '#FF6A1F';
 export const SIGMA  = VIOLET;
-export const YELLOW = '#FFD700';
+export const YELLOW = '#FFC400';
 
 // ─── Text — cool blue-white scale ─────────────────────────────────────────────
-export const TEXT_HI  = '#EFF4FF';   // --tx3 oklch(0.96 0.012 260)  headings
+export const TEXT_HI  = '#F4F6F9';   // --tx3 oklch(0.96 0.012 260)  headings
 export const TEXT_PRI = '#D0DFF0';   // --tx2 oklch(0.88 0.020 260)  primary body
 export const TEXT     = '#B0C0D8';   // --tx  oklch(0.78 0.025 260)  default
 export const TEXT_MID = '#7A8FA8';   // midpoint
@@ -70,9 +70,9 @@ export const TEXT_DIM = '#5A6880';   // --txd oklch(0.50 0.025 260)  muted
 export const TEXT_BRT = TEXT_PRI;
 
 // ─── Borders ──────────────────────────────────────────────────────────────────
-export const BORDER      = 'rgba(91,156,246,0.18)';   // --bd  standard
-export const BORDER2     = 'rgba(91,156,246,0.09)';   // --bd2 divider
-export const BORDER3     = 'rgba(91,156,246,0.28)';   // --bd3 hover
+export const BORDER      = 'rgba(255,106,31,0.18)';   // --bd  standard
+export const BORDER2     = 'rgba(255,106,31,0.09)';   // --bd2 divider
+export const BORDER3     = 'rgba(255,106,31,0.28)';   // --bd3 hover
 export const BORDER_FAINT = '#1A1E2C';
 
 // ─── Semantic shortcuts ────────────────────────────────────────────────────────

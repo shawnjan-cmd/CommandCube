@@ -18,7 +18,7 @@ export default function NotFoundScreen() {
       />
       
       <View style={styles.content}>
-        <MaterialIcons name="photo-camera" size={80} color="#FFD700" />
+        <MaterialIcons name="photo-camera" size={80} color="#FFC400" />
         <Text style={styles.title}>Page Not Found</Text>
         <Text style={styles.message}>
           The moment you're looking for seems to have been lost in the shadows.
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   homeButton: {
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FFC400',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,

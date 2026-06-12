@@ -73,7 +73,7 @@ const TIP_CATEGORIES: { label: string; icon: string; color: string; tips: string
   {
     label: 'BUTLER AI',
     icon: 'psychology',
-    color: '#4488FF',
+    color: '#FF6A1F',
     tips: [
       'Butler AI runs entirely on your local PC via Ollama — no cloud or API key required',
       'Butler AI reads your entire Knowledge Base context before generating every response',
@@ -85,7 +85,7 @@ const TIP_CATEGORIES: { label: string; icon: string; color: string; tips: string
   {
     label: 'SCRIPTS',
     icon: 'code',
-    color: '#FF8C00',
+    color: '#FF6A1F',
     tips: [
       'Long-press any script card to preview the full Python code without opening the detail view',
       'Script execution timeout is 35 seconds — use Python threading for any long-running tasks',
@@ -98,7 +98,7 @@ const TIP_CATEGORIES: { label: string; icon: string; color: string; tips: string
   {
     label: 'KNOWLEDGE BASE',
     icon: 'book',
-    color: '#CC44FF',
+    color: '#FFC400',
     tips: [
       'OMEGA LOOP is a background knowledge accumulation cycle that runs automatically every few minutes',
       'Quantum Link Harvester automatically discovers new Python documentation resource links',
@@ -111,7 +111,7 @@ const TIP_CATEGORIES: { label: string; icon: string; color: string; tips: string
   {
     label: 'SYSTEM',
     icon: 'settings',
-    color: '#00CCDD',
+    color: '#FF2A1F',
     tips: [
       'Install psutil on your PC to enable live CPU, RAM, and Disk percentage metrics on Home',
       'Health Check in Tools tests all 5 server endpoints and reports individual latency values',
@@ -124,7 +124,7 @@ const TIP_CATEGORIES: { label: string; icon: string; color: string; tips: string
   {
     label: 'FEATURES',
     icon: 'star',
-    color: '#FFD700',
+    color: '#FFC400',
     tips: [
       'All cosmetic themes change tab icon colors, card borders, glow effects, and particle colors',
       'Script Only Mode in Settings hides AI and KB tabs for a focused remote control view',
@@ -341,7 +341,7 @@ interface Props {
 
 export default function NexusRotatingBar({ tips = NEXUS_TIPS_35, intervalMs = 5000, active = true }: Props) {
   const { T } = useCosmetic();
-  const primary = T?.primary || '#00CCDD';
+  const primary = T?.primary || '#FF2A1F';
 
   const [shuffled, setShuffled]   = useState<string[]>([]);
   const [idx, setIdx]             = useState(0);

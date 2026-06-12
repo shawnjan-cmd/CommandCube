@@ -27,15 +27,15 @@ export interface ParticleConfig {
 }
 
 const PAGE_CONFIGS: Record<string, ParticleConfig> = {
-  home:      { style: 'drift',    color: '#00CCDD', count: 3,  opacity: 0.14 },
-  scripts:   { style: 'circuit',  color: '#4488FF', count: 2,  opacity: 0.11 },
+  home:      { style: 'drift',    color: '#FF2A1F', count: 3,  opacity: 0.14 },
+  scripts:   { style: 'circuit',  color: '#FF6A1F', count: 2,  opacity: 0.11 },
   butler:    { style: 'neural',   color: '#BB44FF', count: 3,  opacity: 0.11 },
-  knowledge: { style: 'dna',      color: '#FF8C00', count: 2,  opacity: 0.12 },
-  fileshare: { style: 'radar',    color: '#00DDEE', count: 2,  opacity: 0.10 },
-  support:   { style: 'orbit',    color: '#FF6EB4', count: 3,  opacity: 0.13 },
-  settings:  { style: 'matrix',   color: '#00CCDD', count: 2,  opacity: 0.09 },
-  terminal:  { style: 'terminal', color: '#44FF22', count: 2,  opacity: 0.11 },
-  index:     { style: 'drift',    color: '#00CCDD', count: 2,  opacity: 0.11 },
+  knowledge: { style: 'dna',      color: '#FF6A1F', count: 2,  opacity: 0.12 },
+  fileshare: { style: 'radar',    color: '#FF2A1F', count: 2,  opacity: 0.10 },
+  support:   { style: 'orbit',    color: '#FF6A1F', count: 3,  opacity: 0.13 },
+  settings:  { style: 'matrix',   color: '#FF2A1F', count: 2,  opacity: 0.09 },
+  terminal:  { style: 'terminal', color: '#00FF88', count: 2,  opacity: 0.11 },
+  index:     { style: 'drift',    color: '#FF2A1F', count: 2,  opacity: 0.11 },
 };
 
 export function getParticleConfig(pageId: string): ParticleConfig {

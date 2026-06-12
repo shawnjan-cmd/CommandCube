@@ -45,19 +45,19 @@ const C = {
   bg:       '#010306',
   surface:  '#060D18',
   card:     '#080E1C',
-  cyan:     '#00E5FF',
+  cyan:     '#FF2A1F',
   green:    '#00FF88',
-  amber:    '#FFB020',
-  blue:     '#4499FF',
-  teal:     '#00D4CC',
+  amber:    '#FFC400',
+  blue:     '#FF6A1F',
+  teal:     '#FF2A1F',
   red:      '#FF2244',
   orange:   '#FF6820',
-  purple:   '#CC00FF',
+  purple:   '#FFC400',
   pink:     '#FF69B4',
   text:     '#C8E4F0',
   textMid:  '#5A8090',
   textDim:  '#1E3040',
-  border:   'rgba(0,229,255,0.14)',
+  border:   'rgba(255,42,31,0.14)',
 };
 
 const STEP_LABELS = [
@@ -86,15 +86,15 @@ function ButlerRobotLogo({ size = 80, glow = true }: { size?: number; glow?: boo
       <Defs>
         <RadialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
           <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-          <Stop offset="100%" stopColor="#00E5FF" stopOpacity="0.08" />
+          <Stop offset="100%" stopColor="#FF2A1F" stopOpacity="0.08" />
         </RadialGradient>
         <LinearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0%" stopColor="#1A1A1A" />
-          <Stop offset="100%" stopColor="#020810" />
+          <Stop offset="100%" stopColor="#070708" />
         </LinearGradient>
         <LinearGradient id="greenGlow" x1="0" y1="0" x2="0" y2="1">
           <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.12" />
-          <Stop offset="100%" stopColor="#00E5FF" stopOpacity="0.04" />
+          <Stop offset="100%" stopColor="#FF2A1F" stopOpacity="0.04" />
         </LinearGradient>
       </Defs>
       <Rect x={pad} y={panelY} width={panelW} height={panelH} rx={r} fill="url(#panelGrad)"
@@ -152,8 +152,8 @@ function ButlerRobotLogo({ size = 80, glow = true }: { size?: number; glow?: boo
         x={pad} y={panelY + panelH + s * 0.06}
         width={s - pad * 2} height={s * 0.24}
         rx={s * 0.04}
-        fill="#020810"
-        stroke="#00E5FF" strokeWidth={s * 0.015} strokeOpacity={0.18} />
+        fill="#070708"
+        stroke="#FF2A1F" strokeWidth={s * 0.015} strokeOpacity={0.18} />
     </Svg>
   );
 }
@@ -216,11 +216,11 @@ function HUDGridBG() {
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {[15,30,45,60,75,90].map((p,i) => (
         <View key={i} style={{ position:'absolute', left:0, right:0, top:`${p}%` as any,
-          height: StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.055)' }} />
+          height: StyleSheet.hairlineWidth, backgroundColor:'rgba(255,42,31,0.055)' }} />
       ))}
       {[20,40,60,80].map((p,i) => (
         <View key={i} style={{ position:'absolute', top:0, bottom:0, left:`${p}%` as any,
-          width: StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.035)' }} />
+          width: StyleSheet.hairlineWidth, backgroundColor:'rgba(255,42,31,0.035)' }} />
       ))}
       {[
         { top:0, left:0,   borderTopWidth:2, borderLeftWidth:2  },
@@ -229,11 +229,11 @@ function HUDGridBG() {
         { bottom:0, right:0, borderBottomWidth:2, borderRightWidth:2 },
       ].map((cs,i) => (
         <View key={i} style={{ position:'absolute', width:24, height:24,
-          borderColor:'rgba(0,229,255,0.35)', ...cs }} />
+          borderColor:'rgba(255,42,31,0.35)', ...cs }} />
       ))}
       <Animated.View style={{
         position:'absolute', left:0, right:0, height:1.5,
-        backgroundColor:'rgba(0,229,255,0.18)',
+        backgroundColor:'rgba(255,42,31,0.18)',
         transform:[{ translateY: scanY }],
       }} />
       <Animated.View style={{
@@ -1445,7 +1445,7 @@ export default function WelcomeScreen({ onComplete }: { onComplete?: () => void 
             width: i === step ? 20 : i < step ? 8 : 6,
             height: i === step ? 6 : i < step ? 6 : 5,
             borderRadius: 3,
-            backgroundColor: i < step ? C.green : i === step ? C.cyan : 'rgba(0,229,255,0.10)',
+            backgroundColor: i < step ? C.green : i === step ? C.cyan : 'rgba(255,42,31,0.10)',
             ...(i === step ? { shadowColor: C.cyan, shadowOffset:{width:0,height:0}, shadowOpacity:1, shadowRadius:8 } : {}),
           }} />
         ))}
@@ -1476,17 +1476,17 @@ const st = StyleSheet.create({
   card: {
     borderWidth: 1.5, borderRadius: 16, backgroundColor: C.card,
     marginBottom: 12, overflow: 'hidden',
-    borderColor: 'rgba(0,229,255,0.16)',
+    borderColor: 'rgba(255,42,31,0.16)',
   },
   checkRow: {
     flexDirection: 'row', alignItems: 'flex-start', gap: 14,
     borderWidth: 1.5, borderRadius: 14, padding: 16,
-    borderColor: 'rgba(0,229,255,0.13)', backgroundColor: 'rgba(0,229,255,0.03)',
+    borderColor: 'rgba(255,42,31,0.13)', backgroundColor: 'rgba(255,42,31,0.03)',
     marginBottom: 12,
   },
   checkbox: {
     width: 24, height: 24, borderRadius: 7, borderWidth: 2,
-    borderColor: 'rgba(0,229,255,0.35)', backgroundColor: 'transparent',
+    borderColor: 'rgba(255,42,31,0.35)', backgroundColor: 'transparent',
     alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
   checkLabel: { fontSize: 15, fontWeight: '700', color: C.text, lineHeight: 22 },
@@ -1503,7 +1503,7 @@ const st = StyleSheet.create({
   backBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 18, paddingVertical: 17,
-    borderColor: 'rgba(0,229,255,0.22)', backgroundColor: 'rgba(0,229,255,0.05)',
+    borderColor: 'rgba(255,42,31,0.22)', backgroundColor: 'rgba(255,42,31,0.05)',
   },
   backBtnTxt: { fontSize: 13, fontWeight: '900', color: C.cyan, fontFamily: MONO, letterSpacing: 1 },
 });

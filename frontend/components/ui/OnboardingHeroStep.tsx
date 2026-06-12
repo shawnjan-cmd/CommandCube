@@ -34,9 +34,9 @@ const SW = _W > 0 ? _W : 375;
 const SH = _H > 0 ? _H : 720;
 
 const C = {
-  bg: '#000003', card: '#071120', cyan: '#00FFFF', green: '#00FF88',
-  amber: '#F5A623', purple: '#BF00FF', text: '#D8E8F4', textDim: '#7A9AB8',
-  border: 'rgba(0,255,255,0.18)',
+  bg: '#050505', card: '#1A1D24', cyan: '#FF2A1F', green: '#00FF88',
+  amber: '#FFC400', purple: '#FFC400', text: '#E6E9EF', textDim: '#8C95A6',
+  border: 'rgba(255,42,31,0.18)',
 };
 
 const TAGLINES = [
@@ -47,9 +47,9 @@ const TAGLINES = [
 ];
 
 const BOOT_LINES = [
-  { txt: '> initializing neural core…',      color: '#7A9AB8' },
-  { txt: '> loading 300+ python recipes…',   color: '#7A9AB8' },
-  { txt: '> bootstrapping ollama bridge…',   color: '#00FFFF' },
+  { txt: '> initializing neural core…',      color: '#8C95A6' },
+  { txt: '> loading 300+ python recipes…',   color: '#8C95A6' },
+  { txt: '> bootstrapping ollama bridge…',   color: '#FF2A1F' },
   { txt: '> handshake: encrypted ✓',         color: '#00FF88' },
   { txt: '> READY.',                          color: '#00FF88' },
 ];
@@ -228,15 +228,15 @@ function SweepRing({ sweep }: { sweep: Animated.Value }) {
       <Svg width={220} height={220} viewBox="0 0 220 220">
         <Defs>
           <RadialGradient id="g" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%"  stopColor="#00FFFF" stopOpacity="0.45" />
-            <Stop offset="60%" stopColor="#00FFFF" stopOpacity="0" />
-            <Stop offset="100%" stopColor="#00FFFF" stopOpacity="0" />
+            <Stop offset="0%"  stopColor="#FF2A1F" stopOpacity="0.45" />
+            <Stop offset="60%" stopColor="#FF2A1F" stopOpacity="0" />
+            <Stop offset="100%" stopColor="#FF2A1F" stopOpacity="0" />
           </RadialGradient>
         </Defs>
         <Path d="M110 10 A100 100 0 0 1 210 110 L110 110 Z" fill="url(#g)" />
-        <Circle cx="110" cy="110" r="100" stroke="rgba(0,255,255,0.25)" strokeWidth="1" fill="none" />
-        <Circle cx="110" cy="110" r="70"  stroke="rgba(0,255,255,0.15)" strokeWidth="1" fill="none" />
-        <Circle cx="110" cy="110" r="40"  stroke="rgba(0,255,255,0.10)" strokeWidth="1" fill="none" />
+        <Circle cx="110" cy="110" r="100" stroke="rgba(255,42,31,0.25)" strokeWidth="1" fill="none" />
+        <Circle cx="110" cy="110" r="70"  stroke="rgba(255,42,31,0.15)" strokeWidth="1" fill="none" />
+        <Circle cx="110" cy="110" r="40"  stroke="rgba(255,42,31,0.10)" strokeWidth="1" fill="none" />
       </Svg>
     </Animated.View>
   );
@@ -248,19 +248,19 @@ const s = StyleSheet.create({
 
   hero: { height: 300, alignItems: 'center', justifyContent: 'center',
           borderRadius: 18, borderWidth: 1, borderColor: C.border,
-          backgroundColor: 'rgba(0,255,255,0.02)', overflow: 'hidden', position: 'relative' },
+          backgroundColor: 'rgba(255,42,31,0.02)', overflow: 'hidden', position: 'relative' },
   sweepWrap: { position: 'absolute' },
-  scanLine: { position: 'absolute', left: 0, right: 0, height: 1.5, backgroundColor: 'rgba(0,255,255,0.35)', shadowColor: C.cyan, shadowOpacity: 1, shadowRadius: 8 },
+  scanLine: { position: 'absolute', left: 0, right: 0, height: 1.5, backgroundColor: 'rgba(255,42,31,0.35)', shadowColor: C.cyan, shadowOpacity: 1, shadowRadius: 8 },
   core: { width: 96, height: 96, alignItems: 'center', justifyContent: 'center', marginTop: 30 },
   coreHalo: { position: 'absolute', width: 96, height: 96, borderRadius: 48, borderWidth: 2, borderColor: C.cyan, shadowColor: C.cyan, shadowOpacity: 1, shadowRadius: 16 },
-  coreInner: { width: 76, height: 76, borderRadius: 38, backgroundColor: '#000003', borderWidth: 1.5, borderColor: C.cyan + '70', alignItems: 'center', justifyContent: 'center' },
+  coreInner: { width: 76, height: 76, borderRadius: 38, backgroundColor: '#050505', borderWidth: 1.5, borderColor: C.cyan + '70', alignItems: 'center', justifyContent: 'center' },
 
   brand: { marginTop: 18, fontSize: 30, fontWeight: '900', color: C.text, letterSpacing: 6, fontFamily: MONO },
   brandUnderline: { width: 80, height: 2, backgroundColor: C.cyan, marginTop: 6, shadowColor: C.cyan, shadowOpacity: 1, shadowRadius: 6 },
   kicker: { marginTop: 10, fontSize: 12, color: C.textDim, fontFamily: MONO, letterSpacing: 0.5, paddingHorizontal: 14, textAlign: 'center' },
 
-  term: { borderRadius: 10, borderWidth: 1, borderColor: C.border, backgroundColor: '#000003', overflow: 'hidden' },
-  termHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: 'rgba(0,255,255,0.04)' },
+  term: { borderRadius: 10, borderWidth: 1, borderColor: C.border, backgroundColor: '#050505', overflow: 'hidden' },
+  termHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: 'rgba(255,42,31,0.04)' },
   termDot: { width: 8, height: 8, borderRadius: 4 },
   termTitle: { marginLeft: 6, color: C.textDim, fontSize: 10, fontFamily: MONO, fontWeight: '700' },
   termBody: { padding: 12, minHeight: 110 },

@@ -38,17 +38,17 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW, height: SH } = Dimensions.get('window');
 
 const C = {
-  bg:        '#02070D',
-  surface:   '#02070D',
-  surfaceHi: '#071120',
+  bg:        '#0E0F12',
+  surface:   '#0E0F12',
+  surfaceHi: '#1A1D24',
   border:    'rgba(255,255,255,0.07)',
-  text:      '#D0DDE8',
-  textDim:   '#3A5060',
+  text:      '#D5D9E0',
+  textDim:   '#525A68',
   textMid:   '#6A8090',
-  purple:    '#BB33FF',
-  teal:      '#00CCDD',
+  purple:    '#FFC400',
+  teal:      '#FF2A1F',
   green:     '#00FF88',
-  amber:     '#FF9900',
+  amber:     '#FF6A1F',
   red:       '#FF3344',
 };
 
@@ -100,32 +100,32 @@ return React.createElement(View, {
     desc: 'Big number with label',
     code: `var value = '92%';
 var label = 'CPU LOAD';
-var color = '#00CCDD';
+var color = '#FF2A1F';
 return React.createElement(View, {
   style: {
-    backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1.5,
+    backgroundColor: '#0E0F12', borderRadius: 12, borderWidth: 1.5,
     borderColor: color + '55', borderLeftWidth: 4, borderLeftColor: color,
     padding: 16, minWidth: 120, alignItems: 'center',
   }
 },
   React.createElement(Text, { style: { fontSize: 36, fontWeight: '900', color: color, fontFamily: 'monospace' } }, value),
-  React.createElement(Text, { style: { fontSize: 9, fontWeight: '700', color: '#4a607a', fontFamily: 'monospace', letterSpacing: 2, marginTop: 4 } }, label)
+  React.createElement(Text, { style: { fontSize: 9, fontWeight: '700', color: '#525A68', fontFamily: 'monospace', letterSpacing: 2, marginTop: 4 } }, label)
 );`,
   },
   {
     name: 'Progress Bar',
     desc: 'Progress widget',
     code: `var pct = 72;
-var color = '#BB33FF';
+var color = '#FFC400';
 var label = 'MEMORY';
 return React.createElement(View, {
-  style: { backgroundColor: '#02070D', borderRadius: 10, borderWidth: 1, borderColor: '#1a2235', padding: 14, gap: 8 }
+  style: { backgroundColor: '#0E0F12', borderRadius: 10, borderWidth: 1, borderColor: '#232730', padding: 14, gap: 8 }
 },
   React.createElement(View, { style: { flexDirection: 'row', justifyContent: 'space-between' } },
     React.createElement(Text, { style: { fontSize: 10, fontWeight: '700', color: color, fontFamily: 'monospace', letterSpacing: 1 } }, label),
     React.createElement(Text, { style: { fontSize: 12, fontWeight: '900', color: '#fff', fontFamily: 'monospace' } }, pct + '%')
   ),
-  React.createElement(View, { style: { height: 8, backgroundColor: '#1a2235', borderRadius: 4, overflow: 'hidden' } },
+  React.createElement(View, { style: { height: 8, backgroundColor: '#232730', borderRadius: 4, overflow: 'hidden' } },
     React.createElement(View, { style: { height: '100%', width: pct + '%', backgroundColor: color, borderRadius: 4 } })
   )
 );`,
@@ -139,18 +139,18 @@ return React.createElement(View, {
   { label: 'LATENCY', value: '12ms' },
   { label: 'VERSION', value: 'v7.1.0' },
 ];
-var color = '#00CCDD';
+var color = '#FF2A1F';
 return React.createElement(View, {
-  style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235', borderLeftWidth: 3, borderLeftColor: color, overflow: 'hidden' }
+  style: { backgroundColor: '#0E0F12', borderRadius: 12, borderWidth: 1, borderColor: '#232730', borderLeftWidth: 3, borderLeftColor: color, overflow: 'hidden' }
 },
   ...rows.map(function(row, i) {
     return React.createElement(View, {
       key: String(i),
       style: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 9,
-        borderBottomWidth: i < rows.length - 1 ? 1 : 0, borderBottomColor: '#1a2235' }
+        borderBottomWidth: i < rows.length - 1 ? 1 : 0, borderBottomColor: '#232730' }
     },
-      React.createElement(Text, { style: { width: 70, fontSize: 9, color: '#4a607a', fontFamily: 'monospace', letterSpacing: 1 } }, row.label),
-      React.createElement(Text, { style: { flex: 1, fontSize: 12, fontWeight: '700', color: '#c8d8f0', fontFamily: 'monospace' } }, row.value)
+      React.createElement(Text, { style: { width: 70, fontSize: 9, color: '#525A68', fontFamily: 'monospace', letterSpacing: 1 } }, row.label),
+      React.createElement(Text, { style: { flex: 1, fontSize: 12, fontWeight: '700', color: '#D5D9E0', fontFamily: 'monospace' } }, row.value)
     );
   })
 );`,
@@ -177,9 +177,9 @@ return React.createElement(TouchableOpacity, {
 var message = 'CPU usage is above 80%!';
 var cfg = {
   error: { color: '#FF3344', bg: '#FF334418', icon: 'error' },
-  warn:  { color: '#FF9900', bg: '#FF990018', icon: 'warning' },
-  info:  { color: '#00CCDD', bg: '#00CCDD18', icon: 'info' },
-}[type] || { color: '#00CCDD', bg: '#00CCDD18', icon: 'info' };
+  warn:  { color: '#FF6A1F', bg: '#FF6A1F18', icon: 'warning' },
+  info:  { color: '#FF2A1F', bg: '#FF2A1F18', icon: 'info' },
+}[type] || { color: '#FF2A1F', bg: '#FF2A1F18', icon: 'info' };
 return React.createElement(View, {
   style: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: cfg.bg,
     borderWidth: 1, borderColor: cfg.color + '60', borderRadius: 10, padding: 12 }
@@ -192,12 +192,12 @@ return React.createElement(View, {
     name: 'FlatList Demo',
     desc: 'Scrollable list widget',
     code: `var items = [
-  { id: '1', name: 'CPU Monitor',    col: '#00CCDD' },
+  { id: '1', name: 'CPU Monitor',    col: '#FF2A1F' },
   { id: '2', name: 'Disk Cleaner',   col: '#00FF88' },
-  { id: '3', name: 'Net Scanner',    col: '#FF9900' },
-  { id: '4', name: 'Script Builder', col: '#BB33FF' },
+  { id: '3', name: 'Net Scanner',    col: '#FF6A1F' },
+  { id: '4', name: 'Script Builder', col: '#FFC400' },
 ];
-return React.createElement(View, { style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235', overflow: 'hidden', maxHeight: 200 } },
+return React.createElement(View, { style: { backgroundColor: '#0E0F12', borderRadius: 12, borderWidth: 1, borderColor: '#232730', overflow: 'hidden', maxHeight: 200 } },
   React.createElement(FlatList, {
     data: items,
     keyExtractor: function(item) { return item.id; },
@@ -207,10 +207,10 @@ return React.createElement(View, { style: { backgroundColor: '#02070D', borderRa
       return React.createElement(View, {
         style: { flexDirection: 'row', alignItems: 'center', gap: 10,
           paddingHorizontal: 14, paddingVertical: 11,
-          borderBottomWidth: 1, borderBottomColor: '#1a2235' }
+          borderBottomWidth: 1, borderBottomColor: '#232730' }
       },
         React.createElement(View, { style: { width: 8, height: 8, borderRadius: 4, backgroundColor: item.col } }),
-        React.createElement(Text, { style: { flex: 1, fontSize: 12, fontWeight: '700', color: '#c8d8f0', fontFamily: 'monospace' } }, item.name),
+        React.createElement(Text, { style: { flex: 1, fontSize: 12, fontWeight: '700', color: '#D5D9E0', fontFamily: 'monospace' } }, item.name),
         React.createElement(MaterialIcons, { name: 'chevron-right', size: 16, color: item.col })
       );
     }
@@ -221,24 +221,24 @@ return React.createElement(View, { style: { backgroundColor: '#02070D', borderRa
     name: 'Metric Grid',
     desc: '2x2 stats grid',
     code: `var metrics = [
-  { label: 'CPU',    value: '36%',  color: '#00CCDD' },
-  { label: 'RAM',    value: '71%',  color: '#FF9900' },
+  { label: 'CPU',    value: '36%',  color: '#FF2A1F' },
+  { label: 'RAM',    value: '71%',  color: '#FF6A1F' },
   { label: 'DISK',   value: '44%',  color: '#00FF88' },
-  { label: 'NET',    value: '12ms', color: '#BB33FF' },
+  { label: 'NET',    value: '12ms', color: '#FFC400' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1, borderColor: '#1a2235',
+  style: { backgroundColor: '#0E0F12', borderRadius: 12, borderWidth: 1, borderColor: '#232730',
     padding: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }
 },
   ...metrics.map(function(m) {
     return React.createElement(View, {
       key: m.label,
-      style: { width: (SW - 80) / 2, backgroundColor: '#02070D', borderRadius: 8,
+      style: { width: (SW - 80) / 2, backgroundColor: '#0E0F12', borderRadius: 8,
         borderWidth: 1, borderColor: m.color + '35', borderLeftWidth: 3, borderLeftColor: m.color,
         padding: 10, gap: 2 }
     },
       React.createElement(Text, { style: { fontSize: 20, fontWeight: '900', color: m.color, fontFamily: 'monospace' } }, m.value),
-      React.createElement(Text, { style: { fontSize: 8, color: '#4a607a', fontFamily: 'monospace', letterSpacing: 1 } }, m.label)
+      React.createElement(Text, { style: { fontSize: 8, color: '#525A68', fontFamily: 'monospace', letterSpacing: 1 } }, m.label)
     );
   })
 );`,
@@ -247,20 +247,20 @@ return React.createElement(View, {
     name: 'NEXUS Bar Chart',
     desc: 'Animated glowing bars',
     code: `var bars = [
-  { label: 'CPU',  val: 63, color: '#00CCDD' },
-  { label: 'RAM',  val: 78, color: '#FF9900' },
+  { label: 'CPU',  val: 63, color: '#FF2A1F' },
+  { label: 'RAM',  val: 78, color: '#FF6A1F' },
   { label: 'DISK', val: 44, color: '#00FF88' },
-  { label: 'GPU',  val: 31, color: '#BB33FF' },
-  { label: 'NET',  val: 55, color: '#4488FF' },
+  { label: 'GPU',  val: 31, color: '#FFC400' },
+  { label: 'NET',  val: 55, color: '#FF6A1F' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#02070D', borderRadius: 14, borderWidth: 1.5,
-    borderColor: '#00CCDD22', padding: 14, gap: 10,
-    borderLeftWidth: 3, borderLeftColor: '#00CCDD' }
+  style: { backgroundColor: '#0E0F12', borderRadius: 14, borderWidth: 1.5,
+    borderColor: '#FF2A1F22', padding: 14, gap: 10,
+    borderLeftWidth: 3, borderLeftColor: '#FF2A1F' }
 },
   React.createElement(View, { style: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 2 } },
-    React.createElement(View, { style: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#00CCDD' } }),
-    React.createElement(Text, { style: { fontSize: 10, fontWeight: '900', color: '#00CCDDCC',
+    React.createElement(View, { style: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#FF2A1F' } }),
+    React.createElement(Text, { style: { fontSize: 10, fontWeight: '900', color: '#FF2A1FCC',
       fontFamily: 'monospace', letterSpacing: 1.5 } }, 'SYSTEM ACTIVITY')
   ),
   ...bars.map(function(b) {
@@ -280,13 +280,13 @@ return React.createElement(View, {
     name: 'NEXUS Ring Gauge',
     desc: '3D ring meters CPU/RAM/AI',
     code: `var rings = [
-  { pct: 63, color: '#00CCDD', label: 'CPU', size: 68 },
-  { pct: 78, color: '#FF9900', label: 'RAM', size: 68 },
+  { pct: 63, color: '#FF2A1F', label: 'CPU', size: 68 },
+  { pct: 78, color: '#FF6A1F', label: 'RAM', size: 68 },
   { pct: 40, color: '#00FF88', label: 'AI',  size: 68 },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#02070D', borderRadius: 14, borderWidth: 1.5,
-    borderColor: '#00CCDD18', padding: 14, borderLeftWidth: 3, borderLeftColor: '#00CCDD' }
+  style: { backgroundColor: '#0E0F12', borderRadius: 14, borderWidth: 1.5,
+    borderColor: '#FF2A1F18', padding: 14, borderLeftWidth: 3, borderLeftColor: '#FF2A1F' }
 },
   React.createElement(View, { style: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 14 } },
     React.createElement(View, { style: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#00FF88' } }),
@@ -295,7 +295,7 @@ return React.createElement(View, {
   ),
   React.createElement(View, { style: { flexDirection: 'row', justifyContent: 'space-around' } },
     ...rings.map(function(r) {
-      var c = r.pct >= 80 ? '#FF4444' : r.pct >= 60 ? '#FF9900' : r.color;
+      var c = r.pct >= 80 ? '#FF4444' : r.pct >= 60 ? '#FF6A1F' : r.color;
       var S = r.size; var RW = Math.round(S * 0.09);
       var showR = r.pct > 25; var showB = r.pct > 50; var showL = r.pct > 75;
       return React.createElement(View, { key: r.label, style: { alignItems: 'center', gap: 6 } },
@@ -312,7 +312,7 @@ return React.createElement(View, {
           React.createElement(Text, { style: { fontSize: Math.round(S * 0.2), fontWeight: '900',
             color: c, fontFamily: 'monospace' } }, r.pct + '%')
         ),
-        React.createElement(Text, { style: { fontSize: 8, color: '#4a607a', fontFamily: 'monospace', letterSpacing: 1.2 } }, r.label)
+        React.createElement(Text, { style: { fontSize: 8, color: '#525A68', fontFamily: 'monospace', letterSpacing: 1.2 } }, r.label)
       );
     })
   )
@@ -323,16 +323,16 @@ return React.createElement(View, {
     desc: 'Glowing pill containers row',
     code: `var pills = [
   { label: 'ONLINE',    color: '#00FF88', dot: true  },
-  { label: 'v7.1.0',   color: '#00CCDD', dot: false },
-  { label: 'LAN',      color: '#4488FF', dot: false },
-  { label: 'AI READY', color: '#BB33FF', dot: true  },
-  { label: '12ms',     color: '#FF9900', dot: false },
+  { label: 'v7.1.0',   color: '#FF2A1F', dot: false },
+  { label: 'LAN',      color: '#FF6A1F', dot: false },
+  { label: 'AI READY', color: '#FFC400', dot: true  },
+  { label: '12ms',     color: '#FF6A1F', dot: false },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#02070D', borderRadius: 12, borderWidth: 1,
-    borderColor: '#00CCDD15', padding: 12, gap: 8 }
+  style: { backgroundColor: '#0E0F12', borderRadius: 12, borderWidth: 1,
+    borderColor: '#FF2A1F15', padding: 12, gap: 8 }
 },
-  React.createElement(Text, { style: { fontSize: 9, fontWeight: '900', color: '#4a607a',
+  React.createElement(Text, { style: { fontSize: 9, fontWeight: '900', color: '#525A68',
     fontFamily: 'monospace', letterSpacing: 1.5, marginBottom: 4 } }, 'SYSTEM STATUS'),
   React.createElement(View, { style: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 } },
     ...pills.map(function(p) {
@@ -356,14 +356,14 @@ return React.createElement(View, {
     desc: '3D themed button grid',
     code: `var btns = [
   { label: 'RUN SCRIPT', icon: 'play-arrow', color: '#00FF88', action: 'Script launched!' },
-  { label: 'PC STATUS',  icon: 'computer',   color: '#00CCDD', action: 'Checking PC...' },
+  { label: 'PC STATUS',  icon: 'computer',   color: '#FF2A1F', action: 'Checking PC...' },
   { label: 'KILL PROC',  icon: 'stop',       color: '#FF3344', action: 'Process stopped!' },
-  { label: 'AI CHAT',   icon: 'smart-toy',  color: '#BB33FF', action: 'Opening AI...' },
+  { label: 'AI CHAT',   icon: 'smart-toy',  color: '#FFC400', action: 'Opening AI...' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#02070D', borderRadius: 14, borderWidth: 1, borderColor: '#1a2235', overflow: 'hidden' }
+  style: { backgroundColor: '#0E0F12', borderRadius: 14, borderWidth: 1, borderColor: '#232730', overflow: 'hidden' }
 },
-  React.createElement(View, { style: { height: 2, backgroundColor: '#00CCDD40' } }),
+  React.createElement(View, { style: { height: 2, backgroundColor: '#FF2A1F40' } }),
   React.createElement(View, { style: { flexDirection: 'row', flexWrap: 'wrap', padding: 10, gap: 8 } },
     ...btns.map(function(b) {
       return React.createElement(TouchableOpacity, {
@@ -384,8 +384,8 @@ return React.createElement(View, {
     name: 'NEXUS Line Chart',
     desc: 'Midpoint-based line chart',
     code: `var pts = [18, 32, 28, 45, 52, 41, 67, 58, 74, 63, 82, 71];
-var color = '#00CCDD';
-var BG = '#02070D';
+var color = '#FF2A1F';
+var BG = '#0E0F12';
 var CHART_H = 72;
 var W = SW - 88;
 var maxPt = Math.max.apply(null, pts);
@@ -432,17 +432,17 @@ return React.createElement(View, {
     name: 'NEXUS Donut Chart',
     desc: '3D donut/ring pie chart',
     code: `var segs = [
-  { label: 'Python',  val: 34, color: '#00CCDD' },
+  { label: 'Python',  val: 34, color: '#FF2A1F' },
   { label: 'System',  val: 22, color: '#00FF88' },
-  { label: 'Network', val: 18, color: '#BB33FF' },
-  { label: 'Files',   val: 14, color: '#FF9900' },
+  { label: 'Network', val: 18, color: '#FFC400' },
+  { label: 'Files',   val: 14, color: '#FF6A1F' },
   { label: 'AI',      val: 12, color: '#FF4488' },
 ];
 var total = segs.reduce(function(a,s){return a+s.val;},0);
-var SIZE = 90; var RW = 14; var BG = '#02070D';
+var SIZE = 90; var RW = 14; var BG = '#0E0F12';
 return React.createElement(View, {
   style: { backgroundColor: BG, borderRadius: 14, borderWidth: 1,
-    borderColor: '#1a2235', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }
+    borderColor: '#232730', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }
 },
   React.createElement(View, { style: { width: SIZE, height: SIZE, position: 'relative',
     alignItems: 'center', justifyContent: 'center', flexShrink: 0 } },
@@ -456,15 +456,15 @@ return React.createElement(View, {
     React.createElement(View, { style: { width: SIZE-RW*2-4, height: SIZE-RW*2-4,
       borderRadius:(SIZE-RW*2)/2, backgroundColor: BG,
       alignItems: 'center', justifyContent: 'center', zIndex: 5 } },
-      React.createElement(Text, { style: { fontSize: 18, fontWeight: '900', color: '#00CCDD', fontFamily: 'monospace' } }, total),
-      React.createElement(Text, { style: { fontSize: 7, color: '#4a607a', fontFamily: 'monospace', letterSpacing: 0.5 } }, 'TOTAL')
+      React.createElement(Text, { style: { fontSize: 18, fontWeight: '900', color: '#FF2A1F', fontFamily: 'monospace' } }, total),
+      React.createElement(Text, { style: { fontSize: 7, color: '#525A68', fontFamily: 'monospace', letterSpacing: 0.5 } }, 'TOTAL')
     )
   ),
   React.createElement(View, { style: { flex: 1, gap: 6 } },
     ...segs.map(function(seg) {
       return React.createElement(View, { key: seg.label, style: { flexDirection:'row', alignItems:'center', gap:7 } },
         React.createElement(View, { style: { width:8, height:8, borderRadius:4, backgroundColor:seg.color, flexShrink:0 } }),
-        React.createElement(Text, { style: { flex:1, fontSize:9, color:'#94a3b8', fontFamily:'monospace' } }, seg.label),
+        React.createElement(Text, { style: { flex:1, fontSize:9, color:'#8C95A6', fontFamily:'monospace' } }, seg.label),
         React.createElement(Text, { style: { fontSize:9, fontWeight:'900', color:seg.color, fontFamily:'monospace' } }, seg.val)
       );
     })
@@ -476,31 +476,31 @@ return React.createElement(View, {
     desc: 'Animated terminal log',
     code: `var logs = [
   { time: '08:14', msg: 'System boot complete', col: '#00FF88' },
-  { time: '08:15', msg: 'Butler AI connected',  col: '#00CCDD' },
-  { time: '08:16', msg: 'CPU usage: 43%',       col: '#FF9900' },
+  { time: '08:15', msg: 'Butler AI connected',  col: '#FF2A1F' },
+  { time: '08:16', msg: 'CPU usage: 43%',       col: '#FF6A1F' },
   { time: '08:17', msg: 'Script executed OK',   col: '#00FF88' },
-  { time: '08:18', msg: 'KB updated +12 items', col: '#BB33FF' },
+  { time: '08:18', msg: 'KB updated +12 items', col: '#FFC400' },
 ];
 return React.createElement(View, {
-  style: { backgroundColor: '#000003', borderRadius: 12,
+  style: { backgroundColor: '#050505', borderRadius: 12,
     borderWidth: 1.5, borderColor: '#00FF8825', overflow: 'hidden' }
 },
   React.createElement(View, { style: { flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#02070D',
+    paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#0E0F12',
     borderBottomWidth: 1, borderBottomColor: '#00FF8820' } },
     React.createElement(View, { style: { flexDirection: 'row', gap: 5 } },
       ['#FF5F57','#FEBC2E','#28C840'].map(function(c,i) {
         return React.createElement(View, { key: String(i), style: { width:8, height:8, borderRadius:4, backgroundColor:c } });
       })
     ),
-    React.createElement(Text, { style: { flex:1, textAlign:'center', fontSize:9, color:'#4a607a', fontFamily:'monospace' } }, 'NEXUS TERMINAL')
+    React.createElement(Text, { style: { flex:1, textAlign:'center', fontSize:9, color:'#525A68', fontFamily:'monospace' } }, 'NEXUS TERMINAL')
   ),
   React.createElement(View, { style: { padding: 10, gap: 5 } },
     ...logs.map(function(l, i) {
       return React.createElement(View, { key: String(i), style: { flexDirection:'row', gap:8 } },
         React.createElement(Text, { style: { fontSize:9, color:l.col+'70', fontFamily:'monospace', width:38 } }, l.time),
         React.createElement(View, { style: { width:4, height:4, borderRadius:2, backgroundColor:l.col, marginTop:3, flexShrink:0 } }),
-        React.createElement(Text, { style: { flex:1, fontSize:10, color:'#94a3b8', fontFamily:'monospace' }, numberOfLines:1 }, l.msg)
+        React.createElement(Text, { style: { flex:1, fontSize:10, color:'#8C95A6', fontFamily:'monospace' }, numberOfLines:1 }, l.msg)
       );
     }),
     React.createElement(View, { style: { flexDirection:'row', alignItems:'center', gap:5, marginTop:2 } },
@@ -516,8 +516,8 @@ return React.createElement(View, {
     code: `var title = 'NEXUS CORE';
 var value = '99.97%';
 var sublabel = 'UPTIME - ALL SYSTEMS';
-var color = '#00CCDD';
-var BG = '#02070D';
+var color = '#FF2A1F';
+var BG = '#0E0F12';
 return React.createElement(View, { style: { position:'relative', paddingBottom:6, paddingRight:6 } },
   React.createElement(View, { style: { position:'absolute', top:6, left:6, right:0, bottom:0,
     backgroundColor: color + '18', borderRadius:14, borderWidth:1, borderColor:color+'20' } }),
@@ -532,7 +532,7 @@ return React.createElement(View, { style: { position:'relative', paddingBottom:6
     React.createElement(View, { style:{position:'absolute',bottom:0,right:0,width:10,height:10,borderBottomWidth:2,borderRightWidth:2,borderColor:color+'55'} }),
     React.createElement(Text, { style:{fontSize:9,color:color+'80',fontFamily:'monospace',fontWeight:'700',letterSpacing:2,marginBottom:8} }, title),
     React.createElement(Text, { style:{fontSize:40,fontWeight:'900',color:color,fontFamily:'monospace',lineHeight:44} }, value),
-    React.createElement(Text, { style:{fontSize:8,color:'#4a607a',fontFamily:'monospace',letterSpacing:1.5,marginTop:6} }, sublabel)
+    React.createElement(Text, { style:{fontSize:8,color:'#525A68',fontFamily:'monospace',letterSpacing:1.5,marginTop:6} }, sublabel)
   )
 );`,
   },
@@ -545,14 +545,14 @@ var cells = [];
 for (var i = 0; i < 56; i++) { cells.push(rnd(5)); }
 var cols = ['#0d1117','#00FF8840','#00FF8870','#00FF88AA','#00FF88'];
 return React.createElement(View, {
-  style: { backgroundColor:'#02070D', borderRadius:12, borderWidth:1,
+  style: { backgroundColor:'#0E0F12', borderRadius:12, borderWidth:1,
     borderColor:'#00FF8820', padding:12 }
 },
   React.createElement(View, { style:{flexDirection:'row',alignItems:'center',gap:6,marginBottom:10} },
     React.createElement(MaterialIcons, { name:'grid-on', size:12, color:'#00FF88' }),
     React.createElement(Text, { style:{fontSize:9,fontWeight:'900',color:'#00FF88',fontFamily:'monospace',letterSpacing:1} }, 'ACTIVITY HEATMAP'),
     React.createElement(View, { style:{flex:1} }),
-    React.createElement(Text, { style:{fontSize:8,color:'#4a607a',fontFamily:'monospace'} }, '8 WKS')
+    React.createElement(Text, { style:{fontSize:8,color:'#525A68',fontFamily:'monospace'} }, '8 WKS')
   ),
   React.createElement(View, { style:{flexDirection:'row',flexWrap:'wrap',gap:3} },
     ...cells.map(function(level, i) {
@@ -561,11 +561,11 @@ return React.createElement(View, {
     })
   ),
   React.createElement(View, { style:{flexDirection:'row',alignItems:'center',gap:4,marginTop:8} },
-    React.createElement(Text, { style:{fontSize:8,color:'#4a607a',fontFamily:'monospace'} }, 'less'),
+    React.createElement(Text, { style:{fontSize:8,color:'#525A68',fontFamily:'monospace'} }, 'less'),
     ...cols.map(function(c,i) {
       return React.createElement(View, {key:String(i), style:{width:8,height:8,borderRadius:2,backgroundColor:c}});
     }),
-    React.createElement(Text, { style:{fontSize:8,color:'#4a607a',fontFamily:'monospace'} }, 'more')
+    React.createElement(Text, { style:{fontSize:8,color:'#525A68',fontFamily:'monospace'} }, 'more')
   )
 );`,
   },
@@ -573,13 +573,13 @@ return React.createElement(View, {
 
 // ─── Page options ─────────────────────────────────────────────
 const PIN_PAGE_OPTIONS = [
-  { id: 'home',      label: 'HOME',    icon: 'home',         color: '#00CCDD' },
-  { id: 'scripts',   label: 'SCRIPTS', icon: 'code',         color: '#4488FF' },
-  { id: 'builder',   label: 'BUILD',   icon: 'account-tree', color: '#BB33FF' },
-  { id: 'butler',    label: 'AI',      icon: 'smart-toy',    color: '#BB33FF' },
+  { id: 'home',      label: 'HOME',    icon: 'home',         color: '#FF2A1F' },
+  { id: 'scripts',   label: 'SCRIPTS', icon: 'code',         color: '#FF6A1F' },
+  { id: 'builder',   label: 'BUILD',   icon: 'account-tree', color: '#FFC400' },
+  { id: 'butler',    label: 'AI',      icon: 'smart-toy',    color: '#FFC400' },
   { id: 'logs',      label: 'PC',      icon: 'bar-chart',    color: '#00FF88' },
-  { id: 'knowledge', label: 'KB',      icon: 'psychology',   color: '#FF8C00' },
-  { id: 'fileshare', label: 'TOOLS',   icon: 'build',        color: '#FFD700' },
+  { id: 'knowledge', label: 'KB',      icon: 'psychology',   color: '#FF6A1F' },
+  { id: 'fileshare', label: 'TOOLS',   icon: 'build',        color: '#FFC400' },
   { id: 'settings',  label: 'CONFIG',  icon: 'settings',     color: '#CC7755' },
 ];
 
@@ -718,27 +718,27 @@ function PinToPageModal({ visible, code, currentX, currentY, onClose, onPinned }
 
 const ptp = StyleSheet.create({
   overlay:      { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'flex-end' },
-  sheet:        { backgroundColor: '#02070D', borderTopLeftRadius: 20, borderTopRightRadius: 20,
+  sheet:        { backgroundColor: '#0E0F12', borderTopLeftRadius: 20, borderTopRightRadius: 20,
                   overflow: 'hidden', maxHeight: '90%',
                   ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:-8}, shadowOpacity:0.6, shadowRadius:20 }, android:{ elevation:24 } }) },
   topBar:       { height: 3 },
   handleBar:    { width: 36, height: 4, backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 12 },
   title:        { fontSize: 18, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, textAlign: 'center', letterSpacing: 1 },
-  sub:          { fontSize: 10, color: '#3A5060', fontFamily: MONO, textAlign: 'center', marginTop: 4, marginBottom: 14, paddingHorizontal: 20, lineHeight: 16 },
+  sub:          { fontSize: 10, color: '#525A68', fontFamily: MONO, textAlign: 'center', marginTop: 4, marginBottom: 14, paddingHorizontal: 20, lineHeight: 16 },
   labelRow:     { paddingHorizontal: 16, marginBottom: 14 },
-  labelInput:   { backgroundColor: '#02070D', borderWidth: 1.5, borderColor: '#00FF8855', borderRadius: 9,
-                  paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#D0DDE8', fontFamily: MONO },
-  sectionLabel: { fontSize: 8, fontWeight: '900', color: '#3A5060', fontFamily: MONO, letterSpacing: 2,
+  labelInput:   { backgroundColor: '#0E0F12', borderWidth: 1.5, borderColor: '#00FF8855', borderRadius: 9,
+                  paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#D5D9E0', fontFamily: MONO },
+  sectionLabel: { fontSize: 8, fontWeight: '900', color: '#525A68', fontFamily: MONO, letterSpacing: 2,
                   paddingHorizontal: 16, marginBottom: 8 },
   placementCard:{ flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderRadius: 10,
-                  paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#02070D' },
+                  paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#0E0F12' },
   placementIcon:{ width: 40, height: 40, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   placementLabel:{ fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
-  placementDesc:{ fontSize: 9, color: '#3A5060', fontFamily: MONO, marginTop: 2, lineHeight: 13 },
+  placementDesc:{ fontSize: 9, color: '#525A68', fontFamily: MONO, marginTop: 2, lineHeight: 13 },
   grid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingBottom: 10 },
   pageCard:     { width: '46%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 8,
                   borderWidth: 1.5, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 11,
-                  backgroundColor: '#02070D', position: 'relative' },
+                  backgroundColor: '#0E0F12', position: 'relative' },
   pageLabel:    { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
   check:        { position: 'absolute', top: 5, right: 5, width: 6, height: 6, borderRadius: 3 },
   pinBtn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
@@ -816,12 +816,12 @@ function DraggableWidget({ children, onClose, onEdit, onPin }: {
 }
 
 const dw = StyleSheet.create({
-  container:  { position:'absolute', zIndex:9999, backgroundColor:'#02070D', borderRadius:14, borderWidth:1.5, borderColor:'#BB33FF55', overflow:'hidden', minWidth:140 },
-  handleBar:  { flexDirection:'row', alignItems:'center', gap:6, paddingHorizontal:10, paddingVertical:7, backgroundColor:'#02070D', borderBottomWidth:1, borderBottomColor:'#BB33FF30' },
+  container:  { position:'absolute', zIndex:9999, backgroundColor:'#0E0F12', borderRadius:14, borderWidth:1.5, borderColor:'#FFC40055', overflow:'hidden', minWidth:140 },
+  handleBar:  { flexDirection:'row', alignItems:'center', gap:6, paddingHorizontal:10, paddingVertical:7, backgroundColor:'#0E0F12', borderBottomWidth:1, borderBottomColor:'#FFC40030' },
   handleDots: { flexDirection:'row', flexWrap:'wrap', width:18, gap:2 },
   dot:        { width:3, height:3, borderRadius:1.5 },
-  handleLabel:{ flex:1, fontSize:8, fontWeight:'900', color:'#BB33FF80', fontFamily:MONO, letterSpacing:1.2 },
-  iconBtn:    { width:26, height:26, borderRadius:6, backgroundColor:'#071120', alignItems:'center', justifyContent:'center' },
+  handleLabel:{ flex:1, fontSize:8, fontWeight:'900', color:'#FFC40080', fontFamily:MONO, letterSpacing:1.2 },
+  iconBtn:    { width:26, height:26, borderRadius:6, backgroundColor:'#1A1D24', alignItems:'center', justifyContent:'center' },
   pinHint:    { flexDirection:'row', alignItems:'center', gap:5, paddingHorizontal:10, paddingVertical:5, backgroundColor:'#00FF8806', borderBottomWidth:1, borderBottomColor:'#00FF8818' },
   pinHintTxt: { fontSize:8, color:'#00FF8870', fontFamily:MONO },
   content:    { padding:12 },
@@ -958,7 +958,7 @@ const cem = StyleSheet.create({
                       backgroundColor:C.red+'12', borderBottomWidth:1, borderBottomColor:C.red+'40' },
   errorText:        { flex:1, fontSize:10, color:C.red, fontFamily:MONO, lineHeight:15 },
   codeInput:        { flex:1, padding:14, fontSize:13, color:'#A8D8B8', fontFamily:MONO, lineHeight:21,
-                      minHeight:400, backgroundColor:'#000003' },
+                      minHeight:400, backgroundColor:'#050505' },
   bottomBar:        { flexDirection:'row', gap:10, paddingHorizontal:14, paddingVertical:14,
                       borderTopWidth:1, borderTopColor:C.border, backgroundColor:C.surface,
                       paddingBottom: Platform.OS === 'ios' ? 28 : 14 },
@@ -991,13 +991,13 @@ export function LiveWidgetStudio() {
         catch (e: any) {
           const safeLabel = w.label.replace(/[`'"]/g, '');
           const fallback = `return React.createElement(View,{
-  style:{backgroundColor:'#02070D',borderRadius:10,borderWidth:1.5,
+  style:{backgroundColor:'#0E0F12',borderRadius:10,borderWidth:1.5,
     borderColor:'#FF334455',padding:14,gap:6}
 },
-  React.createElement(MaterialIcons,{name:'warning',size:18,color:'#FF9900'}),
-  React.createElement(Text,{style:{fontSize:11,fontWeight:'900',color:'#FF9900',fontFamily:'monospace'}},
+  React.createElement(MaterialIcons,{name:'warning',size:18,color:'#FF6A1F'}),
+  React.createElement(Text,{style:{fontSize:11,fontWeight:'900',color:'#FF6A1F',fontFamily:'monospace'}},
     '${safeLabel} - Code Error'),
-  React.createElement(Text,{style:{fontSize:9,color:'#4a607a',fontFamily:'monospace',lineHeight:14}},
+  React.createElement(Text,{style:{fontSize:9,color:'#525A68',fontFamily:'monospace',lineHeight:14}},
     'Tap EDIT in Widget Studio to fix.')
 );`;
           await widgetStorage.updateCode(w.id, fallback, w.label + ' ⚠');
@@ -1228,14 +1228,14 @@ export function LiveWidgetStudio() {
 }
 
 const lws = StyleSheet.create({
-  card:           { backgroundColor:'#02070D', borderRadius:14, borderWidth:1.5, borderColor:'#BB33FF40',
+  card:           { backgroundColor:'#0E0F12', borderRadius:14, borderWidth:1.5, borderColor:'#FFC40040',
                     overflow:'hidden', marginBottom:14,
-                    ...Platform.select({ ios:{ shadowColor:'#BB33FF', shadowOffset:{width:0,height:4}, shadowOpacity:0.3, shadowRadius:12 }, android:{ elevation:8 } }) },
+                    ...Platform.select({ ios:{ shadowColor:'#FFC400', shadowOffset:{width:0,height:4}, shadowOpacity:0.3, shadowRadius:12 }, android:{ elevation:8 } }) },
   topAccent:      { height:3 },
   cardHeader:     { flexDirection:'row', alignItems:'center', gap:12, padding:14, paddingBottom:10 },
   iconBox:        { width:44, height:44, borderRadius:11, borderWidth:1.5, alignItems:'center', justifyContent:'center', flexShrink:0 },
   cardTitle:      { fontSize:13, fontWeight:'900', fontFamily:MONO, letterSpacing:1 },
-  cardSub:        { fontSize:9, color:'#4a607a', fontFamily:MONO, lineHeight:13 },
+  cardSub:        { fontSize:9, color:'#525A68', fontFamily:MONO, lineHeight:13 },
   toggleBtn:      { flexDirection:'row', alignItems:'center', gap:4, borderWidth:1.5, borderRadius:8, paddingHorizontal:8, paddingVertical:6 },
   pinnedBar:      { flexDirection:'row', alignItems:'center', gap:7, paddingHorizontal:14, paddingVertical:8,
                     backgroundColor:'#00FF8808', borderBottomWidth:1, borderBottomColor:'#00FF8820', borderTopWidth:1, borderTopColor:'#00FF8818' },
@@ -1243,18 +1243,18 @@ const lws = StyleSheet.create({
   errorRow:       { flexDirection:'row', alignItems:'flex-start', gap:7, marginHorizontal:14, marginBottom:8,
                     borderWidth:1, borderRadius:8, padding:9, borderColor:'#FF334440', backgroundColor:'#FF334412' },
   errorTxt:       { flex:1, fontSize:9, color:'#FF3344', fontFamily:MONO, lineHeight:14 },
-  quickLabel:     { fontSize:8, fontWeight:'700', color:'#3A5060', fontFamily:MONO, letterSpacing:1.5, marginBottom:7 },
+  quickLabel:     { fontSize:8, fontWeight:'700', color:'#525A68', fontFamily:MONO, letterSpacing:1.5, marginBottom:7 },
   templatePill:   { borderWidth:1, borderRadius:20, paddingHorizontal:11, paddingVertical:6,
-                    borderColor:'#BB33FF35', backgroundColor:'#BB33FF0A', flexDirection:'row', alignItems:'center', gap:5 },
-  templatePillTxt:{ fontSize:10, fontWeight:'700', color:'#BB33FFCC', fontFamily:MONO },
+                    borderColor:'#FFC40035', backgroundColor:'#FFC4000A', flexDirection:'row', alignItems:'center', gap:5 },
+  templatePillTxt:{ fontSize:10, fontWeight:'700', color:'#FFC400CC', fontFamily:MONO },
   mainBtn:        { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:8,
-                    backgroundColor:'#BB33FF', borderRadius:10, paddingVertical:13,
-                    ...Platform.select({ ios:{ shadowColor:'#BB33FF', shadowOffset:{width:0,height:4}, shadowOpacity:0.5, shadowRadius:10 }, android:{ elevation:6 } }) },
+                    backgroundColor:'#FFC400', borderRadius:10, paddingVertical:13,
+                    ...Platform.select({ ios:{ shadowColor:'#FFC400', shadowOffset:{width:0,height:4}, shadowOpacity:0.5, shadowRadius:10 }, android:{ elevation:6 } }) },
   mainBtnTxt:     { fontSize:13, fontWeight:'900', color:'#000', fontFamily:MONO, letterSpacing:0.5 },
   activeDot:      { width:7, height:7, borderRadius:4, backgroundColor:'#00FF88' },
   secondaryBtn:   { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:7,
                     borderWidth:1.5, borderRadius:10, paddingVertical:10,
-                    borderColor:'#BB33FF50', backgroundColor:'#BB33FF0A' },
+                    borderColor:'#FFC40050', backgroundColor:'#FFC4000A' },
   secondaryBtnTxt:{ fontSize:11, fontWeight:'700', fontFamily:MONO, letterSpacing:0.5 },
   mgmtRow:        { flexDirection:'row', gap:8, paddingHorizontal:14, paddingBottom:8, paddingTop:4,
                     borderBottomWidth:1, borderBottomColor:'rgba(255,255,255,0.05)' },

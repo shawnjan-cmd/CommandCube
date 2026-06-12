@@ -6,8 +6,8 @@
  * - Background: #0a0b0f  Card surface: #0f1520  borderRadius: 14
  * - Primary accent: #00d4ff (Cyan)  Secondary: #00e87a (Emerald)
  * - Tertiary: #ff8c00 (Amber)  Quaternary: #a855f7 (Purple)
- * - Danger: #ff3b30 (Crimson)  Border: #1a2235
- * - Body text: #c8d8f0  Muted: #4a607a
+ * - Danger: #ff3b30 (Crimson)  Border: #232730
+ * - Body text: #D5D9E0  Muted: #525A68
  * - fontFamily: 'monospace' on ALL text, no exceptions
  * - Cards: 3px solid accent line on LEFT edge only (no full glow borders)
  * - Stat cards: dark surface, small uppercase label, HUGE colored number, 3px accent bar at bottom
@@ -48,12 +48,12 @@ export const NCX = {
   yellow:      '#ffd700',     // warning / special
 
   // Borders
-  border:      '#1a2235',     // standard border
+  border:      '#232730',     // standard border
   borderFaint: 'rgba(26,34,53,0.8)',
 
   // Text
-  text:        '#c8d8f0',     // body text
-  textMuted:   '#4a607a',     // muted text
+  text:        '#D5D9E0',     // body text
+  textMuted:   '#525A68',     // muted text
   textDim:     '#2a3a4a',     // very dim
 
   // 3D light source effect on stat cards
@@ -152,14 +152,14 @@ export const NCX_SPACING = {
 } as const;
 
 // ─── BOTTOM TAB BAR ──────────────────────────────────────────────
-// Background: #08090e, borderTopWidth 1, borderTopColor #1a2235
+// Background: #08090e, borderTopWidth 1, borderTopColor #232730
 // Active: 3px top border line in tab's accent color + accent-colored icon + label
 // Inactive: muted gray, no border
 export const NCX_TAB = {
   bg:           '#08090e',
-  borderTop:    '#1a2235',
-  inactiveIcon: '#4a607a',
-  inactiveLabel:'#4a607a',
+  borderTop:    '#232730',
+  inactiveIcon: '#525A68',
+  inactiveLabel:'#525A68',
 } as const;
 
 // ─── STATUS BANNER STYLE ─────────────────────────────────────────

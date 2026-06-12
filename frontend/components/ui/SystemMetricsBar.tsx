@@ -127,7 +127,7 @@ export function SystemMetricsBar({ isConnected, accentColor }: { isConnected: bo
     return () => clearInterval(t);
   }, [isConnected]);
 
-  const statusCol = isConnected ? '#2FD98B' : '#EF4444';
+  const statusCol = isConnected ? '#00FF88' : '#EF4444';
 
   return (
     <View style={s.bar}>
@@ -150,7 +150,7 @@ export function SystemMetricsBar({ isConnected, accentColor }: { isConnected: bo
       <MetricBar
         label="RAM"
         value={metrics.ram}
-        color={accent === '#00FF88' ? '#F5A623' : accent === '#F5A623' ? '#00FF88' : accent === '#BF00FF' ? '#00FFFF' : accent === '#FF6EB4' ? '#FF9A44' : '#F5A623'}
+        color={accent === '#00FF88' ? '#FFC400' : accent === '#FFC400' ? '#00FF88' : accent === '#FFC400' ? '#FF2A1F' : accent === '#FF6A1F' ? '#FF9A44' : '#FFC400'}
         iconName="menu"
         iconLib="material"
       />
@@ -184,9 +184,9 @@ const s = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 14,
     paddingVertical: 7,
-    backgroundColor: '#04080F',
+    backgroundColor: '#0A0B0D',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,255,255,0.08)',
+    borderBottomColor: 'rgba(255,42,31,0.08)',
   },
   statusDot: {
     width: 6,

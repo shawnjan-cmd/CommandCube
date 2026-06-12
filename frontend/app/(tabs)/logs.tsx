@@ -22,26 +22,26 @@ const { width: SW } = Dimensions.get('window');
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
-  bg:       '#000003',
-  surface:  '#02070D',
-  surfaceHi:'#071120',
-  border:   'rgba(0,255,255,0.12)',
-  text:     '#D8E8F4',
-  textMid:  '#7A9AB8',
-  textDim:  '#3A5068',
-  teal:     '#00FFFF',
-  tealD:    'rgba(0,255,255,0.08)',
+  bg:       '#050505',
+  surface:  '#0E0F12',
+  surfaceHi:'#1A1D24',
+  border:   'rgba(255,42,31,0.12)',
+  text:     '#E6E9EF',
+  textMid:  '#8C95A6',
+  textDim:  '#6A7384',
+  teal:     '#FF2A1F',
+  tealD:    'rgba(255,42,31,0.08)',
   green:    '#00FF88',
   greenD:   '#00FF8818',
-  amber:    '#F5A623',
-  amberD:   '#F5A62318',
+  amber:    '#FFC400',
+  amberD:   '#FFC40018',
   red:      '#FF3131',
   redD:     '#FF313118',
-  blue:     '#4A9EFF',
-  blueD:    '#4A9EFF18',
-  purple:   '#BF00FF',
-  purpleD:  '#BF00FF18',
-  cyan:     '#00FFFF',
+  blue:     '#FF6A1F',
+  blueD:    '#FF6A1F18',
+  purple:   '#FFC400',
+  purpleD:  '#FFC40018',
+  cyan:     '#FF2A1F',
 };
 
 // ─── AREA SPARKLINE CHART (matches image 4 style) ─────────────
@@ -185,9 +185,9 @@ const dsc = StyleSheet.create({
 const CATEGORY_DATA = [
   { label: 'SECURITY', color: '#EF4444', pct: 82 },
   { label: 'FILES',    color: '#10B981', pct: 68 },
-  { label: 'NETWORK',  color: '#3B82F6', pct: 55 },
-  { label: 'PRIVACY',  color: '#9D6FFF', pct: 44 },
-  { label: 'SYSTEM',   color: '#F59E0B', pct: 31 },
+  { label: 'NETWORK',  color: '#FF6A1F', pct: 55 },
+  { label: 'PRIVACY',  color: '#FFC400', pct: 44 },
+  { label: 'SYSTEM',   color: '#FFC400', pct: 31 },
 ];
 
 function CategoryUsagePanel({ isConnected, metrics }: { isConnected: boolean; metrics: { cpu: number; ram: number; disk: number; diskTotal: number; diskUsed: number } }) {
@@ -195,9 +195,9 @@ function CategoryUsagePanel({ isConnected, metrics }: { isConnected: boolean; me
   const derived = isConnected ? [
     { label: 'SECURITY', color: '#EF4444', pct: Math.max(10, Math.min(99, 70 + metrics.cpu / 5)) },
     { label: 'FILES',    color: '#10B981', pct: Math.max(10, Math.min(99, metrics.disk)) },
-    { label: 'NETWORK',  color: '#3B82F6', pct: Math.max(10, Math.min(99, metrics.ram * 0.7)) },
-    { label: 'PRIVACY',  color: '#9D6FFF', pct: Math.max(10, Math.min(99, 35 + metrics.cpu / 8)) },
-    { label: 'SYSTEM',   color: '#F59E0B', pct: Math.max(10, Math.min(99, metrics.cpu * 0.4)) },
+    { label: 'NETWORK',  color: '#FF6A1F', pct: Math.max(10, Math.min(99, metrics.ram * 0.7)) },
+    { label: 'PRIVACY',  color: '#FFC400', pct: Math.max(10, Math.min(99, 35 + metrics.cpu / 8)) },
+    { label: 'SYSTEM',   color: '#FFC400', pct: Math.max(10, Math.min(99, metrics.cpu * 0.4)) },
   ] : CATEGORY_DATA;
 
   return (
@@ -253,7 +253,7 @@ const cup = StyleSheet.create({
   liveTxt:   { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
   row:       { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   rowLabel:  { fontSize: 9, fontWeight: '700', fontFamily: MONO, letterSpacing: 1.5, color: C.textMid, width: 62 },
-  track:     { flex: 1, height: 18, backgroundColor: '#0A1828', borderRadius: 4, overflow: 'hidden' },
+  track:     { flex: 1, height: 18, backgroundColor: '#15171C', borderRadius: 4, overflow: 'hidden' },
   fill:      { height: '100%', borderRadius: 4 },
   pct:       { fontSize: 12, fontWeight: '900', fontFamily: MONO, width: 40, textAlign: 'right' },
 });
@@ -311,18 +311,18 @@ const snc = StyleSheet.create({
 
 // ─── SMART ALERTS PANEL (matches image 3 bottom card) ───────────
 const ALERT_DEFS = [
-  { label: 'High disk usage on /var',        badge: 'WARN', badgeColor: '#F59E0B' },
+  { label: 'High disk usage on /var',        badge: 'WARN', badgeColor: '#FFC400' },
   { label: 'Crawler hit rate dropped 12%',   badge: 'INFO', badgeColor: C.blue     },
   { label: 'Failed pair attempt blocked',    badge: 'SEC',  badgeColor: '#EF4444'  },
 ];
 
 function SmartAlertsPanel({ isConnected, metrics }: { isConnected: boolean; metrics: { cpu: number; ram: number; disk: number; diskTotal: number; diskUsed: number } }) {
   const alerts = isConnected ? [
-    ...(metrics.disk > 70  ? [{ label: `High disk usage: ${Math.round(metrics.disk)}%`,   badge: 'WARN', badgeColor: '#F59E0B' }] : []),
+    ...(metrics.disk > 70  ? [{ label: `High disk usage: ${Math.round(metrics.disk)}%`,   badge: 'WARN', badgeColor: '#FFC400' }] : []),
     ...(metrics.cpu  > 80  ? [{ label: `CPU overloaded: ${Math.round(metrics.cpu)}%`,      badge: 'CRIT', badgeColor: '#EF4444' }] : []),
-    ...(metrics.ram  > 85  ? [{ label: `RAM critical: ${Math.round(metrics.ram)}%`,        badge: 'WARN', badgeColor: '#F59E0B' }] : []),
+    ...(metrics.ram  > 85  ? [{ label: `RAM critical: ${Math.round(metrics.ram)}%`,        badge: 'WARN', badgeColor: '#FFC400' }] : []),
     { label: 'Crawler hit rate optimal',   badge: 'OK',   badgeColor: '#10B981' },
-    { label: 'Security scan — no threats', badge: 'SEC',  badgeColor: '#3B82F6' },
+    { label: 'Security scan — no threats', badge: 'SEC',  badgeColor: '#FF6A1F' },
   ] : ALERT_DEFS;
 
   return (
@@ -353,7 +353,7 @@ function SmartAlertsPanel({ isConnected, metrics }: { isConnected: boolean; metr
 
 const sap = StyleSheet.create({
   card:       { borderRadius: 16, borderWidth: 1.5, overflow: 'hidden',
-    ...Platform.select({ ios:{ shadowColor:'#4A9EFF', shadowOffset:{width:0,height:4}, shadowOpacity:0.2, shadowRadius:14 }, android:{elevation:6} }) },
+    ...Platform.select({ ios:{ shadowColor:'#FF6A1F', shadowOffset:{width:0,height:4}, shadowOpacity:0.2, shadowRadius:14 }, android:{elevation:6} }) },
   header:     { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 16, paddingBottom: 12 },
   dot:        { width: 8, height: 8, borderRadius: 4 },
   title:      { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
@@ -442,7 +442,7 @@ function HBar({ label, value, max = 100, color, unit = '%', showValue = true }: 
 const hbs = StyleSheet.create({
   row:   { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
   label: { fontSize: 10, fontWeight: '700', color: C.textMid, fontFamily: MONO, letterSpacing: 0.8, width: 54 },
-  track: { flex: 1, height: 9, backgroundColor: 'rgba(0,255,255,0.05)', borderRadius: 5, overflow: 'hidden' },
+  track: { flex: 1, height: 9, backgroundColor: 'rgba(255,42,31,0.05)', borderRadius: 5, overflow: 'hidden' },
   fill:  { height: '100%', borderRadius: 5 },
   val:   { fontSize: 11, fontWeight: '900', fontFamily: MONO, width: 52, textAlign: 'right' },
 });
@@ -558,7 +558,7 @@ function UndoEntry({ entry, onRollback, rolling }: {
   entry: { id: number; userRequest: string; remainingMin: string; type?: string };
   onRollback: (id: number) => void; rolling: boolean;
 }) {
-  const amber = '#FF9900';
+  const amber = '#FF6A1F';
   return (
     <View style={[ue.row, { borderLeftColor: amber }]}>
       <View style={{ flex: 1 }}>
@@ -618,7 +618,7 @@ const MetricCard = React.memo(function MetricCard({ title, value, color }: { tit
     Animated.timing(barW, { toValue: 1, duration: 1000, useNativeDriver: false }).start();
   }, [value]);
   return (
-    <View style={[sd.metricCard, { borderColor: color + '30', backgroundColor: '#071120' }]}>
+    <View style={[sd.metricCard, { borderColor: color + '30', backgroundColor: '#1A1D24' }]}>
       {/* Corner brackets */}
       <View style={[sd.cTL, { borderColor: color + '70' }]} />
       <View style={[sd.cBR, { borderColor: color + '40' }]} />
@@ -676,7 +676,7 @@ function ThreatHeatmap({ isConnected }: { isConnected: boolean }) {
 
 const thm = StyleSheet.create({
   card:       { borderRadius: 16, borderWidth: 1.5, overflow: 'hidden', padding: 14,
-    ...Platform.select({ ios:{ shadowColor:'#3B82F6', shadowOffset:{width:0,height:4}, shadowOpacity:0.25, shadowRadius:14 }, android:{elevation:6} }) },
+    ...Platform.select({ ios:{ shadowColor:'#FF6A1F', shadowOffset:{width:0,height:4}, shadowOpacity:0.25, shadowRadius:14 }, android:{elevation:6} }) },
   header:     { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 14 },
   dot:        { width: 8, height: 8, borderRadius: 4 },
   title:      { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
@@ -785,7 +785,7 @@ function DiskProgressBar({ pct, color }: { pct: number; color: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
       <Text style={{ fontSize: 11, fontWeight: '700', color: C.textMid, fontFamily: MONO, width: 40, letterSpacing: 1 }}>DISK</Text>
-      <View style={{ flex: 1, height: 10, backgroundColor: '#0A1828', borderRadius: 5, overflow: 'hidden' }}>
+      <View style={{ flex: 1, height: 10, backgroundColor: '#15171C', borderRadius: 5, overflow: 'hidden' }}>
         <Animated.View style={[{
           height: '100%', borderRadius: 5, backgroundColor: color,
           width: barW.interpolate({ inputRange:[0,1], outputRange:['0%','100%'] }) as any,
@@ -865,7 +865,7 @@ function SystemDashboard({ isConnected, metrics }: {
     { title: 'FILES ORGANIZED', value: isConnected ? `${metrics.diskUsed}GB`               : '32.7K',  color: '#2979FF' },
     { title: 'SPACE RECOVERED', value: isConnected ? `${metrics.diskUsed}GB`               : '214GB',  color: '#FF9100' },
     { title: 'SCRIPTS ACTIVE',  value: isConnected ? `${Math.round(metrics.cpu * 2.1)}`   : '203',    color: '#D500F9' },
-    { title: 'UPTIME',          value: isConnected ? '99.97%'                             : '99.97%', color: '#00E5FF' },
+    { title: 'UPTIME',          value: isConnected ? '99.97%'                             : '99.97%', color: '#FF2A1F' },
   ];
   const cpu  = isConnected ? metrics.cpu  : 36;
   const ram  = isConnected ? metrics.ram  : 71;
@@ -920,7 +920,7 @@ function SystemDashboard({ isConnected, metrics }: {
   );
 }
 const sd = StyleSheet.create({
-  outer:       { backgroundColor: '#071120', borderRadius: 16, borderWidth: 1, borderColor: '#0A1828', overflow: 'hidden',
+  outer:       { backgroundColor: '#1A1D24', borderRadius: 16, borderWidth: 1, borderColor: '#15171C', overflow: 'hidden',
     ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:4}, shadowOpacity:0.4, shadowRadius:14 }, android:{elevation:6} }) },
   header:      { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 6 },
   headerDot:   { width: 9, height: 9, borderRadius: 5 },
@@ -930,7 +930,7 @@ const sd = StyleSheet.create({
   sub:         { fontSize: 10, color: '#4A5568', fontFamily: MONO, paddingHorizontal: 16, marginBottom: 14, lineHeight: 15 },
   // Section 1 — metric grid
   metricGrid:  { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, gap: 8, marginBottom: 12 },
-  metricCard:  { width: METRIC_CARD_W, backgroundColor: '#071120', borderRadius: 10, borderWidth: 1, paddingHorizontal: 10, paddingTop: 12, paddingBottom: 14, position: 'relative', overflow: 'hidden',
+  metricCard:  { width: METRIC_CARD_W, backgroundColor: '#1A1D24', borderRadius: 10, borderWidth: 1, paddingHorizontal: 10, paddingTop: 12, paddingBottom: 14, position: 'relative', overflow: 'hidden',
     ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.3, shadowRadius:6 }, android:{elevation:3} }) },
   metricTitle: { fontSize: 8, fontWeight: '700', color: '#6B7280', fontFamily: MONO, letterSpacing: 0.9, marginBottom: 8 },
   metricValue: { fontSize: 22, fontWeight: '900', fontFamily: MONO, marginBottom: 10, lineHeight: 26 },
@@ -939,14 +939,14 @@ const sd = StyleSheet.create({
   cBR:         { position: 'absolute', bottom: 3, right: 0, width: 8, height: 8, borderBottomWidth: 1.5, borderRightWidth: 1.5 },
   // Section 2 — charts row
   middleRow:   { flexDirection: 'row', paddingHorizontal: 12, marginBottom: 12 },
-  chartCard:   { backgroundColor: '#071120', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 12 },
+  chartCard:   { backgroundColor: '#1A1D24', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 12 },
   chartTitle:  { fontSize: 8, fontWeight: '700', color: '#6B7280', fontFamily: MONO, letterSpacing: 0.9, marginBottom: 12 },
   // Storage donut
   donutRing:   { width: 90, height: 90, borderRadius: 45, borderWidth: 10, justifyContent: 'center', alignItems: 'center' },
   donutMain:   { fontSize: 15, fontWeight: '900', fontFamily: MONO, textAlign: 'center' },
   donutSub:    { fontSize: 7, color: '#6B7280', fontFamily: MONO, textAlign: 'center', letterSpacing: 0.5, marginTop: 2 },
   // Section 3 — performance
-  perfCard:    { backgroundColor: '#071120', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 14, marginHorizontal: 12, marginBottom: 16, gap: 0 },
+  perfCard:    { backgroundColor: '#1A1D24', borderRadius: 10, borderWidth: 1, borderColor: '#2A2D3A', padding: 14, marginHorizontal: 12, marginBottom: 16, gap: 0 },
   ringsRow:    { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 24, marginTop: 8 },
 });
 
@@ -970,14 +970,14 @@ const PC_QUICK_SCRIPTS = [
     id: 'pcs-top-proc',
     label: 'Top Processes',
     icon: 'memory',
-    color: '#BB33FF',
+    color: '#FFC400',
     script: `import psutil\nprocs=sorted(psutil.process_iter(['pid','name','cpu_percent','memory_percent']),key=lambda p:p.info['cpu_percent'] or 0,reverse=True)\nprint("PID    CPU%   MEM%   NAME")\nfor p in procs[:12]:\n    i=p.info\n    print(f"{i['pid']:<7}{i['cpu_percent']:<7.1f}{i['memory_percent']:<7.2f}{i['name'][:30]}")`,
   },
   {
     id: 'pcs-network-test',
     label: 'Network Test',
     icon: 'router',
-    color: '#FF9900',
+    color: '#FF6A1F',
     script: `import socket,time\nHOSTS=[('google.com',80),('8.8.8.8',53),('cloudflare.com',443)]\nfor host,port in HOSTS:\n    try:\n        s=socket.socket()\n        s.settimeout(3)\n        t=time.perf_counter()\n        s.connect((host,port))\n        ms=(time.perf_counter()-t)*1000\n        s.close()\n        print(f"OK  {host}:{port}  {ms:.0f}ms")\n    except Exception as e:\n        print(f"FAIL {host}:{port}  {e}")`,
   },
   {
@@ -991,7 +991,7 @@ const PC_QUICK_SCRIPTS = [
     id: 'pcs-free-ram',
     label: 'Free RAM',
     icon: 'memory',
-    color: '#00DDEE',
+    color: '#FF2A1F',
     script: `import psutil,gc,sys,subprocess\nvm=psutil.virtual_memory()\nprint(f"Before: {vm.used/1024**3:.1f}GB/{vm.total/1024**3:.1f}GB ({vm.percent}%)")\ncollected=gc.collect()\nprint(f"GC freed: {collected} objects")\nif sys.platform!='win32':\n    try:\n        open('/proc/sys/vm/drop_caches','w').write('3')\n        print("Page cache dropped")\n    except:\n        print("Run as root to drop page caches")\nvm2=psutil.virtual_memory()\nprint(f"After: {vm2.used/1024**3:.1f}GB ({vm2.percent}%) | Freed: {(vm.used-vm2.used)//1024//1024}MB")`,
   },
   {
@@ -1005,7 +1005,7 @@ const PC_QUICK_SCRIPTS = [
     id: 'pcs-startup-list',
     label: 'Startup Apps',
     icon: 'play-circle-outline',
-    color: '#FFD700',
+    color: '#FFC400',
     script: `import sys\nif sys.platform=='win32':\n    import winreg\n    KEY=r"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"\n    print("=== STARTUP PROGRAMS ===")\n    with winreg.OpenKey(winreg.HKEY_CURRENT_USER,KEY) as k:\n        i=0\n        while True:\n            try:\n                name,val,_=winreg.EnumValue(k,i)\n                print(f"  {name}: {val[:60]}")\n                i+=1\n            except OSError:break\n    print(f"Total: {i} startup items")\nelse:\n    import subprocess\n    r=subprocess.run(["systemctl","list-unit-files","--type=service","--state=enabled","--no-pager"],capture_output=True,text=True)\n    print(r.stdout[:2000])`,
   },
   {
@@ -1019,7 +1019,7 @@ const PC_QUICK_SCRIPTS = [
     id: 'pcs-update-check',
     label: 'Check Updates',
     icon: 'system-update',
-    color: '#00DDEE',
+    color: '#FF2A1F',
     script: `import subprocess,sys\nif sys.platform=='win32':\n    print("Checking Windows Update status...")\n    r=subprocess.run(["powershell","-Command","Get-WindowsUpdate -MicrosoftUpdate"],capture_output=True,text=True,timeout=60)\n    if r.stdout:\n        print(r.stdout[:2000])\n    else:\n        r2=subprocess.run(["powershell","-Command","(New-Object -ComObject Microsoft.Update.Session).CreateUpdateSearcher().Search('IsInstalled=0').Updates | Select-Object Title | Format-List"],capture_output=True,text=True,timeout=60)\n        print(r2.stdout[:2000] or "Windows Update info not available without admin.")\nelif sys.platform=="darwin":\n    subprocess.run(["softwareupdate","-l"])\nelse:\n    r=subprocess.run(["apt","list","--upgradable","2>/dev/null"],capture_output=True,text=True,shell=True)\n    print(r.stdout[:2000] or "No updates found or apt not available")`,
   },
   {
@@ -1033,7 +1033,7 @@ const PC_QUICK_SCRIPTS = [
     id: 'pcs-port-audit',
     label: 'Port Audit',
     icon: 'radar',
-    color: '#FF9900',
+    color: '#FF6A1F',
     script: `import socket\nfrom concurrent.futures import ThreadPoolExecutor\nHOST="127.0.0.1"\nWELL_KNOWN={21:'FTP',22:'SSH',23:'Telnet',25:'SMTP',53:'DNS',80:'HTTP',110:'POP3',443:'HTTPS',445:'SMB',3306:'MySQL',3389:'RDP',5432:'Postgres',6379:'Redis',8080:'HTTP-Alt',27017:'MongoDB'}\ndef scan(port):\n    s=socket.socket()\n    s.settimeout(0.5)\n    if s.connect_ex((HOST,port))==0:\n        s.close();return port\n    s.close()\nPORTS=list(range(1,1025))+list(WELL_KNOWN.keys())\nPORTS=list(set(PORTS))\nprint(f"Scanning {HOST} ({len(PORTS)} ports)...")\nwith ThreadPoolExecutor(max_workers=200) as ex:\n    open_ports=[p for p in ex.map(scan,PORTS) if p]\nprint(f"Open ports: {len(open_ports)}")\nfor port in sorted(open_ports):\n    svc=WELL_KNOWN.get(port,'Unknown')\n    flag=" RISKY" if port in [21,23,445,3389] else ""\n    print(f"  {port:5} {svc}{flag}")`,
   },
 ];
@@ -1066,7 +1066,7 @@ function QuickPCScript({ script: scriptItem, onRun, isRunning, disabled }: {
 }
 
 const qps = StyleSheet.create({
-  card:     { minHeight: 76, borderWidth: 1.5, borderTopWidth: 3, borderRadius: 10, backgroundColor: '#02070D', overflow: 'hidden',
+  card:     { minHeight: 76, borderWidth: 1.5, borderTopWidth: 3, borderRadius: 10, backgroundColor: '#0E0F12', overflow: 'hidden',
     position: 'relative', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 8, paddingHorizontal: 5,
     ...Platform.select({ ios:{ shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.25, shadowRadius:6 }, android:{elevation:3} }) },
   cornerTL: { position: 'absolute', top: 0, left: 0, width: 8, height: 8, borderTopWidth: 1.5, borderLeftWidth: 1.5 },
@@ -1551,7 +1551,7 @@ export default function PCCheckScreen() {
 }
 
 const s = StyleSheet.create({
-  root:        { flex: 1, backgroundColor: '#000003' },
+  root:        { flex: 1, backgroundColor: '#050505' },
   connBar:     { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 11, borderBottomWidth: 1 },
   connStatus:  { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.6 },
   connSub:     { fontSize: 9, color: C.textDim, fontFamily: MONO, marginTop: 1 },

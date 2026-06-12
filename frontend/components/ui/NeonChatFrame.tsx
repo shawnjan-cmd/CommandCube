@@ -8,8 +8,8 @@
 import React from 'react';
 import Svg, { Path, Circle, Rect, Line, G } from 'react-native-svg';
 
-const CYAN   = '#3EC8FF';
-const CYAN_HI = '#7FE3FF';
+const CYAN   = '#FF2A1F';
+const CYAN_HI = '#FF6A52';
 const STEEL  = '#5E7186';
 const FILL   = '#081426';
 
@@ -58,7 +58,7 @@ function RobotBadge({ cx, cy, r }: { cx: number; cy: number; r: number }) {
       {/* helmet */}
       <Rect x={cx - r * 0.6} y={cy - r * 0.52} width={r * 1.2} height={r * 1.04} rx={r * 0.38} fill="#DFE7EF" stroke="#9DAFC1" strokeWidth={1.4} />
       {/* face screen */}
-      <Rect x={cx - r * 0.44} y={cy - r * 0.3} width={r * 0.88} height={r * 0.66} rx={r * 0.24} fill="#071120" />
+      <Rect x={cx - r * 0.44} y={cy - r * 0.3} width={r * 0.88} height={r * 0.66} rx={r * 0.24} fill="#1A1D24" />
       {/* eyes */}
       <Circle cx={cx - r * 0.18} cy={cy - r * 0.02} r={r * 0.1} fill={CYAN_HI} />
       <Circle cx={cx + r * 0.18} cy={cy - r * 0.02} r={r * 0.1} fill={CYAN_HI} />

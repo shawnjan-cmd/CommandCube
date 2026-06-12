@@ -1,0 +1,50 @@
+{
+  "summary": "Iteration 6 — frontend-only sweep on mobile viewport 390x800 at https://startup-fixer.preview.emergentagent.com. Bundle serves HTTP 200 (~9.49 MB). ALL acceptance criteria from the review request PASS: (1) App loads without crash, no red screen, no pageerrors. (2) FuturisticTabBar renders all 8 pills with always-visible labels (HOME / SCRIPTS / AI / KB / PC / BUILD / SKINS / CONFIG) and testIDs tab-nexushome, tab-scripts, tab-butler, tab-knowledge, tab-logs, tab-builder, tab-skins, tab-settings — all 8 detected and tappable; navigation moves URL correctly between /nexushome, /scripts, /butler, /knowledge, /logs, /builder, /skins, /settings; the red sliding target-lock frame moves to the active pill (visible in AI/SKINS screenshots). (3) Every tab renders the Terminator red/gunmetal theme — no leftover cyan/blue panels observed; green is correctly reserved for OK/active status (e.g., Crawlers HARVESTING block) and red dominates accents (endo-red OFFLINE pill, IN USE button on SKINS, KB indexed band, AI active highlight). (4) QuickButlerBar floats above the tab bar on EVERY tab — quickbar-input + quickbar-send testIDs verified present on all 8/8 tabs. (5) QuickBar → AI handoff works end-to-end: typed 'hello butler from quickbar' on home, pressed quickbar-send, router pushed to /butler, the prefill string is visible in the butler composer (see screenshot butler_prefill.png) and the AsyncStorage @butler_prefill_prompt key is cleared (consumed). (6) AI (butler) tab renders chat UI with 'BUTLER >' / 'USER >' role labels (verified in code at butler.tsx:717,724), composer placeholder '> Enter command for Butler AI…' / '> Connect PC from Home tab first…' (verified at butler.tsx:914), Suggested Commands grid (PC Health Snapshot, Clean Temp Files, Sort Downloads, Find Duplicates, Top Processes, Backup Documents), BUILD SCRIPT / HISTORY / VOICE / OLLAMA pills, OFFLINE indicator visible since no PC server is connected — graceful as expected. (7) Settings (CONFIG) tab: ZERO occurrences of 'IMPORT JSON', 'IMPORT UI CONFIG', 'ONE JSON POWERHOUSE', '⚡ IMPORT JSON' in the rendered DOM (forbidden_on_load=[], forbidden_after_scroll=[]). Required EXPORT cards ALL present: 'EXPORT ALL FILES', 'UI VISUAL CONFIG', 'DOWNLOAD UI CONFIG', 'RESET TO DEFAULTS' (missing_required=[]). COPY ALL FILES button verified in source at settings.tsx:1630. (8) autoErrorLogger ring buffer (@butler_auto_error_logs_v1) recorded 8 entries total, 0 at warn/error/fatal level. (9) Browser pageerror events: 0. Deprecated packages detected: NONE. SafeAreaView issues detected: NONE. NexusTips duplicate-default-export bug (carry-over from iter 4/5) is FIXED — only one default export remains at line 257. The Butler 'LOCAL AI BEHAVIORAL NOTICE' modal still overlays the bottom tab bar and absorbs pill taps until dismissed via 'ENTER BUTLER AI' (carry-over from iter 5, low priority). New observation: kbGrowthTracker emits the same 'documentDirectory unavailable' warning ~120 times per session on web (logged on every poll) — console spam, not a crash; should be guarded with a 'has-already-warned' flag for web.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Butler LOCAL AI NOTICE modal vs FuturisticTabBar",
+        "issue": "(carry-over from iter 5) The first-visit LOCAL AI BEHAVIORAL NOTICE modal on /butler renders at a z-index that covers the bottom FuturisticTabBar. While open, taps on other tab pills are absorbed by the modal overlay and the user appears stuck on /butler. Dismissal via the 'ENTER BUTLER AI' CTA works correctly, so impact is one-tap-extra not a hard block. Suggest either auto-dismissing on tab-pill press or rendering the modal below the tab-bar z-index. Reference: /app/frontend/app/(tabs)/butler.tsx:435 (LOCAL AI BEHAVIORAL NOTICE)",
+        "testID": "tab-* (any non-butler pill while notice open)",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "global (RN web)",
+        "issues": [
+          "RN 0.81+ deprecation warnings still flooding console: 'shadow*' → use boxShadow, 'textShadow*' → use textShadow, props.pointerEvents → style.pointerEvents, Image style.resizeMode → props.resizeMode. Non-blocking but worth a sweep before the next RN bump.",
+          "kbGrowthTracker logs '[kbGrowthTracker] documentDirectory unavailable' ~120 times per session on web — should be gated by a once-per-session flag or platform check at /app/frontend/services/kbGrowthTracker.* (web has no FileSystem.documentDirectory)."
+        ]
+      }
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_6.json"],
+  "action_items": [
+    "(LOW, carry-over) Lower the LOCAL AI BEHAVIORAL NOTICE modal z-index below the FuturisticTabBar, OR auto-dismiss it when the user taps another tab pill, OR mark it auto-seen the next render after the user navigates away. File: /app/frontend/app/(tabs)/butler.tsx (around line 435).",
+    "(LOW) Throttle/gate the '[kbGrowthTracker] documentDirectory unavailable' warning — currently fires on every poll on web and floods the console with ~120 entries per session. Add `if (Platform.OS === 'web') { logOnce(); return; }` at the entry of the tracker's tick.",
+    "(LOW, cosmetic) Sweep deprecated style props once before the next RN bump: shadow* → boxShadow, textShadow* → textShadow, style.resizeMode → props.resizeMode, props.pointerEvents → style.pointerEvents.",
+    "(carry-over) 9 of the 11 tab files still exceed the 700-line guideline (settings 2761 now after the ~1300-line import-code removal — down from 4078 — good progress; butler 1279; scripts 3645; knowledge 3403). Keep splitting in future passes."
+  ],
+  "critical_code_review_comments": [
+    "Settings refactor is verified empirically: settings.tsx dropped from 4078 → 2761 lines and the four removed strings ('IMPORT JSON', 'IMPORT UI CONFIG', 'ONE JSON POWERHOUSE', '⚡ IMPORT JSON') are absent both at source level and in the rendered DOM. EXPORT block (EXPORT ALL FILES / COPY ALL FILES / DOWNLOAD UI CONFIG / RESET TO DEFAULTS) is intact and rendering.",
+    "FuturisticTabBar (8 pills, always-visible labels, sliding red target-lock frame) matches the Terminator spec — terminal-mono font, 8px label size, endo-red #FF2A1F signal line, gunmetal #0A0B0E deck, steel #3C424D border, ambient breathing animation on the lock frame. testIDs prefixed `tab-` are consistent and matched route names.",
+    "QuickButlerBar persistence is verified across all 8 tabs (quickbar-input + quickbar-send found on every screen). Handoff via AsyncStorage @butler_prefill_prompt → router.push('/(tabs)/butler') → consumer reads + removes the key works end-to-end (verified by clearing of key after consumption and prefill string visible in the butler composer screenshot).",
+    "Butler chat role labels 'BUTLER >' / 'USER >' confirmed at butler.tsx:717,724; composer placeholder branches on connection state at butler.tsx:914.",
+    "NexusTips duplicate-default-export carry-over from iter 4/5 is RESOLVED — only one `export default function HUDTips` remains at line 257.",
+    "autoErrorLogger captured 0 warn/error/fatal entries across the full 8-tab sweep, and 0 page-level JS errors were thrown. Excellent stability."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "n/a (frontend-only request)",
+    "frontend": "8/8 tabs loaded without crash. 8/8 tabs render the Terminator theme. 8/8 tabs have persistent QuickButlerBar. 0/4 forbidden IMPORT strings present in Settings. 4/4 required EXPORT strings present. QuickBar handoff: PASS (prefill consumed, text visible in composer). Page errors: 0. autoErrorLogger warn/error: 0."
+  },
+  "seed_data_creation": "page.add_init_script seeded localStorage with the onboarding/consent keys (@butler_onboarding_done_v2, @butler_consent_v2, @butler_terms_accepted_v1, @butler_privacy_accepted_v1, @butler_age_confirmed_v1, @butler_lan_consent_v1, @butler_server_privacy_accepted_v1, @butler_local_ai_notice_seen_v1, @butler_ai_notice_dismissed) — the first 7 worked (landed on (tabs) home directly). The Butler-notice keys did NOT pre-dismiss the modal on first navigation to /butler — runtime click on 'ENTER BUTLER AI' was still required.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Web bundle at https://startup-fixer.preview.emergentagent.com is HTTP 200 (~9.49 MB) and hydrates within ~3 s at mobile viewport 390x800. Pre-seed localStorage with the 7 onboarding/consent keys (see seed_data_creation). Visible tab pill testIDs: tab-{nexushome,scripts,butler,knowledge,logs,builder,skins,settings}. Hidden tabs (terminal/fileshare/support) declared href:null in (tabs)/_layout.tsx are unreachable by direct URL — reached only via in-app actions. Persistent floating composer: testIDs quickbar-input + quickbar-send (mounted in (tabs)/_layout.tsx). QuickBar handoff key is @butler_prefill_prompt (AsyncStorage on native, localStorage on web). Butler tab still opens a LOCAL AI BEHAVIORAL NOTICE modal on first visit — dismiss via the 'ENTER BUTLER AI' button before continuing the sweep, or test Butler LAST. autoErrorLogger lives at localStorage['@butler_auto_error_logs_v1']; filter by level∈{warn,error,fatal} to surface real issues.",
+  "rca_of_issue": "No new bugs. Only carry-over LOW: LOCAL AI BEHAVIORAL NOTICE modal at butler.tsx:435 renders at a z-index above the FuturisticTabBar, so taps on tab pills while the notice is open are absorbed by the modal's pointer region. Fix options (any one): (a) wrap the modal in pointerEvents='box-none' and only enable touch on the actual notice card so the surrounding overlay does not absorb taps; (b) lower the modal's container zIndex below the FuturisticTabBar's outerWrap (which is position:absolute, bottom:0); (c) clear the notice automatically on navigation-state change so it auto-dismisses if the user taps another tab."
+}

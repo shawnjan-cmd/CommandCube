@@ -30,9 +30,9 @@ type Props = {
 export function OnboardingProgress({
   step,
   total,
-  color    = '#00FFFF',
-  dimColor = '#3A5068',
-  trackBg  = '#02070D',
+  color    = '#FF2A1F',
+  dimColor = '#6A7384',
+  trackBg  = '#0E0F12',
 }: Props) {
   const safeTotal = Math.max(1, total);
   const safeStep  = Math.max(1, Math.min(step, safeTotal));

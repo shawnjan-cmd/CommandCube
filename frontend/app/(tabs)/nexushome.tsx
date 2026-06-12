@@ -43,27 +43,27 @@ const { width: SW } = Dimensions.get('window');
 // ─── DESIGN TOKENS ────────────────────────────────────────────────
 const D = {
   bg:         '#000000',
-  surface:    '#02070D',
-  surfaceHi:  '#071120',
+  surface:    '#0E0F12',
+  surfaceHi:  '#1A1D24',
   surfaceMid: '#040B14',
-  border:     'rgba(0,229,255,0.14)',
-  borderHi:   'rgba(0,229,255,0.32)',
-  borderGlow: 'rgba(0,229,255,0.55)',
+  border:     'rgba(255,42,31,0.14)',
+  borderHi:   'rgba(255,42,31,0.32)',
+  borderGlow: 'rgba(255,42,31,0.55)',
   text:       '#C8E4F0',
   textMid:    '#6A8EA8',
   textDim:    '#304558',
-  cyan:       '#00E5FF',
+  cyan:       '#FF2A1F',
   cyanDim:    '#0099BB',
-  amber:      '#FFB020',
+  amber:      '#FFC400',
   amberDim:   '#AA7010',
   green:      '#00FF88',
   greenDim:   '#00AA55',
-  purple:     '#CC00FF',
+  purple:     '#FFC400',
   purpleDim:  '#880099',
-  teal:       '#00D4CC',
+  teal:       '#FF2A1F',
   red:        '#FF2244',
   orange:     '#FF6820',
-  blue:       '#4499FF',
+  blue:       '#FF6A1F',
   blueDim:    '#2255AA',
 };
 
@@ -91,7 +91,7 @@ function ScanLines({ opacity = 0.025 }: { opacity?: number }) {
           position:'absolute', left:0, right:0,
           top:`${(i + 1) * 8}%` as any,
           height:StyleSheet.hairlineWidth,
-          backgroundColor:`rgba(0,229,255,${opacity})`,
+          backgroundColor:`rgba(255,42,31,${opacity})`,
         }} />
       ))}
     </View>
@@ -383,7 +383,7 @@ function ConnectedPCCard({ isConnected, serverAddr, metrics, ollamaOnline, cpuHi
           <RingGauge value={isConnected ? metrics.cpu : 0} color={D.cyan} size={64} label="CPU" />
           <MetricLineChart history={cpuHistory} color={D.cyan} height={32} label="cpu" />
         </View>
-        <View style={[pcc.ringWrap, { borderLeftWidth:1, borderRightWidth:1, borderColor:'rgba(0,229,255,0.08)' }]}>
+        <View style={[pcc.ringWrap, { borderLeftWidth:1, borderRightWidth:1, borderColor:'rgba(255,42,31,0.08)' }]}>
           <RingGauge value={isConnected ? metrics.ram : 0} color={D.green} size={64} label="RAM" />
           <MetricLineChart history={ramHistory} color={D.green} height={32} label="ram" />
         </View>
@@ -423,9 +423,9 @@ const pcc = StyleSheet.create({
   connDetail:  { fontSize:10.5, fontFamily:MONO },
   statusPill:  { borderWidth:1.5, borderRadius:8, paddingHorizontal:8, paddingVertical:5, flexShrink:0 },
   statusTxt:   { fontSize:10.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.2 },
-  ringsRow:    { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.10)', paddingVertical:10, paddingHorizontal:4 },
+  ringsRow:    { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(255,42,31,0.10)', paddingVertical:10, paddingHorizontal:4 },
   ringWrap:    { flex:1, alignItems:'center', gap:5, paddingHorizontal:4 },
-  bottomRow:   { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(0,229,255,0.10)' },
+  bottomRow:   { flexDirection:'row', borderTopWidth:1, borderTopColor:'rgba(255,42,31,0.10)' },
   uptimeBox:   { paddingHorizontal:14, paddingVertical:8, gap:2 },
   uptimeLabel: { fontSize:9, fontWeight:'700', fontFamily:MONO, color:D.textDim, letterSpacing:1.5 },
   ollamaStrip: { flex:1, flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingVertical:8 },
@@ -465,7 +465,7 @@ function TerminalFeedCard({ isConnected, liveTermLogs }: {
           ) : liveTermLogs.map((log, i) => (
             <View key={i} style={tfc.logRow}>
               <Text style={[tfc.logTime, { color:D.textDim }]}>{log.time}</Text>
-              <Text style={{ color:'rgba(0,229,255,0.50)', fontFamily:MONO, fontSize:10, flexShrink:0 }}>›</Text>
+              <Text style={{ color:'rgba(255,42,31,0.50)', fontFamily:MONO, fontSize:10, flexShrink:0 }}>›</Text>
               <Text style={[tfc.logMsg, { color:log.col }]} numberOfLines={1}>{log.msg}</Text>
             </View>
           ))}
@@ -491,7 +491,7 @@ const tfc = StyleSheet.create({
   title:     { fontSize:12.5, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5 },
   livePill:  { flexDirection:'row', alignItems:'center', gap:5, borderWidth:1, borderRadius:20, paddingHorizontal:9, paddingVertical:4 },
   liveTxt:   { fontSize:8, fontWeight:'900', fontFamily:MONO, letterSpacing:1 },
-  termBox:   { marginHorizontal:12, marginBottom:4, backgroundColor:'rgba(0,0,0,0.35)', borderRadius:10, borderWidth:1, borderColor:'rgba(0,229,255,0.10)', padding:10, minHeight:120 },
+  termBox:   { marginHorizontal:12, marginBottom:4, backgroundColor:'rgba(0,0,0,0.35)', borderRadius:10, borderWidth:1, borderColor:'rgba(255,42,31,0.10)', padding:10, minHeight:120 },
   logRow:    { flexDirection:'row', gap:6, alignItems:'flex-start', marginBottom:4 },
   logTime:   { fontSize:10, fontFamily:MONO, flexShrink:0, marginTop:1 },
   logMsg:    { flex:1, fontSize:12, fontFamily:MONO, lineHeight:16 },
@@ -746,16 +746,16 @@ function SmartAlertsHomeCard({ isConnected, metrics }: {
 
 // ─── SECURITY PROTOCOLS GRID — with live canary status ────────────
 const SECURITY_ITEMS_V2 = [
-  { icon:'shield-key',            lib:'community',  label:'AES-256\nENCRYPT',       iconBg:'#0D3B4A', iconColor:'#00E5FF', col:'#00E5FF', row:0 },
+  { icon:'shield-key',            lib:'community',  label:'AES-256\nENCRYPT',       iconBg:'#0D3B4A', iconColor:'#FF2A1F', col:'#FF2A1F', row:0 },
   { icon:'eye-off-outline',       lib:'community',  label:'NO TRAFFIC\nTRACKING',   iconBg:'#3B0D0D', iconColor:'#FF3131', col:'#FF3131', row:0 },
   { icon:'robot-angry-outline',   lib:'community',  label:'100% PRIVATE\n& LOCAL',  iconBg:'#0D3B1E', iconColor:'#00FF88', col:'#00FF88', row:0 },
-  { icon:'cloud-off-outline',     lib:'community',  label:'NO CLOUD\nSTORAGE',      iconBg:'#3B2800', iconColor:'#FFB020', col:'#FFB020', row:1 },
-  { icon:'server-security',       lib:'community',  label:'LOCAL-HOSTED\nDATA',     iconBg:'#0D3B3A', iconColor:'#00D4CC', col:'#00D4CC', row:1 },
-  { icon:'account-cancel-outline',lib:'community',  label:'NO ACCOUNT\nREQUIRED',   iconBg:'#2A0D3B', iconColor:'#CC00FF', col:'#CC00FF', row:1 },
+  { icon:'cloud-off-outline',     lib:'community',  label:'NO CLOUD\nSTORAGE',      iconBg:'#3B2800', iconColor:'#FFC400', col:'#FFC400', row:1 },
+  { icon:'server-security',       lib:'community',  label:'LOCAL-HOSTED\nDATA',     iconBg:'#0D3B3A', iconColor:'#FF2A1F', col:'#FF2A1F', row:1 },
+  { icon:'account-cancel-outline',lib:'community',  label:'NO ACCOUNT\nREQUIRED',   iconBg:'#2A0D3B', iconColor:'#FFC400', col:'#FFC400', row:1 },
 ];
 const SPG_ROW_COLORS: Record<number, string[]> = {
-  0: ['#00E5FF', '#FF3131', '#00FF88'],
-  1: ['#FFB020', '#00D4CC', '#CC00FF'],
+  0: ['#FF2A1F', '#FF3131', '#00FF88'],
+  1: ['#FFC400', '#FF2A1F', '#FFC400'],
 };
 
 function SecurityProtocolsGrid({ isConnected, canaryStatus }: { isConnected: boolean; canaryStatus: { deployed: number; allIntact: boolean } | null }) {
@@ -766,7 +766,7 @@ function SecurityProtocolsGrid({ isConnected, canaryStatus }: { isConnected: boo
     <View style={spg.outerCard}>
       <View style={spg.header}>
         <View style={spg.headerDot} />
-        <MaterialIcons name="shield" size={16} color="#00E5FF" style={{ marginRight: 2 }} />
+        <MaterialIcons name="shield" size={16} color="#FF2A1F" style={{ marginRight: 2 }} />
         <View style={{ flex:1 }}>
           <Text style={spg.headerTitle}>SECURITY PROTOCOLS</Text>
           <Text style={spg.headerSub}>[SYSTEM SECURE]</Text>
@@ -818,18 +818,18 @@ function SecurityProtocolsGrid({ isConnected, canaryStatus }: { isConnected: boo
   );
 }
 const spg = StyleSheet.create({
-  outerCard:       { marginHorizontal:0, backgroundColor:'#02070D', borderWidth:1, borderColor:'#00E5FF28', borderRadius:14, overflow:'hidden' },
-  header:          { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:12, paddingTop:12, paddingBottom:10, borderBottomWidth:StyleSheet.hairlineWidth, borderBottomColor:'#00E5FF20' },
-  headerDot:       { width:9, height:9, borderRadius:4.5, backgroundColor:'#00E5FF', shadowColor:'#00E5FF', shadowRadius:6, shadowOpacity:0.9, shadowOffset:{width:0,height:0} },
-  headerTitle:     { fontSize:14, fontWeight:'900', color:'#00E5FF', fontFamily:MONO, letterSpacing:1.2 },
-  headerSub:       { fontSize:9.5, fontWeight:'700', color:'#00E5FF99', fontFamily:MONO, letterSpacing:0.8, marginTop:1 },
-  row:             { flexDirection:'row', backgroundColor:'#02070D' },
-  cell:            { paddingVertical:12, paddingHorizontal:6, alignItems:'center', gap:8, backgroundColor:'#02070D' },
-  cellDividerRight:{ borderRightWidth:StyleSheet.hairlineWidth, borderRightColor:'#00E5FF18' },
+  outerCard:       { marginHorizontal:0, backgroundColor:'#0E0F12', borderWidth:1, borderColor:'#FF2A1F28', borderRadius:14, overflow:'hidden' },
+  header:          { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:12, paddingTop:12, paddingBottom:10, borderBottomWidth:StyleSheet.hairlineWidth, borderBottomColor:'#FF2A1F20' },
+  headerDot:       { width:9, height:9, borderRadius:4.5, backgroundColor:'#FF2A1F', shadowColor:'#FF2A1F', shadowRadius:6, shadowOpacity:0.9, shadowOffset:{width:0,height:0} },
+  headerTitle:     { fontSize:14, fontWeight:'900', color:'#FF2A1F', fontFamily:MONO, letterSpacing:1.2 },
+  headerSub:       { fontSize:9.5, fontWeight:'700', color:'#FF2A1F99', fontFamily:MONO, letterSpacing:0.8, marginTop:1 },
+  row:             { flexDirection:'row', backgroundColor:'#0E0F12' },
+  cell:            { paddingVertical:12, paddingHorizontal:6, alignItems:'center', gap:8, backgroundColor:'#0E0F12' },
+  cellDividerRight:{ borderRightWidth:StyleSheet.hairlineWidth, borderRightColor:'#FF2A1F18' },
   iconBadge:       { width:52, height:52, borderRadius:13, alignItems:'center', justifyContent:'center', position:'relative' },
   corner:          { position:'absolute', width:8, height:8 },
   cellLabel:       { fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5, textAlign:'center', lineHeight:13 },
-  footer:          { borderTopWidth:StyleSheet.hairlineWidth, borderTopColor:'#00E5FF18', paddingVertical:8, paddingHorizontal:12, backgroundColor:'#01050A' },
+  footer:          { borderTopWidth:StyleSheet.hairlineWidth, borderTopColor:'#FF2A1F18', paddingVertical:8, paddingHorizontal:12, backgroundColor:'#01050A' },
   footerTxt:       { fontSize:10, color:'#3A6070', fontFamily:MONO, textAlign:'center', lineHeight:14, letterSpacing:0.3 },
 });
 
@@ -1228,7 +1228,7 @@ const dlc = StyleSheet.create({
   body:      { fontSize: 10.5, fontFamily: MONO, color: D.textMid, lineHeight: 15.5 },
   btn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: D.green, borderRadius: 10, paddingVertical: 11, marginHorizontal: 12, marginBottom: 8 },
   btnTxt:    { fontSize: 12.5, fontWeight: '900', fontFamily: MONO, color: '#001008', letterSpacing: 1.2 },
-  cmdRow:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 12, marginBottom: 12, backgroundColor: '#000003', borderWidth: 1, borderColor: D.green + '30', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 },
+  cmdRow:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 12, marginBottom: 12, backgroundColor: '#050505', borderWidth: 1, borderColor: D.green + '30', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 },
   cmdPrompt: { fontSize: 11, fontWeight: '900', fontFamily: MONO, color: D.green },
   cmd:       { flex: 1, fontSize: 11, fontFamily: MONO, color: D.text },
 });
@@ -1265,7 +1265,7 @@ function HowItWorksCard() {
 }
 const hiw = StyleSheet.create({
   row:        { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 9 },
-  rowDivider: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(0,229,255,0.12)' },
+  rowDivider: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(255,42,31,0.12)' },
   num:        { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 1, width: 22 },
   iconBox:    { width: 32, height: 32, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   title:      { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
@@ -1293,11 +1293,11 @@ function HomeBackdrop() {
       <View style={{ position:'absolute', bottom:-140, left:-110, width:320, height:320, borderRadius:160, backgroundColor:D.purple, opacity:0.04 }} />
       {/* vertical circuit grid */}
       {[10, 26, 42, 58, 74, 90].map((p, i) => (
-        <View key={`v${i}`} style={{ position:'absolute', top:0, bottom:0, left:`${p}%` as any, width:StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.035)' }} />
+        <View key={`v${i}`} style={{ position:'absolute', top:0, bottom:0, left:`${p}%` as any, width:StyleSheet.hairlineWidth, backgroundColor:'rgba(255,42,31,0.035)' }} />
       ))}
       {/* horizontal scanlines */}
       {Array.from({ length: 14 }).map((_, i) => (
-        <View key={`h${i}`} style={{ position:'absolute', left:0, right:0, top:`${(i + 1) * 7}%` as any, height:StyleSheet.hairlineWidth, backgroundColor:'rgba(0,229,255,0.022)' }} />
+        <View key={`h${i}`} style={{ position:'absolute', left:0, right:0, top:`${(i + 1) * 7}%` as any, height:StyleSheet.hairlineWidth, backgroundColor:'rgba(255,42,31,0.022)' }} />
       ))}
       {/* drifting scan beam */}
       <Animated.View style={{ position:'absolute', left:0, right:0, height:90, opacity:0.05, backgroundColor:D.cyan, transform:[{ translateY: beamY }] }} />
@@ -1439,7 +1439,7 @@ export default function NexusHomeScreen() {
             setLiveTermLogs(d.entries.slice(-6).map((e:any) => ({
               time: new Date((e.ts||0)*1000).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false }),
               msg: (e.message||'Server event').slice(0,62),
-              col: e.isOk ? '#2FD98B' : e.isWarn ? D.amber : e.isError ? D.red : D.cyan,
+              col: e.isOk ? '#00FF88' : e.isWarn ? D.amber : e.isError ? D.red : D.cyan,
             })));
           }
         }

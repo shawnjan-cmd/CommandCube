@@ -19,23 +19,23 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // ─── Teal HUD Palette ─────────────────────────────────────────────
 const C = {
-  bg:      '#040C14',
-  panel:   '#071018',
+  bg:      '#0A0B0D',
+  panel:   '#131418',
   card:    '#060F18',
-  teal:    '#00CCDD',
-  tealBrt: '#00EEFF',
-  tealDim: '#004455',
-  tealMid: '#007788',
+  teal:    '#FF2A1F',
+  tealBrt: '#FF2A1F',
+  tealDim: '#55201A',
+  tealMid: '#8A2A20',
   green:   '#44FF88',
   greenDim:'#003322',
-  amber:   '#FF8C00',
-  red:     '#FF3300',
-  purple:  '#8844CC',
-  cyan:    '#00DDFF',
-  text:    '#336677',
-  textBrt: '#88AACC',
-  textHi:  '#CCEEFF',
-  border:  '#0D1A24',
+  amber:   '#FF6A1F',
+  red:     '#FF6A1F',
+  purple:  '#FFC400',
+  cyan:    '#FF2A1F',
+  text:    '#5A626E',
+  textBrt: '#9AA3B2',
+  textHi:  '#E6E9EF',
+  border:  '#1A1D24',
 };
 
 const FALLBACK_URL = 'https://shawnjan-cmd.github.io/privacy-policy-/';
@@ -859,7 +859,7 @@ const t = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
     paddingHorizontal: 14, paddingVertical: 12,
-    backgroundColor: '#050E18', borderBottomWidth: 2, borderBottomColor: C.teal + '60',
+    backgroundColor: '#0E0F12', borderBottomWidth: 2, borderBottomColor: C.teal + '60',
     position: 'relative', overflow: 'hidden',
     ...Platform.select({ ios: { shadowColor: C.teal, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10 }, android: { elevation: 8 } }),
   },
@@ -877,7 +877,7 @@ const t = StyleSheet.create({
   headerSub: { fontSize: 7.5, color: C.text, fontFamily: MONO, marginTop: 2 },
   activeBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1.5, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 6, backgroundColor: C.green + '10' },
   activeTxt: { fontSize: 7.5, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 1 },
-  navBar: { maxHeight: 44, backgroundColor: '#060E18', borderBottomWidth: 1, borderBottomColor: C.border },
+  navBar: { maxHeight: 44, backgroundColor: '#0E0F12', borderBottomWidth: 1, borderBottomColor: C.border },
   navChip: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderColor: C.teal + '50', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: C.teal + '10' },
   navChipTxt: { fontSize: 9, fontWeight: '700', color: C.teal, fontFamily: MONO, letterSpacing: 0.4 },
   heroCard: {

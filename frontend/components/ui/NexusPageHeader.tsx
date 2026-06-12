@@ -40,16 +40,16 @@ type PageTheme = {
 
 function detectTheme(titleMain: string, titleAccent: string, rightColor?: string): PageTheme {
   const full = (titleMain + titleAccent).toUpperCase();
-  if (full.includes('NEXUS') || full.includes('HOME'))    return { accentColor: '#00CCDD', bgTint: '#001820', artType: 'circuit'  };
-  if (full.includes('BUTLER') || full.includes('AI'))     return { accentColor: '#4488FF', bgTint: '#000C20', artType: 'neural'   };
-  if (full.includes('SCRIPT') || full.includes('LIB'))    return { accentColor: '#4488FF', bgTint: '#000A1A', artType: 'code'     };
-  if (full.includes('TERMINAL') || full.includes('TERM')) return { accentColor: '#44FF22', bgTint: '#001200', artType: 'terminal' };
-  if (full.includes('KNOWLEDGE'))                         return { accentColor: '#FF8C00', bgTint: '#130800', artType: 'dna'      };
-  if (full.includes('TOOLS') || full.includes('FILE'))    return { accentColor: '#00CCDD', bgTint: '#001820', artType: 'radar'    };
-  if (full.includes('COSMETIC') || full.includes('PACK')) return { accentColor: '#FF6EB4', bgTint: '#140010', artType: 'orbit'    };
+  if (full.includes('NEXUS') || full.includes('HOME'))    return { accentColor: '#FF2A1F', bgTint: '#180808', artType: 'circuit'  };
+  if (full.includes('BUTLER') || full.includes('AI'))     return { accentColor: '#FF6A1F', bgTint: '#000C20', artType: 'neural'   };
+  if (full.includes('SCRIPT') || full.includes('LIB'))    return { accentColor: '#FF6A1F', bgTint: '#000A1A', artType: 'code'     };
+  if (full.includes('TERMINAL') || full.includes('TERM')) return { accentColor: '#00FF88', bgTint: '#001200', artType: 'terminal' };
+  if (full.includes('KNOWLEDGE'))                         return { accentColor: '#FF6A1F', bgTint: '#130800', artType: 'dna'      };
+  if (full.includes('TOOLS') || full.includes('FILE'))    return { accentColor: '#FF2A1F', bgTint: '#180808', artType: 'radar'    };
+  if (full.includes('COSMETIC') || full.includes('PACK')) return { accentColor: '#FF6A1F', bgTint: '#140010', artType: 'orbit'    };
   if (full.includes('CONFIG') || full.includes('SYSTEM')) return { accentColor: '#CC7755', bgTint: '#100800', artType: 'grid'    };
-  if (full.includes('SIGMA'))                             return { accentColor: '#CC33FF', bgTint: '#0A0015', artType: 'sigma'   };
-  return { accentColor: rightColor || '#00CCDD', bgTint: '#001820', artType: 'circuit' };
+  if (full.includes('SIGMA'))                             return { accentColor: '#FFC400', bgTint: '#0A0015', artType: 'sigma'   };
+  return { accentColor: rightColor || '#FF2A1F', bgTint: '#180808', artType: 'circuit' };
 }
 
 // ─── BACKGROUND ART COMPONENTS ───────────────────────────────
@@ -177,7 +177,7 @@ function DNAArt({ color }: { color: string }) {
       {helixPoints.map((pt, i) => (
         <React.Fragment key={i}>
           <View style={{ position:'absolute', right: 60 + pt.x1, top: 8 + pt.y, width:5, height:5, borderRadius:3, backgroundColor:color, opacity:0.35 }} />
-          <View style={{ position:'absolute', right: 60 + pt.x2, top: 8 + pt.y, width:4, height:4, borderRadius:2, backgroundColor:'#FF8C00', opacity:0.30 }} />
+          <View style={{ position:'absolute', right: 60 + pt.x2, top: 8 + pt.y, width:4, height:4, borderRadius:2, backgroundColor:'#FF6A1F', opacity:0.30 }} />
           {pt.bridge ? (
             <View style={{ position:'absolute', right: 60 + Math.min(pt.x1,pt.x2) + 3, top: 8 + pt.y + 1, width: Math.abs(pt.x1-pt.x2) - 4, height:1.5, backgroundColor:color+'30' }} />
           ) : null}
@@ -214,10 +214,10 @@ function RadarArt({ color }: { color: string }) {
 
 /** Orbit art — static for performance */
 function OrbitArt({ color }: { color: string }) {
-  const orbitColors = ['#FF6EB4','#FF88FF','#88FFFF','#FFFF88'];
+  const orbitColors = ['#FF6A1F','#FFC400','#FF6A52','#FFFF88'];
   return (
     <View style={art.wrap} pointerEvents="none">
-      <View style={{ position:'absolute', right:56, top:24, width:14, height:14, borderRadius:7, backgroundColor:'#FF6EB4', opacity:0.5 }} />
+      <View style={{ position:'absolute', right:56, top:24, width:14, height:14, borderRadius:7, backgroundColor:'#FF6A1F', opacity:0.5 }} />
       <View style={{ position:'absolute', right:24, top:4, width:48, height:48, borderRadius:24, borderWidth:1.5, borderColor:color+'40' }}>
         <View style={{ position:'absolute', top:-4, left:'50%', width:8, height:8, borderRadius:4, backgroundColor:orbitColors[1], marginLeft:-4 }} />
       </View>
@@ -295,7 +295,7 @@ const art = StyleSheet.create({
 
 // ─── HOLO TITLE ACCENT — cosmetics page ──────────────────────
 function HoloTitleAccent({ text }: { text: string }) {
-  return <Text style={[s.titleAccent, { color: '#FF6EB4' }]}>{text}</Text>;
+  return <Text style={[s.titleAccent, { color: '#FF6A1F' }]}>{text}</Text>;
 }
 
 // ─── TOOL TITLE ACCENT — tools hub page ─────────────────────
@@ -343,7 +343,7 @@ function SignalBars({ isConnected }: { isConnected: boolean }) {
     : latencyMs < 50
     ? '#44FF88'
     : latencyMs < 200
-    ? '#FF8C00'
+    ? '#FF6A1F'
     : '#FF4444';
 
   // Number of filled bars: 3 = great, 2 = ok, 1 = poor, 0 = offline
@@ -418,7 +418,7 @@ function TitleWith3D({ main, accent, color, artType, version }: {
 // ─── MAIN HEADER ──────────────────────────────────────────────
 export default function NexusPageHeader({
   titleMain, titleAccent, subtitle, rightLabel,
-  rightColor = '#00CCDD', rightIcon, rightDot, rightDotColor,
+  rightColor = '#FF2A1F', rightIcon, rightDot, rightDotColor,
   onRightPress, isConnected, version,
 }: Props) {
   const insets    = useSafeAreaInsets();

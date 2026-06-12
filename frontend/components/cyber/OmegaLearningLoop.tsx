@@ -15,14 +15,14 @@ import { serverConnection } from '@/services/serverConnection';
 const C = {
   bg:      '#07101C',
   card:    '#0C1520',
-  border:  'rgba(91,156,246,0.22)',
-  cyan:    '#5B9CF6',
-  green:   '#2FD98B',
-  amber:   '#F5A623',
+  border:  'rgba(255,106,31,0.22)',
+  cyan:    '#FF6A1F',
+  green:   '#00FF88',
+  amber:   '#FFC400',
   red:     '#EF4444',
-  violet:  '#A366F5',
-  text:    '#8BACC8',
-  textDim: '#3A5060',
+  violet:  '#FF6A1F',
+  text:    '#9AA3B2',
+  textDim: '#525A68',
 };
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const OMEGA_STORAGE_KEY = '@butler_omega_knowledge';
@@ -324,13 +324,13 @@ const s = StyleSheet.create({
     fontFamily: MONO, letterSpacing: 0.8,
   },
   progressTrack: {
-    height: 2, backgroundColor: 'rgba(91,156,246,0.10)',
+    height: 2, backgroundColor: 'rgba(255,106,31,0.10)',
     marginHorizontal: 12, borderRadius: 1, overflow: 'hidden', marginBottom: 2,
   },
   progressFill: { height: '100%', borderRadius: 1 },
   statsBlock: {
     paddingHorizontal: 12, paddingBottom: 12, paddingTop: 4, gap: 6,
-    borderTopWidth: 1, borderTopColor: 'rgba(91,156,246,0.08)', marginTop: 4,
+    borderTopWidth: 1, borderTopColor: 'rgba(255,106,31,0.08)', marginTop: 4,
   },
   statRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   statKey: { fontSize: 8, color: C.textDim, fontFamily: MONO, letterSpacing: 0.8 },

@@ -85,42 +85,42 @@ function ensureErrorHandling(c: string): string {
 }
 
 const N = {
-  bg:       '#000003',
-  surface:  '#02070D',
-  surfaceHi:'#071120',
-  surfaceMd:'#02070D',
-  border:   'rgba(0,255,255,0.12)',
-  borderHi:  'rgba(0,255,255,0.28)',
-  text:      '#D8E8F4',
-  textDim:   '#3A5068',
-  textMid:   '#7A9AB8',
-  blue:      '#00FFFF',
-  blueDim:   '#00FFFF18',
+  bg:       '#050505',
+  surface:  '#0E0F12',
+  surfaceHi:'#1A1D24',
+  surfaceMd:'#0E0F12',
+  border:   'rgba(255,42,31,0.12)',
+  borderHi:  'rgba(255,42,31,0.28)',
+  text:      '#E6E9EF',
+  textDim:   '#6A7384',
+  textMid:   '#8C95A6',
+  blue:      '#FF2A1F',
+  blueDim:   '#FF2A1F18',
   green:     '#00FF88',
   greenDim:  '#00FF8820',
-  purple:    '#BF00FF',
-  purpleDim: '#BF00FF20',
-  amber:     '#F5A623',
-  amberDim:  '#F5A62320',
+  purple:    '#FFC400',
+  purpleDim: '#FFC40020',
+  amber:     '#FFC400',
+  amberDim:  '#FFC40020',
   red:       '#FF3131',
   redDim:    '#FF313120',
-  teal:      '#00FFFF',
-  tealDim:   '#00FFFF18',
-  yellow:    '#FFD700',
+  teal:      '#FF2A1F',
+  tealDim:   '#FF2A1F18',
+  yellow:    '#FFC400',
 };
 
 const CAT_COLOR: Record<string, string> = {
-  'AI Generated': '#F5A623',
-  Files:          '#F5A623',
-  System:         '#00FFFF',
+  'AI Generated': '#FFC400',
+  Files:          '#FFC400',
+  System:         '#FF2A1F',
   Web:            '#00FF88',
-  GUI:            '#BF00FF',
-  Data:           '#FFD700',
-  Scheduling:     '#00FFFF',
-  Setup:          '#F5A623',
+  GUI:            '#FFC400',
+  Data:           '#FFC400',
+  Scheduling:     '#FF2A1F',
+  Setup:          '#FFC400',
   Network:        '#00FF88',
-  Email:          '#FF44AA',
-  Text:           '#00FFFF',
+  Email:          '#FF6A1F',
+  Text:           '#FF2A1F',
   Monitoring:     '#FF3131',
 };
 
@@ -528,7 +528,7 @@ function NexusFilterChips({ options, active, onSelect, colorMap }: {
               nfc.chip,
               isActive
                 ? { borderColor: col, backgroundColor: col + '20', ...Platform.OS === 'ios' ? { shadowColor: col, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 6 } : {} }
-                : { borderColor: 'rgba(0,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.2)' }
+                : { borderColor: 'rgba(255,42,31,0.1)', backgroundColor: 'rgba(0,0,0,0.2)' }
             ]}
             activeOpacity={0.75}>
             {opt !== 'All' ? (
@@ -876,7 +876,7 @@ function CategoryDetailModal({ cat, onClose }: { cat: CategoryDef | null; onClos
   return (
     <Modal visible={!!cat} animationType="slide" statusBarTranslucent
       onRequestClose={() => { if (selectedScript) setSelectedScript(null); else onClose(); }}>
-      <View style={{ flex: 1, backgroundColor: '#02070D', paddingTop: Math.max(insets.top, 20) }}>
+      <View style={{ flex: 1, backgroundColor: '#0E0F12', paddingTop: Math.max(insets.top, 20) }}>
 
         {/* Header */}
         <View style={[cdm.header, { borderBottomColor: cat.color }]}>
@@ -918,7 +918,7 @@ function CategoryDetailModal({ cat, onClose }: { cat: CategoryDef | null; onClos
             </ScrollView>
 
             {/* Code viewer */}
-            <View style={{ flex: 1, backgroundColor: '#000003', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' }}>
+            <View style={{ flex: 1, backgroundColor: '#050505', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center',
                 paddingHorizontal: 14, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
                 <Text style={{ flex: 1, fontSize: 9, color: cat.color, fontFamily: MONO, letterSpacing: 1.5 }}>
@@ -953,7 +953,7 @@ function CategoryDetailModal({ cat, onClose }: { cat: CategoryDef | null; onClos
             {/* Run button */}
             <View style={[cdm.footer, { paddingBottom: Math.max(insets.bottom + 10, 16) }]}>
               <TouchableOpacity
-                style={[cdm.runBtn, { backgroundColor: execRunning ? '#0D1B28' : cat.color,
+                style={[cdm.runBtn, { backgroundColor: execRunning ? '#1A1D24' : cat.color,
                   borderColor: cat.color, opacity: execRunning ? 0.75 : 1 }]}
                 onPress={runSelectedScript} disabled={execRunning} activeOpacity={0.85}>
                 {execRunning
@@ -1032,7 +1032,7 @@ const cdm = StyleSheet.create({
   scriptDesc: { fontSize: 10, color: N.textDim, lineHeight: 15 },
   diffPill:   { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5, flexShrink: 0 },
   diffTxt:    { fontSize: 8, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.5 },
-  outputBox:  { borderTopWidth: 2.5, backgroundColor: '#000003', maxHeight: 200 },
+  outputBox:  { borderTopWidth: 2.5, backgroundColor: '#050505', maxHeight: 200 },
   outputLabel:{ fontSize: 9, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.8, paddingHorizontal: 14, paddingTop: 8, paddingBottom: 4 },
   outputLine: { fontSize: 11, fontFamily: MONO, lineHeight: 17, color: N.textMid, marginBottom: 2 },
   footer:     { padding: 14, borderTopWidth: 1, borderTopColor: N.border },
@@ -1553,7 +1553,7 @@ function SyntaxHighlight({ code }: { code: string }) {
         while (i < effective.length) {
           const ch = effective[i];
           if (ch === '"' || ch === "'") {
-            if (buf) { parts.push({ text: buf, color: '#B0C4DE' }); buf = ''; }
+            if (buf) { parts.push({ text: buf, color: '#9AA3B2' }); buf = ''; }
             let str = ch; let j = i + 1;
             while (j < effective.length && effective[j] !== ch) str += effective[j++];
             str += ch; i = j + 1;
@@ -1561,11 +1561,11 @@ function SyntaxHighlight({ code }: { code: string }) {
           } else if (/[a-zA-Z_]/.test(ch)) {
             let word = '';
             while (i < effective.length && /[\w]/.test(effective[i])) word += effective[i++];
-            if (buf) { parts.push({ text: buf, color: '#B0C4DE' }); buf = ''; }
+            if (buf) { parts.push({ text: buf, color: '#9AA3B2' }); buf = ''; }
             parts.push({ text: word, color: PY_KW.has(word) ? N.blue : '#E8E8E8' });
           } else { buf += ch; i++; }
         }
-        if (buf) parts.push({ text: buf, color: '#B0C4DE' });
+        if (buf) parts.push({ text: buf, color: '#9AA3B2' });
         if (comment) parts.push({ text: comment, color: '#667744' });
         return (
           <View key={li} style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
@@ -2833,8 +2833,8 @@ export default function ScriptsScreen() {
         {/* HEADER ROW */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8,
           paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(47,217,139,0.12)' }}>
-          <MaterialCommunityIcons name="server" size={13} color="#2FD98B" />
-          <Text style={{ flex: 1, fontSize: 10, fontWeight: '900', color: '#2FD98B',
+          <MaterialCommunityIcons name="server" size={13} color="#00FF88" />
+          <Text style={{ flex: 1, fontSize: 10, fontWeight: '900', color: '#00FF88',
             fontFamily: MONO, letterSpacing: 1.5 }}>PC LIBRARY</Text>
           <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO }}>
             {pcLibScripts.length} scripts
@@ -2844,15 +2844,15 @@ export default function ScriptsScreen() {
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             disabled={pcLibLoading || !isConnected}>
             {pcLibLoading
-              ? <ActivityIndicator size={12} color="#2FD98B" />
-              : <MaterialIcons name="refresh" size={14} color={isConnected ? '#2FD98B' : N.textDim} />}
+              ? <ActivityIndicator size={12} color="#00FF88" />
+              : <MaterialIcons name="refresh" size={14} color={isConnected ? '#00FF88' : N.textDim} />}
           </TouchableOpacity>
         </View>
         {/* SEARCH — only when connected */}
         {isConnected ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8,
             marginTop: 6, marginBottom: 4, borderWidth: 1, borderColor: N.borderHi,
-            borderRadius: 8, backgroundColor: '#02070D', paddingHorizontal: 10 }}>
+            borderRadius: 8, backgroundColor: '#0E0F12', paddingHorizontal: 10 }}>
             <MaterialIcons name="search" size={14} color={N.textDim} />
             <TextInput
               style={{ flex: 1, fontSize: 12, color: N.text, fontFamily: MONO, paddingVertical: 7 }}
@@ -2901,10 +2901,10 @@ export default function ScriptsScreen() {
           const isRunning = pcLibRunning === item.id;
           const hasOutput = pcLibOutput?.id === item.id;
           const CAT_COLORS: Record<string, string> = {
-            Cleaning: '#00CCFF', System: '#00E5FF', Network: '#4A9EFF',
-            Security: '#C084FF', Files: '#FF8C00', Developer: '#2FD98B',
-            Monitoring: '#2FD98B', Automation: '#00E5FF', Performance: '#00FF88',
-            Fun: '#FF6FD8', Custom: '#FFD700', General: N.blue,
+            Cleaning: '#FF2A1F', System: '#FF2A1F', Network: '#FF6A1F',
+            Security: '#FFC400', Files: '#FF6A1F', Developer: '#00FF88',
+            Monitoring: '#00FF88', Automation: '#FF2A1F', Performance: '#00FF88',
+            Fun: '#FF6FD8', Custom: '#FFC400', General: N.blue,
           };
           const col = CAT_COLORS[item.category] || N.blue;
           return (
@@ -2914,7 +2914,7 @@ export default function ScriptsScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10 }}>
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 2 }}>
-                    <MaterialCommunityIcons name="server" size={10} color="#4A9EFF80" />
+                    <MaterialCommunityIcons name="server" size={10} color="#FF6A1F80" />
                     <Text style={{ fontSize: 12, fontWeight: '700', color: N.text,
                       fontFamily: MONO, flex: 1 }} numberOfLines={1}>{item.name}</Text>
                   </View>
@@ -2947,14 +2947,14 @@ export default function ScriptsScreen() {
                     disabled={isRunning}
                     style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6,
                       borderWidth: 1,
-                      borderColor: isRunning ? N.amber + '50' : '#2FD98B50',
-                      backgroundColor: isRunning ? N.amber + '10' : '#2FD98B10',
+                      borderColor: isRunning ? N.amber + '50' : '#00FF8850',
+                      backgroundColor: isRunning ? N.amber + '10' : '#00FF8810',
                       flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                     {isRunning
                       ? <ActivityIndicator size={10} color={N.amber} />
-                      : <MaterialIcons name="play-arrow" size={14} color="#2FD98B" />}
+                      : <MaterialIcons name="play-arrow" size={14} color="#00FF88" />}
                     <Text style={{ fontSize: 10, fontFamily: MONO, fontWeight: '700',
-                      color: isRunning ? N.amber : '#2FD98B' }}>
+                      color: isRunning ? N.amber : '#00FF88' }}>
                       {isRunning ? 'RUNNING' : 'RUN'}
                     </Text>
                   </TouchableOpacity>
@@ -2962,14 +2962,14 @@ export default function ScriptsScreen() {
               </View>
               {hasOutput && pcLibOutput ? (
                 <View style={{ borderTopWidth: 1,
-                  borderTopColor: pcLibOutput.ok ? '#2FD98B25' : '#EF444425',
-                  backgroundColor: pcLibOutput.ok ? '#2FD98B06' : '#EF444406' }}>
+                  borderTopColor: pcLibOutput.ok ? '#00FF8825' : '#EF444425',
+                  backgroundColor: pcLibOutput.ok ? '#00FF8806' : '#EF444406' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center',
                     paddingHorizontal: 10, paddingVertical: 5, gap: 6 }}>
                     <MaterialIcons name={pcLibOutput.ok ? 'check-circle' : 'error-outline'}
-                      size={11} color={pcLibOutput.ok ? '#2FD98B' : '#EF4444'} />
+                      size={11} color={pcLibOutput.ok ? '#00FF88' : '#EF4444'} />
                     <Text style={{ flex: 1, fontSize: 9, fontFamily: MONO, fontWeight: '700',
-                      color: pcLibOutput.ok ? '#2FD98B' : '#EF4444', letterSpacing: 0.8 }}>
+                      color: pcLibOutput.ok ? '#00FF88' : '#EF4444', letterSpacing: 0.8 }}>
                       {pcLibOutput.ok ? 'OUTPUT' : 'ERROR'}
                     </Text>
                     <TouchableOpacity onPress={() => setPcLibOutput(null)}
@@ -2988,7 +2988,7 @@ export default function ScriptsScreen() {
                     style={{ flexDirection: 'row', alignItems: 'center',
                       justifyContent: 'center', gap: 5, paddingVertical: 7,
                       borderTopWidth: 1,
-                      borderTopColor: pcLibOutput.ok ? '#2FD98B20' : '#EF444420' }}>
+                      borderTopColor: pcLibOutput.ok ? '#00FF8820' : '#EF444420' }}>
                     <MaterialIcons name="replay" size={11} color={N.textDim} />
                     <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO }}>RUN AGAIN</Text>
                   </TouchableOpacity>
@@ -3097,7 +3097,7 @@ export default function ScriptsScreen() {
       ) : (
         <View style={{ flex: 1 }}>
           {/* ── TACTICAL ACTION ROW ── */}
-          <View style={[s.fuiActionRow, { backgroundColor: T.panel || '#02070D', borderBottomColor: PR + '20' }]}>
+          <View style={[s.fuiActionRow, { backgroundColor: T.panel || '#0E0F12', borderBottomColor: PR + '20' }]}>
             {/* Favorites toggle */}
             <TouchableOpacity
               onPress={() => { haptics.selection(); setViewMode('favorites'); }}
@@ -3183,7 +3183,7 @@ export default function ScriptsScreen() {
             ) : null}
             {/* AI Builder FAB */}
             <TouchableOpacity
-              style={[s.createFAB, { backgroundColor: '#071120', borderColor: '#7722BB40' }]}
+              style={[s.createFAB, { backgroundColor: '#1A1D24', borderColor: '#7722BB40' }]}
               onPress={() => { haptics.medium(); setBuildResult(null); setBuildDesc(''); setBuildModalVisible(true); }}
               activeOpacity={0.85}
             >
@@ -3325,8 +3325,8 @@ export default function ScriptsScreen() {
             <View style={{ marginHorizontal: 16, marginBottom: 6, display: 'none' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8,
                 paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(47,217,139,0.12)' }}>
-                <MaterialCommunityIcons name="server" size={13} color="#2FD98B" />
-                <Text style={{ flex: 1, fontSize: 10, fontWeight: '900', color: '#2FD98B',
+                <MaterialCommunityIcons name="server" size={13} color="#00FF88" />
+                <Text style={{ flex: 1, fontSize: 10, fontWeight: '900', color: '#00FF88',
                   fontFamily: MONO, letterSpacing: 1.5 }}>PC LIBRARY</Text>
                 <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO }}>
                   {pcLibScripts.length} scripts
@@ -3334,13 +3334,13 @@ export default function ScriptsScreen() {
                 <TouchableOpacity onPress={() => fetchPCLibrary(pcLibSearch || undefined)}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} disabled={pcLibLoading}>
                   {pcLibLoading
-                    ? <ActivityIndicator size={12} color="#2FD98B" />
-                    : <MaterialIcons name="refresh" size={14} color="#2FD98B" />}
+                    ? <ActivityIndicator size={12} color="#00FF88" />
+                    : <MaterialIcons name="refresh" size={14} color="#00FF88" />}
                 </TouchableOpacity>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8,
                 marginTop: 6, marginBottom: 4, borderWidth: 1, borderColor: N.borderHi,
-                borderRadius: 8, backgroundColor: '#02070D', paddingHorizontal: 10 }}>
+                borderRadius: 8, backgroundColor: '#0E0F12', paddingHorizontal: 10 }}>
                 <MaterialIcons name="search" size={14} color={N.textDim} />
                 <TextInput
                   style={{ flex: 1, fontSize: 12, color: N.text, fontFamily: MONO, paddingVertical: 7 }}
@@ -3379,10 +3379,10 @@ export default function ScriptsScreen() {
                   const isRunning = pcLibRunning === item.id;
                   const hasOutput = pcLibOutput?.id === item.id;
                   const CAT_COLORS: Record<string,string> = {
-                    Cleaning:'#00CCFF', System:'#00E5FF', Network:'#4A9EFF',
-                    Security:'#C084FF', Files:'#FF8C00', Developer:'#2FD98B',
-                    Monitoring:'#2FD98B', Automation:'#00E5FF', Performance:'#00FF88',
-                    Fun:'#FF6FD8', Custom:'#FFD700',
+                    Cleaning:'#FF2A1F', System:'#FF2A1F', Network:'#FF6A1F',
+                    Security:'#FFC400', Files:'#FF6A1F', Developer:'#00FF88',
+                    Monitoring:'#00FF88', Automation:'#FF2A1F', Performance:'#00FF88',
+                    Fun:'#FF6FD8', Custom:'#FFC400',
                   };
                   const col = CAT_COLORS[item.category] || N.blue;
                   return (
@@ -3392,7 +3392,7 @@ export default function ScriptsScreen() {
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10 }}>
                         <View style={{ flex: 1 }}>
                           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                            <MaterialCommunityIcons name="server" size={10} color="#4A9EFF80" />
+                            <MaterialCommunityIcons name="server" size={10} color="#FF6A1F80" />
                             <Text style={{ fontSize: 12, fontWeight: '700', color: N.text,
                               fontFamily: MONO }} numberOfLines={1}>{item.name}</Text>
                           </View>
@@ -3423,14 +3423,14 @@ export default function ScriptsScreen() {
                             disabled={isRunning}
                             style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6,
                               borderWidth: 1,
-                              borderColor: isRunning ? N.amber + '50' : '#2FD98B50',
-                              backgroundColor: isRunning ? N.amber + '10' : '#2FD98B10',
+                              borderColor: isRunning ? N.amber + '50' : '#00FF8850',
+                              backgroundColor: isRunning ? N.amber + '10' : '#00FF8810',
                               flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                             {isRunning
                               ? <ActivityIndicator size={10} color={N.amber} />
-                              : <MaterialIcons name="play-arrow" size={14} color="#2FD98B" />}
+                              : <MaterialIcons name="play-arrow" size={14} color="#00FF88" />}
                             <Text style={{ fontSize: 10, fontFamily: MONO, fontWeight: '700',
-                              color: isRunning ? N.amber : '#2FD98B' }}>
+                              color: isRunning ? N.amber : '#00FF88' }}>
                               {isRunning ? 'RUNNING' : 'RUN'}
                             </Text>
                           </TouchableOpacity>
@@ -3438,15 +3438,15 @@ export default function ScriptsScreen() {
                       </View>
                       {hasOutput && pcLibOutput ? (
                         <View style={{ borderTopWidth: 1,
-                          borderTopColor: pcLibOutput.ok ? '#2FD98B25' : '#EF444425',
-                          backgroundColor: pcLibOutput.ok ? '#2FD98B08' : '#EF444408' }}>
+                          borderTopColor: pcLibOutput.ok ? '#00FF8825' : '#EF444425',
+                          backgroundColor: pcLibOutput.ok ? '#00FF8808' : '#EF444408' }}>
                           <View style={{ flexDirection: 'row', alignItems: 'center',
                             paddingHorizontal: 10, paddingVertical: 5, gap: 6 }}>
                             <MaterialIcons
                               name={pcLibOutput.ok ? 'check-circle' : 'error-outline'}
-                              size={11} color={pcLibOutput.ok ? '#2FD98B' : '#EF4444'} />
+                              size={11} color={pcLibOutput.ok ? '#00FF88' : '#EF4444'} />
                             <Text style={{ flex: 1, fontSize: 9, fontFamily: MONO, fontWeight: '700',
-                              color: pcLibOutput.ok ? '#2FD98B' : '#EF4444', letterSpacing: 0.8 }}>
+                              color: pcLibOutput.ok ? '#00FF88' : '#EF4444', letterSpacing: 0.8 }}>
                               {pcLibOutput.ok ? 'OUTPUT' : 'ERROR'}
                             </Text>
                             <TouchableOpacity onPress={() => setPcLibOutput(null)}
@@ -3465,7 +3465,7 @@ export default function ScriptsScreen() {
                             style={{ flexDirection: 'row', alignItems: 'center',
                               justifyContent: 'center', gap: 5, paddingVertical: 7,
                               borderTopWidth: 1,
-                              borderTopColor: pcLibOutput.ok ? '#2FD98B20' : '#EF444420' }}>
+                              borderTopColor: pcLibOutput.ok ? '#00FF8820' : '#EF444420' }}>
                             <MaterialIcons name="replay" size={11} color={N.textDim} />
                             <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO }}>RUN AGAIN</Text>
                           </TouchableOpacity>
@@ -3582,9 +3582,9 @@ export default function ScriptsScreen() {
 }
 
 const s = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: '#000003' },
+  container:    { flex: 1, backgroundColor: '#050505' },
   // ── FUI COMMAND HEADER ──────────────────────────────────────────
-  fuiHeader:    { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, backgroundColor: '#02070D', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.1)' },
+  fuiHeader:    { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, backgroundColor: '#0E0F12', borderBottomWidth: 1, borderBottomColor: 'rgba(255,42,31,0.1)' },
   fuiTitle:     { fontSize: 18, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, letterSpacing: 1.2, lineHeight: 22 },
   fuiSub:       { fontSize: 9, color: N.blue + 'AA', fontFamily: MONO, letterSpacing: 0.8, marginTop: 1 },
   fuiRefreshBtn:{ flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1.5, borderColor: N.blue + '70',
@@ -3592,9 +3592,9 @@ const s = StyleSheet.create({
   fuiRefreshTxt:{ fontSize: 10, fontWeight: '900', color: N.blue, fontFamily: MONO, letterSpacing: 0.5 },
   // ── TACTICAL ACTION ROW ──────────────────────────────────────────
   fuiActionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 14,
-    paddingVertical: 9, backgroundColor: '#02070D', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.12)' },
-  fuiIconCircle:{ width: 36, height: 36, borderRadius: 9, backgroundColor: '#071120', borderWidth: 1,
-    borderColor: 'rgba(0,255,255,0.14)', alignItems: 'center', justifyContent: 'center', position: 'relative' },
+    paddingVertical: 9, backgroundColor: '#0E0F12', borderBottomWidth: 1, borderBottomColor: 'rgba(255,42,31,0.12)' },
+  fuiIconCircle:{ width: 36, height: 36, borderRadius: 9, backgroundColor: '#1A1D24', borderWidth: 1,
+    borderColor: 'rgba(255,42,31,0.14)', alignItems: 'center', justifyContent: 'center', position: 'relative' },
   fuiCountReadout: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: 9, paddingHorizontal: 10, paddingVertical: 7 },
   fuiCountNum:  { fontSize: 16, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.3 },
   fuiCountLabel:{ fontSize: 8, fontWeight: '800', fontFamily: MONO, letterSpacing: 1 },
@@ -3605,7 +3605,7 @@ const s = StyleSheet.create({
   fuiModeRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 6 },
   onlineBanner: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: N.green + '20', backgroundColor: N.green + '05' },
   onlineTxt:    { flex: 1, fontSize: 10, color: N.green + 'AA', fontFamily: MONO, letterSpacing: 0.2 },
-  modeToggle:   { flex: 1, flexDirection: 'row', backgroundColor: '#000003', borderRadius: 8, padding: 2, gap: 2, borderWidth: 1, borderColor: 'rgba(0,255,255,0.10)' },
+  modeToggle:   { flex: 1, flexDirection: 'row', backgroundColor: '#050505', borderRadius: 8, padding: 2, gap: 2, borderWidth: 1, borderColor: 'rgba(255,42,31,0.10)' },
   modeBtn:      { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 7, borderRadius: 6, borderWidth: 0, borderColor: 'transparent' },
   modeBtnTxt:   { fontSize: 10, fontWeight: '700', color: N.textDim, fontFamily: MONO, letterSpacing: 0.3 },
   createBtn:    { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: N.blue, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10 },

@@ -27,30 +27,30 @@ const { width: SW } = Dimensions.get('window');
 
 // ─── NEXUS COMMAND CENTER PALETTE ─────────────────────────────
 const N = {
-  bg:        '#000003',
-  surface:   '#02070D',
-  surfaceHi: '#071120',
-  surfaceMd: '#02070D',
-  border:    'rgba(0,255,255,0.12)',
-  borderHi:  'rgba(0,255,255,0.28)',
-  text:      '#D8E8F4',
-  textDim:   '#3A5068',
-  textMid:   '#7A9AB8',
-  blue:      '#4A9EFF',
-  blueDim:   '#4A9EFF25',
+  bg:        '#050505',
+  surface:   '#0E0F12',
+  surfaceHi: '#1A1D24',
+  surfaceMd: '#0E0F12',
+  border:    'rgba(255,42,31,0.12)',
+  borderHi:  'rgba(255,42,31,0.28)',
+  text:      '#E6E9EF',
+  textDim:   '#6A7384',
+  textMid:   '#8C95A6',
+  blue:      '#FF6A1F',
+  blueDim:   '#FF6A1F25',
   green:     '#00FF88',
   greenDim:  '#00FF8825',
-  purple:    '#BF00FF',
-  purpleDim: '#BF00FF25',
-  amber:     '#F5A623',
+  purple:    '#FFC400',
+  purpleDim: '#FFC40025',
+  amber:     '#FFC400',
   amberBrt:  '#F7B84B',
-  amberDim:  '#F5A62325',
+  amberDim:  '#FFC40025',
   red:       '#FF3131',
   redDim:    '#FF313125',
-  teal:      '#00FFFF',
-  tealDim:   'rgba(0,255,255,0.15)',
-  cyan:      '#00FFFF',
-  yellow:    '#FFD700',
+  teal:      '#FF2A1F',
+  tealDim:   'rgba(255,42,31,0.15)',
+  cyan:      '#FF2A1F',
+  yellow:    '#FFC400',
 };
 
 // ─── Types ────────────────────────────────────────────────────
@@ -685,7 +685,7 @@ const tcmd = StyleSheet.create({
 
 
 const s2 = StyleSheet.create({
-  noteBox:    { flexDirection:'row', alignItems:'flex-start', gap:8, borderWidth:1, borderColor:'rgba(0,204,221,0.25)', borderRadius:8, padding:10, backgroundColor:'rgba(0,204,221,0.05)' },
+  noteBox:    { flexDirection:'row', alignItems:'flex-start', gap:8, borderWidth:1, borderColor:'rgba(255,42,31,0.25)', borderRadius:8, padding:10, backgroundColor:'rgba(255,42,31,0.05)' },
   noteTxt:    { flex:1, fontSize:10, fontFamily:MONO, lineHeight:15 },
 });
 
@@ -1063,7 +1063,7 @@ export default function FileShareScreen() {
 }
 
 const s = StyleSheet.create({
-  container:  { flex: 1, backgroundColor: '#000003' },
+  container:  { flex: 1, backgroundColor: '#050505' },
 
   sectionBar: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: N.border, backgroundColor: N.surface },
   sectionBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 13, borderBottomWidth: 2, borderBottomColor: 'transparent' },

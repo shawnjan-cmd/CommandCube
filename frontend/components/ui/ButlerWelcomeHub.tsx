@@ -41,7 +41,7 @@ const PROMPT_CARDS: PromptCard[] = [
     iconLib: 'mc',
     title: 'PC Health Snapshot',
     desc: 'CPU, RAM, disk + OS info at a glance',
-    hue: '#3EC8FF',
+    hue: '#FF2A1F',
     cmd: 'Run: import psutil, platform; cpu=psutil.cpu_percent(interval=1); ram=psutil.virtual_memory(); disk=psutil.disk_usage("C:\\"); print(f"Host: {platform.node()}\\nCPU: {cpu}%\\nRAM: {ram.used//1024**3:.1f}/{ram.total//1024**3:.1f}GB ({ram.percent}%)\\nDisk: {disk.used//1024**3:.1f}/{disk.total//1024**3:.1f}GB ({disk.percent}%)\\nOS: {platform.system()} {platform.release()}")',
   },
   {
@@ -59,7 +59,7 @@ const PROMPT_CARDS: PromptCard[] = [
     iconLib: 'mc',
     title: 'Sort Downloads',
     desc: 'Auto-organize by file type',
-    hue: '#F5A623',
+    hue: '#FFC400',
     cmd: 'Write and run a Python script to organize my Downloads folder — sort all files into subfolders by type: Images, Videos, Documents, Archives, Installers, Code',
   },
   {
@@ -68,7 +68,7 @@ const PROMPT_CARDS: PromptCard[] = [
     iconLib: 'mc',
     title: 'Find Duplicates',
     desc: 'MD5-hash scan for repeated files',
-    hue: '#BF00FF',
+    hue: '#FFC400',
     cmd: 'Write a Python script to find all duplicate files in my Downloads folder using MD5 hash comparison and list them with their sizes',
   },
   {
@@ -77,7 +77,7 @@ const PROMPT_CARDS: PromptCard[] = [
     iconLib: 'mi',
     title: 'Top Processes',
     desc: 'See what is eating CPU & RAM',
-    hue: '#3EC8FF',
+    hue: '#FF2A1F',
     cmd: 'Run: import psutil; procs=sorted(psutil.process_iter(["pid","name","cpu_percent","memory_percent"]), key=lambda p: p.info.get("cpu_percent") or 0, reverse=True); [print(f\'[{p.info["pid"]}] {p.info["name"]:<28} CPU:{p.info.get("cpu_percent",0):.1f}%  MEM:{p.info.get("memory_percent",0):.1f}%\') for p in procs[:10]]',
   },
   {
@@ -92,11 +92,11 @@ const PROMPT_CARDS: PromptCard[] = [
 ];
 
 const CAPABILITIES = [
-  { icon: 'language-python',     label: 'Run Python',   color: '#3EC8FF' },
+  { icon: 'language-python',     label: 'Run Python',   color: '#FF2A1F' },
   { icon: 'chip',                label: 'Read stats',   color: '#00FF88' },
-  { icon: 'folder-cog-outline',  label: 'Manage files', color: '#F5A623' },
-  { icon: 'head-cog-outline',    label: 'Search KB',    color: '#BF00FF' },
-  { icon: 'code-braces-box',     label: 'Build scripts',color: '#7FE3FF' },
+  { icon: 'folder-cog-outline',  label: 'Manage files', color: '#FFC400' },
+  { icon: 'head-cog-outline',    label: 'Search KB',    color: '#FFC400' },
+  { icon: 'code-braces-box',     label: 'Build scripts',color: '#FF6A52' },
   { icon: 'chat-processing-outline', label: 'Chat',     color: '#FF6BCB' },
 ];
 
@@ -130,7 +130,7 @@ export default function ButlerWelcomeHub({
   onSendPrompt: (cmd: string) => void;
   onBuildScript: () => void;
 }) {
-  const pr = accentColor || '#3EC8FF';
+  const pr = accentColor || '#FF2A1F';
 
   // Tip rotator
   const [tipIdx, setTipIdx] = useState(0);
@@ -186,7 +186,7 @@ export default function ButlerWelcomeHub({
 
       {/* ── 2. Live status card ──────────────────────────────────── */}
       <LinearGradient
-        colors={['rgba(8,20,38,0.95)', 'rgba(3,8,16,0.95)']}
+        colors={['rgba(20,21,26,0.95)', 'rgba(8,8,10,0.95)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={[s.statusCard, { borderColor: pr + '30' }]}
@@ -236,7 +236,7 @@ export default function ButlerWelcomeHub({
               style={[s.gridCard, { borderColor: c.hue + '40' }]}
             >
               <LinearGradient
-                colors={[c.hue + '18', 'rgba(3,8,16,0.95)']}
+                colors={[c.hue + '18', 'rgba(8,8,10,0.95)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -339,11 +339,11 @@ const s = StyleSheet.create({
     letterSpacing: 1.6, marginBottom: 2,
   },
   greetTitle: {
-    color: '#EFF4FF', fontSize: 19, fontWeight: '800',
+    color: '#F4F6F9', fontSize: 19, fontWeight: '800',
     fontFamily: BODY_FONT, letterSpacing: 0.2,
   },
   greetSub: {
-    color: '#7A9AB8', fontSize: 12.5,
+    color: '#8C95A6', fontSize: 12.5,
     fontFamily: BODY_FONT, marginTop: 1,
   },
 
@@ -364,11 +364,11 @@ const s = StyleSheet.create({
   statusDot: { width: 9, height: 9, borderRadius: 4.5 },
   statusDivider: {
     width: 1, height: 26,
-    backgroundColor: 'rgba(127,227,255,0.18)',
+    backgroundColor: 'rgba(255,106,82,0.18)',
   },
   statusKey: {
     fontSize: 8.5, fontWeight: '900', fontFamily: MONO,
-    color: '#3A5068', letterSpacing: 1.3,
+    color: '#6A7384', letterSpacing: 1.3,
   },
   statusVal: {
     fontSize: 11, fontWeight: '800', fontFamily: MONO,
@@ -410,11 +410,11 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   gridTitle: {
-    color: '#EFF4FF', fontSize: 13, fontWeight: '800',
+    color: '#F4F6F9', fontSize: 13, fontWeight: '800',
     fontFamily: BODY_FONT, letterSpacing: 0.2,
   },
   gridDesc: {
-    color: '#7A9AB8', fontSize: 10.5,
+    color: '#8C95A6', fontSize: 10.5,
     fontFamily: BODY_FONT, lineHeight: 14,
     marginTop: 2,
   },
@@ -438,11 +438,11 @@ const s = StyleSheet.create({
     overflow: 'hidden',
   },
   buildTitle: {
-    color: '#EFF4FF', fontSize: 13, fontWeight: '800',
+    color: '#F4F6F9', fontSize: 13, fontWeight: '800',
     fontFamily: BODY_FONT,
   },
   buildSub: {
-    color: '#7A9AB8', fontSize: 10.5, fontFamily: BODY_FONT,
+    color: '#8C95A6', fontSize: 10.5, fontFamily: BODY_FONT,
     marginTop: 1,
   },
 
@@ -452,7 +452,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 11, paddingVertical: 7,
     borderRadius: 18, borderWidth: 1,
-    backgroundColor: 'rgba(3,8,16,0.7)',
+    backgroundColor: 'rgba(8,8,10,0.7)',
   },
   capTxt: {
     fontSize: 11, fontWeight: '700', fontFamily: BODY_FONT,
@@ -463,7 +463,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingHorizontal: 12, paddingVertical: 9,
     borderWidth: 1, borderRadius: 12,
-    backgroundColor: 'rgba(8,20,38,0.6)',
+    backgroundColor: 'rgba(20,21,26,0.6)',
     marginTop: 2,
   },
   tipTxt: {

@@ -26,14 +26,14 @@ import { errorAutoFix, AutoFixResult } from '@/services/errorAutoFix';
 const C = {
   bg:      '#0A0E14',
   bgDark:  '#060D12',
-  bgCard:  'rgba(13,27,42,0.95)',
+  bgCard:  'rgba(24,26,31,0.95)',
   green:   '#00FF88',
   cyan:    '#00D4FF',
-  gold:    '#FFD700',
-  amber:   '#FF8C00',
+  gold:    '#FFC400',
+  amber:   '#FF6A1F',
   red:     '#FF4444',
-  orange:  '#FF8C00',
-  purple:  '#C084FF',
+  orange:  '#FF6A1F',
+  purple:  '#FFC400',
   text:    '#E0E8F0',
   textDim: '#7A8AA8',
   border:  '#1a2333',
@@ -102,8 +102,8 @@ function FixBanner({ pattern }: { pattern: ErrorPattern }) {
           <Text style={[fb.typeTxt, { color: accentColor }]}>AUTO-FIX</Text>
         </View>
         <Text style={[fb.errorType, { color: accentColor }]}>{pattern.type}</Text>
-        <View style={[fb.severityBadge, { backgroundColor: pattern.severity === 'critical' ? '#FF3C5A20' : '#FFB30020', borderColor: pattern.severity === 'critical' ? '#FF3C5A60' : '#FFB30060' }]}>
-          <Text style={[fb.severityTxt, { color: pattern.severity === 'critical' ? '#FF3C5A' : '#FFB300' }]}>{pattern.severity.toUpperCase()}</Text>
+        <View style={[fb.severityBadge, { backgroundColor: pattern.severity === 'critical' ? '#FF3C5A20' : '#FFC40020', borderColor: pattern.severity === 'critical' ? '#FF3C5A60' : '#FFC40060' }]}>
+          <Text style={[fb.severityTxt, { color: pattern.severity === 'critical' ? '#FF3C5A' : '#FFC400' }]}>{pattern.severity.toUpperCase()}</Text>
         </View>
         <MaterialIcons name={expanded ? 'expand-less' : 'expand-more'} size={16} color={accentColor} />
       </TouchableOpacity>
@@ -163,7 +163,7 @@ const fb = StyleSheet.create({
   explanationTxt: { fontSize: 10, color: '#C8E0EE', lineHeight: 15, flex: 1 },
   fixList: { paddingHorizontal: 10, paddingBottom: 4 },
   fixListLabel: { fontSize: 7, fontWeight: '700', color: '#7AAEC4', fontFamily: MONO, letterSpacing: 1.5, marginBottom: 6 },
-  fixRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#0D1B28', borderWidth: 1, borderRadius: 8, padding: 9, marginBottom: 6 },
+  fixRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#1A1D24', borderWidth: 1, borderRadius: 8, padding: 9, marginBottom: 6 },
   fixLabel: { fontSize: 9, fontWeight: '600', marginBottom: 2 },
   fixCmd: { fontSize: 9, fontFamily: MONO, lineHeight: 13 },
   copyBtn: { flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 4 },
@@ -416,7 +416,7 @@ function ExecutionModal({
         {/* Run button */}
         <View style={[em.footer, { paddingBottom: Math.max(insets.bottom + 10, 20) }]}>
           <TouchableOpacity
-            style={[em.runBtn, { backgroundColor: running ? '#0D1B28' : catColor, borderColor: catColor, opacity: running ? 0.75 : 1 }]}
+            style={[em.runBtn, { backgroundColor: running ? '#1A1D24' : catColor, borderColor: catColor, opacity: running ? 0.75 : 1 }]}
             onPress={run} disabled={running} activeOpacity={0.85}>
             {running
               ? <><ActivityIndicator color={catColor} size="small" /><Text style={[em.runTxt, { color: catColor }]}>EXECUTING ON PC...</Text></>
@@ -579,7 +579,7 @@ export default function CategoryDetailScreen() {
             onPress={() => openScript(script)}
             activeOpacity={0.85}>
             <LinearGradient
-              colors={['rgba(13,27,42,0.97)', 'rgba(6,10,15,0.99)']}
+              colors={['rgba(24,26,31,0.97)', 'rgba(10,11,13,0.99)']}
               style={s.cardGrad}>
               <View style={[s.cardBorder, { borderColor: cat.color + '50' }]} />
               <View style={[s.idxBadge, { backgroundColor: cat.color + '20' }]}>
@@ -649,6 +649,6 @@ const s = StyleSheet.create({
   cardFoot:    { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, flexWrap: 'wrap' },
   timeT:       { fontSize: 8, color: C.textDim, fontFamily: MONO },
   tagsRow:     { flexDirection: 'row', gap: 4, marginLeft: 4 },
-  tagChip:     { backgroundColor: 'rgba(0,212,255,0.1)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2, borderWidth: 1, borderColor: 'rgba(0,212,255,0.25)' },
+  tagChip:     { backgroundColor: 'rgba(255,42,31,0.1)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2, borderWidth: 1, borderColor: 'rgba(255,42,31,0.25)' },
   tagTxt:      { fontSize: 7, color: C.cyan, fontFamily: MONO },
 });

@@ -32,9 +32,9 @@ import { haptics } from '@/services/haptics';
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
-  scrim: 'rgba(2,4,7,0.86)', card: '#071120', surface: '#02070D',
-  cyan: '#00FFFF', green: '#00FF88', amber: '#F5A623',
-  text: '#D8E8F4', textDim: '#7A9AB8', border: 'rgba(0,255,255,0.20)',
+  scrim: 'rgba(2,4,7,0.86)', card: '#1A1D24', surface: '#0E0F12',
+  cyan: '#FF2A1F', green: '#00FF88', amber: '#FFC400',
+  text: '#E6E9EF', textDim: '#8C95A6', border: 'rgba(255,42,31,0.20)',
 };
 
 export interface PaletteHit {
@@ -251,19 +251,19 @@ const s = StyleSheet.create({
   kbd: { borderWidth: 1, borderColor: C.border, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
   kbdTxt: { color: C.textDim, fontSize: 9, fontFamily: MONO, fontWeight: '900' },
 
-  hintBar: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: 'rgba(0,255,255,0.02)' },
+  hintBar: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: 'rgba(255,42,31,0.02)' },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 2 },
   hintTxt: { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
   hintCount: { fontSize: 9, color: C.textDim, fontFamily: MONO, fontWeight: '900' },
 
   row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.border },
-  rowSel: { backgroundColor: 'rgba(0,255,255,0.06)' },
-  rowIcon: { width: 32, height: 32, borderRadius: 8, borderWidth: 1, borderColor: C.border, backgroundColor: 'rgba(0,255,255,0.06)', alignItems: 'center', justifyContent: 'center' },
+  rowSel: { backgroundColor: 'rgba(255,42,31,0.06)' },
+  rowIcon: { width: 32, height: 32, borderRadius: 8, borderWidth: 1, borderColor: C.border, backgroundColor: 'rgba(255,42,31,0.06)', alignItems: 'center', justifyContent: 'center' },
   rowName: { color: C.text, fontSize: 13, fontWeight: '700' },
   rowDesc: { color: C.textDim, fontSize: 11, marginTop: 2 },
   rowCat: { color: C.cyan, fontSize: 8, fontFamily: MONO, fontWeight: '900', marginTop: 3, letterSpacing: 1 },
   rowActions: { flexDirection: 'row', gap: 6, marginLeft: 8 },
-  actBtn: { width: 30, height: 30, borderRadius: 7, borderWidth: 1, borderColor: C.border, backgroundColor: 'rgba(0,255,255,0.05)', alignItems: 'center', justifyContent: 'center' },
+  actBtn: { width: 30, height: 30, borderRadius: 7, borderWidth: 1, borderColor: C.border, backgroundColor: 'rgba(255,42,31,0.05)', alignItems: 'center', justifyContent: 'center' },
 
   empty: { alignItems: 'center', paddingVertical: 40, gap: 6 },
   emptyTxt: { color: C.textDim, fontSize: 12, fontFamily: MONO, fontWeight: '900', letterSpacing: 1 },

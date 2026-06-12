@@ -140,7 +140,7 @@ class ScriptExecutorService {
       if (missingModule && serverConnection.isConnected()) {
         const pkg = missingModule[1].split('.')[0]; // top-level package
         onOutput?.(`\u{1F4E6} Auto-installing ${pkg}...\n`);
-        (global as any).__showConnectionToast?.(`Auto-installing ${pkg}...`, '#FF8C00');
+        (global as any).__showConnectionToast?.(`Auto-installing ${pkg}...`, '#FF6A1F');
         try {
           await fetch(`http://${serverIp}:${serverPort}/api/pip/install`, {
             method: 'POST',

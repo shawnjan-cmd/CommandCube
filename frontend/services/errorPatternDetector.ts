@@ -103,7 +103,7 @@ const PATTERNS: Array<{
         fixes,
         severity: 'critical',
         docsUrl: `https://pypi.org/project/${installPkg}/`,
-        color: '#FF8C00',
+        color: '#FF6A1F',
       };
     },
   },
@@ -180,7 +180,7 @@ const PATTERNS: Array<{
           { label: 'List files in parent directory', command: `python -c "import os; print(os.listdir('.'))"`, icon: 'folder-open' },
         ],
         severity: 'critical',
-        color: '#FFB300',
+        color: '#FFC400',
       };
     },
   },
@@ -198,7 +198,7 @@ const PATTERNS: Array<{
         { label: 'Use threading with timeout', command: 'from concurrent.futures import ThreadPoolExecutor; ex.submit(fn).result(timeout=30)', icon: 'schedule' },
       ],
       severity: 'warning',
-      color: '#FFB300',
+      color: '#FFC400',
     }),
   },
 
@@ -236,7 +236,7 @@ const PATTERNS: Array<{
         { label: 'Update package', command: 'pip install --upgrade PACKAGE_NAME', icon: 'upgrade' },
       ],
       severity: 'warning',
-      color: '#B06EFF',
+      color: '#FFC400',
     }),
   },
 
@@ -252,7 +252,7 @@ const PATTERNS: Array<{
         { label: 'Convert to correct type', command: 'int(x)  # or str(x) or float(x)', icon: 'code' },
       ],
       severity: 'warning',
-      color: '#B06EFF',
+      color: '#FFC400',
     }),
   },
 
@@ -284,7 +284,7 @@ const PATTERNS: Array<{
         { label: 'Add try/except for safety', command: 'try:\n    result = operation(value)\nexcept ValueError as e:\n    print(f"Bad value: {e}")', icon: 'security' },
       ],
       severity: 'warning',
-      color: '#FFB300',
+      color: '#FFC400',
     }),
   },
 
@@ -316,7 +316,7 @@ const PATTERNS: Array<{
         { label: 'Refactor to iterative approach', command: '# Convert recursive function to use a loop + stack', icon: 'loop' },
       ],
       severity: 'warning',
-      color: '#FFB300',
+      color: '#FFC400',
     }),
   },
 
@@ -350,7 +350,7 @@ const PATTERNS: Array<{
           { label: 'Run with verbose output', command: 'python -v script.py 2>&1', icon: 'terminal' },
         ],
         severity: 'warning',
-        color: '#FF8C00',
+        color: '#FF6A1F',
       };
     },
   },

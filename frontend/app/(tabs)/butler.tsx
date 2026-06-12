@@ -52,28 +52,28 @@ const BODY_FONT: any = Platform.OS === 'ios' ? 'System' : 'sans-serif';
 const ROBOT_BG = require('@/assets/images/butler-robot-tux.jpg');
 
 const C = {
-  bg:          '#000003',
-  bgDeep:      '#000003',
-  surface:     '#02070D',
-  surfaceHi:   '#071120',
-  panel:       '#050B14',
-  teal:        '#00FFFF',
-  tealDim:     'rgba(0,255,255,0.08)',
-  tealGlow:    'rgba(0,255,255,0.25)',
+  bg:          '#050505',
+  bgDeep:      '#050505',
+  surface:     '#0E0F12',
+  surfaceHi:   '#1A1D24',
+  panel:       '#0A0B0E',
+  teal:        '#FF2A1F',
+  tealDim:     'rgba(255,42,31,0.08)',
+  tealGlow:    'rgba(255,42,31,0.25)',
   green:       '#00FF88',
   greenDim:    '#00FF8820',
-  amber:       '#F5A623',
-  amberDim:    '#F5A62320',
-  purple:      '#BF00FF',
+  amber:       '#FFC400',
+  amberDim:    '#FFC40020',
+  purple:      '#FFC400',
   red:         '#FF3131',
   redDim:      '#FF313120',
-  cyan:        '#00FFFF',
-  cyanDim:     'rgba(0,255,255,0.08)',
-  text:        '#D8E8F4',
-  textBright:  '#EFF4FF',
-  textDim:     '#3A5068',
-  textMid:     '#7A9AB8',
-  borderFaint: 'rgba(0,255,255,0.12)',
+  cyan:        '#FF2A1F',
+  cyanDim:     'rgba(255,42,31,0.08)',
+  text:        '#E6E9EF',
+  textBright:  '#F4F6F9',
+  textDim:     '#6A7384',
+  textMid:     '#8C95A6',
+  borderFaint: 'rgba(255,42,31,0.12)',
 };
 
 type AiBackend = 'ollama' | 'local' | null;
@@ -116,11 +116,11 @@ const USER_AVATAR_KEY = '@butler_user_avatar_v1';
 const AI_AVATAR_KEY   = '@butler_ai_avatar_v1';
 
 const INTENT_META: Record<string, { icon: string; color: string; label: string }> = {
-  question:     { icon: 'help-outline',  color: '#5B9CF6', label: 'Question'     },
-  script:       { icon: 'code',          color: '#2FD98B', label: 'Script'       },
-  troubleshoot: { icon: 'build',         color: '#F5A623', label: 'Troubleshoot' },
-  install:      { icon: 'get-app',       color: '#A366F5', label: 'Install'      },
-  explain:      { icon: 'library-books', color: '#5B9CF6', label: 'Explain'      },
+  question:     { icon: 'help-outline',  color: '#FF6A1F', label: 'Question'     },
+  script:       { icon: 'code',          color: '#00FF88', label: 'Script'       },
+  troubleshoot: { icon: 'build',         color: '#FFC400', label: 'Troubleshoot' },
+  install:      { icon: 'get-app',       color: '#FF6A1F', label: 'Install'      },
+  explain:      { icon: 'library-books', color: '#FF6A1F', label: 'Explain'      },
   general:      { icon: 'smart-toy',     color: '#7A8FA8', label: 'General'      },
 };
 
@@ -161,7 +161,7 @@ function HUDGridBackground() {
   );
 }
 const hud = StyleSheet.create({
-  corner: { position: 'absolute', width: 24, height: 24, borderColor: 'rgba(91,156,246,0.14)' },
+  corner: { position: 'absolute', width: 24, height: 24, borderColor: 'rgba(255,106,31,0.14)' },
 });
 
 function NexusChatHeader({ isConnected, onClear, accentColor, onBuildScript, onToggleVoice, onToggleHistory }: {
@@ -252,7 +252,7 @@ function NexusChatHeader({ isConnected, onClear, accentColor, onBuildScript, onT
   );
 }
 const nch = StyleSheet.create({
-  wrap:      { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(0,229,255,0.12)', backgroundColor: '#02070D' },
+  wrap:      { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,42,31,0.12)', backgroundColor: '#0E0F12' },
   iconBox:   { width: 46, height: 46, borderRadius: 13, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', overflow: 'hidden' },
   robotFace: { alignItems: 'center', gap: 3, zIndex: 2 },
   eye:       { width: 7, height: 5, borderRadius: 2.5 },
@@ -261,10 +261,10 @@ const nch = StyleSheet.create({
   title:     { fontSize: 15, fontWeight: '800', fontFamily: BODY_FONT, letterSpacing: 0.4 },
   sub:       { fontSize: 9, fontFamily: MONO, letterSpacing: 0.4, marginTop: 1 },
   iconBtn:   { width: 34, height: 34, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  toolbarRow:{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#02070D', borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.10)' },
+  toolbarRow:{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#0E0F12', borderBottomWidth: 1, borderBottomColor: 'rgba(255,42,31,0.10)' },
   toolBtn:   { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, flexShrink: 0 },
   toolBtnTxt:{ fontSize: 9, fontWeight: '800', fontFamily: MONO, letterSpacing: 0.7 },
-  toolSep:   { width: 1, height: 18, backgroundColor: 'rgba(0,255,255,0.1)', marginHorizontal: 2 },
+  toolSep:   { width: 1, height: 18, backgroundColor: 'rgba(255,42,31,0.1)', marginHorizontal: 2 },
   modelBadge:{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 7, paddingVertical: 4, borderRadius: 6, borderWidth: 1, marginLeft: 'auto' as any },
   modelTxt:  { fontSize: 8, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.5 },
 });
@@ -562,8 +562,8 @@ function SynapseHealPanel({ script, onClose, accentColor }: {
   );
 }
 const shp = StyleSheet.create({
-  wrap:     { margin: 12, borderWidth: 1, borderRadius: 12, overflow: 'hidden', backgroundColor: '#02070D' },
-  header:   { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.1)' },
+  wrap:     { margin: 12, borderWidth: 1, borderRadius: 12, overflow: 'hidden', backgroundColor: '#0E0F12' },
+  header:   { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,42,31,0.1)' },
   title:    { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.5 },
   badge:    { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6, borderWidth: 1 },
   badgeTxt: { fontSize: 8, fontWeight: '900', fontFamily: MONO },
@@ -591,7 +591,7 @@ function ScriptBuilderModal({ visible, onClose, onBuild, accentColor }: {
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: '#02070D', borderTopLeftRadius: 20, borderTopRightRadius: 20,
+        <View style={{ backgroundColor: '#0E0F12', borderTopLeftRadius: 20, borderTopRightRadius: 20,
           borderWidth: 1, borderColor: pr + '30', paddingBottom: 32 }}>
           <View style={{ alignItems: 'center', padding: 16 }}>
             <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: pr + '40' }} />
@@ -602,7 +602,7 @@ function ScriptBuilderModal({ visible, onClose, onBuild, accentColor }: {
             Describe what you want to automate — Butler AI will write and run it
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginBottom: 12,
-            borderWidth: 1.5, borderColor: pr + '40', borderRadius: 12, backgroundColor: '#000003', paddingHorizontal: 12 }}>
+            borderWidth: 1.5, borderColor: pr + '40', borderRadius: 12, backgroundColor: '#050505', paddingHorizontal: 12 }}>
             <TextInput
               style={{ flex: 1, fontSize: 14, color: C.textBright, paddingVertical: 12, fontFamily: BODY_FONT }}
               value={prompt}
@@ -714,14 +714,14 @@ function MessageBubble({ msg, onCopy, onReact, onSave, onSuggest, isLast, accent
               <View style={[mb.roleIcon, { borderColor: pr + '50', backgroundColor: pr + '0C' }]}>
                 <MaterialIcons name="smart-toy" size={10} color={pr} />
               </View>
-              <Text style={[mb.roleLabel, { color: pr + 'AA' }]}>Butler AI</Text>
+              <Text style={[mb.roleLabel, { color: pr }]}>{'BUTLER >'}</Text>
             </>
           ) : (
             <>
               <View style={[mb.roleIcon, { borderColor: sc + '50', backgroundColor: sc + '0C' }]}>
                 <MaterialIcons name="person" size={10} color={sc} />
               </View>
-              <Text style={[mb.roleLabel, { color: sc + 'AA' }]}>You</Text>
+              <Text style={[mb.roleLabel, { color: sc }]}>{'USER >'}</Text>
             </>
           )}
           <Text style={mb.timestamp}>
@@ -792,14 +792,14 @@ const mb = StyleSheet.create({
   content:     { fontSize: 14, lineHeight: 22, fontFamily: BODY_FONT },
   codeBlock:   { borderWidth: 1, borderRadius: 10, overflow: 'hidden', marginTop: 10 },
   codeHeader:  { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8,
-                 borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.1)', backgroundColor: 'rgba(0,0,0,0.3)' },
+                 borderBottomWidth: 1, borderBottomColor: 'rgba(255,42,31,0.1)', backgroundColor: 'rgba(0,0,0,0.3)' },
   codeLang:    { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
   codeAction:  { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 6,
                  paddingHorizontal: 7, paddingVertical: 4 },
   codeActionTxt:{ fontSize: 8, fontWeight: '900', fontFamily: MONO },
-  codeText:    { fontSize: 12, color: '#7EC8E3', fontFamily: MONO, padding: 12, lineHeight: 19 },
+  codeText:    { fontSize: 12, color: '#FFB3AD', fontFamily: MONO, padding: 12, lineHeight: 19 },
   actions:     { flexDirection: 'row', gap: 4, marginTop: 10, paddingTop: 8,
-                 borderTopWidth: 1, borderTopColor: 'rgba(0,255,255,0.08)' },
+                 borderTopWidth: 1, borderTopColor: 'rgba(255,42,31,0.08)' },
   actionBtn:   { width: 28, height: 28, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
   systemRow:   { alignItems: 'center', paddingVertical: 8, paddingHorizontal: 14 },
   systemPill:  { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 20,
@@ -840,7 +840,7 @@ function TypingIndicator({ accentColor }: { accentColor: string }) {
           <Animated.View key={i} style={[ti.dot, { backgroundColor: pr, opacity: d }]} />
         ))}
       </View>
-      <Text style={[ti.label, { color: pr + '50' }]}>Butler AI is thinking...</Text>
+      <Text style={[ti.label, { color: pr + '70' }]}>{'BUTLER > processing...'}</Text>
     </View>
   );
 }
@@ -911,7 +911,7 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
           style={[ccb.input, { color: C.textBright }]}
           value={inputText}
           onChangeText={setInputText}
-          placeholder={isConnected ? 'Ask Butler AI anything...' : 'Connect PC from Home tab first...'}
+          placeholder={isConnected ? '> Enter command for Butler AI…' : '> Connect PC from Home tab first…'}
           placeholderTextColor={C.textDim}
           returnKeyType="send"
           onSubmitEditing={handleSend}
@@ -941,13 +941,13 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
 const ccb = StyleSheet.create({
   wrap:      { flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 12, paddingVertical: 10,
                borderTopWidth: 1.5 },
-  connBlock: { width: 36, height: 36, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center',
+  connBlock: { width: 36, height: 36, borderRadius: 8, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center',
                gap: 1, flexShrink: 0 },
   connDot:   { width: 8, height: 8, borderRadius: 4 },
   connLabel: { fontSize: 7, fontWeight: '900', fontFamily: MONO },
-  inputWrap: { flex: 1, borderWidth: 1.5, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 8, minHeight: 44, maxHeight: 120 },
+  inputWrap: { flex: 1, borderWidth: 1.5, borderRadius: 9, paddingHorizontal: 14, paddingVertical: 8, minHeight: 44, maxHeight: 120 },
   input:     { fontSize: 14, fontFamily: BODY_FONT, lineHeight: 20, includeFontPadding: false },
-  sendBtn:   { width: 44, height: 44, borderRadius: 13, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  sendBtn:   { width: 44, height: 44, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
 });
 
 // ── Main Butler Screen ────────────────────────────────────────────────────────
@@ -1198,7 +1198,7 @@ export default function ButlerScreen() {
         accentColor={pr}
         onBuildScript={() => setShowScriptBuilder(true)}
         onToggleHistory={() => {}}
-        onToggleVoice={() => { (global as any).__showConnectionToast?.('Voice input coming soon', '#F5A623'); }}
+        onToggleVoice={() => { (global as any).__showConnectionToast?.('Voice input coming soon', '#FFC400'); }}
       />
 
       {/* Message list */}
@@ -1276,3 +1276,4 @@ export default function ButlerScreen() {
 
 // Expo Router per-route ErrorBoundary — isolates crashes to this tab
 export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';
+

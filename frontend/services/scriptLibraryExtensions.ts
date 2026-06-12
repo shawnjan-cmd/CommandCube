@@ -549,14 +549,14 @@ html = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>PC Health Report</title>
 <style>
   body{{font-family:monospace;background:#05080F;color:#E8F0F8;padding:20px}}
-  h1{{color:#00DDEE}} h2{{color:#00FF88;border-bottom:1px solid #1a2535;padding-bottom:8px}}
+  h1{{color:#FF2A1F}} h2{{color:#00FF88;border-bottom:1px solid #1a2535;padding-bottom:8px}}
   .card{{background:#0A0F18;border:1px solid #1a2535;border-radius:8px;padding:16px;margin:12px 0}}
   .bar{{height:16px;background:#1a2535;border-radius:4px;overflow:hidden;margin:4px 0}}
   .bar-fill{{height:100%;border-radius:4px}}
-  .green{{background:#00FF88}} .amber{{background:#FF9900}} .red{{background:#FF3344}}
+  .green{{background:#00FF88}} .amber{{background:#FF6A1F}} .red{{background:#FF3344}}
   table{{width:100%;border-collapse:collapse}}
   td,th{{padding:8px 12px;border-bottom:1px solid #1a2535;text-align:left}}
-  .status-ok{{color:#00FF88}} .status-warn{{color:#FF9900}} .status-crit{{color:#FF3344}}
+  .status-ok{{color:#00FF88}} .status-warn{{color:#FF6A1F}} .status-crit{{color:#FF3344}}
 </style></head><body>
 <h1>🖥 PC Health Report</h1>
 <p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Host: {socket.gethostname()} | Status: <b class="{'status-ok' if status=='HEALTHY' else 'status-warn'}">{status}</b></p>

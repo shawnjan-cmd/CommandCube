@@ -21,14 +21,14 @@ import { useLanguage, LangCode } from '@/contexts/LanguageContext';
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
-  cyan:    '#00FFFF',
+  cyan:    '#FF2A1F',
   green:   '#00FF88',
-  text:    '#D8E8F4',
-  textMid: '#7A9AB8',
-  textDim: '#3A5068',
-  bg:      '#000003',
-  card:    '#071120',
-  border:  'rgba(0,255,255,0.18)',
+  text:    '#E6E9EF',
+  textMid: '#8C95A6',
+  textDim: '#6A7384',
+  bg:      '#050505',
+  card:    '#1A1D24',
+  border:  'rgba(255,42,31,0.18)',
 };
 
 interface Props {

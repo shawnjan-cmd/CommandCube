@@ -38,32 +38,32 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // ─── NEXUS COMMAND CENTER PALETTE ─────────────────────────────
 const N = {
-  bg:        '#000003',
-  surface:   '#02070D',
-  surfaceHi: '#071120',
-  surfaceMd: '#02070D',
-  border:    'rgba(0,255,255,0.12)',
-  borderHi:  'rgba(0,255,255,0.28)',
-  text:      '#D8E8F4',
-  textDim:   '#3A5068',
-  textMid:   '#7A9AB8',
-  blue:      '#00FFFF',
-  blueDim:   '#00FFFF18',
+  bg:        '#050505',
+  surface:   '#0E0F12',
+  surfaceHi: '#1A1D24',
+  surfaceMd: '#0E0F12',
+  border:    'rgba(255,42,31,0.12)',
+  borderHi:  'rgba(255,42,31,0.28)',
+  text:      '#E6E9EF',
+  textDim:   '#6A7384',
+  textMid:   '#8C95A6',
+  blue:      '#FF2A1F',
+  blueDim:   '#FF2A1F18',
   green:     '#00FF88',
   greenDim:  '#00FF8820',
-  purple:    '#BF00FF',
-  purpleDim: '#BF00FF20',
-  amber:     '#F5A623',
+  purple:    '#FFC400',
+  purpleDim: '#FFC40020',
+  amber:     '#FFC400',
   amberBrt:  '#F7B84B',
-  amberDim:  '#F5A62320',
+  amberDim:  '#FFC40020',
   red:       '#FF3131',
   redDim:    '#FF313120',
-  teal:      '#00FFFF',
-  tealDim:   '#00FFFF18',
+  teal:      '#FF2A1F',
+  tealDim:   '#FF2A1F18',
   cyan:      '#00BFFF',
-  sigma:     '#BF00FF',
-  sigmaDim:  '#BF00FF20',
-  yellow:    '#FFD700',
+  sigma:     '#FFC400',
+  sigmaDim:  '#FFC40020',
+  yellow:    '#FFC400',
 };
 
 type TabKey = 'dashboard' | 'overview' | 'nexus' | 'nexusbot' | 'crawler' | 'lscan' | 'manual' | 'base' | 'arch';
@@ -76,18 +76,18 @@ interface KBStats { totalSessions: number; totalFindings: number; totalCompressi
 const KB_CATS = [
   { emoji: '🐍', label: 'Python',   color: '#00FF88', pct: 92 },
   { emoji: '🛡️', label: 'Security', color: '#FF3366', pct: 76 },
-  { emoji: '🔧', label: 'System',   color: '#FFB800', pct: 84 },
-  { emoji: '📡', label: 'Network',  color: '#9D6FFF', pct: 68 },
+  { emoji: '🔧', label: 'System',   color: '#FFC400', pct: 84 },
+  { emoji: '📡', label: 'Network',  color: '#FFC400', pct: 68 },
   { emoji: '💻', label: 'Windows',  color: '#00B4FF', pct: 78 },
-  { emoji: '⚡', label: 'Auto',     color: '#00E5FF', pct: 95 },
+  { emoji: '⚡', label: 'Auto',     color: '#FF2A1F', pct: 95 },
 ];
 
 const TERMINAL_FEED_KB = [
   { time: '08:14', msg: 'Crawled 24 new Python docs · psutil 6.2 added', col: '#00FF88' },
   { time: '07:52', msg: 'Security KB updated · 3 CVE entries indexed', col: '#FF3366' },
-  { time: '07:31', msg: 'Network scripts synced · 18 new templates', col: '#9D6FFF' },
-  { time: '06:58', msg: 'AI model retrained on 89 verified answers', col: '#00E5FF' },
-  { time: '06:14', msg: 'Knowledge graph rebuilt · 342 nodes active', col: '#FFB800' },
+  { time: '07:31', msg: 'Network scripts synced · 18 new templates', col: '#FFC400' },
+  { time: '06:58', msg: 'AI model retrained on 89 verified answers', col: '#FF2A1F' },
+  { time: '06:14', msg: 'Knowledge graph rebuilt · 342 nodes active', col: '#FFC400' },
 ];
 
 function NexusKnowledgeEngine({ kbFindings, kbSessions, goToTab }: {
@@ -119,15 +119,15 @@ function NexusKnowledgeEngine({ kbFindings, kbSessions, goToTab }: {
   const imported = Math.max(89, Math.round(kbFindings * 0.26));
   const pending  = Math.max(6, kbSessions > 0 ? kbSessions : 6);
   const shimLeft = scanAnim.interpolate({ inputRange: [0, 1], outputRange: ['-80%', '180%'] });
-  const teal = '#00CCDD';
+  const teal = '#FF2A1F';
 
   const STAT_GRID = [
     { val: String(crawled),  label: 'CRAWLED',  col: teal   },
     { val: String(imported), label: 'IMPORTED', col: '#00FF88'  },
-    { val: String(pending),  label: 'PENDING',  col: '#FF8C00'  },
-    { val: '78%',  label: 'KB COVERAGE', col: '#CC44FF' },
+    { val: String(pending),  label: 'PENDING',  col: '#FF6A1F'  },
+    { val: '78%',  label: 'KB COVERAGE', col: '#FFC400' },
     { val: '92%',  label: 'FRESHNESS',   col: teal   },
-    { val: '96%',  label: 'ACCURACY',    col: '#FFD700' },
+    { val: '96%',  label: 'ACCURACY',    col: '#FFC400' },
   ];
 
   return (
@@ -226,8 +226,8 @@ function NexusKnowledgeEngine({ kbFindings, kbSessions, goToTab }: {
 }
 
 const nke = StyleSheet.create({
-  outer:       { backgroundColor: '#050810', borderRadius: 18, borderWidth: 1.5, borderColor: '#00CCDD40', overflow: 'hidden', position: 'relative', margin: 12,
-    ...Platform.select({ ios:{ shadowColor:'#00CCDD', shadowOffset:{width:0,height:6}, shadowOpacity:0.28, shadowRadius:20 }, android:{elevation:10} }) },
+  outer:       { backgroundColor: '#050810', borderRadius: 18, borderWidth: 1.5, borderColor: '#FF2A1F40', overflow: 'hidden', position: 'relative', margin: 12,
+    ...Platform.select({ ios:{ shadowColor:'#FF2A1F', shadowOffset:{width:0,height:6}, shadowOpacity:0.28, shadowRadius:20 }, android:{elevation:10} }) },
   shimmer:     { position:'absolute', top:0, bottom:0, width:'40%', backgroundColor:'rgba(0,221,238,0.04)', transform:[{skewX:'-16deg'}], zIndex:0 },
   topBar:      { height:4, borderTopLeftRadius:18, borderTopRightRadius:18 },
   corner:      { position:'absolute', width:16, height:16 },
@@ -239,18 +239,18 @@ const nke = StyleSheet.create({
   liveBadge:   { flexDirection:'row', alignItems:'center', gap:5, borderWidth:1.5, borderRadius:8, paddingHorizontal:9, paddingVertical:5 },
   liveTxt:     { fontSize:9, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5 },
   statGrid:    { flexDirection:'row', flexWrap:'wrap', paddingHorizontal:12, gap:8, marginBottom:14 },
-  statCard:    { width:(SW - 32 - 24 - 16) / 3, backgroundColor:'#02070D', borderRadius:10, borderWidth:1.5, borderBottomWidth:3,
+  statCard:    { width:(SW - 32 - 24 - 16) / 3, backgroundColor:'#0E0F12', borderRadius:10, borderWidth:1.5, borderBottomWidth:3,
     paddingHorizontal:10, paddingTop:12, paddingBottom:10, minHeight:80, position:'relative', overflow:'hidden' },
   miniCorner:  { position:'absolute', width:8, height:8 },
   statVal:     { fontSize:22, fontWeight:'900', fontFamily:MONO, lineHeight:26, marginBottom:5 },
-  statLabel:   { fontSize:7.5, fontWeight:'700', color:'#3A5060', fontFamily:MONO, letterSpacing:1.2 },
+  statLabel:   { fontSize:7.5, fontWeight:'700', color:'#525A68', fontFamily:MONO, letterSpacing:1.2 },
   sectionHead: { flexDirection:'row', alignItems:'center', gap:6, paddingHorizontal:16, marginBottom:10 },
   sectionTxt:  { fontSize:9, fontWeight:'900', fontFamily:MONO, letterSpacing:1 },
   catGrid:     { flexDirection:'row', flexWrap:'wrap', paddingHorizontal:12, gap:6, marginBottom:14 },
   catCard:     { width:(SW - 32 - 24 - 6) / 3, borderWidth:1, borderRadius:8, overflow:'hidden' },
   catTrack:    { height:4, backgroundColor:'rgba(255,255,255,0.05)', borderRadius:2, overflow:'hidden' },
   catFill:     { height:'100%', borderRadius:2 },
-  terminalBox: { backgroundColor:'#000003', borderTopWidth:1, borderBottomWidth:1, borderColor:'rgba(255,255,255,0.06)', marginBottom:12, paddingHorizontal:14 },
+  terminalBox: { backgroundColor:'#050505', borderTopWidth:1, borderBottomWidth:1, borderColor:'rgba(255,255,255,0.06)', marginBottom:12, paddingHorizontal:14 },
   termRow:     { flexDirection:'row', alignItems:'center', gap:8, paddingVertical:8 },
   termTime:    { fontSize:9, fontFamily:MONO, fontWeight:'700', width:42, flexShrink:0 },
   termDot:     { width:4, height:4, borderRadius:2, flexShrink:0 },
@@ -258,7 +258,7 @@ const nke = StyleSheet.create({
   footerRow:   { flexDirection:'row', paddingHorizontal:12, paddingBottom:14, gap:6 },
   footerChip:  { flex:1, borderWidth:1, borderRadius:8, paddingVertical:8, alignItems:'center', gap:2 },
   footerVal:   { fontSize:12, fontWeight:'900', fontFamily:MONO },
-  footerLabel: { fontSize:7.5, color:'#3A5060', fontFamily:MONO, letterSpacing:0.8 },
+  footerLabel: { fontSize:7.5, color:'#525A68', fontFamily:MONO, letterSpacing:0.8 },
 });
 
 // ─── KB INTELLIGENCE DASHBOARD ───────────────────────────────────────────────
@@ -307,11 +307,11 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
           sources.forEach((s, i) => { if (barAnims[i]) Animated.timing(barAnims[i], { toValue: s.count / maxS, duration: 800 + i * 80, useNativeDriver: false }).start(); });
         }
         const cats = [
-          { name: 'Python', count: Math.round(articles * 0.34), color: '#00CCFF' },
+          { name: 'Python', count: Math.round(articles * 0.34), color: '#FF2A1F' },
           { name: 'Automation', count: Math.round(articles * 0.22), color: '#00FF88' },
           { name: 'Network', count: Math.round(articles * 0.15), color: '#7755FF' },
-          { name: 'Security', count: Math.round(articles * 0.11), color: '#FFAA00' },
-          { name: 'Registry', count: Math.round(articles * 0.08), color: '#CC44FF' },
+          { name: 'Security', count: Math.round(articles * 0.11), color: '#FFC400' },
+          { name: 'Registry', count: Math.round(articles * 0.08), color: '#FFC400' },
           { name: 'Hardware', count: Math.round(articles * 0.10), color: '#FF4455' },
         ].filter(c => c.count > 0);
         setCategoryData(cats);
@@ -350,9 +350,9 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
     { name: 'PyPI', count: 11 }, { name: 'AutomateBoring', count: 8 },
   ];
   const DEFAULT_CATS = [
-    { name: 'Python', count: 34, color: '#00CCFF' }, { name: 'Automation', count: 22, color: '#00FF88' },
-    { name: 'Network', count: 15, color: '#7755FF' }, { name: 'Security', count: 11, color: '#FFAA00' },
-    { name: 'Registry', count: 8, color: '#CC44FF' }, { name: 'Hardware', count: 10, color: '#FF4455' },
+    { name: 'Python', count: 34, color: '#FF2A1F' }, { name: 'Automation', count: 22, color: '#00FF88' },
+    { name: 'Network', count: 15, color: '#7755FF' }, { name: 'Security', count: 11, color: '#FFC400' },
+    { name: 'Registry', count: 8, color: '#FFC400' }, { name: 'Hardware', count: 10, color: '#FF4455' },
   ];
   const displaySources = sourceBars.length > 0 ? sourceBars : DEFAULT_SOURCES;
   const displayCats = categoryData.length > 0 ? categoryData : DEFAULT_CATS;
@@ -365,12 +365,12 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
         {[
           { label: 'KB ARTICLES',     val: articles,                  sub: 'TOTAL SYNCED \u00b7 Real-Time',  col: '#00C2FF', icon: 'psychology' as const },
           { label: 'SOURCES CRAWLED', val: liveData?.queuePending ?? localStats.sources, sub: 'ACTIVE ENDPOINTS',   col: '#00FF88', icon: 'language' as const },
-          { label: 'SCRIPTS RUN',     val: localStats.scriptsRun,     sub: 'EXECUTED JOBS',      col: '#FFAA00', icon: 'code' as const },
+          { label: 'SCRIPTS RUN',     val: localStats.scriptsRun,     sub: 'EXECUTED JOBS',      col: '#FFC400', icon: 'code' as const },
           { label: 'TOPIC GAPS',      val: localStats.gaps,           sub: localStats.gaps > 0 ? 'Auto-filling...' : 'All covered', col: '#FF5566', icon: 'warning' as const },
         ].map(({ label, val, sub, col, icon }) => (
           <View key={label} style={[kbid.kpiCard, { borderColor: col + '55', width: (SW - 24 - 8) / 2 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <Text style={[kbid.kpiLabel, { color: '#5A6A7A' }]}>{label}</Text>
+              <Text style={[kbid.kpiLabel, { color: '#525A68' }]}>{label}</Text>
               <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: col, opacity: liveDot }} />
             </View>
             <Text style={[kbid.kpiVal, { color: col }]}>{val}</Text>
@@ -394,7 +394,7 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
             <View key={pct} style={{ position: 'absolute', left: 30, right: 0, top: (1 - pct) * CHART_H, height: 1, backgroundColor: 'rgba(255,255,255,0.05)' }} />
           ))}
           {[0, 0.5, 1].map(pct => (
-            <Text key={pct} style={{ position: 'absolute', left: 0, top: (1 - pct) * CHART_H - 8, fontSize: 7, color: '#3A4A55', fontFamily: MONO, width: 28, textAlign: 'right' }}>
+            <Text key={pct} style={{ position: 'absolute', left: 0, top: (1 - pct) * CHART_H - 8, fontSize: 7, color: '#3C424D', fontFamily: MONO, width: 28, textAlign: 'right' }}>
               {Math.round(maxPt * pct)}
             </Text>
           ))}
@@ -423,14 +423,14 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
                 position: 'absolute',
                 left: 30 + (i / (growthData.length - 1)) * chartW - 4,
                 top: CHART_H - (pt / maxPt) * (CHART_H - 10) - 9,
-                width: 8, height: 8, borderRadius: 4, backgroundColor: accent, borderWidth: 2, borderColor: '#050910',
+                width: 8, height: 8, borderRadius: 4, backgroundColor: accent, borderWidth: 2, borderColor: '#0A0B0E',
               }} />
             );
           })}
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6, paddingLeft: 30 }}>
           {['00', '04', '08', '12', '16', '20'].map(h => (
-            <Text key={h} style={{ fontSize: 9, color: '#3A4A55', fontFamily: MONO }}>{h}</Text>
+            <Text key={h} style={{ fontSize: 9, color: '#3C424D', fontFamily: MONO }}>{h}</Text>
           ))}
         </View>
       </View>
@@ -479,7 +479,7 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
               })}
               <View style={{
                 width: DONUT_SIZE - RING_W * 2 - 4, height: DONUT_SIZE - RING_W * 2 - 4,
-                borderRadius: (DONUT_SIZE - RING_W * 2) / 2, backgroundColor: '#050910',
+                borderRadius: (DONUT_SIZE - RING_W * 2) / 2, backgroundColor: '#0A0B0E',
                 alignItems: 'center', justifyContent: 'center', zIndex: 5,
               }}>
                 <Text style={{ fontSize: 20, fontWeight: '900', color: accent, fontFamily: MONO }}>{articles > 0 ? articles : '100'}</Text>
@@ -501,14 +501,14 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
 
       {/* Crawler status chips v6.1.0 */}
       {liveData?.crawling ? (
-        <View style={{ flexDirection:'row', alignItems:'center', gap:6, backgroundColor:'rgba(0,229,255,0.08)', borderRadius:8, borderWidth:1, borderColor:'rgba(0,229,255,0.2)', paddingHorizontal:10, paddingVertical:6, marginBottom:8 }}>
-          <ActivityIndicator size="small" color="#00E5FF" />
-          <Text style={{ color:'#00E5FF', fontSize:11, fontFamily:'monospace' }}>{`Crawling — ${(liveData as any).queue_size ?? liveData.queuePending ?? 0} in queue`}</Text>
+        <View style={{ flexDirection:'row', alignItems:'center', gap:6, backgroundColor:'rgba(255,42,31,0.08)', borderRadius:8, borderWidth:1, borderColor:'rgba(255,42,31,0.2)', paddingHorizontal:10, paddingVertical:6, marginBottom:8 }}>
+          <ActivityIndicator size="small" color="#FF2A1F" />
+          <Text style={{ color:'#FF2A1F', fontSize:11, fontFamily:'monospace' }}>{`Crawling — ${(liveData as any).queue_size ?? liveData.queuePending ?? 0} in queue`}</Text>
         </View>
       ) : null}
       {(liveData as any)?.paused && !liveData?.crawling ? (
         <View style={{ backgroundColor:'rgba(255,184,0,0.08)', borderRadius:8, borderWidth:1, borderColor:'rgba(255,184,0,0.2)', paddingHorizontal:10, paddingVertical:6, marginBottom:8 }}>
-          <Text style={{ color:'#FFB800', fontSize:11, fontFamily:'monospace' }}>{'Crawlers paused — AI is active'}</Text>
+          <Text style={{ color:'#FFC400', fontSize:11, fontFamily:'monospace' }}>{'Crawlers paused — AI is active'}</Text>
         </View>
       ) : null}
 
@@ -539,12 +539,12 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
 }
 
 const kbid = StyleSheet.create({
-  kpiCard:   { backgroundColor: '#02070D', borderWidth: 1.5, borderRadius: 14, padding: 14, minHeight: 96, position: 'relative', overflow: 'hidden' },
+  kpiCard:   { backgroundColor: '#0E0F12', borderWidth: 1.5, borderRadius: 14, padding: 14, minHeight: 96, position: 'relative', overflow: 'hidden' },
   kpiLabel:  { fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.8 },
   kpiVal:    { fontSize: 32, fontWeight: '900', fontFamily: MONO, lineHeight: 38 },
   kpiSub:    { fontSize: 10, fontWeight: '600', fontFamily: MONO, letterSpacing: 0.3, marginTop: 4 },
   kpiAccent: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 2 },
-  chartCard: { backgroundColor: '#02070D', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', borderRadius: 14, padding: 16 },
+  chartCard: { backgroundColor: '#0E0F12', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.10)', borderRadius: 14, padding: 16 },
   chartTitle:{ fontSize: 13, fontWeight: '900', color: '#8A9BAB', fontFamily: MONO, letterSpacing: 1.2, marginBottom: 0 },
 });
 
@@ -629,7 +629,7 @@ function LogRow({ log }: { log: CrawlLog | BotActivity }) {
 }
 const lr = StyleSheet.create({
   line: { fontSize: 12, fontWeight: '600', fontFamily: MONO, lineHeight: 18, marginBottom: 3 },
-  ts: { color: '#3A4A55' },
+  ts: { color: '#3C424D' },
 });
 
 // ─── KNOWLEDGE PROCESS DIAGRAM ────────────────────────────────
@@ -1886,7 +1886,7 @@ function NexusBridgeAutoPanel({ relayAddr, isConnected }: { relayAddr: string; i
     return () => anims.forEach(a => a.stop());
   }, []));
 
-  const SIGMA = '#CC33FF';
+  const SIGMA = '#FFC400';
   const connCol = isConnected ? N.green : N.amber;
   const rotDeg = ringAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
 
@@ -1958,7 +1958,7 @@ function NexusBridgeAutoPanel({ relayAddr, isConnected }: { relayAddr: string; i
 }
 
 const nbap = StyleSheet.create({
-  wrap:      { backgroundColor: N.surface, borderRadius: 14, borderWidth: 1.5, borderColor: '#CC33FF30', padding: 14, marginBottom: 12, overflow: 'hidden' },
+  wrap:      { backgroundColor: N.surface, borderRadius: 14, borderWidth: 1.5, borderColor: '#FFC40030', padding: 14, marginBottom: 12, overflow: 'hidden' },
   header:    { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
   orbWrap:   { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0 },
   orbRing:   { position: 'absolute', width: 36, height: 36, borderRadius: 18, borderWidth: 1.5 },
@@ -1986,7 +1986,7 @@ function NexusBridgeFullTab({ relayAddr, isConnected, qlhStats, kbStats }: {
   qlhStats: QLHStats | null; kbStats: KBStats | null;
 }) {
   const { T } = useCosmetic();
-  const SIGMA = '#CC33FF';
+  const SIGMA = '#FFC400';
   const TEAL  = N.teal;
 
   // ─ Bridge state ─
@@ -2199,7 +2199,7 @@ function NexusBridgeFullTab({ relayAddr, isConnected, qlhStats, kbStats }: {
       <Animated.View style={[nbft.qlhCard, {
         borderColor: ringAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: [TEAL + '40', TEAL + 'BB', TEAL + '40'] })
       }]}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000003', borderRadius: 14 }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#050505', borderRadius: 14 }]} />
         {/* Header */}
         <View style={nbft.cardHeader}>
           <View style={[nbft.qlhOrb, { borderColor: TEAL, backgroundColor: TEAL + '20' }]}>
@@ -2297,9 +2297,9 @@ function NexusBridgeFullTab({ relayAddr, isConnected, qlhStats, kbStats }: {
 
 const nbft = StyleSheet.create({
   bridgeCard:      { borderWidth: 2, borderRadius: 16, overflow: 'hidden', position: 'relative',
-    ...Platform.select({ ios:{ shadowColor:'#CC33FF', shadowOffset:{width:0,height:6}, shadowOpacity:0.2, shadowRadius:12 }, android:{elevation:8} }) },
+    ...Platform.select({ ios:{ shadowColor:'#FFC400', shadowOffset:{width:0,height:6}, shadowOpacity:0.2, shadowRadius:12 }, android:{elevation:8} }) },
   qlhCard:         { borderWidth: 2, borderRadius: 14, overflow: 'hidden', position: 'relative',
-    ...Platform.select({ ios:{ shadowColor:'#00CCDD', shadowOffset:{width:0,height:4}, shadowOpacity:0.15, shadowRadius:10 }, android:{elevation:6} }) },
+    ...Platform.select({ ios:{ shadowColor:'#FF2A1F', shadowOffset:{width:0,height:4}, shadowOpacity:0.15, shadowRadius:10 }, android:{elevation:6} }) },
   cardHeader:      { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, paddingBottom: 10 },
   orbWrap:         { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0 },
   orbRing:         { position: 'absolute', width: 40, height: 40, borderRadius: 20, borderWidth: 1.5 },
@@ -2654,7 +2654,7 @@ function NexusBotFullTab({ kbStats, qlhStats, isConnected }: {
       <Animated.View style={[nbot.qlhCard, {
         borderColor: dotPulse.interpolate({ inputRange:[0.2,1], outputRange:[N.teal+'40', N.teal+'BB'] })
       }]}>
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000003', borderRadius: 14 }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#050505', borderRadius: 14 }]} />
         <View style={[nbot.headerTopBar, { backgroundColor: N.teal }]} />
         <View style={nbot.headerRow}>
           <View style={[nbot.qlhOrb, { borderColor: N.teal, backgroundColor: N.teal + '20' }]}>
@@ -2735,7 +2735,7 @@ function NexusBotFullTab({ kbStats, qlhStats, isConnected }: {
 
 const nbot = StyleSheet.create({
   headerCard:    { borderWidth: 2, borderRadius: 16, overflow: 'hidden', position: 'relative',
-    ...Platform.select({ ios:{ shadowColor:'#FF9900', shadowOffset:{width:0,height:6}, shadowOpacity:0.2, shadowRadius:12 }, android:{elevation:8} }) },
+    ...Platform.select({ ios:{ shadowColor:'#FF6A1F', shadowOffset:{width:0,height:6}, shadowOpacity:0.2, shadowRadius:12 }, android:{elevation:8} }) },
   headerTopBar:  { height: 3 },
   headerRow:     { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, paddingBottom: 10 },
   orbWrap:       { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0 },
@@ -2772,7 +2772,7 @@ const nbot = StyleSheet.create({
   logPrefix:     { fontSize: 11, fontWeight: '900', fontFamily: MONO, minWidth: 30 },
   logMsg:        { flex: 1, fontSize: 11, fontFamily: MONO, lineHeight: 16 },
   qlhCard:       { borderWidth: 2, borderRadius: 14, overflow: 'hidden', position: 'relative',
-    ...Platform.select({ ios:{ shadowColor:'#00CCDD', shadowOffset:{width:0,height:4}, shadowOpacity:0.15, shadowRadius:10 }, android:{elevation:6} }) },
+    ...Platform.select({ ios:{ shadowColor:'#FF2A1F', shadowOffset:{width:0,height:4}, shadowOpacity:0.15, shadowRadius:10 }, android:{elevation:6} }) },
   qlhBtn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderWidth: 2, borderRadius: 12, paddingVertical: 14, marginHorizontal: 14, marginBottom: 10, overflow: 'hidden' },
   qlhBtnTxt:     { fontSize: 13, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.8 },
   autoRow:       { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 14, marginBottom: 14, borderWidth: 1, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 9 },
@@ -3028,8 +3028,8 @@ export default function KnowledgeScreen() {
               onPress={() => { haptics.selection(); setActiveTab(tab.key); }}
               activeOpacity={0.8}
             >
-              <MaterialIcons name={tab.icon as any} size={isActive ? 17 : 15} color={isActive ? tab.color : '#5A6A7A'} />
-              <Text style={[s.tabTxt, { color: isActive ? tab.color : '#5A6A7A', fontWeight: isActive ? '900' : '600',
+              <MaterialIcons name={tab.icon as any} size={isActive ? 17 : 15} color={isActive ? tab.color : '#525A68'} />
+              <Text style={[s.tabTxt, { color: isActive ? tab.color : '#525A68', fontWeight: isActive ? '900' : '600',
                 ...Platform.select({ ios: isActive ? { textShadowColor: tab.color, textShadowOffset:{width:0,height:0}, textShadowRadius:6 } : {}, android:{} }) }]}>{tab.label}</Text>
             </TouchableOpacity>
           );
@@ -3331,11 +3331,11 @@ export default function KnowledgeScreen() {
 }
 
 const s = StyleSheet.create({
-  container:  { flex: 1, backgroundColor: '#000003' },
+  container:  { flex: 1, backgroundColor: '#050505' },
   statusStrip:{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: N.border, backgroundColor: N.surface },
   kbPill:     { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1.5, borderRadius: 20, paddingHorizontal: 9, paddingVertical: 5 },
   kbPillTxt:  { fontSize: 13, fontWeight: '900', fontFamily: MONO },
-  tabBarScroll: { backgroundColor: '#000003', borderBottomWidth: 1.5, borderBottomColor: 'rgba(0,255,255,0.14)', flexGrow: 0 },
+  tabBarScroll: { backgroundColor: '#050505', borderBottomWidth: 1.5, borderBottomColor: 'rgba(255,42,31,0.14)', flexGrow: 0 },
   tabBarContent: { flexDirection: 'row', alignItems: 'stretch' },
   tabBtn:     { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 3, position: 'relative', minHeight: 52, borderTopColor: 'transparent', borderLeftColor: 'transparent', borderRightColor: 'transparent' },
   tabTxt:     { fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.5 },
@@ -3363,10 +3363,10 @@ const s = StyleSheet.create({
   targetChip: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: N.surface, borderRadius: 10, borderWidth: 1, borderColor: N.border, padding: 12, marginBottom: 8 },
   targetLabel:{ fontSize: 14, fontWeight: '900', color: N.text, fontFamily: MONO },
   targetUrl:  { fontSize: 9, color: N.textDim, fontFamily: MONO, marginTop: 2 },
-  textArea:   { backgroundColor: '#02070D', borderWidth: 2, borderColor: 'rgba(0,255,255,0.35)', borderRadius: 12, padding: 14, color: '#D8E8F4', fontSize: 14, fontFamily: MONO, minHeight: 160, lineHeight: 23 },
+  textArea:   { backgroundColor: '#0E0F12', borderWidth: 2, borderColor: 'rgba(255,42,31,0.35)', borderRadius: 12, padding: 14, color: '#E6E9EF', fontSize: 14, fontFamily: MONO, minHeight: 160, lineHeight: 23 },
   dbToolbar:  { padding: 14, gap: 10, borderBottomWidth: 1, borderBottomColor: N.border, backgroundColor: N.surface },
   searchRow:  { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: N.surfaceHi, borderRadius: 10, borderWidth: 1, borderColor: N.border, paddingHorizontal: 12, paddingVertical: 10 },
-  searchInput:{ flex: 1, fontSize: 14, fontWeight: '600', color: '#D8E8F4', fontFamily: MONO },
+  searchInput:{ flex: 1, fontSize: 14, fontWeight: '600', color: '#E6E9EF', fontFamily: MONO },
   dbAction:   { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 },
   dbActionTxt:{ fontSize: 11, fontWeight: '900', fontFamily: MONO },
   dbStats:    { padding: 16, borderBottomWidth: 1, borderBottomColor: N.border },

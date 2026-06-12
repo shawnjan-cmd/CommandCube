@@ -37,28 +37,25 @@ import { BUTLER_STARTER_KNOWLEDGE, BUTLER_KNOWLEDGE_COMPACT } from '@/constants/
 import '@/constants/tabSourcesBundle'; // registers nexushome/knowledge/builder/settings sources
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import * as DocumentPicker from 'expo-document-picker';
-import { processPowerhouseJson, generateCurrentStateJson, getImportLog, clearImportLog } from '@/services/powerhouseImport';
-import type { PHLog, PHResult } from '@/services/powerhouseImport';
 import { uiConfig, DEFAULT_UI_CONFIG, HomeCardId } from '@/services/uiConfig';
 
 const N = {
-  bg:       '#000003',
-  panel:    '#02070D',
-  card:     '#02070D',
-  border:   'rgba(0,255,255,0.12)',
-  cyan:     '#00FFFF',
+  bg:       '#050505',
+  panel:    '#0E0F12',
+  card:     '#0E0F12',
+  border:   'rgba(255,42,31,0.12)',
+  cyan:     '#FF2A1F',
   green:    '#00FF88',
-  amber:    '#F5A623',
+  amber:    '#FFC400',
   red:      '#FF3131',
-  sigma:    '#BF00FF',
-  purple:   '#BF00FF',
-  blue:     '#4A9EFF',
-  text:     '#3A5068',
-  textBrt:  '#D8E8F4',
-  textDim:  '#2A3A50',
+  sigma:    '#FFC400',
+  purple:   '#FFC400',
+  blue:     '#FF6A1F',
+  text:     '#6A7384',
+  textBrt:  '#E6E9EF',
+  textDim:  '#3C424D',
 };
-const C_BLUE = '#4A9EFF';
+const C_BLUE = '#FF6A1F';
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 export const SCRIPT_ONLY_MODE_KEY = 'commandcube_script_only_mode';
@@ -175,23 +172,23 @@ function EditableRow({
 }
 
 const er = StyleSheet.create({
-  wrap:      { paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: '#071120' },
+  wrap:      { paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: '#1A1D24' },
   header:    { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 5 },
   label:     { flex: 1, fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.3 },
-  editChip:  { flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3, borderColor: '#00CCDD40', backgroundColor: '#00CCDD0A' },
-  editChipTxt:{ fontSize: 8, fontWeight: '900', color: '#00CCDD', fontFamily: MONO, letterSpacing: 0.5 },
+  editChip:  { flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3, borderColor: '#FF2A1F40', backgroundColor: '#FF2A1F0A' },
+  editChipTxt:{ fontSize: 8, fontWeight: '900', color: '#FF2A1F', fontFamily: MONO, letterSpacing: 0.5 },
   valueWrap: { paddingVertical: 2 },
-  value:     { fontSize: 13, color: '#88AACC', fontFamily: MONO, lineHeight: 19 },
+  value:     { fontSize: 13, color: '#9AA3B2', fontFamily: MONO, lineHeight: 19 },
   inputWrap: { gap: 8 },
   input:     {
-    backgroundColor: '#071018', borderWidth: 1.5, borderColor: '#00CCDD55',
+    backgroundColor: '#131418', borderWidth: 1.5, borderColor: '#FF2A1F55',
     borderRadius: 9, paddingHorizontal: 12, paddingVertical: 11,
-    fontSize: 14, color: '#c8d8f0', fontFamily: MONO, lineHeight: 20,
+    fontSize: 14, color: '#D5D9E0', fontFamily: MONO, lineHeight: 20,
   },
   actions:   { flexDirection: 'row', gap: 8 },
-  cancelBtn: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 8, backgroundColor: '#071120', borderWidth: 1, borderColor: '#1a2235' },
-  cancelTxt: { fontSize: 10, fontWeight: '700', color: '#336677', fontFamily: MONO },
-  saveBtn:   { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 10, borderRadius: 8, backgroundColor: '#00CCDD' },
+  cancelBtn: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 8, backgroundColor: '#1A1D24', borderWidth: 1, borderColor: '#232730' },
+  cancelTxt: { fontSize: 10, fontWeight: '700', color: '#5A626E', fontFamily: MONO },
+  saveBtn:   { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 10, borderRadius: 8, backgroundColor: '#FF2A1F' },
   saveTxt:   { fontSize: 11, fontWeight: '900', color: '#000', fontFamily: MONO },
 });
 
@@ -300,31 +297,31 @@ function PowerControlsCard({ isConnected }: { isConnected: boolean }) {
   };
 
   const BTNS: { action: 'sleep' | 'restart' | 'shutdown'; icon: string; label: string; col: string; desc: string }[] = [
-    { action: 'sleep',    icon: 'bedtime',            label: 'SLEEP',    col: '#00CCDD', desc: 'Suspend to RAM - resumes in seconds' },
-    { action: 'restart',  icon: 'restart-alt',        label: 'RESTART',  col: '#FF8C00', desc: 'Reboot PC - apps will restart' },
-    { action: 'shutdown', icon: 'power-settings-new', label: 'SHUTDOWN', col: '#FF3300', desc: 'Full power off - save work first' },
+    { action: 'sleep',    icon: 'bedtime',            label: 'SLEEP',    col: '#FF2A1F', desc: 'Suspend to RAM - resumes in seconds' },
+    { action: 'restart',  icon: 'restart-alt',        label: 'RESTART',  col: '#FF6A1F', desc: 'Reboot PC - apps will restart' },
+    { action: 'shutdown', icon: 'power-settings-new', label: 'SHUTDOWN', col: '#FF6A1F', desc: 'Full power off - save work first' },
   ];
 
   return (
-    <View style={[g.card, { borderColor: '#00CCDD55', borderWidth: 2 }]}>
+    <View style={[g.card, { borderColor: '#FF2A1F55', borderWidth: 2 }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <View style={[g.iconBox, { borderColor: '#00CCDD', backgroundColor: '#00CCDD12' }]}>
-          <MaterialIcons name="power-settings-new" size={20} color="#00CCDD" />
+        <View style={[g.iconBox, { borderColor: '#FF2A1F', backgroundColor: '#FF2A1F12' }]}>
+          <MaterialIcons name="power-settings-new" size={20} color="#FF2A1F" />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[g.cardTitle, { color: '#00CCDD', marginBottom: 0 }]}>PC POWER CONTROLS</Text>
+          <Text style={[g.cardTitle, { color: '#FF2A1F', marginBottom: 0 }]}>PC POWER CONTROLS</Text>
           <Text style={g.cardSub}>Sleep, Restart, Shutdown - confirmation required</Text>
         </View>
-        <View style={[g.statusBadge, { borderColor: isConnected ? '#00FF8855' : '#FF330055' }]}>
-          <View style={[g.statusDot, { backgroundColor: isConnected ? '#00FF88' : '#FF3300' }]} />
-          <Text style={[g.statusTxt, { color: isConnected ? '#00FF88' : '#FF3300' }]}>
+        <View style={[g.statusBadge, { borderColor: isConnected ? '#00FF8855' : '#FF6A1F55' }]}>
+          <View style={[g.statusDot, { backgroundColor: isConnected ? '#00FF88' : '#FF6A1F' }]} />
+          <Text style={[g.statusTxt, { color: isConnected ? '#00FF88' : '#FF6A1F' }]}>
             {isConnected ? 'READY' : 'OFFLINE'}
           </Text>
         </View>
       </View>
-      <View style={[g.infoBanner, { borderColor: '#FF8C0035', backgroundColor: '#FF8C0008', marginBottom: 14 }]}>
-        <MaterialIcons name="warning" size={13} color="#FF8C00" />
-        <Text style={[g.infoBannerTxt, { color: '#FF8C00CC' }]}>
+      <View style={[g.infoBanner, { borderColor: '#FF6A1F35', backgroundColor: '#FF6A1F08', marginBottom: 14 }]}>
+        <MaterialIcons name="warning" size={13} color="#FF6A1F" />
+        <Text style={[g.infoBannerTxt, { color: '#FF6A1FCC' }]}>
           Each button shows a confirmation dialog. Requires butler_server.py v7.1.0+ with power controls enabled.
         </Text>
       </View>
@@ -921,7 +918,7 @@ function OmegaScannerCard({
             {showFixLog ? (
               <ScrollView style={{ maxHeight: 180 }} nestedScrollEnabled showsVerticalScrollIndicator={false}>
                 {fixLog.slice(0, 30).map((fix, i) => (
-                  <View key={i} style={[omega.fixLogRow, { borderBottomWidth: i < Math.min(fixLog.length, 30) - 1 ? 1 : 0, borderBottomColor: '#071120' }]}>
+                  <View key={i} style={[omega.fixLogRow, { borderBottomWidth: i < Math.min(fixLog.length, 30) - 1 ? 1 : 0, borderBottomColor: '#1A1D24' }]}>
                     <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: N.green, flexShrink: 0, marginTop: 4 }} />
                     <Text style={omega.fixLogTxt} numberOfLines={2}>{fix}</Text>
                   </View>
@@ -1055,7 +1052,7 @@ const omega = StyleSheet.create({
   progressFill: { height: '100%', borderRadius: 1 },
   section:      { marginHorizontal: 14, marginBottom: 10, padding: 10, backgroundColor: N.panel, borderRadius: 10, borderWidth: 1, borderColor: N.border },
   sectionLbl:   { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.5, marginBottom: 0 },
-  issueRow:     { flexDirection: 'row', alignItems: 'flex-start', gap: 9, paddingVertical: 9, borderLeftWidth: 3, paddingLeft: 8, borderBottomColor: '#071120', backgroundColor: N.bg, marginBottom: 4, borderRadius: 6 },
+  issueRow:     { flexDirection: 'row', alignItems: 'flex-start', gap: 9, paddingVertical: 9, borderLeftWidth: 3, paddingLeft: 8, borderBottomColor: '#1A1D24', backgroundColor: N.bg, marginBottom: 4, borderRadius: 6 },
   issueIconBox: { width: 26, height: 26, borderRadius: 6, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   severityPill: { borderWidth: 1, borderRadius: 5, paddingHorizontal: 5, paddingVertical: 2 },
   severityTxt:  { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.3 },
@@ -1080,22 +1077,22 @@ const omega = StyleSheet.create({
 // Sections are parsed from the [SECTION_NAME] block headers in the knowledge string.
 
 const KNOWLEDGE_SECTIONS: { id: string; title: string; icon: string; color: string }[] = [
-  { id: 'WHAT YOU ARE',          title: 'Identity & Mission',      icon: 'smart-toy',       color: '#5B9CF6' },
-  { id: 'APP ARCHITECTURE',      title: 'App Architecture',        icon: 'account-tree',    color: '#2FD98B' },
-  { id: 'TABS & FEATURES',       title: 'Tabs & Features',         icon: 'tab',             color: '#A366F5' },
-  { id: 'HOW TO HELP',           title: 'AI Priority Rules',       icon: 'rule',            color: '#F5A623' },
-  { id: 'SERVER API ENDPOINTS',  title: 'Server API Endpoints',    icon: 'api',             color: '#5B9CF6' },
-  { id: 'SCRIPT EXECUTION',      title: 'Script Execution Rules',  icon: 'code',            color: '#2FD98B' },
-  { id: 'OLLAMA AI MODELS',      title: 'Ollama AI Models',        icon: 'memory',          color: '#FF6EB4' },
-  { id: 'RESPONSE FORMAT',       title: 'Response Format Rules',   icon: 'format-align-left', color: '#FFD700' },
-  { id: 'HOW THE APP STORES',    title: 'AsyncStorage Keys',       icon: 'storage',         color: '#F5A623' },
-  { id: 'UI / JSON EDITING',     title: 'UI / JSON Editing',       icon: 'edit',            color: '#A366F5' },
-  { id: 'COSMETIC THEMES',       title: 'Cosmetic Themes',         icon: 'palette',         color: '#FF6EB4' },
-  { id: 'PLAY STORE COMPLIANCE', title: 'Play Store Compliance',   icon: 'verified-user',   color: '#2FD98B' },
-  { id: 'SELF-LEARNING',         title: 'Self-Learning System',    icon: 'school',          color: '#00CCDD' },
-  { id: 'MEMORY SYSTEM',         title: 'Memory System',           icon: 'psychology',      color: '#5B9CF6' },
-  { id: 'QUICK AUTOMATION',      title: 'Quick Automation Examples', icon: 'bolt',          color: '#FFD700' },
-  { id: 'WHEN USER ASKS',        title: 'Capability Summary',      icon: 'help-circle',     color: '#2FD98B' },
+  { id: 'WHAT YOU ARE',          title: 'Identity & Mission',      icon: 'smart-toy',       color: '#FF6A1F' },
+  { id: 'APP ARCHITECTURE',      title: 'App Architecture',        icon: 'account-tree',    color: '#00FF88' },
+  { id: 'TABS & FEATURES',       title: 'Tabs & Features',         icon: 'tab',             color: '#FF6A1F' },
+  { id: 'HOW TO HELP',           title: 'AI Priority Rules',       icon: 'rule',            color: '#FFC400' },
+  { id: 'SERVER API ENDPOINTS',  title: 'Server API Endpoints',    icon: 'api',             color: '#FF6A1F' },
+  { id: 'SCRIPT EXECUTION',      title: 'Script Execution Rules',  icon: 'code',            color: '#00FF88' },
+  { id: 'OLLAMA AI MODELS',      title: 'Ollama AI Models',        icon: 'memory',          color: '#FF6A1F' },
+  { id: 'RESPONSE FORMAT',       title: 'Response Format Rules',   icon: 'format-align-left', color: '#FFC400' },
+  { id: 'HOW THE APP STORES',    title: 'AsyncStorage Keys',       icon: 'storage',         color: '#FFC400' },
+  { id: 'UI / JSON EDITING',     title: 'UI / JSON Editing',       icon: 'edit',            color: '#FF6A1F' },
+  { id: 'COSMETIC THEMES',       title: 'Cosmetic Themes',         icon: 'palette',         color: '#FF6A1F' },
+  { id: 'PLAY STORE COMPLIANCE', title: 'Play Store Compliance',   icon: 'verified-user',   color: '#00FF88' },
+  { id: 'SELF-LEARNING',         title: 'Self-Learning System',    icon: 'school',          color: '#FF2A1F' },
+  { id: 'MEMORY SYSTEM',         title: 'Memory System',           icon: 'psychology',      color: '#FF6A1F' },
+  { id: 'QUICK AUTOMATION',      title: 'Quick Automation Examples', icon: 'bolt',          color: '#FFC400' },
+  { id: 'WHEN USER ASKS',        title: 'Capability Summary',      icon: 'help-circle',     color: '#00FF88' },
 ];
 
 function extractSection(knowledge: string, sectionId: string): string {
@@ -1112,7 +1109,7 @@ function extractSection(knowledge: string, sectionId: string): string {
 }
 
 function ButlerKnowledgeViewer() {
-  const ACCENT = '#5B9CF6';
+  const ACCENT = '#FF6A1F';
   const [open, setOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -1139,7 +1136,7 @@ function ButlerKnowledgeViewer() {
     } catch {}
   };
 
-  const NEON = '#00CCDD';
+  const NEON = '#FF2A1F';
 
   return (
     <View style={[bkv.outer, { borderColor: ACCENT + '55' }]}>
@@ -1162,9 +1159,9 @@ function ButlerKnowledgeViewer() {
       <View style={bkv.statsRow}>
         {[
           { val: String(knowledgeSections), label: 'SECTIONS', col: ACCENT },
-          { val: `${knowledgeWords}K`,      label: 'WORDS',    col: '#2FD98B' },
-          { val: `${(knowledgeLen / 1024).toFixed(0)}KB`, label: 'SIZE', col: '#F5A623' },
-          { val: 'AUTO',                    label: 'INJECT',   col: '#A366F5' },
+          { val: `${knowledgeWords}K`,      label: 'WORDS',    col: '#00FF88' },
+          { val: `${(knowledgeLen / 1024).toFixed(0)}KB`, label: 'SIZE', col: '#FFC400' },
+          { val: 'AUTO',                    label: 'INJECT',   col: '#FF6A1F' },
         ].map(({ val, label, col }) => (
           <View key={label} style={[bkv.statChip, { borderColor: col + '35', backgroundColor: col + '08' }]}>
             <Text style={[bkv.statVal, { color: col }]}>{val}</Text>
@@ -1189,7 +1186,7 @@ function ButlerKnowledgeViewer() {
             const isExp = expandedSection === sec.id;
             if (!content) return null;
             return (
-              <View key={sec.id} style={[bkv.sectionCard, { borderLeftColor: sec.color, borderBottomWidth: idx < KNOWLEDGE_SECTIONS.length - 1 ? 1 : 0, borderBottomColor: '#071120' }]}>
+              <View key={sec.id} style={[bkv.sectionCard, { borderLeftColor: sec.color, borderBottomWidth: idx < KNOWLEDGE_SECTIONS.length - 1 ? 1 : 0, borderBottomColor: '#1A1D24' }]}>
                 <TouchableOpacity
                   onPress={() => { haptics.light(); setExpandedSection(isExp ? null : sec.id); }}
                   style={bkv.sectionHeader}
@@ -1216,21 +1213,21 @@ function ButlerKnowledgeViewer() {
         <View style={bkv.actionRow}>
           <TouchableOpacity
             onPress={handleCopyAll}
-            style={[bkv.copyBtn, { borderColor: copied ? '#2FD98B60' : ACCENT + '55', backgroundColor: copied ? '#2FD98B10' : ACCENT + '0C' }]}
+            style={[bkv.copyBtn, { borderColor: copied ? '#00FF8860' : ACCENT + '55', backgroundColor: copied ? '#00FF8810' : ACCENT + '0C' }]}
             activeOpacity={0.85}
           >
-            <MaterialIcons name={copied ? 'check-circle' : 'content-copy'} size={14} color={copied ? '#2FD98B' : ACCENT} />
-            <Text style={[bkv.copyBtnTxt, { color: copied ? '#2FD98B' : ACCENT }]}>
+            <MaterialIcons name={copied ? 'check-circle' : 'content-copy'} size={14} color={copied ? '#00FF88' : ACCENT} />
+            <Text style={[bkv.copyBtnTxt, { color: copied ? '#00FF88' : ACCENT }]}>
               {copied ? 'COPIED FULL KNOWLEDGE' : 'COPY ALL KNOWLEDGE'}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Compact version */}
-        <View style={[bkv.compactBox, { borderColor: '#2FD98B25', backgroundColor: '#2FD98B06' }]}>
+        <View style={[bkv.compactBox, { borderColor: '#00FF8825', backgroundColor: '#00FF8806' }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 6 }}>
-            <MaterialIcons name="compress" size={12} color="#2FD98B" />
-            <Text style={{ fontSize: 9, fontWeight: '900', color: '#2FD98B', fontFamily: MONO, letterSpacing: 1.2 }}>COMPACT VERSION (BUTLER_KNOWLEDGE_COMPACT)</Text>
+            <MaterialIcons name="compress" size={12} color="#00FF88" />
+            <Text style={{ fontSize: 9, fontWeight: '900', color: '#00FF88', fontFamily: MONO, letterSpacing: 1.2 }}>COMPACT VERSION (BUTLER_KNOWLEDGE_COMPACT)</Text>
           </View>
           <Text selectable style={bkv.compactText}>{BUTLER_KNOWLEDGE_COMPACT}</Text>
         </View>
@@ -1258,8 +1255,8 @@ const bkv = StyleSheet.create({
   sectionIconBox: { width: 26, height: 26, borderRadius: 6, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   sectionTitle:   { flex: 1, fontSize: 11, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.3 },
   sectionLen:     { fontSize: 8, color: N.text, fontFamily: MONO },
-  sectionContent: { maxHeight: 280, backgroundColor: '#000003', borderTopWidth: 1, borderTopColor: '#071120' },
-  sectionText:    { fontSize: 10, color: '#88AACC', fontFamily: MONO, lineHeight: 16, padding: 12 },
+  sectionContent: { maxHeight: 280, backgroundColor: '#050505', borderTopWidth: 1, borderTopColor: '#1A1D24' },
+  sectionText:    { fontSize: 10, color: '#9AA3B2', fontFamily: MONO, lineHeight: 16, padding: 12 },
   actionRow:      { paddingHorizontal: 14, paddingTop: 10, paddingBottom: 8 },
   copyBtn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1.5, borderRadius: 10, paddingVertical: 12 },
   copyBtnTxt:     { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5 },
@@ -1270,34 +1267,11 @@ const bkv = StyleSheet.create({
 // ─── EXPORT UI CODE CARD ───────────────────────────────────────────────────────
 // Produces a single combined dump of ALL app files — manifest + embedded sources.
 
-interface ImportDiff {
-  added:    string[];
-  removed:  string[];
-  same:     string[];
-  sourceFiles: string[];
-  meta: { exportedAt?: string; version?: string; totalFiles?: number };
-}
-
-interface ApplyableChange {
-  key: string;
-  label: string;
-  currentVal: string;
-  newVal: string;
-  storageKey?: string;
-  applied?: boolean;
-}
-
-function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => void }) {
+function ExportUICodeCard() {
   const [copied,        setCopied]        = useState(false);
   const [copying,       setCopying]       = useState(false);
   const [showModal,     setShowModal]     = useState(false);
   const [exportText,    setExportText]    = useState('');
-  const [showImport,    setShowImport]    = useState(false);
-  const [importing,     setImporting]     = useState(false);
-  const [importDiff,    setImportDiff]    = useState<ImportDiff | null>(null);
-  const [applyChanges,  setApplyChanges]  = useState<ApplyableChange[]>([]);
-  const [applying,      setApplying]      = useState(false);
-  const [applyResults,  setApplyResults]  = useState<{ key: string; ok: boolean }[]>([]);
   const [promptCopied,  setPromptCopied]  = useState(false);
   const [jsonSaving,    setJsonSaving]    = useState(false);
   const [lastExportTs,  setLastExportTs]  = useState<string>('');
@@ -1341,7 +1315,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
     }
   };
 
-  const accentColor = '#10d9a0';
+  const accentColor = '#00FF88';
   const embeddedCount = Object.keys(BUNDLE_SOURCES).length;
   const totalFiles    = BUNDLE_MANIFEST.length;
 
@@ -1384,286 +1358,6 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
         title:   'Butler AI — Full App Export',
       });
     } catch {}
-  };
-
-  // ─── Detect applyable settings from a parsed JSON export ────────────────
-  const extractApplyableChanges = async (parsed: Record<string, any>): Promise<ApplyableChange[]> => {
-    const changes: ApplyableChange[] = [];
-    const meta = parsed['_meta'] || {};
-
-    // --- Server IP from _meta or from the settings source if embedded ---
-    // Check if there's palette/theme data we can apply
-    if (meta?.palette) {
-      // We store these in AsyncStorage for CosmeticContext / theme overrides
-      const p = meta.palette;
-      if (p.teal || p.bg) {
-        changes.push({
-          key: 'palette',
-          label: 'Color palette from export metadata',
-          currentVal: 'current theme',
-          newVal: JSON.stringify(p),
-          storageKey: '@butler_imported_palette',
-        });
-      }
-    }
-
-    // --- Server connection settings ---
-    const currentIp   = await AsyncStorage.getItem('commandcube_server_ip').catch(() => null) || '';
-    const currentPort = await AsyncStorage.getItem('commandcube_server_port').catch(() => null) || '';
-
-    // Try to find server IP in any embedded source (search for IP patterns)
-    for (const [, entry] of Object.entries(parsed)) {
-      if (!entry || typeof entry !== 'object') continue;
-      const src: string = (entry as any).content || '';
-      if (!src) continue;
-      // Look for hardcoded IPs in source — uncommon but possible
-      const ipMatch = src.match(/['"]?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})['"]?/);
-      const portMatch = src.match(/['"]?(876[0-9]|8766|8767)['"]?/);
-      if (ipMatch && ipMatch[1] !== currentIp && ipMatch[1] !== '192.168.1.100') {
-        changes.push({
-          key: 'server_ip',
-          label: 'Server IP Address',
-          currentVal: currentIp || '(none)',
-          newVal: ipMatch[1],
-          storageKey: 'commandcube_server_ip',
-        });
-        if (portMatch && portMatch[1] !== currentPort) {
-          changes.push({
-            key: 'server_port',
-            label: 'Server Port',
-            currentVal: currentPort || '(none)',
-            newVal: portMatch[1],
-            storageKey: 'commandcube_server_port',
-          });
-        }
-        break; // only pick one
-      }
-    }
-
-    // --- App settings flags from _meta.settings if present ---
-    if (meta?.settings && typeof meta.settings === 'object') {
-      const settingMap: Record<string, string> = {
-        autoRun:         'commandcube_autorun',
-        autoConnect:     'commandcube_autoconnect',
-        hapticsOff:      'commandcube_haptics_off',
-        pauseAnimations: 'commandcube_pause_animations',
-        scriptOnlyMode:  'commandcube_script_only_mode',
-      };
-      for (const [key, storeKey] of Object.entries(settingMap)) {
-        if (key in meta.settings) {
-          const current = await AsyncStorage.getItem(storeKey).catch(() => null) || 'false';
-          const imported = String(meta.settings[key]);
-          if (imported !== current) {
-            changes.push({
-              key: 'setting_' + key,
-              label: 'Setting: ' + key,
-              currentVal: current,
-              newVal: imported,
-              storageKey: storeKey,
-            });
-          }
-        }
-      }
-    }
-
-    // --- Embedded source files — mark as copyable (can't write to FS in RN) ---
-    for (const [path, entry] of Object.entries(parsed)) {
-      if (path === '_meta') continue;
-      if (!entry || typeof entry !== 'object') continue;
-      const e = entry as any;
-      if (e.type === 'source' && e.content && typeof e.content === 'string' && e.content.length > 50) {
-        changes.push({
-          key: 'source::' + path,
-          label: 'Source: ' + path,
-          currentVal: '(current file)',
-          newVal: e.content.slice(0, 120) + '…',
-          storageKey: undefined, // copy-only
-        });
-      }
-    }
-
-    return changes;
-  };
-
-  // ─── Apply a single change to AsyncStorage ─────────────────────────────
-  const applyOneChange = async (change: ApplyableChange): Promise<boolean> => {
-    try {
-      if (!change.storageKey) return false; // source-only, can't auto-apply
-      if (change.key === 'palette') {
-        await AsyncStorage.setItem('@butler_imported_palette', change.newVal);
-        return true;
-      }
-      await AsyncStorage.setItem(change.storageKey, change.newVal);
-      return true;
-    } catch { return false; }
-  };
-
-  // ─── Apply all applyable changes at once ───────────────────────────────
-  const applyAllChanges = async () => {
-    if (applying) return;
-    setApplying(true);
-    haptics.heavy();
-    const results: { key: string; ok: boolean }[] = [];
-    for (const change of applyChanges) {
-      if (change.storageKey) {
-        const ok = await applyOneChange(change);
-        results.push({ key: change.key, ok });
-      }
-    }
-    setApplyResults(results);
-    setApplying(false);
-    haptics.success();
-    // ── Instantly refresh parent settings so toggles update without restart ──
-    onSettingsApplied?.();
-    const applied = results.filter(r => r.ok).length;
-    Alert.alert(
-      applied > 0 ? `✓ Applied ${applied} Changes` : 'No Changes Applied',
-      applied > 0
-        ? `${applied} setting${applied !== 1 ? 's' : ''} updated instantly — toggles refreshed above.`
-        : 'No auto-applicable settings found in this export. Use COPY SRC buttons to restore source files.',
-      [{ text: 'OK' }]
-    );
-  };
-
-  // ── Parse and validate a single file asset → returns parsed object or null ──
-  const parseSingleFile = async (asset: { uri: string; name?: string }): Promise<Record<string, any> | null> => {
-    const fname = (asset.name || asset.uri).toLowerCase();
-    // Skip non-JSON files with a helpful log (won't block batch)
-    if (fname.endsWith('.zip') || fname.endsWith('.ts') || fname.endsWith('.tsx') || fname.endsWith('.js')) {
-      return null;
-    }
-    let raw: string;
-    try {
-      raw = await FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.UTF8 });
-    } catch { return null; }
-    if (raw && raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
-    raw = raw.trim();
-    if (!raw || (!raw.startsWith('{') && !raw.startsWith('['))) return null;
-    try { return JSON.parse(raw); } catch { return null; }
-  };
-
-  const handleImportJson = async () => {
-    haptics.medium();
-    setImporting(true);
-    setApplyChanges([]);
-    setApplyResults([]);
-    setImportDiff(null);
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/json', 'text/plain', '*/*'],
-        copyToCacheDirectory: true,
-        multiple: true,   // ← multi-file import
-      });
-      if (result.canceled) { setImporting(false); return; }
-      const assets = result.assets;
-      if (!assets || assets.length === 0) { setImporting(false); return; }
-
-      // ── Process every selected file ──────────────────────────────────────
-      const parsedFiles: Record<string, any>[] = [];
-      const skipped: string[] = [];
-      for (const asset of assets) {
-        const fname = (asset.name || asset.uri).toLowerCase();
-        // Source-code files — skip gracefully
-        if (fname.endsWith('.ts') || fname.endsWith('.tsx') || fname.endsWith('.js')) {
-          skipped.push(asset.name || fname);
-          continue;
-        }
-        if (fname.endsWith('.zip')) {
-          skipped.push(asset.name || fname);
-          continue;
-        }
-        const p = await parseSingleFile(asset);
-        if (p && typeof p === 'object' && !Array.isArray(p)) {
-          parsedFiles.push(p);
-        } else {
-          skipped.push(asset.name || fname);
-        }
-      }
-
-      if (parsedFiles.length === 0) {
-        Alert.alert(
-          'No Valid Files',
-          (skipped.length > 0
-            ? 'None of the selected files could be parsed:\n' + skipped.map(s => '  • ' + s).join('\n') + '\n\n'
-            : '')
-          + 'Select butler_ai_export_*.json files created by the SAVE JSON button.'
-        );
-        setImporting(false);
-        return;
-      }
-
-      // ── Merge all parsed exports into one combined object ─────────────────
-      // Later files overwrite earlier ones for the same key (newest wins).
-      const merged: Record<string, any> = {};
-      let primaryMeta: Record<string, any> = {};
-      for (const p of parsedFiles) {
-        const meta = p['_meta'];
-        if (meta && Object.keys(primaryMeta).length === 0) primaryMeta = meta;
-        for (const [k, v] of Object.entries(p)) {
-          if (k !== '_meta') merged[k] = v;
-        }
-      }
-
-      const importedPaths = Object.keys(merged);
-      if (importedPaths.length === 0) {
-        Alert.alert('Empty Export', 'No file entries found in the selected JSON(s).');
-        setImporting(false);
-        return;
-      }
-
-      const manifestPaths = BUNDLE_MANIFEST.map(f => f.path);
-      const added       = importedPaths.filter(p => !manifestPaths.includes(p));
-      const removed     = manifestPaths.filter(p => !importedPaths.includes(p));
-      const same        = importedPaths.filter(p =>  manifestPaths.includes(p));
-      const sourceFiles = importedPaths.filter(p => merged[p]?.type === 'source');
-
-      // Notify if some files were skipped
-      if (skipped.length > 0) {
-        Alert.alert(
-          parsedFiles.length + ' of ' + assets.length + ' files imported',
-          'Skipped (unsupported format):\n' + skipped.map(s => '  • ' + s).join('\n'),
-          [{ text: 'OK' }]
-        );
-      }
-
-      // ── Old-file detection: warn if export is >24h old ──────────────────
-      const exportedAt = primaryMeta?.exportedAt ? new Date(primaryMeta.exportedAt).getTime() : 0;
-      const ageHours = exportedAt > 0 ? (Date.now() - exportedAt) / 3600000 : 0;
-      const isOldFile = ageHours > 24;
-
-      const changes = await extractApplyableChanges({ ...merged, _meta: primaryMeta });
-      setApplyChanges(changes);
-      setImportDiff({
-        added, removed, same, sourceFiles,
-        meta: { ...primaryMeta, _isOldFile: isOldFile, _ageHours: Math.round(ageHours) },
-      });
-      haptics.success();
-      // ── If there are auto-applicable changes, apply immediately without waiting for modal ──
-      if (changes.some(c => c.storageKey)) {
-        const autoResults: { key: string; ok: boolean }[] = [];
-        for (const change of changes) {
-          if (change.storageKey) {
-            const ok = await applyOneChange(change);
-            autoResults.push({ key: change.key, ok });
-          }
-        }
-        setApplyResults(autoResults);
-        const autoApplied = autoResults.filter(r => r.ok).length;
-        if (autoApplied > 0) {
-          onSettingsApplied?.();
-          haptics.success();
-        }
-      }
-      setTimeout(() => setShowImport(true), 80);
-    } catch (e: any) {
-      Alert.alert(
-        'Import Failed',
-        e?.message || 'Could not read JSON file(s).\n\nMake sure you selected valid butler_ai_export_*.json files.'
-      );
-      haptics.warning();
-    } finally {
-      setImporting(false);
-    }
   };
 
   const handleSaveJson = async () => {
@@ -1823,7 +1517,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[g.cardTitle, { color: accentColor, marginBottom: 2 }]}>EXPORT ALL FILES</Text>
-            <Text style={g.cardSub}>Full app export → edit in any AI builder → import back</Text>
+            <Text style={g.cardSub}>Full app export → edit in any AI builder</Text>
           </View>
         </View>
 
@@ -1831,9 +1525,9 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
         <TouchableOpacity
           style={[{
             flexDirection: 'row', alignItems: 'center', gap: 8,
-            backgroundColor: promptCopied ? '#00FF8815' : '#071120',
+            backgroundColor: promptCopied ? '#00FF8815' : '#1A1D24',
             borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 10,
-            borderWidth: 1.5, borderColor: promptCopied ? '#00FF8870' : '#1a2235',
+            borderWidth: 1.5, borderColor: promptCopied ? '#00FF8870' : '#232730',
           }]}
           onPress={() => { haptics.medium(); autoCopyPrompt(); }}
           activeOpacity={0.8}
@@ -1861,8 +1555,8 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
           {[
             { label: 'FILES',    val: String(totalFiles),    col: accentColor },
             { label: 'EMBEDDED', val: String(embeddedCount), col: '#00FF88'   },
-            { label: 'FORMAT',   val: 'JS/TS',               col: '#4488FF'   },
-            { label: 'OUTPUT',   val: 'CLIPBOARD',            col: '#FF9900'   },
+            { label: 'FORMAT',   val: 'JS/TS',               col: '#FF6A1F'   },
+            { label: 'OUTPUT',   val: 'CLIPBOARD',            col: '#FF6A1F'   },
           ].map(({ label, val, col }) => (
             <View key={label} style={{ flex: 1, alignItems: 'center', backgroundColor: N.card, borderRadius: 8, borderWidth: 1, borderColor: N.border, paddingVertical: 9 }}>
               <Text style={{ fontSize: 13, fontWeight: '900', color: col, fontFamily: MONO }}>{val}</Text>
@@ -1872,23 +1566,23 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
         </View>
 
         {/* File list preview */}
-        <View style={{ backgroundColor: '#000003', borderRadius: 8, borderWidth: 1, borderColor: '#071120', padding: 10, marginBottom: 12, gap: 3 }}>
-          <Text style={{ fontSize: 8, fontWeight: '900', color: '#4a607a', fontFamily: MONO, letterSpacing: 1.5, marginBottom: 5 }}>FILE MANIFEST</Text>
+        <View style={{ backgroundColor: '#050505', borderRadius: 8, borderWidth: 1, borderColor: '#1A1D24', padding: 10, marginBottom: 12, gap: 3 }}>
+          <Text style={{ fontSize: 8, fontWeight: '900', color: '#525A68', fontFamily: MONO, letterSpacing: 1.5, marginBottom: 5 }}>FILE MANIFEST</Text>
           {BUNDLE_MANIFEST.slice(0, 8).map((f, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-              <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: BUNDLE_SOURCES[f.path] ? '#00FF88' : '#4a607a', flexShrink: 0 }} />
-              <Text style={{ flex: 1, fontSize: 9, color: BUNDLE_SOURCES[f.path] ? '#A8D8B8' : '#4a607a', fontFamily: MONO }} numberOfLines={1}>{f.path}</Text>
-              <Text style={{ fontSize: 7, color: '#336677', fontFamily: MONO }}>~{f.lines}L</Text>
+              <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: BUNDLE_SOURCES[f.path] ? '#00FF88' : '#525A68', flexShrink: 0 }} />
+              <Text style={{ flex: 1, fontSize: 9, color: BUNDLE_SOURCES[f.path] ? '#A8D8B8' : '#525A68', fontFamily: MONO }} numberOfLines={1}>{f.path}</Text>
+              <Text style={{ fontSize: 7, color: '#5A626E', fontFamily: MONO }}>~{f.lines}L</Text>
             </View>
           ))}
           {BUNDLE_MANIFEST.length > 8 ? (
-            <Text style={{ fontSize: 8, color: '#4a607a', fontFamily: MONO, marginTop: 3 }}>+ {BUNDLE_MANIFEST.length - 8} more files listed in manifest...</Text>
+            <Text style={{ fontSize: 8, color: '#525A68', fontFamily: MONO, marginTop: 3 }}>+ {BUNDLE_MANIFEST.length - 8} more files listed in manifest...</Text>
           ) : null}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#071120' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#1A1D24' }}>
             <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#00FF88' }} />
             <Text style={{ fontSize: 8, color: '#00FF88', fontFamily: MONO }}>green = full source embedded</Text>
-            <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#4a607a', marginLeft: 8 }} />
-            <Text style={{ fontSize: 8, color: '#4a607a', fontFamily: MONO }}>grey = manifest only</Text>
+            <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#525A68', marginLeft: 8 }} />
+            <Text style={{ fontSize: 8, color: '#525A68', fontFamily: MONO }}>grey = manifest only</Text>
           </View>
         </View>
 
@@ -1906,7 +1600,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
               <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: accentColor + '20', borderWidth: 1, borderColor: accentColor + '60', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                 <Text style={{ fontSize: 8, fontWeight: '900', color: accentColor, fontFamily: MONO }}>{step}</Text>
               </View>
-              <Text style={{ flex: 1, fontSize: 9, color: '#6a8090', fontFamily: MONO, lineHeight: 14 }}>{txt}</Text>
+              <Text style={{ flex: 1, fontSize: 9, color: '#7A8392', fontFamily: MONO, lineHeight: 14 }}>{txt}</Text>
             </View>
           ))}
         </View>
@@ -1952,21 +1646,21 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
           <TouchableOpacity
             style={[{
               flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
-              borderWidth: 1.5, borderColor: '#8b5cf655', borderRadius: 10, paddingVertical: 12,
-              backgroundColor: '#8b5cf60A',
+              borderWidth: 1.5, borderColor: '#FFC40055', borderRadius: 10, paddingVertical: 12,
+              backgroundColor: '#FFC4000A',
             }]}
             onPress={handleShare} activeOpacity={0.8}
           >
-            <MaterialIcons name="share" size={14} color="#8b5cf6" />
-            <Text style={{ fontSize: 9, fontWeight: '900', color: '#8b5cf6', fontFamily: MONO }}>SHARE</Text>
+            <MaterialIcons name="share" size={14} color="#FFC400" />
+            <Text style={{ fontSize: 9, fontWeight: '900', color: '#FFC400', fontFamily: MONO }}>SHARE</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[{
               flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
               borderWidth: 1.5,
-              borderColor: hasChanged ? '#00FF8855' : '#f59e0b55',
+              borderColor: hasChanged ? '#00FF8855' : '#FFC40055',
               borderRadius: 10, paddingVertical: 12,
-              backgroundColor: jsonSaving ? '#f59e0b15' : hasChanged ? '#00FF8808' : '#f59e0b0A',
+              backgroundColor: jsonSaving ? '#FFC40015' : hasChanged ? '#00FF8808' : '#FFC4000A',
               opacity: jsonSaving ? 0.7 : 1,
               position: 'relative' as const,
             }]}
@@ -1978,302 +1672,36 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
                 position: 'absolute', top: -5, right: -5,
                 width: 11, height: 11, borderRadius: 6,
                 backgroundColor: '#00FF88',
-                borderWidth: 2, borderColor: '#02070D',
+                borderWidth: 2, borderColor: '#0E0F12',
                 zIndex: 10,
                 ...Platform.select({ ios: { shadowColor: '#00FF88', shadowOffset:{width:0,height:0}, shadowOpacity:1, shadowRadius:5 }, android: {} }),
               }} />
             ) : null}
             {jsonSaving
-              ? <ActivityIndicator size="small" color={hasChanged ? '#00FF88' : '#f59e0b'} />
-              : <MaterialIcons name="save-alt" size={14} color={hasChanged ? '#00FF88' : '#f59e0b'} />}
-            <Text style={{ fontSize: 9, fontWeight: '900', color: hasChanged ? '#00FF88' : '#f59e0b', fontFamily: MONO }}>
+              ? <ActivityIndicator size="small" color={hasChanged ? '#00FF88' : '#FFC400'} />
+              : <MaterialIcons name="save-alt" size={14} color={hasChanged ? '#00FF88' : '#FFC400'} />}
+            <Text style={{ fontSize: 9, fontWeight: '900', color: hasChanged ? '#00FF88' : '#FFC400', fontFamily: MONO }}>
               {jsonSaving ? 'SAVING...' : hasChanged ? 'SAVE JSON ●' : 'SAVE JSON'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[{
-              flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5,
-              borderWidth: 1.5, borderColor: '#10d9a055', borderRadius: 10, paddingVertical: 12,
-              backgroundColor: '#10d9a00A',
-              opacity: importing ? 0.6 : 1,
-            }]}
-            onPress={handleImportJson} disabled={importing} activeOpacity={0.8}
-          >
-            {importing
-              ? <ActivityIndicator size="small" color="#10d9a0" />
-              : <MaterialIcons name="file-upload" size={14} color="#10d9a0" />}
-            <Text style={{ fontSize: 9, fontWeight: '900', color: '#10d9a0', fontFamily: MONO }}>
-              {importing ? 'READING...' : 'IMPORT JSON(s)'}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Import diff modal */}
-      <Modal visible={showImport} animationType="slide" statusBarTranslucent onRequestClose={() => setShowImport(false)}>
-        <View style={{ flex: 1, backgroundColor: '#02070D' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16,
-            paddingTop: Platform.OS === 'android' ? 40 : 60, paddingBottom: 14,
-            borderBottomWidth: 1, borderBottomColor: '#071120', backgroundColor: '#02070D' }}>
-            <TouchableOpacity onPress={() => setShowImport(false)} hitSlop={{ top:10,bottom:10,left:10,right:10 }}>
-              <MaterialIcons name="arrow-back" size={20} color="#88AACC" />
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 16, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO }}>
-                IMPORT <Text style={{ color: '#10d9a0' }}>DIFF</Text>
-              </Text>
-              <Text style={{ fontSize: 9, color: '#336677', fontFamily: MONO, marginTop: 2 }}>
-                {importDiff?.meta?.exportedAt
-                  ? 'Exported: ' + new Date(importDiff.meta.exportedAt).toLocaleString()
-                  : 'No metadata'}
-              </Text>
-            </View>
-            <View style={{ borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5,
-              borderColor: '#10d9a040', backgroundColor: '#10d9a010' }}>
-              <Text style={{ fontSize: 10, fontWeight: '900', color: '#10d9a0', fontFamily: MONO }}>
-                v{importDiff?.meta?.version || '?'}
-              </Text>
-            </View>
-          </View>
-          <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
-            showsVerticalScrollIndicator={true}
-            nestedScrollEnabled={true}
-            keyboardShouldPersistTaps="handled"
-            bounces={true}
-            alwaysBounceVertical={true}
-          >
-
-            {/* ── OLD FILE WARNING ── */}
-            {importDiff?.meta?._isOldFile ? (
-              <View style={{ backgroundColor: '#1a0800', borderRadius: 10, borderWidth: 1.5,
-                borderColor: '#FF880040', padding: 12, marginBottom: 12,
-                flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <MaterialIcons name="warning" size={18} color="#FF8800" />
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '900', color: '#FF8800', fontFamily: MONO, letterSpacing: 0.5 }}>
-                    OLD EXPORT DETECTED
-                  </Text>
-                  <Text style={{ fontSize: 9, color: '#FF880080', fontFamily: MONO, marginTop: 2 }}>
-                    {`This file is ~${importDiff.meta._ageHours}h old. Changes already auto-applied if any settings were found.`}
-                  </Text>
-                </View>
-              </View>
-            ) : null}
-
-            {/* ── APPLY CHANGES PANEL ── */}
-            {applyChanges.length > 0 ? (
-              <View style={{ backgroundColor: '#0d1f10', borderRadius: 10, borderWidth: 1.5,
-                borderColor: '#00FF8840', padding: 14, marginBottom: 14 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                  <MaterialIcons name="auto-fix-high" size={16} color="#00FF88" />
-                  <Text style={{ fontSize: 11, fontWeight: '900', color: '#00FF88', fontFamily: MONO, letterSpacing: 1.5, flex: 1 }}>
-                    AUTO-APPLY CHANGES
-                  </Text>
-                  <Text style={{ fontSize: 8, color: '#336677', fontFamily: MONO }}>
-                    {applyChanges.filter(c => c.storageKey).length} applicable
-                  </Text>
-                </View>
-
-                {/* ── APPLY BUTTON AT TOP so it's reachable without scrolling past file list ── */}
-                {applyChanges.some(c => c.storageKey) ? (
-                  <TouchableOpacity
-                    style={[{
-                      flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-                      gap: 8, borderRadius: 9, paddingVertical: 13, marginBottom: 12,
-                      backgroundColor: applying ? '#00FF8870' : '#00FF88',
-                      opacity: applying ? 0.7 : 1,
-                    }]}
-                    onPress={applyAllChanges}
-                    disabled={applying}
-                    activeOpacity={0.85}
-                  >
-                    {applying
-                      ? <ActivityIndicator size="small" color="#000" />
-                      : <MaterialIcons name="auto-fix-high" size={16} color="#000" />}
-                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#000', fontFamily: MONO }}>
-                      {applying ? 'APPLYING...' : 'APPLY ALL TO APP'}
-                    </Text>
-                  </TouchableOpacity>
-                ) : null}
-
-                {applyChanges.map((change, i) => {
-                  const isSource  = change.key.startsWith('source::');
-                  const applied   = applyResults.find(r => r.key === change.key);
-                  const col       = applied ? (applied.ok ? '#00FF88' : '#ef4444') : (isSource ? '#8b5cf6' : '#10d9a0');
-                  return (
-                    <View key={i} style={{ paddingVertical: 8, borderBottomWidth: i < applyChanges.length - 1 ? 1 : 0,
-                      borderBottomColor: '#071120' }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-                        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: col, flexShrink: 0 }} />
-                        <Text style={{ flex: 1, fontSize: 10, fontWeight: '700', color: col, fontFamily: MONO }}>{change.label}</Text>
-                        {applied ? (
-                          <MaterialIcons name={applied.ok ? 'check-circle' : 'error'} size={14} color={col} />
-                        ) : isSource ? (
-                          <TouchableOpacity
-                            onPress={async () => {
-                              haptics.light();
-                              try {
-                                // Find full source
-                                const path = change.key.replace('source::', '');
-                                const fullSrc = `// File: ${path}\n${change.newVal}`;
-                                await ExpoClipboard.setStringAsync(fullSrc);
-                                haptics.success();
-                                Alert.alert('Copied!', `Source for ${path} copied.\n\nPaste into OnSpace AI: "Please replace the content of ${path} with this code:"`);
-                              } catch { haptics.warning(); }
-                            }}
-                            style={{ flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1,
-                              borderRadius: 5, paddingHorizontal: 7, paddingVertical: 3,
-                              borderColor: '#8b5cf640', backgroundColor: '#8b5cf60A' }}
-                          >
-                            <MaterialIcons name="content-copy" size={10} color="#8b5cf6" />
-                            <Text style={{ fontSize: 7, fontWeight: '900', color: '#8b5cf6', fontFamily: MONO }}>COPY SRC</Text>
-                          </TouchableOpacity>
-                        ) : null}
-                      </View>
-                      {!isSource ? (
-                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 4, marginLeft: 13 }}>
-                          <Text style={{ fontSize: 8, color: '#336677', fontFamily: MONO }}>
-                            {change.currentVal.length > 30 ? change.currentVal.slice(0, 30) + '…' : change.currentVal}
-                          </Text>
-                          <MaterialIcons name="arrow-forward" size={9} color="#336677" />
-                          <Text style={{ fontSize: 8, color: '#10d9a0', fontFamily: MONO, flex: 1 }}>
-                            {change.newVal.length > 30 ? change.newVal.slice(0, 30) + '…' : change.newVal}
-                          </Text>
-                        </View>
-                      ) : null}
-                    </View>
-                  );
-                })}
-
-                {!applyChanges.some(c => c.storageKey) ? (
-                  <View style={{ backgroundColor: '#8b5cf608', borderRadius: 8, borderWidth: 1,
-                    borderColor: '#8b5cf625', padding: 10, marginTop: 10 }}>
-                    <Text style={{ fontSize: 9, color: '#8b5cf6', fontFamily: MONO, lineHeight: 14 }}>
-                      This export contains only source code.{`\n`}Use COPY SRC on each file, then paste into OnSpace AI chat to update those files.
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-            ) : null}
-
-            {/* Stats row */}
-            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
-              {[
-                { label: 'TOTAL',   val: String(importDiff ? importDiff.same.length + importDiff.added.length : 0), col: '#10d9a0' },
-                { label: 'MATCHED', val: String(importDiff?.same.length ?? 0),       col: '#00FF88' },
-                { label: 'NEW',     val: String(importDiff?.added.length ?? 0),      col: '#f59e0b' },
-                { label: 'MISSING', val: String(importDiff?.removed.length ?? 0),    col: '#ef4444' },
-                { label: 'SOURCE',  val: String(importDiff?.sourceFiles.length ?? 0),col: '#8b5cf6' },
-              ].map(({ label, val, col }) => (
-                <View key={label} style={{ flex: 1, alignItems: 'center', backgroundColor: '#02070D',
-                  borderRadius: 8, borderWidth: 1, borderColor: col + '40', paddingVertical: 10 }}>
-                  <Text style={{ fontSize: 15, fontWeight: '900', color: col, fontFamily: MONO }}>{val}</Text>
-                  <Text style={{ fontSize: 6, color: '#336677', fontFamily: MONO, marginTop: 3, letterSpacing: 0.5 }}>{label}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Matched files */}
-            {importDiff && importDiff.same.length > 0 ? (
-              <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1,
-                borderColor: '#00FF8825', padding: 12, marginBottom: 14 }}>
-                <Text style={{ fontSize: 8, fontWeight: '900', color: '#00FF88', fontFamily: MONO,
-                  letterSpacing: 1.5, marginBottom: 8 }}>MATCHED FILES ({importDiff.same.length})</Text>
-                {importDiff.same.map((p, i) => (
-                  <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7,
-                    paddingVertical: 4, borderBottomWidth: i < importDiff.same.length - 1 ? 1 : 0,
-                    borderBottomColor: '#071120' }}>
-                    <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor:
-                      importDiff.sourceFiles.includes(p) ? '#8b5cf6' : '#00FF8870', flexShrink: 0 }} />
-                    <Text style={{ flex: 1, fontSize: 9, color: '#A8D8B8', fontFamily: MONO }}
-                      numberOfLines={1}>{p}</Text>
-                    {importDiff.sourceFiles.includes(p)
-                      ? <Text style={{ fontSize: 7, color: '#8b5cf6', fontFamily: MONO }}>SRC</Text>
-                      : <Text style={{ fontSize: 7, color: '#336677', fontFamily: MONO }}>META</Text>}
-                  </View>
-                ))}
-              </View>
-            ) : null}
-
-            {/* New files in import */}
-            {importDiff && importDiff.added.length > 0 ? (
-              <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1,
-                borderColor: '#f59e0b25', padding: 12, marginBottom: 14 }}>
-                <Text style={{ fontSize: 8, fontWeight: '900', color: '#f59e0b', fontFamily: MONO,
-                  letterSpacing: 1.5, marginBottom: 8 }}>NEW IN IMPORT — NOT IN MANIFEST ({importDiff.added.length})</Text>
-                {importDiff.added.map((p, i) => (
-                  <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7,
-                    paddingVertical: 4, borderBottomWidth: i < importDiff.added.length - 1 ? 1 : 0,
-                    borderBottomColor: '#071120' }}>
-                    <MaterialIcons name="add" size={10} color="#f59e0b" />
-                    <Text style={{ flex: 1, fontSize: 9, color: '#f59e0b', fontFamily: MONO }}
-                      numberOfLines={1}>{p}</Text>
-                  </View>
-                ))}
-              </View>
-            ) : null}
-
-            {/* Missing files */}
-            {importDiff && importDiff.removed.length > 0 ? (
-              <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1,
-                borderColor: '#ef444425', padding: 12, marginBottom: 14 }}>
-                <Text style={{ fontSize: 8, fontWeight: '900', color: '#ef4444', fontFamily: MONO,
-                  letterSpacing: 1.5, marginBottom: 8 }}>IN MANIFEST — MISSING FROM IMPORT ({importDiff.removed.length})</Text>
-                {importDiff.removed.map((p, i) => (
-                  <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 7,
-                    paddingVertical: 4, borderBottomWidth: i < importDiff.removed.length - 1 ? 1 : 0,
-                    borderBottomColor: '#071120' }}>
-                    <MaterialIcons name="remove" size={10} color="#ef4444" />
-                    <Text style={{ flex: 1, fontSize: 9, color: '#ef4444', fontFamily: MONO }}
-                      numberOfLines={1}>{p}</Text>
-                  </View>
-                ))}
-              </View>
-            ) : null}
-
-            {/* How to use */}
-            <View style={{ backgroundColor: '#10d9a008', borderRadius: 10, borderWidth: 1,
-              borderColor: '#10d9a025', padding: 14, marginBottom: 14 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 7 }}>
-                <MaterialIcons name="info-outline" size={13} color="#10d9a0" />
-                <Text style={{ fontSize: 9, fontWeight: '900', color: '#10d9a0', fontFamily: MONO, letterSpacing: 1 }}>HOW TO RESTORE</Text>
-              </View>
-              <Text style={{ fontSize: 9, color: '#336677', fontFamily: MONO, lineHeight: 15 }}>
-                {'1. MATCHED files — same structure, no action needed.\n'
-                + '2. NEW files in import — these were added since the backup.\n'
-                + '3. MISSING files — removed in your current version.\n'
-                + '4. SOURCE (purple dot) — full code is embedded and can be pasted into OnSpace AI to restore.'}
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-                borderWidth: 1.5, borderColor: '#10d9a055', borderRadius: 10, paddingVertical: 14,
-                backgroundColor: '#10d9a00A' }}
-              onPress={() => setShowImport(false)} activeOpacity={0.85}>
-              <MaterialIcons name="check" size={16} color="#10d9a0" />
-              <Text style={{ fontSize: 13, fontWeight: '900', color: '#10d9a0', fontFamily: MONO }}>DONE</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      </Modal>
 
       {/* Full preview modal */}
       <Modal visible={showModal} animationType="slide" statusBarTranslucent onRequestClose={() => setShowModal(false)}>
-        <View style={{ flex: 1, backgroundColor: '#02070D' }}>
+        <View style={{ flex: 1, backgroundColor: '#0E0F12' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16,
             paddingTop: Platform.OS === 'android' ? 40 : 60, paddingBottom: 14,
-            borderBottomWidth: 1, borderBottomColor: '#071120', backgroundColor: '#02070D' }}>
+            borderBottomWidth: 1, borderBottomColor: '#1A1D24', backgroundColor: '#0E0F12' }}>
             <TouchableOpacity onPress={() => setShowModal(false)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <MaterialIcons name="arrow-back" size={20} color="#88AACC" />
+              <MaterialIcons name="arrow-back" size={20} color="#9AA3B2" />
             </TouchableOpacity>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 15, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO }}>
                 ALL FILES <Text style={{ color: accentColor }}>EXPORT</Text>
               </Text>
-              <Text style={{ fontSize: 9, color: '#336677', fontFamily: MONO, marginTop: 2 }}>{totalFiles} files · {embeddedCount} with full source</Text>
+              <Text style={{ fontSize: 9, color: '#5A626E', fontFamily: MONO, marginTop: 2 }}>{totalFiles} files · {embeddedCount} with full source</Text>
             </View>
             <TouchableOpacity
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6,
@@ -2286,7 +1714,7 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
             </TouchableOpacity>
           </View>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={false}>
-            <View style={{ backgroundColor: '#000003', borderRadius: 10, borderWidth: 1, borderColor: '#071120', padding: 14, marginBottom: 16 }}>
+            <View style={{ backgroundColor: '#050505', borderRadius: 10, borderWidth: 1, borderColor: '#1A1D24', padding: 14, marginBottom: 16 }}>
               <Text style={{ fontSize: 10, color: '#A8D8B8', fontFamily: MONO, lineHeight: 18 }}>
                 {exportText || buildAllFilesExport()}
               </Text>
@@ -2301,12 +1729,12 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
             </TouchableOpacity>
             <TouchableOpacity
               style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-                borderWidth: 1.5, borderColor: '#8b5cf655', borderRadius: 10, paddingVertical: 13,
-                backgroundColor: '#8b5cf60A' }}
+                borderWidth: 1.5, borderColor: '#FFC40055', borderRadius: 10, paddingVertical: 13,
+                backgroundColor: '#FFC4000A' }}
               onPress={() => { handleShare(); setShowModal(false); }} activeOpacity={0.8}
             >
-              <MaterialIcons name="share" size={15} color="#8b5cf6" />
-              <Text style={{ fontSize: 12, fontWeight: '900', color: '#8b5cf6', fontFamily: MONO }}>SHARE AS TEXT FILE</Text>
+              <MaterialIcons name="share" size={15} color="#FFC400" />
+              <Text style={{ fontSize: 12, fontWeight: '900', color: '#FFC400', fontFamily: MONO }}>SHARE AS TEXT FILE</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -2315,61 +1743,6 @@ function ExportUICodeCard({ onSettingsApplied }: { onSettingsApplied?: () => voi
   );
 }
 
-// ─── IMPORT SUCCESS TOAST ─────────────────────────────────────────────────────
-function ImportSuccessToast({ message }: { message: string }) {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(-30)).current;
-  useEffect(() => {
-    Animated.parallel([
-      Animated.spring(slideAnim, { toValue: 0, tension: 200, friction: 16, useNativeDriver: true }),
-      Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
-    ]).start();
-    const t = setTimeout(() => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: -30, duration: 400, useNativeDriver: true }),
-      ]).start();
-    }, 3200);
-    return () => clearTimeout(t);
-  }, []);
-  return (
-    <Animated.View pointerEvents="none" style={{
-      position: 'absolute', top: 0, left: 16, right: 16, zIndex: 9999,
-      opacity: fadeAnim, transform: [{ translateY: slideAnim }],
-    }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#05160C', borderRadius: 12, borderWidth: 2, borderColor: N.green, paddingHorizontal: 14, paddingVertical: 12,
-        ...Platform.select({ ios: { shadowColor: N.green, shadowOffset:{width:0,height:0}, shadowOpacity:0.9, shadowRadius:14 }, android:{ elevation:16 } }) }}>
-        <MaterialIcons name="check-circle" size={22} color={N.green} />
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 13, fontWeight: '900', color: N.green, fontFamily: MONO, letterSpacing: 0.5 }}>APPLIED & SAVED</Text>
-          <Text style={{ fontSize: 10, color: N.green + 'AA', fontFamily: MONO, marginTop: 2 }} numberOfLines={2}>{message}</Text>
-        </View>
-        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: N.green }} />
-      </View>
-    </Animated.View>
-  );
-}
-
-// ─── VERSION GUARD — rejects stale exports ─────────────────────────────────
-// Returns null if ok, or a warning string (still imports but shows caution)
-function checkImportVersion(json: Record<string, any>): { stale: boolean; ageHours: number; msg: string } {
-  const meta = json._meta || json;
-  const exportedAt = meta.exportedAt ? new Date(meta.exportedAt).getTime() : 0;
-  const exportVersion = meta.version || '';
-  const CURRENT_VERSION = '7.0.0';
-  const ageMs = exportedAt > 0 ? Date.now() - exportedAt : 0;
-  const ageHours = Math.round(ageMs / 3600000);
-
-  // Block if version is older major — e.g. 6.x < 7.x
-  const exportMajor = parseInt((exportVersion || '0').split('.')[0], 10) || 0;
-  const currentMajor = parseInt(CURRENT_VERSION.split('.')[0], 10);
-  const stale = exportMajor > 0 && exportMajor < currentMajor;
-
-  let msg = '';
-  if (stale) msg = `File exported from v${exportVersion} — current app is v${CURRENT_VERSION}. Schema may differ.`;
-  else if (ageHours > 72) msg = `File is ${ageHours}h old — some settings may have changed since export.`;
-  return { stale, ageHours, msg };
-}
 
 // ─── UI CONFIG CARD — Download/edit/upload the visual config JSON ─────────────
 // Edit card visibility, order, all text strings, colors.
@@ -2377,21 +1750,10 @@ function checkImportVersion(json: Record<string, any>): { stale: boolean; ageHou
 function UIConfigCard() {
   const ACCENT = '#00FF88';
   const [saving,       setSaving]       = React.useState(false);
-  const [importing,    setImporting]    = React.useState(false);
   const [resetting,    setResetting]    = React.useState(false);
   const [savedOk,      setSavedOk]      = React.useState(false);
   const [cardToggles,  setCardToggles]  = React.useState<Record<string, boolean>>({});
   const [showCards,    setShowCards]    = React.useState(false);
-  const [toastMsg,     setToastMsg]     = React.useState('');
-  const [toastKey,     setToastKey]     = React.useState(0);
-  const toastTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const showToast = React.useCallback((msg: string) => {
-    setToastMsg(msg);
-    setToastKey(k => k + 1);
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    toastTimeoutRef.current = setTimeout(() => setToastMsg(''), 4000);
-  }, []);
 
   React.useEffect(() => {
     uiConfig.load().then(cfg => {
@@ -2399,7 +1761,6 @@ function UIConfigCard() {
       cfg.home.cards.forEach(c => { toggles[c.id] = c.visible; });
       setCardToggles(toggles);
     });
-    return () => { if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current); };
   }, []);
 
   const CARD_LABELS: Record<string, string> = {
@@ -2437,106 +1798,6 @@ function UIConfigCard() {
       setTimeout(() => setSavedOk(false), 3000);
     } catch (e: any) { Alert.alert('Error', e?.message); haptics.warning(); }
     finally { setSaving(false); }
-  };
-
-  const [lastImportedAt, setLastImportedAt] = React.useState('');
-
-  const handleImport = async () => {
-    haptics.medium(); setImporting(true);
-    try {
-      // Multi-select — grab as many JSON files as user picks
-      const picked = await DocumentPicker.getDocumentAsync({
-        type: ['application/json', 'text/plain', '*/*'],
-        copyToCacheDirectory: true,
-        multiple: true,
-      });
-      if (picked.canceled || !picked.assets || picked.assets.length === 0) { setImporting(false); return; }
-
-      let totalCardsChanged = 0;
-      let totalStringsChanged = 0;
-      let totalColorsChanged = 0;
-      let filesApplied = 0;
-      let newestExportTs = 0;
-
-      for (const asset of picked.assets) {
-        try {
-          let raw = await FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.UTF8 });
-          if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
-          raw = raw.trim();
-          if (!raw.startsWith('{')) continue; // skip non-JSON silently
-          const json = JSON.parse(raw);
-
-          // ── Version / staleness guard ──
-          const guard = checkImportVersion(json);
-          if (guard.stale) {
-            // Hard block for major version mismatch
-            Alert.alert(
-              '⛔ Incompatible File',
-              `${guard.msg}\n\nDownload a fresh copy via DOWNLOAD UI CONFIG.`,
-              [{ text: 'OK' }]
-            );
-            continue;
-          }
-
-          // Track newest export timestamp to detect if user uploads older file after newer one
-          const exportedAt = (json._meta?.exportedAt || json.exportedAt)
-            ? new Date(json._meta?.exportedAt || json.exportedAt).getTime()
-            : 0;
-          if (exportedAt > newestExportTs) newestExportTs = exportedAt;
-
-          // ── Auto-detect section ──
-          let uiSection: any;
-          if (json._type === 'butler_ui_config') {
-            uiSection = { colors: json.colors, strings: json.strings, home: json.home };
-          } else if (json.ui && typeof json.ui === 'object') {
-            uiSection = json.ui;
-          } else if (json.home?.cards || json.strings || json.colors) {
-            uiSection = json;
-          } else {
-            uiSection = json;
-          }
-
-          // Count changes before applying
-          const prevCfg = uiConfig.get();
-          await uiConfig.applyFromPowerhouse(uiSection);
-          const newCfg = uiConfig.get();
-
-          totalCardsChanged  += (uiSection?.home?.cards?.length  || 0);
-          totalStringsChanged += Object.keys(uiSection?.strings || {}).length;
-          totalColorsChanged  += Object.keys(uiSection?.colors  || {}).length;
-          filesApplied++;
-        } catch { /* skip malformed file silently */ }
-      }
-
-      if (filesApplied === 0) {
-        Alert.alert('Nothing Applied', 'No valid UI config files were found. Make sure you selected files exported from DOWNLOAD UI CONFIG.');
-        setImporting(false);
-        return;
-      }
-
-      // Refresh toggles
-      const cfg = uiConfig.get();
-      const toggles: Record<string, boolean> = {};
-      cfg.home.cards.forEach(c => { toggles[c.id] = c.visible; });
-      setCardToggles(toggles);
-
-      // Auto-persist is already handled inside uiConfig.applyFromPowerhouse
-      haptics.success();
-
-      const filePlural = filesApplied > 1 ? `${filesApplied} files` : 'file';
-      const summary = [
-        totalCardsChanged  > 0 ? `${totalCardsChanged} card settings` : '',
-        totalStringsChanged > 0 ? `${totalStringsChanged} strings` : '',
-        totalColorsChanged > 0 ? `${totalColorsChanged} colors` : '',
-      ].filter(Boolean).join(', ') || 'settings';
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setLastImportedAt(`${filePlural} · ${timeStr}`);
-      showToast(`${filePlural} merged — ${summary} applied instantly`);
-    } catch (e: any) {
-      Alert.alert('Import Failed', e?.message || 'Could not parse JSON.');
-      haptics.warning();
-    }
-    finally { setImporting(false); }
   };
 
   const handleReset = () => {
@@ -2596,7 +1857,7 @@ function UIConfigCard() {
       {showCards ? (
         <View style={{ backgroundColor: N.panel, borderRadius: 10, borderWidth: 1, borderColor: ACCENT + '22', overflow: 'hidden', marginBottom: 12 }}>
           {Object.keys(CARD_LABELS).map((id, i, arr) => (
-            <View key={id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: '#071120' }}>
+            <View key={id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: i < arr.length - 1 ? 1 : 0, borderBottomColor: '#1A1D24' }}>
               <Text style={{ flex: 1, fontSize: 10, color: cardToggles[id] !== false ? N.textBrt : N.textDim, fontFamily: MONO, lineHeight: 15 }} numberOfLines={1}>{CARD_LABELS[id]}</Text>
               <Switch value={cardToggles[id] !== false} onValueChange={val => toggleCard(id, val)} thumbColor={cardToggles[id] !== false ? ACCENT : N.textDim} trackColor={{ false: N.border, true: ACCENT + '55' }} ios_backgroundColor={N.border} />
             </View>
@@ -2606,7 +1867,7 @@ function UIConfigCard() {
 
       <View style={{ backgroundColor: '#0A1A10', borderRadius: 9, borderWidth: 1, borderColor: ACCENT + '30', padding: 10, marginBottom: 12, gap: 5 }}>
         <Text style={{ fontSize: 8, fontWeight: '900', color: ACCENT, fontFamily: MONO, letterSpacing: 1.5, marginBottom: 4 }}>WORKFLOW (ZERO CREDITS)</Text>
-        {['1. Tap DOWNLOAD UI CONFIG — get a JSON file','2. Open in any text editor or send to ChatGPT/Claude','3. Edit text, hide cards, change colors, reorder sections','4. Tap IMPORT UI CONFIG — changes apply instantly','5. Repeat as many times as you want — always free'].map((line, i) => (
+        {['1. Tap DOWNLOAD UI CONFIG — get a JSON file','2. Open in any text editor or send to ChatGPT/Claude','3. Use it as a reference of every card, text and color','4. Toggle cards on/off instantly with the switches above'].map((line, i) => (
           <View key={i} style={{ flexDirection: 'row', gap: 7 }}>
             <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: ACCENT + '20', borderWidth: 1, borderColor: ACCENT + '50', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
               <Text style={{ fontSize: 8, fontWeight: '900', color: ACCENT, fontFamily: MONO }}>{i + 1}</Text>
@@ -2622,594 +1883,19 @@ function UIConfigCard() {
       </TouchableOpacity>
 
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <TouchableOpacity style={{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1.5, borderColor: ACCENT + '55', borderRadius: 10, paddingVertical: 12, backgroundColor: ACCENT + '0A', opacity: importing ? 0.65 : 1 }} onPress={handleImport} disabled={importing} activeOpacity={0.8}>
-          {importing ? <ActivityIndicator size="small" color={ACCENT} /> : <MaterialIcons name="file-upload" size={15} color={ACCENT} />}
-          <Text style={{ fontSize: 10, fontWeight: '900', color: ACCENT, fontFamily: MONO }}>{importing ? 'APPLYING...' : 'IMPORT UI CONFIG'}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1.5, borderColor: N.red + '55', borderRadius: 10, paddingVertical: 12, backgroundColor: N.red + '08', opacity: resetting ? 0.65 : 1 }} onPress={handleReset} disabled={resetting} activeOpacity={0.8}>
+        <TouchableOpacity style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1.5, borderColor: N.red + '55', borderRadius: 10, paddingVertical: 12, backgroundColor: N.red + '08', opacity: resetting ? 0.65 : 1 }} onPress={handleReset} disabled={resetting} activeOpacity={0.8} testID="ui-config-reset-btn">
           {resetting ? <ActivityIndicator size="small" color={N.red} /> : <MaterialIcons name="restore" size={14} color={N.red} />}
-          <Text style={{ fontSize: 9, fontWeight: '900', color: N.red, fontFamily: MONO }}>RESET</Text>
+          <Text style={{ fontSize: 9, fontWeight: '900', color: N.red, fontFamily: MONO }}>RESET TO DEFAULTS</Text>
         </TouchableOpacity>
       </View>
 
-      {lastImportedAt ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: ACCENT + '25' }}>
-          <MaterialIcons name="check-circle" size={11} color={ACCENT} />
-          <Text style={{ fontSize: 8, color: ACCENT + 'AA', fontFamily: MONO, flex: 1 }}>LAST APPLIED: {lastImportedAt}</Text>
-        </View>
-      ) : (
-        <Text style={{ fontSize: 8, color: N.text, fontFamily: MONO, textAlign: 'center', marginTop: 8, lineHeight: 13 }}>
-          Edit in any text editor or AI — strings, colors, card order, visibility — all in one file.
-        </Text>
-      )}
-
-      {/* Green success toast */}
-      {toastMsg ? <ImportSuccessToast key={toastKey} message={toastMsg} /> : null}
+      <Text style={{ fontSize: 8, color: N.text, fontFamily: MONO, textAlign: 'center', marginTop: 8, lineHeight: 13 }}>
+        Reference export — strings, colors, card order, visibility — all in one file.
+      </Text>
     </View>
   );
 }
 
-// ─── POWERHOUSE IMPORT CARD ──────────────────────────────────────────────
-function PowerhouseCard({ onSettingsApplied }: { onSettingsApplied?: () => void }) {
-  const ACCENT = '#00FFFF';
-  const [importing,     setImporting]     = useState(false);
-  const [downloading,   setDownloading]   = useState(false);
-  const [result,        setResult]        = useState<PHResult | null>(null);
-  const [log,           setLog]           = useState<PHLog[]>([]);
-  const [showLog,       setShowLog]       = useState(false);
-  const [patchCopied,   setPatchCopied]   = useState(false);
-  const [promptCopied,  setPromptCopied]  = useState(false);
-  const [aiCmdCopied,   setAiCmdCopied]   = useState(false);
-  const [showWorkflow,  setShowWorkflow]  = useState(false);
-  const [phToastMsg,    setPhToastMsg]    = useState('');
-  const [phToastKey,    setPhToastKey]    = useState(0);
-  const phToastRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const glowAnim = useRef(new Animated.Value(0.4)).current;
-
-  const showPhToast = useCallback((msg: string) => {
-    setPhToastMsg(msg);
-    setPhToastKey(k => k + 1);
-    if (phToastRef.current) clearTimeout(phToastRef.current);
-    phToastRef.current = setTimeout(() => setPhToastMsg(''), 4500);
-  }, []);
-
-  useEffect(() => {
-    getImportLog().then(setLog).catch(() => {});
-    const a = Animated.loop(Animated.sequence([
-      Animated.timing(glowAnim, { toValue: 1,    duration: 1400, useNativeDriver: false }),
-      Animated.timing(glowAnim, { toValue: 0.25, duration: 1400, useNativeDriver: false }),
-    ]));
-    a.start();
-    return () => a.stop();
-  }, []);
-
-  const handleImport = async () => {
-    haptics.medium();
-    setImporting(true);
-    setResult(null);
-    try {
-      // Multi-select — user can pick several powerhouse JSONs at once
-      const picked = await DocumentPicker.getDocumentAsync({
-        type: ['application/json', 'text/plain', '*/*'],
-        copyToCacheDirectory: true,
-        multiple: true,
-      });
-      if (picked.canceled || !picked.assets || picked.assets.length === 0) { setImporting(false); return; }
-
-      // Sort assets so newest-exported file is processed last (wins on merge conflicts)
-      const parsedAssets: { json: Record<string, any>; name: string }[] = [];
-      for (const asset of picked.assets) {
-        try {
-          let raw = await FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.UTF8 });
-          if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
-          raw = raw.trim();
-          if (!raw.startsWith('{')) continue;
-          parsedAssets.push({ json: JSON.parse(raw), name: asset.name || 'unknown' });
-        } catch { /* skip corrupt files */ }
-      }
-
-      if (parsedAssets.length === 0) {
-        Alert.alert('No Valid Files', 'Select butler_ai_powerhouse_*.json files generated by DOWNLOAD CURRENT STATE.');
-        setImporting(false);
-        return;
-      }
-
-      // Sort by exportedAt ascending so newest wins
-      parsedAssets.sort((a, b) => {
-        const tsA = a.json._meta?.exportedAt ? new Date(a.json._meta.exportedAt).getTime() : 0;
-        const tsB = b.json._meta?.exportedAt ? new Date(b.json._meta.exportedAt).getTime() : 0;
-        return tsA - tsB;
-      });
-
-      let combinedApplied: string[] = [];
-      let combinedWarnings: string[] = [];
-      let lastRes: PHResult | null = null;
-      let blockedCount = 0;
-
-      for (const { json, name } of parsedAssets) {
-        // ── Version guard — block stale major versions ──
-        const guard = checkImportVersion(json);
-        if (guard.stale) {
-          blockedCount++;
-          combinedWarnings.push(`Blocked "${name}": ${guard.msg}`);
-          continue; // skip this file, don't apply
-        }
-
-        // Strip example-only entries
-        if (Array.isArray(json.files))   json.files   = json.files.filter((f: any) => !f.__EXAMPLE_ONLY__);
-        if (Array.isArray(json.patches)) json.patches = json.patches.filter((p: any) => !p.__EXAMPLE_ONLY__);
-
-        const res = await processPowerhouseJson(json);
-        combinedApplied  = [...combinedApplied,  ...res.applied];
-        combinedWarnings = [...combinedWarnings, ...res.warnings];
-        lastRes = res;
-      }
-
-      if (blockedCount > 0 && combinedApplied.length === 0) {
-        Alert.alert(
-          '⛔ All Files Blocked',
-          `${blockedCount} file(s) rejected due to version mismatch.\n\nDownload a fresh copy via DOWNLOAD CURRENT STATE.`
-        );
-        setImporting(false);
-        return;
-      }
-
-      // Build merged result for display
-      const mergedResult: PHResult = {
-        ok: combinedApplied.length > 0,
-        applied: combinedApplied,
-        warnings: combinedWarnings,
-        patchScript: lastRes?.patchScript,
-        aiPrompt:    lastRes?.aiPrompt,
-        summary: `Applied ${combinedApplied.length} changes from ${parsedAssets.length - blockedCount} file(s)${
-          blockedCount > 0 ? ` (${blockedCount} blocked — outdated)` : ''
-        }`,
-      };
-      setResult(mergedResult);
-      haptics.success();
-      onSettingsApplied?.();
-
-      // Green toast
-      showPhToast(mergedResult.summary);
-
-      // Auto-send patch script to PC server (fire-and-forget)
-      if (mergedResult.patchScript) {
-        (async () => {
-          try {
-            const { serverConnection: sc } = await import('@/services/serverConnection');
-            const ip    = sc.getIP();
-            const port  = sc.getPort();
-            const token = sc.getToken();
-            if (ip && port) {
-              const ctrl = new AbortController();
-              setTimeout(() => ctrl.abort(), 60_000);
-              const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-              if (token) headers['Authorization'] = 'Bearer ' + token;
-              const pRes = await fetch('http://' + ip + ':' + port + '/api/execute', {
-                method: 'POST', headers,
-                body: JSON.stringify({ script: mergedResult.patchScript }),
-                signal: ctrl.signal,
-              });
-              const pData = await pRes.json().catch(() => ({}));
-              const pOut  = (pData.output || pData.error || '').slice(0, 400);
-              setResult(prev => prev ? { ...prev, applied: [...prev.applied, 'PC patches: ' + pOut] } : prev);
-            }
-          } catch {}
-        })();
-      }
-
-      getImportLog().then(setLog).catch(() => {});
-    } catch (e: any) {
-      haptics.warning();
-      console.warn('[PowerhouseImport]', e?.message);
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const handleDownload = async () => {
-    haptics.heavy();
-    setDownloading(true);
-    try {
-      const json    = await generateCurrentStateJson();
-      const jsonStr = JSON.stringify(json, null, 2);
-      const docDir  = FileSystem.documentDirectory;
-      if (!docDir) throw new Error('No document directory');
-      const dir  = docDir + 'powerhouse/';
-      const path = dir + 'butler_ai_powerhouse_' + Date.now() + '.json';
-      await FileSystem.makeDirectoryAsync(dir, { intermediates: true }).catch(() => {});
-      await FileSystem.writeAsStringAsync(path, jsonStr, { encoding: FileSystem.EncodingType.UTF8 });
-      const canShare = await Sharing.isAvailableAsync();
-      if (canShare) {
-        await Sharing.shareAsync(path, { mimeType: 'application/json', dialogTitle: 'Save Powerhouse JSON' });
-      } else {
-        await ExpoClipboard.setStringAsync(jsonStr);
-        Alert.alert('Copied!', 'Powerhouse JSON copied to clipboard.');
-      }
-      haptics.success();
-    } catch (e: any) {
-      Alert.alert('Error', e?.message);
-      haptics.warning();
-    } finally {
-      setDownloading(false);
-    }
-  };
-
-  const borderCol = glowAnim.interpolate({ inputRange: [0.25, 1], outputRange: [ACCENT + '40', ACCENT + 'CC'] });
-
-  const UI_COMPONENT_PROMPT =
-    'BUTLER AI — REACT NATIVE UI COMPONENT SPEC\n' +
-    '============================================\n\n' +
-    'STACK: React Native + Expo + TypeScript. StyleSheet.create() at bottom of every file.\n\n' +
-    'COLOR SYSTEM (exact values — never hardcode hex elsewhere):\n' +
-    '  bg:#000003 surface:#02070D surfaceHi:#071120\n' +
-    '  cyan:#00FFFF green:#00FF88 amber:#F5A623 purple:#BF00FF\n' +
-    '  blue:#4A9EFF red:#FF3131 text:#D8E8F4 textMid:#7A9AB8 textDim:#3A5068\n' +
-    '  border: rgba(0,255,255,0.12)\n\n' +
-    'TYPOGRAPHY: const MONO:any = Platform.OS==="ios" ? "Courier" : "monospace"\n' +
-    '  Labels UPPERCASE 7-9px letterSpacing 0.5-2 fontFamily MONO\n' +
-    '  Titles 11-15px fontWeight 900 · Body/values 12-16px 500-700\n\n' +
-    'CARD TEMPLATE:\n' +
-    '  <View style={[card.wrap,{borderColor:ACCENT+"55"}]}>\n' +
-    '    <View style={[card.topLine,{backgroundColor:ACCENT}]} />\n' +
-    '    <View style={card.header}>\n' +
-    '      <View style={[card.iconBox,{borderColor:ACCENT+"60",backgroundColor:ACCENT+"12"}]}>\n' +
-    '        <MaterialIcons name="..." size={18} color={ACCENT} />\n' +
-    '      </View>\n' +
-    '      <View style={{flex:1}}>\n' +
-    '        <Text style={[card.title,{color:ACCENT}]}>TITLE</Text>\n' +
-    '        <Text style={card.sub}>subtitle</Text>\n' +
-    '      </View>\n' +
-    '      <View style={[card.badge,{borderColor:ACCENT+"55",backgroundColor:ACCENT+"12"}]}>\n' +
-    '        <Text style={[card.badgeTxt,{color:ACCENT}]}>LABEL</Text>\n' +
-    '      </View>\n' +
-    '    </View>\n' +
-    '  </View>\n\n' +
-    'CARD STYLES (StyleSheet.create):\n' +
-    '  wrap:{ backgroundColor:"#050C18",borderRadius:16,borderWidth:1.5,borderColor:"rgba(0,255,255,0.18)",overflow:"hidden",\n' +
-    '    ...Platform.select({ios:{shadowColor:ACCENT,shadowOffset:{width:0,height:0},shadowOpacity:0.22,shadowRadius:22},android:{elevation:7}}) }\n' +
-    '  topLine:{ height:2 }\n' +
-    '  header:{ flexDirection:"row",alignItems:"center",gap:12,paddingHorizontal:14,paddingTop:14,paddingBottom:10 }\n' +
-    '  iconBox:{ width:42,height:42,borderRadius:10,borderWidth:1.5,alignItems:"center",justifyContent:"center",flexShrink:0 }\n' +
-    '  title:{ fontSize:12,fontWeight:"900",fontFamily:MONO,letterSpacing:1.5 }\n' +
-    '  sub:{ fontSize:8.5,color:"#3A5068",fontFamily:MONO,marginTop:2 }\n' +
-    '  badge:{ flexDirection:"row",alignItems:"center",gap:5,paddingHorizontal:9,paddingVertical:5,borderRadius:8,borderWidth:1 }\n' +
-    '  badgeTxt:{ fontSize:8,fontWeight:"900",fontFamily:MONO,letterSpacing:0.5 }\n\n' +
-    'PULSE ANIMATION:\n' +
-    '  const pulse=useRef(new Animated.Value(0.4)).current;\n' +
-    '  useEffect(()=>{ const a=Animated.loop(Animated.sequence([\n' +
-    '    Animated.timing(pulse,{toValue:1,duration:900,useNativeDriver:true}),\n' +
-    '    Animated.timing(pulse,{toValue:0.2,duration:900,useNativeDriver:true}),\n' +
-    '  ])); a.start(); return ()=>a.stop(); },[]);\n\n' +
-    'STAT ROW pattern:\n' +
-    '  <View style={{flexDirection:"row",borderTopWidth:1,borderTopColor:"rgba(255,255,255,0.07)"}}>\n' +
-    '    {items.map((s,i)=>(<View key={i} style={[cell,i>0&&{borderLeftWidth:1,borderLeftColor:"rgba(255,255,255,0.07)"}]}>\n' +
-    '      <Text style={{fontSize:8,fontFamily:MONO,letterSpacing:1.2,color:"#5A6880"}}>{s.label}</Text>\n' +
-    '      <Text style={{fontSize:18,fontWeight:"900",fontFamily:MONO,color:s.color}}>{s.value}</Text>\n' +
-    '    </View>))}\n' +
-    '  </View>\n\n' +
-    'PROGRESS BAR:\n' +
-    '  const anim=useRef(new Animated.Value(0)).current;\n' +
-    '  Animated.timing(anim,{toValue:value/100,duration:700,useNativeDriver:false}).start();\n' +
-    '  <View style={{height:3,backgroundColor:"rgba(255,255,255,0.07)",borderRadius:1.5}}>\n' +
-    '    <Animated.View style={{height:"100%",borderRadius:1.5,backgroundColor:color,\n' +
-    '      width:anim.interpolate({inputRange:[0,1],outputRange:["0%","100%"]}) as any}} />\n' +
-    '  </View>\n\n' +
-    'SECTION LABEL:\n' +
-    '  <View style={{flexDirection:"row",alignItems:"center",gap:7,marginBottom:10}}>\n' +
-    '    <View style={{width:3,height:16,backgroundColor:ACCENT,borderRadius:2}} />\n' +
-    '    <Text style={{fontSize:10,fontWeight:"900",color:ACCENT,fontFamily:MONO,letterSpacing:1.5}}>NAME</Text>\n' +
-    '    <View style={{flex:1,height:1,backgroundColor:ACCENT+"25",marginLeft:4}} />\n' +
-    '  </View>\n\n' +
-    'RULES:\n' +
-    '  1. NEVER white/light backgrounds — always dark obsidian (#000003 to #071120)\n' +
-    '  2. EVERY interactive: TouchableOpacity activeOpacity 0.8-0.85\n' +
-    '  3. EVERY card: 2px colored topLine as first child\n' +
-    '  4. EVERY status dot: pulse Animated.Value for opacity\n' +
-    '  5. iOS shadow* props · Android elevation\n' +
-    '  6. HUD corner brackets (position:absolute 8-14px borderTopWidth+borderLeftWidth etc)\n' +
-    '  7. ALL mono labels UPPERCASE with letterSpacing\n' +
-    '  8. StyleSheet.create() at FILE BOTTOM — no inline styles for repeated patterns\n' +
-    '  9. React.memo for components with only primitive props\n' +
-    '  10. useNativeDriver:true for opacity/transform · false for width/height/color\n\n' +
-    'HOMEPAGE RENDER ORDER:\n' +
-    '  hero > connected_pc > terminal_feed > crawlers_graph > kb_graph >\n' +
-    '  scripts_graph > fileshare_clipboard > sigma_net > smart_alerts >\n' +
-    '  omega_loop > security_grid > kb_articles > server_setup > quick_access > recent_activity\n\n' +
-    'OUTPUT FORMAT: self-contained .tsx — imports > component > StyleSheet.create() at bottom.\n' +
-    'No external deps beyond @expo/vector-icons + react-native built-ins.\n';
-
-  const AI_PROMPT_TEMPLATE =
-    'I have a React Native (Expo + TypeScript) app called Butler AI.\n' +
-    'I will attach a JSON file called butler_ai_powerhouse_*.json that describes the current app state.\n\n' +
-    'TASK: [DESCRIBE WHAT YOU WANT — e.g. "Add a new NetworkSpeedCard component to the homepage after the CrawlersGraphCard"]\n\n' +
-    'INSTRUCTIONS FOR YOUR RESPONSE:\n' +
-    '1. Read the _ai_instructions section in the JSON — it has the color system, design rules, and homepage landmarks\n' +
-    '2. Return a modified version of the JSON with your changes in files[] and patches[]\n' +
-    '3. files[] = new component files to create (full TSX source, self-contained, StyleSheet at bottom)\n' +
-    '4. patches[] = edits to existing files (import lines + render placement in nexushome.tsx)\n' +
-    '5. Keep ALL existing JSON sections unchanged — only add/modify files[] and patches[]\n' +
-    '6. Patches use op: "file.replace", "file.insertAfter", "file.regex", "file.create", or "file.delete"\n' +
-    '7. After I upload the JSON, a Python script auto-runs on my PC to apply all file changes\n\n' +
-    'COLOR SYSTEM: background #000003, cyan #00FFFF, green #00FF88, amber #F5A623, purple #BF00FF\n' +
-    'Cards: borderRadius 14-16, border 1.5px rgba(0,255,255,0.18), iOS shadow opacity 0.22\n' +
-    'All labels: monospace font, all backgrounds dark obsidian — NO white or light surfaces';
-
-  const TABLE_ROWS = [
-    { key: 'tokens / typography / motion', val: 'Colors, spacing, radius, shadows, fonts, animations, haptics' },
-    { key: 'navigation',                   val: 'Add / remove / reorder tabs' },
-    { key: 'features / flags',             val: 'Toggle features, app settings, permissions' },
-    { key: 'ai',                           val: 'Personas, model, temperature, system prompt, tools, routing' },
-    { key: 'server',                       val: 'PC IP address and port' },
-    { key: 'scripts',                      val: 'PC automation library (shell / powershell)' },
-    { key: 'knowledge',                    val: 'KB entries' },
-    { key: 'automations',                  val: 'Trigger \u2192 action rules (time, wake-word, etc.)' },
-    { key: 'assets / icons',               val: 'Inline SVG, splash, app icon' },
-    { key: 'files[]',                      val: 'Optional full-source replacement' },
-    { key: 'patches[]',                    val: 'file.replace / file.regex / file.insertAfter / file.deleteRange / file.create / file.delete' },
-  ];
-
-  return (
-    <Animated.View style={[phc.card, { borderColor: borderCol }]}>
-      <View style={[phc.topLine, { backgroundColor: ACCENT }]} />
-      <View style={[phc.cornerTL, { borderColor: ACCENT + '90' }]} />
-      <View style={[phc.cornerBR, { borderColor: ACCENT + '60' }]} />
-
-      <View style={phc.header}>
-        <View style={[phc.iconBox, { borderColor: ACCENT + '60', backgroundColor: ACCENT + '10' }]}>
-          <MaterialIcons name="bolt" size={24} color={ACCENT} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[phc.title, { color: ACCENT }]}>ONE JSON POWERHOUSE</Text>
-          <Text style={phc.sub}>Upload one file \u2192 change ANYTHING in the app instantly</Text>
-        </View>
-        {log.length > 0 ? (
-          <TouchableOpacity
-            style={[phc.logBtn, { borderColor: ACCENT + '40' }]}
-            onPress={() => setShowLog(v => !v)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <MaterialIcons name="history" size={13} color={ACCENT + '80'} />
-            <Text style={[phc.logBtnTxt, { color: ACCENT + '80' }]}>{log.length}</Text>
-          </TouchableOpacity>
-        ) : null}
-      </View>
-
-      {/* ── AI Workflow strip ── */}
-      <TouchableOpacity
-        style={[phc.workflowStrip, showWorkflow ? { borderColor: ACCENT + '60' } : { borderColor: ACCENT + '25' }]}
-        onPress={() => { haptics.light(); setShowWorkflow(v => !v); }}
-        activeOpacity={0.85}
-      >
-        <MaterialIcons name="auto-awesome" size={14} color={ACCENT} />
-        <Text style={[phc.workflowStripTxt, { color: ACCENT }]}>HOW TO USE WITH AI (Claude / GPT)</Text>
-        <View style={{ flex: 1 }} />
-        <MaterialIcons name={showWorkflow ? 'expand-less' : 'expand-more'} size={16} color={ACCENT + '80'} />
-      </TouchableOpacity>
-
-      {showWorkflow ? (
-        <View style={phc.workflowPanel}>
-          {[
-            { num: '1', col: ACCENT,     icon: 'download',        txt: 'Tap DOWNLOAD CURRENT STATE — saves a JSON with your full app config + AI instructions' },
-            { num: '2', col: N.purple,   icon: 'psychology',      txt: 'Open Claude / GPT — tap COPY AI PROMPT below, paste it, then attach the JSON file' },
-            { num: '3', col: N.amber,    icon: 'edit',            txt: 'Tell the AI what you want: "Add a neon graph card", "Change primary color to gold", "Add a speedometer"' },
-            { num: '4', col: N.green,    icon: 'file-upload',     txt: 'AI returns a modified JSON — save it, then tap IMPORT JSON here' },
-            { num: '5', col: '#00FF88',  icon: 'check-circle',    txt: 'Done! File changes auto-apply via PC server. Repeat as many times as you want.' },
-          ].map(({ num, col, icon, txt }, i) => (
-            <View key={i} style={phc.workflowStep}>
-              <View style={[phc.workflowNum, { borderColor: col + '70', backgroundColor: col + '14' }]}>
-                <Text style={[phc.workflowNumTxt, { color: col }]}>{num}</Text>
-              </View>
-              <MaterialIcons name={icon as any} size={13} color={col} />
-              <Text style={phc.workflowStepTxt} numberOfLines={4}>{txt}</Text>
-            </View>
-          ))}
-
-          {/* Copy AI Prompt button */}
-          <TouchableOpacity
-            style={[phc.copyPromptBtn, { borderColor: N.purple + '60', backgroundColor: N.purple + '0C' }]}
-            onPress={async () => {
-              haptics.medium();
-              try { await ExpoClipboard.setStringAsync(AI_PROMPT_TEMPLATE); setAiCmdCopied(true); setTimeout(() => setAiCmdCopied(false), 4000); haptics.success(); } catch {}
-            }}
-            activeOpacity={0.85}
-          >
-            <MaterialIcons name={aiCmdCopied ? 'check-circle' : 'content-copy'} size={15} color={aiCmdCopied ? N.green : N.purple} />
-            <View style={{ flex: 1 }}>
-              <Text style={[phc.copyPromptTitle, { color: aiCmdCopied ? N.green : N.purple }]}>
-                {aiCmdCopied ? 'PROMPT COPIED — PASTE INTO AI CHAT' : 'COPY AI PROMPT'}
-              </Text>
-              <Text style={phc.copyPromptSub}>
-                {aiCmdCopied ? 'Then attach the downloaded JSON file and describe what you want' : 'Paste this into Claude/GPT + attach the JSON — AI knows exactly how to add components'}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Copy UI Component Prompt button */}
-          <TouchableOpacity
-            style={[phc.copyPromptBtn, { borderColor: N.cyan + '55', backgroundColor: N.cyan + '08', marginTop: 6 }]}
-            onPress={async () => {
-              haptics.medium();
-              try { await ExpoClipboard.setStringAsync(UI_COMPONENT_PROMPT); setAiCmdCopied(true); setTimeout(() => setAiCmdCopied(false), 4000); haptics.success(); } catch {}
-            }}
-            activeOpacity={0.85}
-          >
-            <MaterialIcons name={aiCmdCopied ? 'check-circle' : 'palette'} size={15} color={aiCmdCopied ? N.green : N.cyan} />
-            <View style={{ flex: 1 }}>
-              <Text style={[phc.copyPromptTitle, { color: aiCmdCopied ? N.green : N.cyan }]}>
-                {aiCmdCopied ? 'UI PROMPT COPIED!' : 'COPY UI COMPONENT PROMPT'}
-              </Text>
-              <Text style={phc.copyPromptSub}>Full design spec: colors, card template, animations, rules — paste into any AI to get matching components instantly</Text>
-            </View>
-          </TouchableOpacity>
-
-          <View style={phc.workflowTip}>
-            <MaterialIcons name="tips-and-updates" size={11} color={ACCENT + '90'} />
-            <Text style={[phc.workflowTipTxt, { color: ACCENT + '80' }]}>
-              {'The JSON includes _ai_instructions with your color system, design rules, and homepage landmarks so AI places components exactly where you want them.'}
-            </Text>
-          </View>
-        </View>
-      ) : null}
-
-      <View style={phc.whoCopy}>
-        <Text style={[phc.whoTitle, { color: '#8BACC8' }]}>What you can change from this one file:</Text>
-      </View>
-
-      <View style={phc.table}>
-        <View style={[phc.tableHdr, { borderBottomColor: ACCENT + '25' }]}>
-          <Text style={[phc.tableHdrTxt, { flex: 1 }]}>Section</Text>
-          <Text style={[phc.tableHdrTxt, { flex: 2 }]}>Edits</Text>
-        </View>
-        {TABLE_ROWS.map(({ key, val }, i) => (
-          <View key={key} style={[phc.tableRow, i < TABLE_ROWS.length - 1 && { borderBottomWidth: 1, borderBottomColor: 'rgba(0,255,255,0.06)' }]}>
-            <View style={[phc.tableKeyWrap]}>
-              <Text style={[phc.tableKey, { color: ACCENT + 'BB' }]} numberOfLines={3}>{key}</Text>
-            </View>
-            <Text style={phc.tableVal} numberOfLines={4}>{val}</Text>
-          </View>
-        ))}
-      </View>
-
-      {result ? (
-        <View style={[phc.resultBox, { borderColor: result.ok ? N.green + '55' : N.amber + '55', backgroundColor: result.ok ? N.green + '06' : N.amber + '06' }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-            <MaterialIcons name={result.ok ? 'check-circle' : 'warning'} size={16} color={result.ok ? N.green : N.amber} />
-            <Text style={[phc.resultTitle, { color: result.ok ? N.green : N.amber }]}>{result.summary.toUpperCase()}</Text>
-          </View>
-          {result.applied.slice(0, 8).map((a, i) => (
-            <Text key={i} style={[phc.resultLine, { color: N.green + 'CC' }]} numberOfLines={2}>{a}</Text>
-          ))}
-          {result.warnings.map((w, i) => (
-            <Text key={i} style={[phc.resultLine, { color: N.amber + 'CC' }]} numberOfLines={2}>{w}</Text>
-          ))}
-          {result.patchScript ? (
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-              <TouchableOpacity
-                style={[phc.miniBtn, { borderColor: ACCENT + '55', backgroundColor: ACCENT + '0C', flex: 1 }]}
-                onPress={async () => { haptics.light(); try { await ExpoClipboard.setStringAsync(result.patchScript!); setPatchCopied(true); setTimeout(() => setPatchCopied(false), 3000); haptics.success(); } catch {} }}
-              >
-                <MaterialIcons name={patchCopied ? 'check' : 'code'} size={12} color={ACCENT} />
-                <Text style={[phc.miniBtnTxt, { color: ACCENT }]}>{patchCopied ? 'COPIED!' : 'COPY PYTHON PATCH'}</Text>
-              </TouchableOpacity>
-              {result.aiPrompt ? (
-                <TouchableOpacity
-                  style={[phc.miniBtn, { borderColor: N.purple + '55', backgroundColor: N.purple + '0C', flex: 1 }]}
-                  onPress={async () => { haptics.light(); try { await ExpoClipboard.setStringAsync(result.aiPrompt!); setPromptCopied(true); setTimeout(() => setPromptCopied(false), 3000); haptics.success(); } catch {} }}
-                >
-                  <MaterialIcons name={promptCopied ? 'check' : 'psychology'} size={12} color={N.purple} />
-                  <Text style={[phc.miniBtnTxt, { color: N.purple }]}>{promptCopied ? 'COPIED!' : 'COPY AI PROMPT'}</Text>
-                </TouchableOpacity>
-              ) : null}
-            </View>
-          ) : null}
-        </View>
-      ) : null}
-
-      {showLog && log.length > 0 ? (
-        <View style={phc.logPanel}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <Text style={[phc.sub, { color: ACCENT + '80', flex: 1 }]}>IMPORT HISTORY</Text>
-            <TouchableOpacity onPress={() => { clearImportLog(); setLog([]); setShowLog(false); haptics.light(); }} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Text style={{ fontSize: 8, color: N.red, fontFamily: MONO, fontWeight: '900' }}>CLEAR</Text>
-            </TouchableOpacity>
-          </View>
-          {log.slice(0, 8).map((entry, i) => (
-            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6, borderBottomWidth: i < log.length - 1 ? 1 : 0, borderBottomColor: '#071120' }}>
-              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: entry.warningCount === 0 ? N.green : N.amber }} />
-              <Text style={{ flex: 1, fontSize: 10, color: N.textBrt, fontFamily: MONO }} numberOfLines={1}>{entry.name}</Text>
-              <Text style={{ fontSize: 8, color: N.green, fontFamily: MONO }}>{entry.appliedCount}\u2713</Text>
-              {entry.warningCount > 0 ? <Text style={{ fontSize: 8, color: N.amber, fontFamily: MONO }}>{entry.warningCount}\u26A0</Text> : null}
-              <Text style={{ fontSize: 8, color: N.textDim, fontFamily: MONO }}>{new Date(entry.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
-
-      <View style={{ gap: 8, marginTop: 8 }}>
-        <TouchableOpacity
-          style={[phc.importBtn, { backgroundColor: importing ? ACCENT + 'AA' : ACCENT, opacity: importing ? 0.75 : 1 }]}
-          onPress={handleImport}
-          disabled={importing}
-          activeOpacity={0.85}
-        >
-          {importing
-            ? <ActivityIndicator size="small" color="#000" />
-            : <MaterialIcons name="file-upload" size={20} color="#000" />}
-          <Text style={phc.importBtnTxt}>{importing ? 'PROCESSING...' : '\u26A1 IMPORT JSON'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[phc.downloadBtn, { borderColor: ACCENT + '50', backgroundColor: ACCENT + '0A', opacity: downloading ? 0.7 : 1 }]}
-          onPress={handleDownload}
-          disabled={downloading}
-          activeOpacity={0.85}
-        >
-          {downloading ? <ActivityIndicator size="small" color={ACCENT} /> : <MaterialIcons name="download" size={16} color={ACCENT} />}
-          <Text style={[phc.downloadBtnTxt, { color: ACCENT }]}>{downloading ? 'GENERATING...' : 'DOWNLOAD CURRENT STATE \u2192 JSON'}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={phc.footer}>
-        <MaterialIcons name="info-outline" size={10} color={ACCENT + '50'} />
-        <Text style={phc.footerTxt}>
-          Multi-select supported — pick several files at once. Older major-version files are automatically blocked. Newest file always wins on conflicts. Changes persist instantly.
-        </Text>
-      </View>
-
-      {/* Green success toast */}
-      {phToastMsg ? <ImportSuccessToast key={phToastKey} message={phToastMsg} /> : null}
-    </Animated.View>
-  );
-}
-
-const phc = StyleSheet.create({
-  card:          { backgroundColor: '#030A12', borderRadius: 14, borderWidth: 2, marginBottom: 14, overflow: 'hidden', position: 'relative',
-    ...Platform.select({ ios:{ shadowColor:'#00FFFF', shadowOffset:{width:0,height:0}, shadowOpacity:0.45, shadowRadius:24 }, android:{ elevation:10 } }) },
-  topLine:       { height: 3 },
-  cornerTL:      { position:'absolute', top:4, left:8, width:16, height:16, borderTopWidth:2, borderLeftWidth:2, zIndex:4 },
-  cornerBR:      { position:'absolute', bottom:4, right:8, width:16, height:16, borderBottomWidth:2, borderRightWidth:2, zIndex:4 },
-  header:        { flexDirection:'row', alignItems:'center', gap:12, paddingHorizontal:14, paddingTop:14, paddingBottom:8 },
-  iconBox:       { width:48, height:48, borderRadius:12, borderWidth:2, alignItems:'center', justifyContent:'center', flexShrink:0 },
-  title:         { fontSize:13, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5 },
-  sub:           { fontSize:8, color:N.text, fontFamily:MONO, letterSpacing:0.5, marginTop:2 },
-  logBtn:        { flexDirection:'row', alignItems:'center', gap:4, borderWidth:1, borderRadius:7, paddingHorizontal:8, paddingVertical:5 },
-  logBtnTxt:     { fontSize:10, fontWeight:'900', fontFamily:MONO },
-  whoCopy:       { paddingHorizontal:14, marginBottom:8 },
-  whoTitle:      { fontSize:12, fontWeight:'700', fontFamily:MONO },
-  table:         { marginHorizontal:14, marginBottom:12, borderWidth:1, borderColor:'rgba(0,255,255,0.15)', borderRadius:10, overflow:'hidden' },
-  tableHdr:      { flexDirection:'row', paddingHorizontal:10, paddingVertical:7, borderBottomWidth:1 },
-  tableHdrTxt:   { fontSize:10, fontWeight:'900', color:'#7A9AB8', fontFamily:MONO, letterSpacing:0.5 },
-  tableRow:      { flexDirection:'row', alignItems:'flex-start', paddingHorizontal:10, paddingVertical:9 },
-  tableKeyWrap:  { width:132, flexShrink:0, paddingRight:8 },
-  tableKey:      { fontSize:9, fontFamily:MONO, fontWeight:'700', letterSpacing:0.3, lineHeight:14, backgroundColor:'rgba(0,255,255,0.06)', borderRadius:4, paddingHorizontal:6, paddingVertical:3, alignSelf:'flex-start', overflow:'hidden' },
-  tableVal:      { flex:2, fontSize:10, color:'#8BACC8', fontFamily:MONO, lineHeight:15 },
-  resultBox:     { marginHorizontal:14, marginBottom:12, borderWidth:1.5, borderRadius:10, padding:12 },
-  resultTitle:   { fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5 },
-  resultLine:    { fontSize:9, fontFamily:MONO, lineHeight:15, marginTop:3 },
-  miniBtn:       { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:5, borderWidth:1.5, borderRadius:8, paddingVertical:9 },
-  miniBtnTxt:    { fontSize:9, fontWeight:'900', fontFamily:MONO, letterSpacing:0.3 },
-  logPanel:      { marginHorizontal:14, marginBottom:12, backgroundColor:'#000003', borderRadius:10, borderWidth:1, borderColor:'rgba(0,255,255,0.12)', padding:12 },
-  importBtn:     { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:10, borderRadius:12, paddingVertical:16, marginHorizontal:14,
-    ...Platform.select({ ios:{ shadowColor:'#00FFFF', shadowOffset:{width:0,height:4}, shadowOpacity:0.6, shadowRadius:14 }, android:{ elevation:7 } }) },
-  importBtnTxt:  { fontSize:14, fontWeight:'900', color:'#000', fontFamily:MONO, letterSpacing:1 },
-  downloadBtn:   { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:8, borderWidth:1.5, borderRadius:12, paddingVertical:13, marginHorizontal:14 },
-  downloadBtnTxt:{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5 },
-  footer:        { flexDirection:'row', alignItems:'flex-start', gap:6, marginHorizontal:14, marginTop:8, marginBottom:14 },
-  footerTxt:     { flex:1, fontSize:8, color:N.text, fontFamily:MONO, lineHeight:13 },
-  workflowStrip: { flexDirection:'row', alignItems:'center', gap:8, borderWidth:1, borderRadius:10, paddingHorizontal:12, paddingVertical:11, marginHorizontal:14, marginBottom:6, backgroundColor:N.card },
-  workflowStripTxt:{ fontSize:10, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5 },
-  workflowPanel: { marginHorizontal:14, marginBottom:10, backgroundColor:'#000003', borderRadius:10, borderWidth:1, borderColor:'rgba(0,255,255,0.18)', padding:12, gap:8 },
-  workflowStep:  { flexDirection:'row', alignItems:'flex-start', gap:9 },
-  workflowNum:   { width:22, height:22, borderRadius:11, borderWidth:1.5, alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 },
-  workflowNumTxt:{ fontSize:10, fontWeight:'900', fontFamily:MONO },
-  workflowStepTxt:{ flex:1, fontSize:11, color:N.textBrt, fontFamily:MONO, lineHeight:17 },
-  copyPromptBtn: { flexDirection:'row', alignItems:'center', gap:10, borderWidth:1.5, borderRadius:10, padding:12, marginTop:6 },
-  copyPromptTitle:{ fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:0.5 },
-  copyPromptSub: { fontSize:9, color:N.text, fontFamily:MONO, lineHeight:13, marginTop:2 },
-  workflowTip:   { flexDirection:'row', alignItems:'flex-start', gap:6, borderWidth:1, borderColor:'rgba(0,255,255,0.15)', borderRadius:8, padding:9, backgroundColor:'rgba(0,255,255,0.04)' },
-  workflowTipTxt:{ flex:1, fontSize:9, fontFamily:MONO, lineHeight:14 },
-});
 
 // ─── MAIN SCREEN ─────────────────────────────────────────────────────────
 export default function SettingsScreen() {
@@ -3863,11 +2549,8 @@ export default function SettingsScreen() {
         {/* ── UI CONFIG CARD ── */}
         <UIConfigCard />
 
-        {/* ── ONE JSON POWERHOUSE ── */}
-        <PowerhouseCard onSettingsApplied={loadSettings} />
-
         {/* ── EXPORT UI CODE ── */}
-        <ExportUICodeCard onSettingsApplied={loadSettings} />
+        <ExportUICodeCard />
 
         {/* ════════════════════════════════════════════════════════════
             DEV / TECH SECTION — at the very bottom
@@ -4028,7 +2711,7 @@ export default function SettingsScreen() {
 
 // Global Styles
 const g = StyleSheet.create({
-  root:        { flex: 1, backgroundColor: '#000003' },
+  root:        { flex: 1, backgroundColor: '#050505' },
   scrollPad:   { padding: 14, paddingTop: 12 },
   card:        { backgroundColor: N.card, borderRadius: 12, borderWidth: 1.5, borderColor: N.border, marginBottom: 14, padding: 14 },
   cardTitle:   { fontSize: 10, fontWeight: '900', color: N.cyan, fontFamily: MONO, letterSpacing: 2, marginBottom: 12 },

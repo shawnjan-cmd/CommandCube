@@ -142,7 +142,7 @@ function ArcFlash({ trigger }: { trigger: boolean }) {
       style={{
         position: 'absolute',
         top: -50, left: -20, right: -20, height: 50,
-        backgroundColor: '#00A8FF',
+        backgroundColor: '#FF6A1F',
         opacity: op,
         borderRadius: 30,
       }}
@@ -174,7 +174,7 @@ export default function VerificationArc({ visible, width = 300, height = 56 }: V
       {/* Crimson outer arc */}
       <Filament color="#FF2200" radius={width * 0.46} speed={3200} thickness={1.5} phase={0} dir={1} />
       {/* Cerulean mid arc */}
-      <Filament color="#00A8FF" radius={width * 0.38} speed={2400} thickness={1} phase={0.3} dir={-1} />
+      <Filament color="#FF6A1F" radius={width * 0.38} speed={2400} thickness={1} phase={0.3} dir={-1} />
       {/* Crimson inner arc */}
       <Filament color="#FF5500" radius={width * 0.28} speed={1800} thickness={2} phase={0.6} dir={1} />
       {/* Cerulean thin outer */}
@@ -187,7 +187,7 @@ export default function VerificationArc({ visible, width = 300, height = 56 }: V
       <ArcDot color="#00D4FF" radius={width * 0.38} speed={2100} delay={300} dir={-1} />
       <ArcDot color="#0099CC" radius={width * 0.38} speed={2100} delay={1050} dir={-1} />
       {/* Inner fast crimson */}
-      <ArcDot color="#FF3300" radius={width * 0.28} speed={1600} delay={150} dir={1} />
+      <ArcDot color="#FF6A1F" radius={width * 0.28} speed={1600} delay={150} dir={1} />
 
       {/* Bottom glow line — where arc meets card surface */}
       <Animated.View
@@ -196,11 +196,11 @@ export default function VerificationArc({ visible, width = 300, height = 56 }: V
           position: 'absolute',
           bottom: 0, left: 10, right: 10,
           height: 2,
-          backgroundColor: '#00A8FF',
+          backgroundColor: '#FF6A1F',
           borderRadius: 2,
           opacity: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.6] }),
           ...Platform.select({
-            ios: { shadowColor: '#00A8FF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 8 },
+            ios: { shadowColor: '#FF6A1F', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 8 },
             android: {},
           }),
         }}

@@ -9,10 +9,10 @@ import { useFocusEffect } from 'expo-router';
 const { width: SW } = Dimensions.get('window');
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
-const CYAN    = '#00FFFF';
-const SURFACE = '#02070D';
-const BORDER  = 'rgba(0,255,255,0.12)';
-const TEXTDIM = '#3A5068';
+const CYAN    = '#FF2A1F';
+const SURFACE = '#0E0F12';
+const BORDER  = 'rgba(255,42,31,0.12)';
+const TEXTDIM = '#6A7384';
 
 interface Props {
   totalFindings: number;
@@ -110,7 +110,7 @@ export function IsometricKBShardMap({ totalFindings, sessions }: Props) {
 
         {/* Shards */}
         {shards.map(({ idx, filled, anim, sx, sy, hw, hh }) => {
-          const topBg   = filled ? '#00CCDD' : '#0A1828';
+          const topBg   = filled ? '#FF2A1F' : '#15171C';
           const leftBg  = filled ? '#006677' : '#0E1820';
           const rightBg = filled ? '#008899' : '#111E2A';
           return (
@@ -150,7 +150,7 @@ export function IsometricKBShardMap({ totalFindings, sessions }: Props) {
         {[
           { label: 'INDEXED',  val: filledCount,             col: CYAN },
           { label: 'PENDING',  val: COLS * ROWS - filledCount, col: '#1E3448' },
-          { label: 'SESSIONS', val: sessions,                 col: '#F5A623' },
+          { label: 'SESSIONS', val: sessions,                 col: '#FFC400' },
           { label: 'FINDINGS', val: totalFindings,            col: '#00FF88' },
         ].map(({ label, val, col }) => (
           <View key={label} style={[s.stat, { borderColor: col + '35', backgroundColor: col + '08' }]}>
@@ -173,7 +173,7 @@ const s = StyleSheet.create({
   badgeTxt: { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.5, color: CYAN },
   canvas:   { overflow: 'hidden', backgroundColor: '#030A14', borderRadius: 10, borderWidth: 1, borderColor: CYAN + '25', position: 'relative' },
   scanSweep:{ position: 'absolute', top: 0, bottom: 0, width: '25%',
-    backgroundColor: 'rgba(0,255,255,0.06)', transform: [{ skewX: '-12deg' }] },
+    backgroundColor: 'rgba(255,42,31,0.06)', transform: [{ skewX: '-12deg' }] },
   corner:   { position: 'absolute', width: 10, height: 10, borderColor: CYAN + '55' },
   glowNode: { position: 'absolute', width: 6, height: 6, borderRadius: 3, backgroundColor: CYAN,
     ...Platform.select({ ios: { shadowColor: CYAN, shadowOffset:{width:0,height:0}, shadowOpacity:1, shadowRadius:8 }, android:{} }) },

@@ -26,26 +26,26 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // ─── PALETTE ─────────────────────────────────────────────────
 const C = {
-  bg:         '#000003',
-  surface:    '#02070D',
-  surfaceHi:  '#071120',
-  border:     'rgba(0,255,255,0.12)',
-  text:       '#D8E8F4',
-  textDim:    '#3A5068',
-  textMid:    '#7A9AB8',
-  teal:       '#00FFFF',
-  tealDim:    'rgba(0,255,255,0.08)',
+  bg:         '#050505',
+  surface:    '#0E0F12',
+  surfaceHi:  '#1A1D24',
+  border:     'rgba(255,42,31,0.12)',
+  text:       '#E6E9EF',
+  textDim:    '#6A7384',
+  textMid:    '#8C95A6',
+  teal:       '#FF2A1F',
+  tealDim:    'rgba(255,42,31,0.08)',
   green:      '#00FF88',
   greenDim:   '#00FF8815',
-  purple:     '#BF00FF',
-  purpleDim:  '#BF00FF15',
-  amber:      '#F5A623',
-  amberDim:   '#F5A62315',
+  purple:     '#FFC400',
+  purpleDim:  '#FFC40015',
+  amber:      '#FFC400',
+  amberDim:   '#FFC40015',
   red:        '#FF3131',
   redDim:     '#FF313115',
-  blue:       '#4A9EFF',
-  blueDim:    '#4A9EFF15',
-  cyan:       '#00FFFF',
+  blue:       '#FF6A1F',
+  blueDim:    '#FF6A1F15',
+  cyan:       '#FF2A1F',
 };
 
 // ─── NODE TYPES ──────────────────────────────────────────────
@@ -584,10 +584,10 @@ function NodeDetailModal({ node, onClose, onAdd }: {
   const lineColor = (line: string): string => {
     const t = line.trim();
     if (t.startsWith('#'))                             return '#667744';
-    if (/^(import|from|as)\b/.test(t))                return '#4488FF';
-    if (/^(def|class|return|if|else|elif|for|while|try|except|with|in)\b/.test(t)) return '#CC44FF';
+    if (/^(import|from|as)\b/.test(t))                return '#FF6A1F';
+    if (/^(def|class|return|if|else|elif|for|while|try|except|with|in)\b/.test(t)) return '#FFC400';
     if (/^print\s*\(/.test(t))                        return '#88CC66';
-    return '#D0DDE8';
+    return '#D5D9E0';
   };
 
   return (
@@ -719,7 +719,7 @@ function NodeDetailModal({ node, onClose, onAdd }: {
 const ndm = StyleSheet.create({
   overlay:    { flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'flex-end' },
   sheet:      {
-    backgroundColor: '#02070D', borderTopLeftRadius: 18, borderTopRightRadius: 18,
+    backgroundColor: '#0E0F12', borderTopLeftRadius: 18, borderTopRightRadius: 18,
     overflow: 'hidden', position: 'relative',
     ...Platform.select({
       ios: { shadowColor: '#000', shadowOffset: { width: 0, height: -8 }, shadowOpacity: 0.6, shadowRadius: 20 },
@@ -740,7 +740,7 @@ const ndm = StyleSheet.create({
   infoDiv:    { width: 1, height: 28 },
   infoLabel:  { fontSize: 7.5, fontWeight: '700', fontFamily: MONO, letterSpacing: 1, flexShrink: 0 },
   infoVal:    { fontSize: 10, fontWeight: '900', fontFamily: MONO },
-  codeWrap:   { marginHorizontal: 16, marginBottom: 12, borderRadius: 10, overflow: 'hidden', borderWidth: 1, backgroundColor: '#000003' },
+  codeWrap:   { marginHorizontal: 16, marginBottom: 12, borderRadius: 10, overflow: 'hidden', borderWidth: 1, backgroundColor: '#050505' },
   codeHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 9, borderBottomWidth: 1 },
   codeFilename:{ flex: 1, fontSize: 9, fontFamily: MONO, textAlign: 'center', letterSpacing: 0.5 },
   copyBtn:    { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
@@ -936,7 +936,7 @@ function ExecuteResultPanel({ output, error, running, onClose }: { output: strin
   );
 }
 const erp = StyleSheet.create({
-  wrap:      { backgroundColor: '#02070D', borderTopWidth: 1.5, borderTopColor: C.teal + '40' },
+  wrap:      { backgroundColor: '#0E0F12', borderTopWidth: 1.5, borderTopColor: C.teal + '40' },
   header:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1 },
   headerTxt: { flex: 1, fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.8 },
 });
@@ -1186,7 +1186,7 @@ export default function BuilderScreen() {
           <Text style={s.executeBtnTxt}>{executing ? 'RUNNING' : 'EXECUTE'}</Text>
           </TouchableOpacity>
           {genStage !== 'idle' ? (
-            <Text style={{ color: '#00DDEE', fontSize: 11, fontFamily: MONO, marginTop: 4, textAlign: 'center' }}>
+            <Text style={{ color: '#FF2A1F', fontSize: 11, fontFamily: MONO, marginTop: 4, textAlign: 'center' }}>
               {({'connecting':'Connecting to AI...','generating':'Building script...','validating':'Validating...','done':'Ready'} as Record<string,string>)[genStage] ?? ''}
             </Text>
           ) : null}
@@ -1353,7 +1353,7 @@ export default function BuilderScreen() {
 }
 
 const s = StyleSheet.create({
-  root:         { flex: 1, backgroundColor: '#000003' },
+  root:         { flex: 1, backgroundColor: '#050505' },
   header:       { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.surface },
   titleMain:    { fontSize: 22, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, letterSpacing: -0.5 },
   titleAccent:  { fontSize: 22, fontWeight: '900', fontFamily: MONO, letterSpacing: -0.5 },

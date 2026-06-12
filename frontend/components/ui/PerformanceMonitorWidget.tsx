@@ -1,7 +1,7 @@
 /**
  * PERFORMANCE MONITOR WIDGET — Standalone component
  * Real-time circular ring gauges for CPU, RAM, GPU/AI, Disk
- * Same color scheme as the app (teal #10d9a0, amber, red, purple)
+ * Same color scheme as the app (teal #00FF88, amber, red, purple)
  * Can be placed on any page as a self-contained card.
  */
 
@@ -26,15 +26,15 @@ const PM = {
   border:    'rgba(255,255,255,0.06)',
   text:      '#e2e8f0',
   dim:       '#4a5568',
-  mid:       '#94a3b8',
-  teal:      '#10d9a0',
-  tealDim:   '#10d9a015',
-  amber:     '#f59e0b',
-  amberDim:  '#f59e0b15',
+  mid:       '#8C95A6',
+  teal:      '#00FF88',
+  tealDim:   '#00FF8815',
+  amber:     '#FFC400',
+  amberDim:  '#FFC40015',
   red:       '#ef4444',
   redDim:    '#ef444415',
-  purple:    '#8b5cf6',
-  purpleDim: '#8b5cf615',
+  purple:    '#FFC400',
+  purpleDim: '#FFC40015',
   blue:      '#3b82f6',
   green:     '#22c55e',
   cyan:      '#22d3ee',
@@ -457,7 +457,7 @@ const pms = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 14,
     ...Platform.select({
-      ios:     { shadowColor: '#10d9a0', shadowOffset:{width:0,height:4}, shadowOpacity:0.12, shadowRadius:14 },
+      ios:     { shadowColor: '#00FF88', shadowOffset:{width:0,height:4}, shadowOpacity:0.12, shadowRadius:14 },
       android: { elevation: 4 },
     }),
   },
@@ -491,7 +491,7 @@ const pms = StyleSheet.create({
 
   // Feed
   feedSection:  { paddingHorizontal: 14, paddingBottom: 12 },
-  feedWrap:     { backgroundColor: '#000003', borderRadius: 8, overflow: 'hidden' },
+  feedWrap:     { backgroundColor: '#050505', borderRadius: 8, overflow: 'hidden' },
   feedRow:      { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
   feedTime:     { fontSize: 9, fontFamily: MONO, fontWeight: '700', width: 56, flexShrink: 0 },
   feedDot:      { width: 4, height: 4, borderRadius: 2, flexShrink: 0 },

@@ -19,9 +19,9 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 export const FX = {
   bg:      '#000509',
   red:     '#CC2200',
-  redBrt:  '#FF3300',
+  redBrt:  '#FF6A1F',
   amber:   '#FF7700',
-  text:    '#00CCDD',
+  text:    '#FF2A1F',
   dim:     '#0A1A22',
 };
 
@@ -85,7 +85,7 @@ export function MiniSkull({
   }, []);
 
   const S = size;
-  const eyeColor = eyeGlow.interpolate({ inputRange: [0, 1], outputRange: ['#001A22', '#00EEFF'] });
+  const eyeColor = eyeGlow.interpolate({ inputRange: [0, 1], outputRange: ['#001A22', '#FF2A1F'] });
 
   const skull = (
     <Animated.View style={[ms.wrap, { width: S, height: S * 1.15, transform: [{ translateY: floatY }, { translateX: jitterX }] }]}>
@@ -104,7 +104,7 @@ export function MiniSkull({
               <Animated.View style={[ms.eyeLens, {
                 width: S * 0.14, height: S * 0.10,
                 backgroundColor: eyeColor as any,
-                shadowColor: '#00EEFF',
+                shadowColor: '#FF2A1F',
                 shadowRadius: S * 0.06,
               }]} />
               <Animated.View style={[ms.lensFlare, { opacity: eyeGlow, top: S * 0.025, left: S * 0.045, width: S * 0.04, height: S * 0.03 }]} />
@@ -154,11 +154,11 @@ export function MiniSkull({
 const ms = StyleSheet.create({
   wrap:      { alignItems: 'center', justifyContent: 'center', gap: 0, position: 'relative' },
   cranium: {
-    backgroundColor: '#001018', borderWidth: 1.5, borderColor: '#00CCDD',
+    backgroundColor: '#140707', borderWidth: 1.5, borderColor: '#FF2A1F',
     alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden',
-    shadowColor: '#00EEFF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 4,
+    shadowColor: '#FF2A1F', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 4,
   },
-  crack:     { position: 'absolute', top: 6, width: 1.5, backgroundColor: '#00EEFF', borderRadius: 1, transform: [{ rotate: '8deg' }] },
+  crack:     { position: 'absolute', top: 6, width: 1.5, backgroundColor: '#FF2A1F', borderRadius: 1, transform: [{ rotate: '8deg' }] },
   socketRow: { flexDirection: 'row', marginBottom: 2, marginTop: 6 },
   socket:    {
     backgroundColor: '#000',
@@ -169,20 +169,20 @@ const ms = StyleSheet.create({
   eyeLens:   { borderRadius: 3, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, elevation: 3 },
   lensFlare: { position: 'absolute', backgroundColor: '#88EEFF', borderRadius: 2 },
   nasalRow:  { flexDirection: 'row', marginBottom: 2 },
-  nasal:     { backgroundColor: '#000A0E', borderWidth: 1, borderColor: '#003344' },
+  nasal:     { backgroundColor: '#000A0E', borderWidth: 1, borderColor: '#451A15' },
   jaw: {
-    backgroundColor: '#001018', borderBottomWidth: 1.5, borderLeftWidth: 1.5, borderRightWidth: 1.5,
-    borderColor: '#00CCDD', paddingVertical: 4, paddingHorizontal: 4, alignItems: 'center', marginTop: 1,
+    backgroundColor: '#140707', borderBottomWidth: 1.5, borderLeftWidth: 1.5, borderRightWidth: 1.5,
+    borderColor: '#FF2A1F', paddingVertical: 4, paddingHorizontal: 4, alignItems: 'center', marginTop: 1,
   },
   teethRow: { flexDirection: 'row', alignItems: 'flex-start' },
   tooth:    { backgroundColor: '#002233', borderWidth: 1, borderColor: '#005577' },
   neckRow:  { flexDirection: 'row', marginTop: 2, alignItems: 'flex-start' },
-  neckPipe: { backgroundColor: '#001A22', borderWidth: 1, borderColor: '#003344', borderRadius: 2 },
-  led:      { backgroundColor: '#00EEFF', marginTop: 2, shadowColor: '#00EEFF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1 },
+  neckPipe: { backgroundColor: '#001A22', borderWidth: 1, borderColor: '#451A15', borderRadius: 2 },
+  led:      { backgroundColor: '#FF2A1F', marginTop: 2, shadowColor: '#FF2A1F', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1 },
   glitchScan: {
     position: 'absolute', left: -8, right: -8,
-    backgroundColor: '#00EEFF', borderRadius: 2,
-    shadowColor: '#00EEFF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 8,
+    backgroundColor: '#FF2A1F', borderRadius: 2,
+    shadowColor: '#FF2A1F', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 8,
   },
 });
 
@@ -223,14 +223,14 @@ export function TypewriterLine({
 }
 const tw = StyleSheet.create({
   line:   { fontSize: 10, fontFamily: MONO, lineHeight: 17, letterSpacing: 0.3 },
-  cursor: { fontSize: 10, color: '#00EEFF', fontFamily: MONO },
+  cursor: { fontSize: 10, color: '#FF2A1F', fontFamily: MONO },
 });
 
 // ═══════════════════════════════════════════════════════════════════
 // 3. TechGrid
 // ═══════════════════════════════════════════════════════════════════
 export function TechGrid({
-  rows = 20, cols = 14, color = 'rgba(0,200,220,0.06)', animated = false,
+  rows = 20, cols = 14, color = 'rgba(255,42,31,0.06)', animated = false,
 }: {
   rows?: number; cols?: number; color?: string; animated?: boolean;
 }) {
@@ -313,7 +313,7 @@ export function GlitchPressButton({
           transform: [{ translateY: scanTY.interpolate({ inputRange: [0, 1], outputRange: [-40, 80] }) }],
         }]} />
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, {
-          borderRadius: 6, borderWidth: 2, borderColor: '#00EEFF', opacity: borderOp,
+          borderRadius: 6, borderWidth: 2, borderColor: '#FF2A1F', opacity: borderOp,
         }]} />
       </Animated.View>
     </TouchableOpacity>
@@ -322,8 +322,8 @@ export function GlitchPressButton({
 const gp = StyleSheet.create({
   scan: {
     position: 'absolute', left: 0, right: 0, height: 3,
-    backgroundColor: '#00EEFF',
-    shadowColor: '#00EEFF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 6,
+    backgroundColor: '#FF2A1F',
+    shadowColor: '#FF2A1F', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 6,
   },
 });
 
@@ -348,11 +348,11 @@ export function ChromeHeader({
     ])).start();
   }, []);
 
-  const connColor = connected == null ? '#FF8C00' : connected ? '#44FF22' : '#FF3300';
+  const connColor = connected == null ? '#FF6A1F' : connected ? '#00FF88' : '#FF6A1F';
 
   return (
     <View style={ch.wrap}>
-      <TechGrid rows={6} cols={8} color="rgba(0,200,220,0.04)" />
+      <TechGrid rows={6} cols={8} color="rgba(255,42,31,0.04)" />
       <View style={ch.row}>
         {showSkull ? (
           <MiniSkull size={40} glitchOnPress />
@@ -362,7 +362,7 @@ export function ChromeHeader({
           </View>
         )}
         <View style={{ flex: 1 }}>
-          <TypewriterLine text={title} color="#00EEFF" speed={22} style={ch.title} />
+          <TypewriterLine text={title} color="#FF2A1F" speed={22} style={ch.title} />
           {subtitle ? <Text style={ch.sub}>{subtitle}</Text> : null}
         </View>
         <View style={ch.rightWrap}>
@@ -382,17 +382,17 @@ export function ChromeHeader({
   );
 }
 const ch = StyleSheet.create({
-  wrap:       { backgroundColor: '#02070D', borderBottomWidth: 3, borderBottomColor: '#00CCDD', paddingHorizontal: 12, paddingVertical: 9, overflow: 'hidden', position: 'relative' },
+  wrap:       { backgroundColor: '#0E0F12', borderBottomWidth: 3, borderBottomColor: '#FF2A1F', paddingHorizontal: 12, paddingVertical: 9, overflow: 'hidden', position: 'relative' },
   row:        { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  tBox:       { width: 30, height: 30, borderRadius: 5, backgroundColor: '#00CCDD', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#00EEFF' },
+  tBox:       { width: 30, height: 30, borderRadius: 5, backgroundColor: '#FF2A1F', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FF2A1F' },
   tTxt:       { fontSize: 18, fontWeight: '900', color: '#000', fontFamily: MONO },
   title:      { fontSize: 11, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' },
-  sub:        { fontSize: 6, color: '#336677', fontFamily: MONO, letterSpacing: 1, marginTop: 1 },
+  sub:        { fontSize: 6, color: '#5A626E', fontFamily: MONO, letterSpacing: 1, marginTop: 1 },
   rightWrap:  { alignItems: 'flex-end', gap: 4 },
   connBadge:  { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1.5, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 4 },
   connDot:    { width: 5, height: 5, borderRadius: 3 },
   connTxt:    { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.5 },
-  bottomEdge: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, backgroundColor: '#00EEFF' },
+  bottomEdge: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, backgroundColor: '#FF2A1F' },
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -444,20 +444,20 @@ export function BootLogBox({
   );
 }
 const blb = StyleSheet.create({
-  box:    { backgroundColor: '#020810', borderRadius: 5, borderWidth: 1.5, borderColor: '#00CCDD70', overflow: 'hidden' },
-  hdr:    { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#00CCDD', paddingHorizontal: 10, paddingVertical: 5 },
+  box:    { backgroundColor: '#070708', borderRadius: 5, borderWidth: 1.5, borderColor: '#FF2A1F70', overflow: 'hidden' },
+  hdr:    { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#FF2A1F', paddingHorizontal: 10, paddingVertical: 5 },
   dot:    { width: 7, height: 7, borderRadius: 4, backgroundColor: '#000' },
   hdrTxt: { fontSize: 8, fontWeight: '900', color: '#000', fontFamily: MONO, letterSpacing: 1.5, flex: 1 },
   recTxt: { fontSize: 8, fontWeight: '900', color: '#000', fontFamily: MONO, letterSpacing: 1 },
   body:   { padding: 8, gap: 1 },
-  cursor: { fontSize: 10, color: '#00EEFF', fontFamily: MONO, marginTop: 3 },
+  cursor: { fontSize: 10, color: '#FF2A1F', fontFamily: MONO, marginTop: 3 },
 });
 
 // ═══════════════════════════════════════════════════════════════════
 // 7. AutoHealthButton
 // ═══════════════════════════════════════════════════════════════════
 export function AutoHealthButton({
-  label, icon, color = '#00EEFF', onPress, onCheck, disabled, style, textStyle,
+  label, icon, color = '#FF2A1F', onPress, onCheck, disabled, style, textStyle,
 }: {
   label: string;
   icon?: string;
@@ -498,7 +498,7 @@ export function AutoHealthButton({
     }
   };
 
-  const statusColor = lastStatus === 'ok' ? '#44FF22' : lastStatus === 'fail' ? '#FF3300' : color;
+  const statusColor = lastStatus === 'ok' ? '#00FF88' : lastStatus === 'fail' ? '#FF6A1F' : color;
 
   return (
     <GlitchPressButton onPress={handlePress} disabled={disabled || checking} style={style} logLabel={label}>
@@ -510,7 +510,7 @@ export function AutoHealthButton({
         {icon ? <Text style={ahb.icon}>{icon}</Text> : null}
         <Text style={[ahb.label, { color: statusColor }, textStyle]}>{label}</Text>
         {checking ? (
-          <Animated.View style={[ahb.led, { backgroundColor: '#FF8800', opacity: glowAnim }]} />
+          <Animated.View style={[ahb.led, { backgroundColor: '#FF6A1F', opacity: glowAnim }]} />
         ) : lastStatus !== 'idle' ? (
           <View style={[ahb.led, { backgroundColor: statusColor }]} />
         ) : null}
@@ -521,7 +521,7 @@ export function AutoHealthButton({
 const ahb = StyleSheet.create({
   inner: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: '#02070D', borderRadius: 6, borderWidth: 1.5,
+    backgroundColor: '#0E0F12', borderRadius: 6, borderWidth: 1.5,
     paddingHorizontal: 12, paddingVertical: 9, overflow: 'hidden',
     ...Platform.select({
       ios: { shadowOffset: { width: 0, height: 0 }, shadowRadius: 6 },
@@ -557,7 +557,7 @@ type AnimatedWireProps = {
 export function AnimatedWire({
   direction = 'horizontal',
   length = 40,
-  color = '#00E5FF',
+  color = '#FF2A1F',
   thickness = 1,
   opacity = 0.5,
   absolute = false,

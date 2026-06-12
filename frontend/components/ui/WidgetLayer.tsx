@@ -37,16 +37,16 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');
 
 const C = {
-  bg:      '#02070D',
-  surface: '#02070D',
+  bg:      '#0E0F12',
+  surface: '#0E0F12',
   border:  'rgba(255,255,255,0.07)',
-  text:    '#D0DDE8',
-  dim:     '#3A5060',
+  text:    '#D5D9E0',
+  dim:     '#525A68',
   textMid: '#6A8090',
-  purple:  '#BB33FF',
-  teal:    '#00CCDD',
+  purple:  '#FFC400',
+  teal:    '#FF2A1F',
   green:   '#00FF88',
-  amber:   '#FF9900',
+  amber:   '#FF6A1F',
   red:     '#FF3344',
 };
 
@@ -163,7 +163,7 @@ const rhStyles = StyleSheet.create({
   deltaLabel: {
     position: 'absolute',
     left: '50%',
-    backgroundColor: '#02070D',
+    backgroundColor: '#0E0F12',
     borderWidth: 1,
     borderColor: C.purple + '60',
     borderRadius: 6,
@@ -411,10 +411,10 @@ const ewm = StyleSheet.create({
   errorBar:     { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingHorizontal: 16, paddingVertical: 9,
                   backgroundColor: C.red + '12', borderBottomWidth: 1, borderBottomColor: C.red + '40' },
   errorText:    { flex: 1, fontSize: 10, color: C.red, fontFamily: MONO, lineHeight: 15 },
-  previewBox:   { padding: 14, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: '#000003' },
+  previewBox:   { padding: 14, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: '#050505' },
   previewLabel: { fontSize: 8, fontWeight: '900', color: C.teal + '80', fontFamily: MONO, letterSpacing: 1.5, marginBottom: 8 },
   codeInput:    { padding: 16, fontSize: 13, color: '#A8D8B8', fontFamily: MONO, lineHeight: 21,
-                  minHeight: 400, backgroundColor: '#000003' },
+                  minHeight: 400, backgroundColor: '#050505' },
 });
 
 // ── Inline content card — renders widget in normal flow ────────────────────────
@@ -650,20 +650,20 @@ function DraggablePinnedWidget({
 const dpw = StyleSheet.create({
   container: {
     position: 'absolute', zIndex: 500,
-    backgroundColor: '#02070D', borderRadius: 13,
-    borderWidth: 1.5, borderColor: '#BB33FF55', overflow: 'hidden',
+    backgroundColor: '#0E0F12', borderRadius: 13,
+    borderWidth: 1.5, borderColor: '#FFC40055', overflow: 'hidden',
     minWidth: 120, maxWidth: SW - 20,
   },
   handle: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingHorizontal: 10, paddingVertical: 7,
-    backgroundColor: '#02070D', borderBottomWidth: 1, borderBottomColor: '#BB33FF30',
+    backgroundColor: '#0E0F12', borderBottomWidth: 1, borderBottomColor: '#FFC40030',
   },
   handleDots:    { flexDirection: 'row', flexWrap: 'wrap', width: 18, gap: 2 },
   dot:           { width: 3, height: 3, borderRadius: 1.5 },
-  handleLabel:   { flex: 1, fontSize: 9, fontWeight: '900', color: '#BB33FFCC', fontFamily: MONO, letterSpacing: 0.8 },
+  handleLabel:   { flex: 1, fontSize: 9, fontWeight: '900', color: '#FFC400CC', fontFamily: MONO, letterSpacing: 0.8 },
   handleActions: { flexDirection: 'row', gap: 4 },
-  iconBtn:       { width: 22, height: 22, borderRadius: 6, backgroundColor: '#071120', alignItems: 'center', justifyContent: 'center' },
+  iconBtn:       { width: 22, height: 22, borderRadius: 6, backgroundColor: '#1A1D24', alignItems: 'center', justifyContent: 'center' },
   content:       { padding: 12 },
   errorBox:      { flexDirection: 'row', alignItems: 'flex-start', gap: 7, borderWidth: 1, borderRadius: 8,
                    padding: 9, borderColor: '#FF334440', backgroundColor: '#FF334412' },

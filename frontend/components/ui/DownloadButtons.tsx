@@ -20,14 +20,14 @@ const MAIN_DOWNLOAD_LABEL = 'AIBUTLERENCRYPTEDSELFHOST.zip';
 const C = {
   bg:       '#050202',
   card:     '#080202',
-  amber:    '#FF8C00',
-  amberBrt: '#FFAA00',
+  amber:    '#FF6A1F',
+  amberBrt: '#FFC400',
   amberDim: '#1A0600',
   red:      '#CC2200',
-  redBrt:   '#FF3300',
+  redBrt:   '#FF6A1F',
   redDim:   '#1A0000',
-  green:    '#44FF22',
-  cyan:     '#00BBCC',
+  green:    '#00FF88',
+  cyan:     '#FF2A1F',
   text:     '#8A4433',
   textBrt:  '#CC7755',
   border:   '#2A0E0E',
@@ -1020,7 +1020,7 @@ com.butlerai.pc.automation`
       sub:   'v7.0 Auto-admin · process guardian · requirements scan · butler/chat · kill_interference',
       tag:   'v7.0',
       badge: 'LATEST',
-      color: '#FF8800',
+      color: '#FF6A1F',
       onPress: () => shareTextFile('butler_server.py', SERVER_PY, 'text/x-python'),
     },
     {
@@ -1047,7 +1047,7 @@ com.butlerai.pc.automation`
       label: 'boter_setup.ps1',
       sub:   'Windows PowerShell · right-click → Run as Administrator',
       tag:   'WINDOWS',
-      color: '#00A8FF',
+      color: '#FF6A1F',
       onPress: () => shareTextFile('boter_setup.ps1', WIN_PS1, 'application/octet-stream'),
     },
     {
@@ -1120,29 +1120,29 @@ com.butlerai.pc.automation`
       {/* ── EMAIL TO PC — Send setup to yourself ── */}
       <TouchableOpacity style={bs.emailCard} onPress={sendToEmail} activeOpacity={0.82}>
         {/* HUD corners */}
-        <View style={[bs.corner, { top:-1, left:-1, borderTopWidth:2, borderLeftWidth:2, borderColor:'#FF44AA' }]} />
-        <View style={[bs.corner, { bottom:-1, right:-1, borderBottomWidth:2, borderRightWidth:2, borderColor:'#FF44AA' }]} />
+        <View style={[bs.corner, { top:-1, left:-1, borderTopWidth:2, borderLeftWidth:2, borderColor:'#FF6A1F' }]} />
+        <View style={[bs.corner, { bottom:-1, right:-1, borderBottomWidth:2, borderRightWidth:2, borderColor:'#FF6A1F' }]} />
         <View style={[bs.emailIconBox]}>
-          <MaterialIcons name="email" size={22} color="#FF44AA" />
+          <MaterialIcons name="email" size={22} color="#FF6A1F" />
         </View>
         <View style={{ flex: 1, gap: 3 }}>
           <View style={{ flexDirection:'row', alignItems:'center', gap:6 }}>
             <Text style={[bs.emailTitle]}>SEND TO YOUR EMAIL</Text>
-            <View style={[bs.heroBadge, { borderColor:'#FF44AA60', backgroundColor:'#FF44AA15' }]}>
-              <Text style={[bs.heroBadgeTxt, { color:'#FF44AA' }]}>FASTEST</Text>
+            <View style={[bs.heroBadge, { borderColor:'#FF6A1F60', backgroundColor:'#FF6A1F15' }]}>
+              <Text style={[bs.heroBadgeTxt, { color:'#FF6A1F' }]}>FASTEST</Text>
             </View>
           </View>
           <Text style={bs.emailSub}>{'Opens your email app · Pre-filled with download link + full setup guide · Open on PC → click → extract → run'}</Text>
           <View style={{ flexDirection:'row', flexWrap:'wrap', gap:4, marginTop:2 }}>
             {['1-CLICK SETUP','PRE-FILLED','FULL GUIDE','NO COPY-PASTE'].map(tag => (
-              <View key={tag} style={[bs.heroTag, { borderColor:'#FF44AA30', backgroundColor:'#FF44AA08' }]}>
-                <View style={[bs.heroTagDot, { backgroundColor:'#FF44AA' }]} />
-                <Text style={[bs.heroTagTxt, { color:'#FF44AACC' }]}>{tag}</Text>
+              <View key={tag} style={[bs.heroTag, { borderColor:'#FF6A1F30', backgroundColor:'#FF6A1F08' }]}>
+                <View style={[bs.heroTagDot, { backgroundColor:'#FF6A1F' }]} />
+                <Text style={[bs.heroTagTxt, { color:'#FF6A1FCC' }]}>{tag}</Text>
               </View>
             ))}
           </View>
         </View>
-        <MaterialIcons name="send" size={16} color="#FF44AA99" />
+        <MaterialIcons name="send" size={16} color="#FF6A1F99" />
       </TouchableOpacity>
 
       {/* Steps */}
@@ -1163,12 +1163,12 @@ com.butlerai.pc.automation`
       {/* Feature grid */}
       <View style={bs.featureGrid}>
         {[
-          { icon:'security',      label:'Encrypted',      col:'#00CCDD' },
+          { icon:'security',      label:'Encrypted',      col:'#FF2A1F' },
           { icon:'cloud-off',     label:'No Cloud',       col:C.green },
           { icon:'store',         label:'Not on Store',   col:C.amber },
           { icon:'admin-panel-settings', label:'Auto Admin', col:C.redBrt },
-          { icon:'settings-suggest', label:'Auto Install', col:'#9B59B6' },
-          { icon:'qr-code-scanner',  label:'QR Pair',     col:'#00CCDD' },
+          { icon:'settings-suggest', label:'Auto Install', col:'#FFC400' },
+          { icon:'qr-code-scanner',  label:'QR Pair',     col:'#FF2A1F' },
         ].map(({ icon, label, col }) => (
           <View key={label} style={[bs.featureChip, { borderColor:col+'40', backgroundColor:col+'0F' }]}>
             <MaterialIcons name={icon as any} size={12} color={col} />
@@ -1190,40 +1190,40 @@ com.butlerai.pc.automation`
 
       {/* BAT installer card */}
       <TouchableOpacity
-        style={[bs.installerCard, { borderColor: '#00A8FF60', backgroundColor: '#00A8FF08' }]}
+        style={[bs.installerCard, { borderColor: '#FF6A1F60', backgroundColor: '#FF6A1F08' }]}
         onPress={() => { haptics.medium(); Linking.openURL('https://github.com/AndroidNewWatchAll/PlaystoreOpenSourcre/blob/main/INSTALL_REQUIREMENTS.bat').catch(() => {}); }}
         activeOpacity={0.8}
       >
-        <View style={[bs.installerIconBox, { borderColor: '#00A8FF80', backgroundColor: '#00A8FF18' }]}>
-          <MaterialIcons name="computer" size={22} color="#00A8FF" />
+        <View style={[bs.installerIconBox, { borderColor: '#FF6A1F80', backgroundColor: '#FF6A1F18' }]}>
+          <MaterialIcons name="computer" size={22} color="#FF6A1F" />
         </View>
         <View style={{ flex: 1, gap: 3 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text style={[bs.installerTitle, { color: '#00A8FF' }]}>INSTALL_REQUIREMENTS.bat</Text>
-            <View style={[bs.heroBadge, { borderColor: '#00A8FF60' }]}><Text style={[bs.heroBadgeTxt, { color: '#00A8FF' }]}>WINDOWS</Text></View>
+            <Text style={[bs.installerTitle, { color: '#FF6A1F' }]}>INSTALL_REQUIREMENTS.bat</Text>
+            <View style={[bs.heroBadge, { borderColor: '#FF6A1F60' }]}><Text style={[bs.heroBadgeTxt, { color: '#FF6A1F' }]}>WINDOWS</Text></View>
           </View>
           <Text style={bs.installerSub}>{'Double-click → auto-detects & installs Python + Ollama + all deps · Skips what is already installed · Zero prompts'}</Text>
         </View>
-        <MaterialIcons name="open-in-new" size={16} color="#00A8FF60" />
+        <MaterialIcons name="open-in-new" size={16} color="#FF6A1F60" />
       </TouchableOpacity>
 
       {/* PS1 installer card */}
       <TouchableOpacity
-        style={[bs.installerCard, { borderColor: '#9B59B660', backgroundColor: '#9B59B608' }]}
+        style={[bs.installerCard, { borderColor: '#FFC40060', backgroundColor: '#FFC40008' }]}
         onPress={() => { haptics.medium(); Linking.openURL('https://github.com/AndroidNewWatchAll/PlaystoreOpenSourcre/blob/main/INSTALL_REQUIREMENTS.ps1').catch(() => {}); }}
         activeOpacity={0.8}
       >
-        <View style={[bs.installerIconBox, { borderColor: '#9B59B680', backgroundColor: '#9B59B618' }]}>
-          <MaterialCommunityIcons name="powershell" size={22} color="#9B59B6" />
+        <View style={[bs.installerIconBox, { borderColor: '#FFC40080', backgroundColor: '#FFC40018' }]}>
+          <MaterialCommunityIcons name="powershell" size={22} color="#FFC400" />
         </View>
         <View style={{ flex: 1, gap: 3 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text style={[bs.installerTitle, { color: '#9B59B6' }]}>INSTALL_REQUIREMENTS.ps1</Text>
-            <View style={[bs.heroBadge, { borderColor: '#9B59B660' }]}><Text style={[bs.heroBadgeTxt, { color: '#9B59B6' }]}>POWERSHELL</Text></View>
+            <Text style={[bs.installerTitle, { color: '#FFC400' }]}>INSTALL_REQUIREMENTS.ps1</Text>
+            <View style={[bs.heroBadge, { borderColor: '#FFC40060' }]}><Text style={[bs.heroBadgeTxt, { color: '#FFC400' }]}>POWERSHELL</Text></View>
           </View>
           <Text style={bs.installerSub}>{'Right-click → Run with PowerShell · Same auto-detect logic · Preferred for corporate/IT environments'}</Text>
         </View>
-        <MaterialIcons name="open-in-new" size={16} color="#9B59B660" />
+        <MaterialIcons name="open-in-new" size={16} color="#FFC40060" />
       </TouchableOpacity>
 
       <View style={[bs.autoNote, { borderColor: C.green + '40', backgroundColor: C.green + '08' }]}>
@@ -1320,7 +1320,7 @@ const bs = StyleSheet.create({
     backgroundColor: C.card, borderRadius: 0, borderWidth: 1.5,
     paddingHorizontal: 12, paddingVertical: 11,
     position: 'relative', overflow: 'hidden',
-    ...Platform.select({ ios: { shadowColor: '#FF8800', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.25, shadowRadius: 8 }, android: { elevation: 3 } }),
+    ...Platform.select({ ios: { shadowColor: '#FF6A1F', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.25, shadowRadius: 8 }, android: { elevation: 3 } }),
   },
   corner:     { position: 'absolute', width: 9, height: 9, zIndex: 5 },
   iconBox:    { width: 38, height: 38, borderWidth: 1.5, borderRadius: 0, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
@@ -1351,16 +1351,16 @@ const bs = StyleSheet.create({
   autoNote: { flexDirection: 'row', alignItems: 'flex-start', gap: 7, borderWidth: 1, borderRadius: 0, padding: 9, marginBottom: 6, position: 'relative', overflow: 'hidden' },
   emailCard: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#120008', borderWidth: 1.5, borderColor: '#FF44AA55',
+    backgroundColor: '#120008', borderWidth: 1.5, borderColor: '#FF6A1F55',
     borderRadius: 0, padding: 13, position: 'relative', overflow: 'hidden', marginTop: 4,
-    ...Platform.select({ ios:{ shadowColor:'#FF44AA', shadowOffset:{width:0,height:2}, shadowOpacity:0.35, shadowRadius:10 }, android:{elevation:5} }),
+    ...Platform.select({ ios:{ shadowColor:'#FF6A1F', shadowOffset:{width:0,height:2}, shadowOpacity:0.35, shadowRadius:10 }, android:{elevation:5} }),
   },
   emailIconBox: {
     width: 44, height: 44, borderWidth: 1.5, borderRadius: 0,
     alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-    borderColor: '#FF44AA80', backgroundColor: '#FF44AA18',
+    borderColor: '#FF6A1F80', backgroundColor: '#FF6A1F18',
   },
-  emailTitle: { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1, color: '#FF44AA' },
+  emailTitle: { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1, color: '#FF6A1F' },
   emailSub:   { fontSize: 8, color: C.text, fontFamily: MONO, lineHeight: 12 },
   stepsBox:  { backgroundColor: C.redDim + 'AA', borderWidth: 1, borderColor: C.red + '40', padding: 10, gap: 6, marginTop: 2 },
   stepRow:   { flexDirection: 'row', alignItems: 'center', gap: 8 },

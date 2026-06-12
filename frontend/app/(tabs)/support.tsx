@@ -505,7 +505,7 @@ function ThemeRow({ theme, isActive, onApply, onPreview, onLivePreview }: {
         {/* Info */}
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-            <Text style={[tr.name, { color: isActive ? pr : '#c8d8f0' }]}>{theme.name}</Text>
+            <Text style={[tr.name, { color: isActive ? pr : '#D5D9E0' }]}>{theme.name}</Text>
             {theme.badge ? (
               <View style={[tr.badge, { borderColor: pr + '55', backgroundColor: pr + '18' }]}>
                 <Text style={[tr.badgeTxt, { color: pr }]}>{theme.badge}</Text>
@@ -558,7 +558,7 @@ const tr = StyleSheet.create({
   shimmer:   { position: 'absolute', top: 0, bottom: 0, width: 80, backgroundColor: 'rgba(255,255,255,0.035)', transform: [{ skewX: '-20deg' }] },
   activeRing:{ position: 'absolute', top: -1, left: -1, right: -1, bottom: -1, borderRadius: 13, borderWidth: 2 },
   name:      { fontSize: 11, fontFamily: MONO, fontWeight: '900', letterSpacing: 0.4 },
-  tagline:   { fontSize: 8, color: '#3A5060', fontFamily: MONO },
+  tagline:   { fontSize: 8, color: '#525A68', fontFamily: MONO },
   badge:     { paddingHorizontal: 5, paddingVertical: 1, borderRadius: 5, borderWidth: 1 },
   badgeTxt:  { fontSize: 7, fontFamily: MONO, fontWeight: '900' },
   activeBadge:{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 5, borderWidth: 1 },
@@ -753,7 +753,7 @@ const tc2 = StyleSheet.create({
   iconBox:     { width: 52, height: 52, borderRadius: 14, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   tierName:    { fontSize: 13, fontFamily: MONO, fontWeight: '900', letterSpacing: 0.8 },
   price:       { fontSize: 24, fontFamily: MONO, fontWeight: '900' },
-  pricePeriod: { fontSize: 9, color: '#3A5060', fontFamily: MONO, letterSpacing: 0.5 },
+  pricePeriod: { fontSize: 9, color: '#525A68', fontFamily: MONO, letterSpacing: 0.5 },
   popularChip: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, borderWidth: 1 },
   popularTxt:  { fontSize: 7, fontFamily: MONO, fontWeight: '900', letterSpacing: 0.4 },
   morePill:    { width: 18, height: 18, borderRadius: 5, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
@@ -1020,17 +1020,17 @@ function ChampionHoloCard({ isUnlocked, currentPackId, onApply, onPreview, onLiv
   // Cycling holo colors for the border
   const borderCol = glowAnim.interpolate({
     inputRange: [0, 0.25, 0.5, 0.75, 1],
-    outputRange: ['#EE44FF', '#00FFEE', '#FFEE00', '#FF44AA', '#EE44FF'],
+    outputRange: ['#FFC400', '#00FFEE', '#FFEE00', '#FF6A1F', '#FFC400'],
   });
 
-  const COLORS = ['#EE44FF', '#00FFEE', '#FFEE00', '#FF44AA', '#44AAFF'];
+  const COLORS = ['#FFC400', '#00FFEE', '#FFEE00', '#FF6A1F', '#44AAFF'];
 
   return (
     <View style={{ marginBottom: 14 }}>
       {/* Section label */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: pr }} />
-        <Text style={{ fontSize: 9, fontFamily: MONO, fontWeight: '900', letterSpacing: 2, color: '#3A5060' }}>REVIEW REWARD</Text>
+        <Text style={{ fontSize: 9, fontFamily: MONO, fontWeight: '900', letterSpacing: 2, color: '#525A68' }}>REVIEW REWARD</Text>
         <View style={{ flex: 1, height: 1, backgroundColor: pr + '20' }} />
         {isUnlocked ? (
           <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, backgroundColor: '#00FF8815', borderWidth: 1, borderColor: '#00FF8850' }}>
@@ -1163,7 +1163,7 @@ export default function SupportScreen() {
   const toastAnim  = useRef(new Animated.Value(0)).current;
   const toastSlide = useRef(new Animated.Value(-60)).current;
 
-  const accentColor  = T.primary || '#00CCDD';
+  const accentColor  = T.primary || '#FF2A1F';
   const activeTheme  = PACK_THEMES[currentPackId] || PACK_THEMES.nexus;
 
   const showToast = useCallback((name: string) => {
@@ -1499,7 +1499,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 9, padding: 12,
     borderRadius: 14, borderWidth: 1.5,
     ...Platform.select({
-      ios: { shadowColor: '#00CCDD', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 14 },
+      ios: { shadowColor: '#FF2A1F', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 14 },
       android: { elevation: 14 },
     }),
   },

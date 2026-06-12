@@ -101,7 +101,7 @@ const eb = StyleSheet.create({
   divider:   { width: 60, height: 2, backgroundColor: '#CC3333', borderRadius: 1, marginBottom: 20, opacity: 0.55 },
   errorBox:  { width: '100%', borderWidth: 1, borderRadius: 12, borderColor: 'rgba(255,49,49,0.22)', backgroundColor: 'rgba(255,49,49,0.04)', padding: 14, marginBottom: 24 },
   errorLabel:{ fontSize: 9, fontWeight: '900', color: '#CC3333', letterSpacing: 1.5 },
-  errorMsg:  { fontSize: 12, color: '#7A9AB8', lineHeight: 19 },
+  errorMsg:  { fontSize: 12, color: '#8C95A6', lineHeight: 19 },
   btn:       { flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1.5, borderColor: 'rgba(0,255,136,0.5)', borderRadius: 10, paddingHorizontal: 24, paddingVertical: 13, backgroundColor: 'rgba(0,255,136,0.06)', marginBottom: 20 },
   btnTxt:    { fontSize: 13, fontWeight: '900', color: '#FFFFFF', letterSpacing: 2 },
   badge:     { borderWidth: 1, borderRadius: 6, borderColor: 'rgba(255,49,49,0.2)', paddingHorizontal: 10, paddingVertical: 4, backgroundColor: 'rgba(255,49,49,0.04)' },
@@ -112,9 +112,9 @@ const eb = StyleSheet.create({
 function ButlerLogoSVG({ size = 80 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="350 300 850 420">
-      <Path d="m376 323h157l61 1 15 4 14 7 10 8 8 10 7 14 3 11 1 7v225l-3 14-5 13-8 11-9 9-13 8-18 6h-235l-12-3-16-8-11-9-9-12-5-11-4-17v-227l3-15 8-16 7-9 10-9 14-7 14-4z" fill="#050910"/>
-      <Path d="m1220 323h174l44 1 15 4 14 7 10 8 8 10 7 15 3 11 1 8v219l-3 17-6 16-8 10-8 8-13 8-18 6h-234l-12-3-12-5-11-8-5-5-7-8-6-12-4-14-1-7v-224l3-15 5-12 8-12 7-7 10-7 12-5 11-3z" fill="#04080F"/>
-      <Path d="m796 323h174l46 1 15 4 14 7 10 8 8 10 7 14 2 7 1 10v226l-2 15-5 12-7 10-5 6-14 10-11 5-11 3h-235l-14-4-14-7-12-11-6-7-7-14-3-12v-237l3-13 8-15 12-13 13-8 18-6z" fill="#04080F"/>
+      <Path d="m376 323h157l61 1 15 4 14 7 10 8 8 10 7 14 3 11 1 7v225l-3 14-5 13-8 11-9 9-13 8-18 6h-235l-12-3-16-8-11-9-9-12-5-11-4-17v-227l3-15 8-16 7-9 10-9 14-7 14-4z" fill="#0A0B0E"/>
+      <Path d="m1220 323h174l44 1 15 4 14 7 10 8 8 10 7 15 3 11 1 8v219l-3 17-6 16-8 10-8 8-13 8-18 6h-234l-12-3-12-5-11-8-5-5-7-8-6-12-4-14-1-7v-224l3-15 5-12 8-12 7-7 10-7 12-5 11-3z" fill="#0A0B0D"/>
+      <Path d="m796 323h174l46 1 15 4 14 7 10 8 8 10 7 14 2 7 1 10v226l-2 15-5 12-7 10-5 6-14 10-11 5-11 3h-235l-14-4-14-7-12-11-6-7-7-14-3-12v-237l3-13 8-15 12-13 13-8 18-6z" fill="#0A0B0D"/>
       <Path d="m440 379h9l5 3 2 6-1 6-3 4-1 4v35l22 1-1-7v-24l-1-9-3-4v-10l5-5h9l5 4 1 9-4 7-1 39h22l-1-38-4-8 1-9 5-4h9l5 5 1 7-2 5-3 3-1 39h10l5 2 6 7 1 5v8h41l1-4 1-1h10l5 3 1 2v9l-3 5-2 1h-10l-2-1-1-3-41-1 1 22h40l1-4 8-1 8 3 1 4v7l-1 4-4 2h-12l-1-3-40-1-1 22 41-1 1-4h9l6 2 2 4v7l-2 5-5 2-10-1-2-3-40-1v9l-3 7-4 4-3 1-11 1v39l4 4 1 7-3 7-2 1h-11l-4-4-1-2v-7l4-6 1-40-21 1v39l3 4 1 7-2 6-3 2h-11l-4-4v-10l2-3h2v-41h-21v38l4 5v11l-4 4h-12l-3-3-1-4v-7l4-4 1-3v-37l-11-1-5-3-5-6v-12l-41 1-1 3h-14l-3-4v-11l3-3h13l2 3 3 1 37 1v-18l1-3h-42l-1 4h-13l-3-4v-12l3-3h13l2 3 3 1 37 1v-10l1-13-41 1-2 4h-11l-5-4-1-8 2-5 4-3 6-1 5 2 2 4h40l1-12 6-8 4-2h12l-1-4-1-36-4-5v-7l3-6z" fill="#FCFCFC"/>
       <Path d="m899 422l4 2 10 14h5l11-10 3 1v29l4 7 10 11 8 11v108h-108l-1-106 3-6 11-12 8-10 1-32h3l11 9 5-1 8-10z" fill="#FCFCFC"/>
       <Path d="m1242 422h160l5 3 1 21v82l-1 8-3 3 14 1 9 3 3 5v12l-4 6-1 1-13 1h-185l-8-1-4-4-1-3v-13l5-5 7-2h14l-4-6v-107l3-4zm64 9-60 1v97l1 1h150l1-22v-74l-1-2-61-1z" fill="#FBFBFB"/>
@@ -293,13 +293,13 @@ function NexusSplash({ onDone }: { onDone: () => void }) {
 }
 
 const sp = StyleSheet.create({
-  root:          { ...StyleSheet.absoluteFillObject, backgroundColor: '#020810', zIndex: 9999, alignItems: 'center', justifyContent: 'center' },
+  root:          { ...StyleSheet.absoluteFillObject, backgroundColor: '#070708', zIndex: 9999, alignItems: 'center', justifyContent: 'center' },
   scanLine:      { position: 'absolute', left: 0, right: 0, height: 1.5, opacity: 0.32 },
-  gridH1:        { position: 'absolute', top: '33%', left: 0, right: 0, height: 1, backgroundColor: 'rgba(0,229,255,0.034)' },
-  gridH2:        { position: 'absolute', top: '66%', left: 0, right: 0, height: 1, backgroundColor: 'rgba(0,229,255,0.034)' },
-  gridV1:        { position: 'absolute', left: '33%', top: 0, bottom: 0, width: 1, backgroundColor: 'rgba(0,229,255,0.025)' },
-  gridV2:        { position: 'absolute', left: '66%', top: 0, bottom: 0, width: 1, backgroundColor: 'rgba(0,229,255,0.025)' },
-  corner:        { position: 'absolute', width: 24, height: 24, borderColor: 'rgba(0,229,255,0.38)' },
+  gridH1:        { position: 'absolute', top: '33%', left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,42,31,0.034)' },
+  gridH2:        { position: 'absolute', top: '66%', left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,42,31,0.034)' },
+  gridV1:        { position: 'absolute', left: '33%', top: 0, bottom: 0, width: 1, backgroundColor: 'rgba(255,42,31,0.025)' },
+  gridV2:        { position: 'absolute', left: '66%', top: 0, bottom: 0, width: 1, backgroundColor: 'rgba(255,42,31,0.025)' },
+  corner:        { position: 'absolute', width: 24, height: 24, borderColor: 'rgba(255,42,31,0.38)' },
   content:       { alignItems: 'center', gap: 7 },
   logoContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   logoWaveRing:  { position: 'absolute', width: 140, height: 140, borderRadius: 70, borderWidth: 1.5 },
@@ -308,7 +308,7 @@ const sp = StyleSheet.create({
   title:         { fontSize: 48, fontWeight: '900', letterSpacing: 4, lineHeight: 52 },
   titleAccent:   { fontSize: 48, fontWeight: '900', letterSpacing: 8, lineHeight: 52, marginTop: -10 },
   sub:           { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, marginTop: 3 },
-  barTrack:      { height: 3, backgroundColor: 'rgba(0,229,255,0.10)', borderRadius: 2, overflow: 'hidden' },
+  barTrack:      { height: 3, backgroundColor: 'rgba(255,42,31,0.10)', borderRadius: 2, overflow: 'hidden' },
   barFill:       { height: '100%', borderRadius: 2 },
   bootTxt:       { fontSize: 10, fontWeight: '700', letterSpacing: 0.7 },
   verBadge:      { borderWidth: 1, borderRadius: 8, paddingHorizontal: 13, paddingVertical: 5, marginTop: 16 },
@@ -532,14 +532,14 @@ export default function RootLayout() {
           {/* Dark holding screen prevents black flash while AsyncStorage reads */}
           {showHoldingScreen ? (
             <View style={s.holdingScreen}>
-              <View style={{ width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(0,229,255,0.30)', backgroundColor: 'rgba(0,229,255,0.06)', alignItems: 'center', justifyContent: 'center' }}>
-                <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#00E5FF', opacity: 0.6 }} />
+              <View style={{ width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(255,42,31,0.30)', backgroundColor: 'rgba(255,42,31,0.06)', alignItems: 'center', justifyContent: 'center' }}>
+                <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#FF2A1F', opacity: 0.6 }} />
               </View>
             </View>
           ) : null}
           <StatusBar style="light" />
           <View style={[s.container, showHoldingScreen && { opacity: 0 }]}>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000003' } }}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
               <Stack.Screen name="welcome"        options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
               <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
@@ -568,7 +568,7 @@ export default function RootLayout() {
 }
 
 const s = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: '#000003' },
+  container:    { flex: 1, backgroundColor: '#050505' },
   holdingScreen: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#010306',

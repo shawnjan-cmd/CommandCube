@@ -28,18 +28,18 @@ import { haptics } from '@/services/haptics';
 const MONO = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const PAL = {
-  bg:         '#02070D',
-  bgInner:    '#000003',
-  cyan:       '#00E5FF',
-  purple:     '#A366F5',
+  bg:         '#0E0F12',
+  bgInner:    '#050505',
+  cyan:       '#FF2A1F',
+  purple:     '#FF6A1F',
   amber:      '#FFB341',
-  green:      '#2FD98B',
+  green:      '#00FF88',
   red:        '#FF4466',
   textHi:     '#E8F8FF',
   textMid:    '#7FB6D9',
   textDim:    '#456A7E',
-  border:     'rgba(0,229,255,0.22)',
-  borderBrt:  'rgba(0,229,255,0.55)',
+  border:     'rgba(255,42,31,0.22)',
+  borderBrt:  'rgba(255,42,31,0.55)',
 };
 
 type Status = 'idle' | 'sending' | 'ok' | 'fail' | 'unpaired';
@@ -259,7 +259,7 @@ export default function QuickSendCard({ isConnected }: { isConnected: boolean })
             maxLength={4000}
           />
           <TouchableOpacity testID="qsend-input-send" onPress={sendTypedText} style={styles.inputSend} activeOpacity={0.8}>
-            <MaterialCommunityIcons name="send" size={14} color="#001018" />
+            <MaterialCommunityIcons name="send" size={14} color="#140707" />
           </TouchableOpacity>
         </View>
       )}
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   bgOrbA: { position: 'absolute', top: -50, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: PAL.cyan,   opacity: 0.10 },
   bgOrbB: { position: 'absolute', bottom: -60, right: -50, width: 180, height: 180, borderRadius: 90, backgroundColor: PAL.purple, opacity: 0.10 },
-  gridLine: { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.05)' },
+  gridLine: { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(255,42,31,0.05)' },
 
   header:     { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   headerIcon: { width: 30, height: 30, borderRadius: 9, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },

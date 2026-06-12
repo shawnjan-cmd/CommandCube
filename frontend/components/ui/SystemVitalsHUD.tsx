@@ -10,12 +10,12 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
   teal:   '#00F5FF',
-  cyan:   '#00DDFF',
+  cyan:   '#FF2A1F',
   blue:   '#3377FF',
   green:  '#00FF88',
-  amber:  '#FFD700',
-  purple: '#CC44FF',
-  textDim:'#1A2A44',
+  amber:  '#FFC400',
+  purple: '#FFC400',
+  textDim:'#232730',
 };
 
 interface Props {
@@ -72,9 +72,9 @@ export default function SystemVitalsHUD({ isConnected, quickStats, pingMs, ollam
 
   const statusItems = [
     { label: 'SERVER', active: isConnected,   col: connCol },
-    { label: 'OLLAMA', active: !!ollamaOnline, col: ollamaOnline ? C.green : '#1A2A44' },
-    { label: 'SCRIPT', active: isConnected,   col: isConnected ? C.amber : '#1A2A44' },
-    { label: 'AI',     active: !!ollamaOnline, col: ollamaOnline ? C.purple : '#1A2A44' },
+    { label: 'OLLAMA', active: !!ollamaOnline, col: ollamaOnline ? C.green : '#232730' },
+    { label: 'SCRIPT', active: isConnected,   col: isConnected ? C.amber : '#232730' },
+    { label: 'AI',     active: !!ollamaOnline, col: ollamaOnline ? C.purple : '#232730' },
   ];
 
   // Radar blip positions
@@ -235,17 +235,17 @@ export default function SystemVitalsHUD({ isConnected, quickStats, pingMs, ollam
 const s = StyleSheet.create({
   wrap: {
     borderWidth: 1.5, borderRadius: 10,
-    backgroundColor: 'rgba(0,5,12,0.97)',
-    borderColor: '#00CCDD50', overflow: 'hidden', position: 'relative',
+    backgroundColor: 'rgba(5,5,6,0.97)',
+    borderColor: '#FF2A1F50', overflow: 'hidden', position: 'relative',
     ...Platform.select({
-      ios: { shadowColor:'#00CCDD', shadowOffset:{width:0,height:4}, shadowOpacity:0.4, shadowRadius:14 },
+      ios: { shadowColor:'#FF2A1F', shadowOffset:{width:0,height:4}, shadowOpacity:0.4, shadowRadius:14 },
       android: { elevation: 7 },
     }),
   },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 10, paddingTop: 9, paddingBottom: 7,
-    borderBottomWidth: 1, borderBottomColor: '#00CCDD18',
+    borderBottomWidth: 1, borderBottomColor: '#FF2A1F18',
   },
   headerTxt: { fontSize: 8, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.5 },
   body: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, paddingTop: 14 },
@@ -263,7 +263,7 @@ const s = StyleSheet.create({
   centerHub: {
     position: 'absolute', width: 16, height: 16, borderRadius: 8,
     borderWidth: 2, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(0,5,12,0.97)',
+    backgroundColor: 'rgba(5,5,6,0.97)',
   },
   radarLabel: {
     position: 'absolute', bottom: -13, fontSize: 6,
@@ -276,7 +276,7 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
   barTrack: {
-    height: 5, backgroundColor: '#00CCDD12',
+    height: 5, backgroundColor: '#FF2A1F12',
     borderRadius: 2, overflow: 'hidden', position: 'relative',
   },
   barFill:   { height: '100%', borderRadius: 2 },
@@ -288,6 +288,6 @@ const s = StyleSheet.create({
   dataBus: {
     flexDirection: 'row', alignItems: 'center', gap: 2,
     paddingHorizontal: 10, paddingVertical: 6,
-    borderTopWidth: 1, borderTopColor: '#00CCDD15',
+    borderTopWidth: 1, borderTopColor: '#FF2A1F15',
   },
 });

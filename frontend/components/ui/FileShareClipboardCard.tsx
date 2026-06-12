@@ -22,15 +22,15 @@ import { Image as ExpoImage } from 'expo-image';
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const D = {
-  text:    '#D8E8F4',
-  textMid: '#7A9AB8',
-  textDim: '#3A5068',
-  cyan:    '#00FFFF',
+  text:    '#E6E9EF',
+  textMid: '#8C95A6',
+  textDim: '#6A7384',
+  cyan:    '#FF2A1F',
   green:   '#00FF88',
-  amber:   '#F5A623',
+  amber:   '#FFC400',
   red:     '#FF3131',
-  purple:  '#BF00FF',
-  border:  'rgba(0,255,255,0.12)',
+  purple:  '#FFC400',
+  border:  'rgba(255,42,31,0.12)',
 };
 
 interface Props {
@@ -435,8 +435,8 @@ export function FileShareClipboardCard({ isConnected, goToTab }: Props) {
 }
 
 const s = StyleSheet.create({
-  card:          { backgroundColor: '#000003', borderRadius: 16, borderWidth: 1.5, borderColor: 'rgba(0,255,255,0.22)', overflow: 'hidden', position: 'relative',
-    ...Platform.select({ ios:{ shadowColor:'#00FFFF', shadowOffset:{width:0,height:0}, shadowOpacity:0.22, shadowRadius:22 }, android:{elevation:8} }) },
+  card:          { backgroundColor: '#050505', borderRadius: 16, borderWidth: 1.5, borderColor: 'rgba(255,42,31,0.22)', overflow: 'hidden', position: 'relative',
+    ...Platform.select({ ios:{ shadowColor:'#FF2A1F', shadowOffset:{width:0,height:0}, shadowOpacity:0.22, shadowRadius:22 }, android:{elevation:8} }) },
   topLine:       { height: 2 },
   cornerTL:      { position:'absolute', top:4, left:8, width:14, height:14, borderTopWidth:1.5, borderLeftWidth:1.5, zIndex:4 },
   cornerBR:      { position:'absolute', bottom:4, right:8, width:14, height:14, borderBottomWidth:1.5, borderRightWidth:1.5, zIndex:4 },
@@ -456,14 +456,14 @@ const s = StyleSheet.create({
   tileIconBox:   { width:46, height:46, borderRadius:12, borderWidth:1.5, alignItems:'center', justifyContent:'center' },
   tileLabel:     { fontWeight:'900', fontFamily:MONO, letterSpacing:0.3, textAlign:'center' },
   tileDesc:      { fontSize:9, fontFamily:MONO, letterSpacing:0.5, textAlign:'center' },
-  progressTrack: { position:'absolute', bottom:0, left:0, right:0, height:3, backgroundColor:'rgba(0,255,255,0.12)', overflow:'hidden' },
+  progressTrack: { position:'absolute', bottom:0, left:0, right:0, height:3, backgroundColor:'rgba(255,42,31,0.12)', overflow:'hidden' },
   progressFill:  { height:'100%', borderRadius:2 },
   clipPanel:     { marginHorizontal:14, borderRadius:12, borderWidth:1.5, padding:14, marginBottom:0 },
   clipHeader:    { flexDirection:'row', alignItems:'center', gap:7, marginBottom:10 },
   clipTitle:     { fontSize:10, fontWeight:'900', fontFamily:MONO, letterSpacing:1 },
   clipDivider:   { flex:1, height:1 },
   clipTime:      { fontSize:8, fontFamily:MONO, letterSpacing:0.3 },
-  inputWrap:     { flexDirection:'row', alignItems:'center', gap:8, borderWidth:1.5, borderRadius:10, paddingHorizontal:12, paddingVertical:10, marginBottom:10, backgroundColor:'#000003' },
+  inputWrap:     { flexDirection:'row', alignItems:'center', gap:8, borderWidth:1.5, borderRadius:10, paddingHorizontal:12, paddingVertical:10, marginBottom:10, backgroundColor:'#050505' },
   inputPrompt:   { fontSize:12, fontFamily:MONO, flexShrink:0 },
   input:         { flex:1, fontSize:13, fontFamily:MONO, paddingVertical:0, includeFontPadding:false },
   pasteBtn:      { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:6, borderRadius:10, borderWidth:1.5, paddingVertical:12, overflow:'hidden' },
@@ -472,7 +472,7 @@ const s = StyleSheet.create({
   syncBtnSheen:  { position:'absolute', top:0, left:0, right:0, height:'45%', backgroundColor:'rgba(255,255,255,0.14)', borderTopLeftRadius:10, borderTopRightRadius:10 },
   syncBtnTxt:    { fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:0.8 },
   privacyRow:    { flexDirection:'row', alignItems:'center', gap:5, marginTop:10 },
-  privacyTxt:    { fontSize:8, color:'#3A5068', fontFamily:MONO, letterSpacing:0.3, flex:1 },
+  privacyTxt:    { fontSize:8, color:'#6A7384', fontFamily:MONO, letterSpacing:0.3, flex:1 },
   footer:        { flexDirection:'row', alignItems:'center', justifyContent:'center', gap:6, paddingVertical:13, borderTopWidth:1, marginTop:14 },
   footerTxt:     { fontSize:10, fontWeight:'900', fontFamily:MONO, letterSpacing:0.8 },
 });

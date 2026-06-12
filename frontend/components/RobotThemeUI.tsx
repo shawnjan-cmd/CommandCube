@@ -35,18 +35,18 @@ export const ROBOT_THEME = {
   bg: '#000000',
   surface: '#0A0A0A',
   card: '#111111',
-  cyan: '#00E5FF',
+  cyan: '#FF2A1F',
   cyanDim: '#0099BB',
   green: '#FFFFFF',
-  amber: '#FFB020',
-  purple: '#CC00FF',
-  teal: '#00D4CC',
+  amber: '#FFC400',
+  purple: '#FFC400',
+  teal: '#FF2A1F',
   red: '#FF2244',
   text: '#FFFFFF',
   textMid: '#B0B0B0',
   textDim: '#555555',
-  border: 'rgba(0,229,255,0.15)',
-  borderHi: 'rgba(0,229,255,0.35)',
+  border: 'rgba(255,42,31,0.15)',
+  borderHi: 'rgba(255,42,31,0.35)',
 };
 
 // ─────────────────────────────────────────────────────────────────
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,229,255,0.1)',
+    borderBottomColor: 'rgba(255,42,31,0.1)',
   },
   robotCardTitle: {
     fontSize: 13,

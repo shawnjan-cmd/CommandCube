@@ -14,17 +14,17 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // Deterministic particle positions (no Math.random on render)
 const PARTICLES = [
-  { x: 0.12, y: 0.08, r: 1.5, col: '#00E5FF', dur: 2800 },
-  { x: 0.88, y: 0.15, r: 2.0, col: '#CC00FF', dur: 3400 },
+  { x: 0.12, y: 0.08, r: 1.5, col: '#FF2A1F', dur: 2800 },
+  { x: 0.88, y: 0.15, r: 2.0, col: '#FFC400', dur: 3400 },
   { x: 0.45, y: 0.22, r: 1.2, col: '#00FF88', dur: 2200 },
-  { x: 0.72, y: 0.38, r: 1.8, col: '#FFB020', dur: 3100 },
-  { x: 0.18, y: 0.55, r: 1.4, col: '#00E5FF', dur: 2600 },
-  { x: 0.91, y: 0.62, r: 1.0, col: '#CC00FF', dur: 3700 },
+  { x: 0.72, y: 0.38, r: 1.8, col: '#FFC400', dur: 3100 },
+  { x: 0.18, y: 0.55, r: 1.4, col: '#FF2A1F', dur: 2600 },
+  { x: 0.91, y: 0.62, r: 1.0, col: '#FFC400', dur: 3700 },
   { x: 0.33, y: 0.75, r: 1.6, col: '#00FF88', dur: 2900 },
-  { x: 0.60, y: 0.88, r: 1.3, col: '#4499FF', dur: 2400 },
-  { x: 0.05, y: 0.91, r: 1.7, col: '#FFB020', dur: 3300 },
-  { x: 0.78, y: 0.94, r: 1.1, col: '#00E5FF', dur: 2700 },
-  { x: 0.55, y: 0.48, r: 1.9, col: '#CC00FF', dur: 3600 },
+  { x: 0.60, y: 0.88, r: 1.3, col: '#FF6A1F', dur: 2400 },
+  { x: 0.05, y: 0.91, r: 1.7, col: '#FFC400', dur: 3300 },
+  { x: 0.78, y: 0.94, r: 1.1, col: '#FF2A1F', dur: 2700 },
+  { x: 0.55, y: 0.48, r: 1.9, col: '#FFC400', dur: 3600 },
   { x: 0.25, y: 0.33, r: 1.3, col: '#00FF88', dur: 2500 },
 ];
 
@@ -68,7 +68,7 @@ function AnimatedParticle({ x, y, r, col, dur }: typeof PARTICLES[0]) {
 }
 
 // Animated horizontal scan line sweep
-function ScanSweep({ color = 'rgba(0,229,255,0.06)' }: { color?: string }) {
+function ScanSweep({ color = 'rgba(255,42,31,0.06)' }: { color?: string }) {
   const y = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -90,7 +90,7 @@ function ScanSweep({ color = 'rgba(0,229,255,0.06)' }: { color?: string }) {
         backgroundColor: color,
         transform: [{ translateY: y.interpolate({ inputRange: [0, 1], outputRange: [0, H] }) }],
         ...(Platform.OS === 'ios'
-          ? { shadowColor: '#00E5FF', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 8 }
+          ? { shadowColor: '#FF2A1F', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 8 }
           : {}),
       }}
     />
@@ -126,14 +126,14 @@ function HexGrid({ opacity = 0.025 }: { opacity?: number }) {
   return (
     <Svg width={W} height={H} style={StyleSheet.absoluteFill} pointerEvents="none">
       {hexes.map(h => (
-        <Polygon key={h.key} points={h.pts} fill="none" stroke="#00E5FF" strokeWidth={0.5} opacity={opacity} />
+        <Polygon key={h.key} points={h.pts} fill="none" stroke="#FF2A1F" strokeWidth={0.5} opacity={opacity} />
       ))}
     </Svg>
   );
 }
 
 // Corner HUD brackets
-function HUDCorners({ color = 'rgba(0,229,255,0.25)', size = 28, thickness = 1.5 }: {
+function HUDCorners({ color = 'rgba(255,42,31,0.25)', size = 28, thickness = 1.5 }: {
   color?: string; size?: number; thickness?: number;
 }) {
   return (
@@ -164,8 +164,8 @@ interface NexusBackgroundProps {
 }
 
 export default function NexusBackground({
-  glowColor  = '#00E5FF',
-  glowColor2 = '#CC00FF',
+  glowColor  = '#FF2A1F',
+  glowColor2 = '#FFC400',
   hexOpacity = 0.022,
   particles  = true,
   sweep      = true,
@@ -175,7 +175,7 @@ export default function NexusBackground({
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {/* Base background */}
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050505' }} />
 
       {/* Radial glows */}
       <View style={{
@@ -191,7 +191,7 @@ export default function NexusBackground({
       <View style={{
         position: 'absolute', bottom: H * 0.25, left: -60,
         width: 240, height: 240, borderRadius: 120,
-        backgroundColor: '#FFB020', opacity: 0.05,
+        backgroundColor: '#FFC400', opacity: 0.05,
       }} />
       <View style={{
         position: 'absolute', bottom: 0, right: -60,
@@ -215,7 +215,7 @@ export default function NexusBackground({
           position: 'absolute', left: 0, right: 0,
           top: `${(i + 1) * 5.5}%` as any,
           height: StyleSheet.hairlineWidth,
-          backgroundColor: `rgba(0,229,255,${hexOpacity * 1.2})`,
+          backgroundColor: `rgba(255,42,31,${hexOpacity * 1.2})`,
         }} />
       ))}
 
@@ -225,12 +225,12 @@ export default function NexusBackground({
           position: 'absolute', top: 0, bottom: 0,
           left: `${p}%` as any,
           width: StyleSheet.hairlineWidth,
-          backgroundColor: `rgba(0,229,255,${hexOpacity * 0.8})`,
+          backgroundColor: `rgba(255,42,31,${hexOpacity * 0.8})`,
         }} />
       ))}
 
       {/* Sweep */}
-      {sweep && <ScanSweep color={`rgba(0,229,255,0.07)`} />}
+      {sweep && <ScanSweep color={`rgba(255,42,31,0.07)`} />}
 
       {/* Particles */}
       {particles && PARTICLES.map((p, i) => <AnimatedParticle key={i} {...p} />)}

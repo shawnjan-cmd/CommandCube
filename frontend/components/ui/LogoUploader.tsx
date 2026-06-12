@@ -13,7 +13,7 @@ interface LogoUploaderProps {
 export default function LogoUploader({
   storageKey,
   size = 120,
-  themeColor = '#00E5FF',
+  themeColor = '#FF2A1F',
   shape = 'rounded',
   fallback,
 }: LogoUploaderProps) {

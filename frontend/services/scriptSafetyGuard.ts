@@ -420,8 +420,8 @@ export function formatSafetyReport(report: SafetyReport): string {
 // ─── Threat level metadata for UI ────────────────────────────────
 export const THREAT_META: Record<ThreatLevel, { label: string; color: string; icon: string; bgColor: string }> = {
   safe:     { label: 'SAFE',     color: '#00FF88', icon: 'verified',       bgColor: '#00FF8812' },
-  low:      { label: 'LOW',      color: '#FFD700', icon: 'info',           bgColor: '#FFD70012' },
-  medium:   { label: 'MEDIUM',   color: '#FF8C00', icon: 'warning',        bgColor: '#FF8C0015' },
+  low:      { label: 'LOW',      color: '#FFC400', icon: 'info',           bgColor: '#FFC40012' },
+  medium:   { label: 'MEDIUM',   color: '#FF6A1F', icon: 'warning',        bgColor: '#FF6A1F15' },
   high:     { label: 'HIGH',     color: '#FF4444', icon: 'error',          bgColor: '#FF444420' },
   critical: { label: 'CRITICAL', color: '#FF0044', icon: 'dangerous',      bgColor: '#FF004430' },
 };

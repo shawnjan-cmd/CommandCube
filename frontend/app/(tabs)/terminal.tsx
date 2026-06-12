@@ -58,17 +58,17 @@ import NexusTips, { TERMINAL_TIPS } from '@/components/ui/NexusTips';
 
 // ─── Theme constants ──────────────────────────────────────────────────────────
 const C = {
-  bg: '#000003',
-  bgPanel: '#02070D',
+  bg: '#050505',
+  bgPanel: '#0E0F12',
   green: '#00FF88',
   greenDim: '#00FF8822',
-  cyan: '#00FFFF',
-  gold: '#F5A623',
+  cyan: '#FF2A1F',
+  gold: '#FFC400',
   red: '#FF3131',
-  amber: '#F5A623',
-  text: '#7A9AB8',
-  textDim: '#3A5068',
-  border: 'rgba(0,255,255,0.12)',
+  amber: '#FFC400',
+  text: '#8C95A6',
+  textDim: '#6A7384',
+  border: 'rgba(255,42,31,0.12)',
 } as const;
 
 const MONO: string = Platform.OS === 'ios' ? 'Courier' : 'monospace';
@@ -93,70 +93,70 @@ const QUICK_SCRIPTS: QuickScript[] = [
   {
     label: 'sys.info',
     icon: '💻',
-    color: '#00BBCC',
+    color: '#FF2A1F',
     category: 'system',
     code: `import platform,psutil,socket,datetime\nprint(f"OS: {platform.system()} {platform.release()}")\nprint(f"Host: {socket.gethostname()}")\nvm=psutil.virtual_memory()\nprint(f"RAM: {vm.used//1024**2}MB/{vm.total//1024**2}MB ({vm.percent}%)")\nprint(f"CPU: {psutil.cpu_percent(1)}%")\nprint(f"Time: {datetime.datetime.now().strftime('%H:%M:%S')}")`,
   },
   {
     label: 'cpu.top5',
     icon: '📊',
-    color: '#FF3300',
+    color: '#FF6A1F',
     category: 'process',
     code: `import psutil\nps=[p.info for p in psutil.process_iter(['pid','name','cpu_percent']) if p.info['cpu_percent']>0]\nps.sort(key=lambda x:x['cpu_percent'],reverse=True)\nfor p in ps[:5]:print(f"{p['cpu_percent']:>5.1f}%  {p['name']}")`,
   },
   {
     label: 'disk.free',
     icon: '💾',
-    color: '#FFD700',
+    color: '#FFC400',
     category: 'disk',
     code: `import shutil\nfor d in ['C:\\\\\\\\','D:\\\\\\\\','E:\\\\\\\\','/','/home']:\n    try:\n        u=shutil.disk_usage(d)\n        print(f"{d}  Free: {u.free//1024**3}GB / {u.total//1024**3}GB")\n    except:pass`,
   },
   {
     label: 'net.ip',
     icon: '🌐',
-    color: '#44FF22',
+    color: '#00FF88',
     category: 'network',
     code: `import socket,psutil\nfor iface,addrs in psutil.net_if_addrs().items():\n    for a in addrs:\n        if a.family==socket.AF_INET and not a.address.startswith('127'):\n            print(f"{iface}: {a.address}")`,
   },
   {
     label: 'ping.test',
     icon: '📡',
-    color: '#44FF22',
+    color: '#00FF88',
     category: 'network',
     code: `import subprocess,platform\nf='-n' if platform.system()=='Windows' else '-c'\nfor h in ['8.8.8.8','1.1.1.1','google.com']:\n    r=subprocess.run(['ping',f,'1',h],capture_output=True,text=True)\n    print(f"{'OK' if r.returncode==0 else 'FAIL'} {h}")`,
   },
   {
     label: 'temp.clean',
     icon: '🧹',
-    color: '#00BBCC',
+    color: '#FF2A1F',
     category: 'disk',
     code: `import os,shutil,tempfile\np=tempfile.gettempdir();removed=0;size=0\nfor item in os.listdir(p):\n    fp=os.path.join(p,item)\n    try:\n        sz=os.path.getsize(fp) if os.path.isfile(fp) else 0\n        if os.path.isfile(fp):os.unlink(fp)\n        else:shutil.rmtree(fp,ignore_errors=True)\n        size+=sz;removed+=1\n    except:pass\nprint(f"Removed {removed} items ({size//1024**2}MB freed)")`,
   },
   {
     label: 'proc.list',
     icon: '⚙️',
-    color: '#FF8800',
+    color: '#FF6A1F',
     category: 'process',
     code: `import psutil\nprocs=sorted(psutil.process_iter(['pid','name','memory_percent']),key=lambda x:x.info['memory_percent'],reverse=True)\nfor p in procs[:8]:\n    print(f"{p.info['pid']:>6}  {p.info['memory_percent']:>5.1f}%  {p.info['name']}")`,
   },
   {
     label: 'ports.open',
     icon: '🔒',
-    color: '#FF3300',
+    color: '#FF6A1F',
     category: 'network',
     code: `import socket\nhost=socket.gethostbyname(socket.gethostname())\nprint(f"Scanning {host}...")\nfor port in [21,22,23,25,53,80,443,3306,3389,5900,8080,8765,8766]:\n    s=socket.socket()\n    s.settimeout(0.4)\n    if s.connect_ex((host,port))==0:print(f"  OPEN: {port}")\n    s.close()\nprint("Done.")`,
   },
   {
     label: 'uptime',
     icon: '⏱️',
-    color: '#B06EFF',
+    color: '#FFC400',
     category: 'system',
     code: `import psutil,datetime\nboot=datetime.datetime.fromtimestamp(psutil.boot_time())\nup=datetime.datetime.now()-boot\ndays=up.days\nhours=up.seconds//3600\nmins=(up.seconds%3600)//60\nprint(f"Boot: {boot.strftime('%Y-%m-%d %H:%M')}")\nprint(f"Uptime: {days}d {hours}h {mins}m")`,
   },
   {
     label: 'py.version',
     icon: '🐍',
-    color: '#44FF22',
+    color: '#00FF88',
     category: 'misc',
     code: `import sys,platform\nprint(f"Python: {sys.version}")\nprint(f"Executable: {sys.executable}")\nprint(f"Platform: {platform.platform()}")`,
   },
@@ -176,10 +176,10 @@ const LANGS = ['python', 'bash', 'powershell', 'batch'] as const;
 type Lang = (typeof LANGS)[number];
 
 const LANG_COLORS: Record<Lang, string> = {
-  python: '#44FF22',
-  bash: '#FFD700',
-  powershell: '#00BBCC',
-  batch: '#FF8800',
+  python: '#00FF88',
+  bash: '#FFC400',
+  powershell: '#FF2A1F',
+  batch: '#FF6A1F',
 };
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -528,7 +528,7 @@ export default function TerminalScreen() {
     const label = `snip.${sessionSnippets.length + 1}`;
     setSessionSnippets((prev) => [
       ...prev,
-      { label, icon: '📌', color: '#B06EFF', code, category: 'misc' },
+      { label, icon: '📌', color: '#FFC400', code, category: 'misc' },
     ]);
     addLine('success', `📌 Saved snippet as "${label}"`);
   }, [command, sessionSnippets.length, addLine]);
@@ -560,7 +560,7 @@ export default function TerminalScreen() {
           <View style={st.termHdrLeft}>
             <MiniSkull size={34} glitchOnPress />
             <View>
-              <Text style={st.termHdrTitle}>// NEXUS<Text style={{ color: '#44FF22' }}> TERMINAL</Text></Text>
+              <Text style={st.termHdrTitle}>// NEXUS<Text style={{ color: '#00FF88' }}> TERMINAL</Text></Text>
               <Text style={st.termHdrSub}>LIVE EXEC · {activeLang.toUpperCase()} · {connected ? `LINKED ${connLabel}` : 'OFFLINE'}</Text>
             </View>
           </View>
@@ -584,9 +584,9 @@ export default function TerminalScreen() {
 
         {/* ── Rotating Tips ───────────────────────────────────────────────── */}
         <View style={{ position: 'relative' }}>
-          <NexusTips tips={TERMINAL_TIPS} color="#44FF22" accentColor="#00BBCC" intervalMs={3000} />
-          <AnimatedWire direction="vertical" length={38} color="#44FF22" thickness={1} dotCount={1} speed={1600} caps={false} opacity={0.45} absolute style={{ left: 0, top: 0 }} />
-          <AnimatedWire direction="vertical" length={38} color="#00BBCC" thickness={1} dotCount={1} speed={2200} caps={false} opacity={0.35} absolute delay={500} style={{ right: 0, top: 0 }} />
+          <NexusTips tips={TERMINAL_TIPS} color="#00FF88" accentColor="#FF2A1F" intervalMs={3000} />
+          <AnimatedWire direction="vertical" length={38} color="#00FF88" thickness={1} dotCount={1} speed={1600} caps={false} opacity={0.45} absolute style={{ left: 0, top: 0 }} />
+          <AnimatedWire direction="vertical" length={38} color="#FF2A1F" thickness={1} dotCount={1} speed={2200} caps={false} opacity={0.35} absolute delay={500} style={{ right: 0, top: 0 }} />
         </View>
 
         {/* ── Inner Header ────────────────────────────────────────────────── */}
@@ -677,7 +677,7 @@ export default function TerminalScreen() {
           <AnimatedWire
             direction="vertical"
             length={500}
-            color="#44FF22"
+            color="#00FF88"
             thickness={1.5}
             dotCount={2}
             speed={3000}
@@ -741,7 +741,7 @@ export default function TerminalScreen() {
           {/* NEW: save snippet button (visible when there's text) */}
           {command.trim().length > 0 && (
             <TouchableOpacity onPress={saveSnippet} style={st.saveBtn}>
-              <MaterialIcons name="bookmark-add" size={17} color="#B06EFF" />
+              <MaterialIcons name="bookmark-add" size={17} color="#FFC400" />
             </TouchableOpacity>
           )}
 
@@ -824,7 +824,7 @@ const st = StyleSheet.create({
     height: 7,
     borderRadius: 4,
     ...Platform.select({
-      ios: { shadowColor: '#44FF22', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 6 },
+      ios: { shadowColor: '#00FF88', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 6 },
       android: {},
     }),
   },

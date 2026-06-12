@@ -42,7 +42,7 @@ export default function MatrixRain() {
         if (!ctx) return;
 
         // Fade effect
-        ctx.fillStyle = 'rgba(6, 11, 18, 0.07)';
+        ctx.fillStyle = 'rgba(10, 11, 14, 0.07)';
         ctx.fillRect(0, 0, innerWidth, innerHeight);
 
         // Draw characters

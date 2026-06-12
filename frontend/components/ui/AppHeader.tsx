@@ -19,23 +19,23 @@ const { width: SW } = Dimensions.get('window');
 
 // ── Teal Design Tokens ──────────────────────────────────────────
 const C = {
-  bg:        '#000003',
+  bg:        '#050505',
   panel:     '#071218',
   panelBrt:  '#0A1A22',
-  teal:      '#00CCDD',
-  tealBrt:   '#00EEFF',
-  tealDim:   '#003344',
-  tealGlow:  '#00CCDD30',
+  teal:      '#FF2A1F',
+  tealBrt:   '#FF2A1F',
+  tealDim:   '#451A15',
+  tealGlow:  '#FF2A1F30',
   tealMid:   '#008899',
-  cyan:      '#00DDFF',
+  cyan:      '#FF2A1F',
   blue:      '#0088CC',
   green:     '#44FF88',
-  amber:     '#FF8C00',
-  red:       '#FF3300',
+  amber:     '#FF6A1F',
+  red:       '#FF6A1F',
   text:      '#99CCDD',
   textBrt:   '#CCEEEE',
   textHi:    '#E8F8FF',
-  textDim:   '#336677',
+  textDim:   '#5A626E',
   border:    '#0A2233',
   borderHi:  '#1A4455',
   chrome:    '#8899AA',
@@ -65,25 +65,25 @@ function HUDCorners({ size = 10, color = C.teal, thickness = 1.5 }: {
 function CircuitBg() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'#000003' }} />
+      <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'#050505' }} />
       {[16, 32, 48, 64, 80, 96, 112].map((y, i) => (
         <View key={`h${i}`} style={{ position:'absolute', left:0, right:0, top:y, height: i%3===0 ? 1.5 : 0.8,
-          backgroundColor: i%3===0 ? 'rgba(0,200,220,0.09)' : 'rgba(0,160,180,0.04)' }} />
+          backgroundColor: i%3===0 ? 'rgba(255,42,31,0.09)' : 'rgba(160,30,22,0.04)' }} />
       ))}
       {[0, 1, 2, 3, 4, 5].map((_, i) => (
         <View key={`v${i}`} style={{ position:'absolute', top:0, bottom:0, left: i*(SW/5),
           width: i%2===0 ? 1.5 : 0.8,
-          backgroundColor: i%2===0 ? 'rgba(0,200,220,0.07)' : 'rgba(0,160,180,0.03)' }} />
+          backgroundColor: i%2===0 ? 'rgba(255,42,31,0.07)' : 'rgba(160,30,22,0.03)' }} />
       ))}
       {/* SMD pads */}
       {[[0.08,0.3],[0.55,0.15],[0.85,0.6],[0.25,0.75]].map(([rx,ry],i) => (
         <View key={`p${i}`} style={{ position:'absolute', left:rx*SW-4, top:ry*120-4,
           width:8, height:8, borderRadius:4,
           backgroundColor: 'rgba(0,210,230,0.18)',
-          borderWidth:1, borderColor:'rgba(0,200,220,0.28)' }} />
+          borderWidth:1, borderColor:'rgba(255,42,31,0.28)' }} />
       ))}
-      <View style={{ position:'absolute', left:0, top:0, bottom:0, width:2.5, backgroundColor:'rgba(0,220,240,0.3)' }} />
-      <View style={{ position:'absolute', right:0, top:0, bottom:0, width:2.5, backgroundColor:'rgba(0,220,240,0.3)' }} />
+      <View style={{ position:'absolute', left:0, top:0, bottom:0, width:2.5, backgroundColor:'rgba(255,42,31,0.3)' }} />
+      <View style={{ position:'absolute', right:0, top:0, bottom:0, width:2.5, backgroundColor:'rgba(255,42,31,0.3)' }} />
     </View>
   );
 }
@@ -119,7 +119,7 @@ function StatusBadge({ isOnline }: { isOnline: boolean }) {
   );
 }
 const sb = StyleSheet.create({
-  outer: { borderWidth: 1.5, borderRadius: 4, backgroundColor: '#050F16', overflow:'hidden', position:'relative', width: 82 },
+  outer: { borderWidth: 1.5, borderRadius: 4, backgroundColor: '#0E0F12', overflow:'hidden', position:'relative', width: 82 },
   inner: { flexDirection:'row', alignItems:'center', gap:6, paddingHorizontal:8, paddingVertical:6 },
   dot:   { width:7, height:7, borderRadius:4 },
   label: { fontSize:11, fontWeight:'900', fontFamily:MONO, letterSpacing:1.5 },
@@ -210,7 +210,7 @@ const tb = StyleSheet.create({
   wrap:       { flex:1, justifyContent:'center', paddingHorizontal:8, overflow:'hidden' },
   backBtn:    { marginBottom:3, alignSelf:'flex-start' },
   backBtnInner:{ borderWidth:1, borderColor:C.teal+'60', backgroundColor:C.tealDim+'40', paddingHorizontal:4, paddingVertical:1, borderRadius:2 },
-  hudLabel:   { fontSize:6.5, color:'rgba(0,180,200,0.5)', fontFamily:MONO, letterSpacing:0.8, marginBottom:2 },
+  hudLabel:   { fontSize:6.5, color:'rgba(216,36,26,0.5)', fontFamily:MONO, letterSpacing:0.8, marginBottom:2 },
   titleRow:   { flexDirection:'row', alignItems:'center', gap:3 },
   bracket:    { fontSize:26, fontWeight:'900', color:C.teal, fontFamily:MONO,
     ...Platform.select({ ios:{ textShadowColor:C.teal, textShadowOffset:{width:0,height:0}, textShadowRadius:14 }, android:{} }) },
@@ -274,21 +274,21 @@ function KBLiveGraph({ isOnline }: { isOnline: boolean }) {
   }, []);
 
   const maxVal = Math.max(...kbGrowth, 1);
-  const connCol = isOnline ? '#44FF88' : '#00CCDD';
+  const connCol = isOnline ? '#44FF88' : '#FF2A1F';
   const displayFindings = kbFindings >= 1000 ? `${(kbFindings / 1000).toFixed(1)}k` : String(kbFindings);
   const scanTop = scanLine.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
 
   return (
     <View style={rp.wrap}>
       {/* Dark navy bg */}
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#02070D' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#0E0F12' }} />
       {/* Circuit trace lines */}
       {[0.2, 0.45, 0.7, 0.9].map((p, i) => (
-        <View key={i} style={{ position:'absolute', left:0, right:0, top:`${p*100}%` as any, height:1, backgroundColor:'#00CCDD0A' }} pointerEvents="none" />
+        <View key={i} style={{ position:'absolute', left:0, right:0, top:`${p*100}%` as any, height:1, backgroundColor:'#FF2A1F0A' }} pointerEvents="none" />
       ))}
       {/* Animated scan line */}
       <Animated.View style={{ position:'absolute', left:0, right:0, height:1.5,
-        top: scanTop, backgroundColor: '#00EEFF', opacity: 0.12, zIndex:4 }} pointerEvents="none" />
+        top: scanTop, backgroundColor: '#FF2A1F', opacity: 0.12, zIndex:4 }} pointerEvents="none" />
 
       {/* HUD corners */}
       <View style={[rp.corner, { top:0, left:0, borderTopWidth:1.5, borderLeftWidth:1.5 }]} />
@@ -300,16 +300,16 @@ function KBLiveGraph({ isOnline }: { isOnline: boolean }) {
       <View style={{ flexDirection:'row', alignItems:'center', paddingHorizontal:8, paddingTop:6, paddingBottom:4, gap:6 }}>
         <View style={{ width:7, height:7, borderRadius:4, backgroundColor: connCol,
           ...Platform.select({ ios:{ shadowColor:connCol, shadowOffset:{width:0,height:0}, shadowOpacity:1, shadowRadius:5 }, android:{} }) }} />
-        <Text style={{ fontSize:8, fontWeight:'900', color:'#00CCDD', fontFamily:MONO, letterSpacing:1.2, flex:1 }}>KNOWLEDGE BASE</Text>
+        <Text style={{ fontSize:8, fontWeight:'900', color:'#FF2A1F', fontFamily:MONO, letterSpacing:1.2, flex:1 }}>KNOWLEDGE BASE</Text>
         <Text style={{ fontSize:7, color: connCol, fontFamily:MONO, fontWeight:'900' }}>{isOnline ? 'LIVE' : 'LOCAL'}</Text>
       </View>
 
       {/* Stats row */}
       <View style={{ flexDirection:'row', paddingHorizontal:8, gap:6, marginBottom:4 }}>
         {[
-          { label:'FINDINGS', val: displayFindings, col:'#00CCDD' },
+          { label:'FINDINGS', val: displayFindings, col:'#FF2A1F' },
           { label:'DOMAINS',  val: String(kbDomains), col:'#00AACC' },
-          { label:'EXECS',    val: String(execCount), col:'#FF8C00' },
+          { label:'EXECS',    val: String(execCount), col:'#FF6A1F' },
         ].map(({ label, val, col }) => (
           <View key={label} style={{ flex:1, backgroundColor: col+'15', borderWidth:1, borderColor: col+'40', borderRadius:4, alignItems:'center', paddingVertical:4 }}>
             <Animated.Text style={{ fontSize:13, fontWeight:'900', color:col, fontFamily:MONO,
@@ -326,7 +326,7 @@ function KBLiveGraph({ isOnline }: { isOnline: boolean }) {
           const pct = Math.max(val / maxVal, 0.08);
           const barH = Math.round(pct * 22);
           const isLast = i === kbGrowth.length - 1;
-          const col = isLast ? '#00EEFF' : '#00CCDD';
+          const col = isLast ? '#FF2A1F' : '#FF2A1F';
           return (
             <Animated.View key={i} style={[
               { flex:1, borderRadius:2, backgroundColor: col, height: barH,
@@ -337,22 +337,22 @@ function KBLiveGraph({ isOnline }: { isOnline: boolean }) {
           );
         })}
         {/* Y-axis guide */}
-        <View style={{ position:'absolute', left:6, right:6, bottom:6, height:1, backgroundColor:'#00CCDD25' }} />
+        <View style={{ position:'absolute', left:6, right:6, bottom:6, height:1, backgroundColor:'#FF2A1F25' }} />
       </View>
 
       {/* Bottom label */}
       <View style={{ paddingHorizontal:8, paddingBottom:5, flexDirection:'row', alignItems:'center', gap:4 }}>
-        <View style={{ flex:1, height:1, backgroundColor:'#00CCDD20' }} />
-        <Text style={{ fontSize:6, color:'#00CCDD60', fontFamily:MONO, letterSpacing:0.5 }}>7-DOMAIN GROWTH</Text>
-        <View style={{ flex:1, height:1, backgroundColor:'#00CCDD20' }} />
+        <View style={{ flex:1, height:1, backgroundColor:'#FF2A1F20' }} />
+        <Text style={{ fontSize:6, color:'#FF2A1F60', fontFamily:MONO, letterSpacing:0.5 }}>7-DOMAIN GROWTH</Text>
+        <View style={{ flex:1, height:1, backgroundColor:'#FF2A1F20' }} />
       </View>
     </View>
   );
 }
 const rp = StyleSheet.create({
   wrap:   { flex:1, overflow:'hidden', position:'relative', minHeight:86,
-    ...Platform.select({ ios:{ shadowColor:'#00CCDD', shadowOffset:{width:0,height:0}, shadowOpacity:0.3, shadowRadius:6 }, android:{elevation:4} }) },
-  corner: { position:'absolute', width:8, height:8, borderColor:'#00CCDD', zIndex:5 },
+    ...Platform.select({ ios:{ shadowColor:'#FF2A1F', shadowOffset:{width:0,height:0}, shadowOpacity:0.3, shadowRadius:6 }, android:{elevation:4} }) },
+  corner: { position:'absolute', width:8, height:8, borderColor:'#FF2A1F', zIndex:5 },
 });
 
 // ── Menu Dots Button ─────────────────────────────────────────────
@@ -368,7 +368,7 @@ function MenuDots({ onPress }: { onPress: () => void }) {
   );
 }
 const md = StyleSheet.create({
-  btn: { width:36, height:36, backgroundColor:'#050F16', borderWidth:1.5, borderColor:C.tealDim, borderRadius:4,
+  btn: { width:36, height:36, backgroundColor:'#0E0F12', borderWidth:1.5, borderColor:C.tealDim, borderRadius:4,
     overflow:'hidden', alignItems:'center', justifyContent:'center', position:'relative',
     ...Platform.select({ ios:{ shadowColor:C.teal, shadowOffset:{width:0,height:0}, shadowOpacity:0.3, shadowRadius:5 }, android:{ elevation:3 } }) },
   inner: { gap:3, alignItems:'center' },
@@ -546,7 +546,7 @@ export default function AppHeader({
 
 const hdr = StyleSheet.create({
   container: {
-    backgroundColor: '#000003', zIndex:50, overflow:'hidden', position:'relative',
+    backgroundColor: '#050505', zIndex:50, overflow:'hidden', position:'relative',
     ...Platform.select({ ios:{ shadowColor:C.teal, shadowOffset:{width:0,height:6}, shadowOpacity:0.4, shadowRadius:14 }, android:{elevation:12} }),
   },
   scanBeam: { position:'absolute', left:0, right:0, height:2.5, backgroundColor:C.tealBrt, opacity:0.2, zIndex:8 },
@@ -554,9 +554,9 @@ const hdr = StyleSheet.create({
 
   // Ticker
   tickerBar:  { flexDirection:'row', alignItems:'center', gap:8, paddingHorizontal:14, paddingVertical:5,
-    borderBottomWidth:1, borderBottomColor:'rgba(0,200,220,0.12)', backgroundColor:'rgba(0,0,0,0.3)' },
+    borderBottomWidth:1, borderBottomColor:'rgba(255,42,31,0.12)', backgroundColor:'rgba(0,0,0,0.3)' },
   tickerDot:  { width:5, height:5, borderRadius:3, flexShrink:0 },
-  tickerTxt:  { flex:1, fontSize:7, fontWeight:'900', color:'rgba(0,180,200,0.6)', fontFamily:MONO, letterSpacing:1 },
+  tickerTxt:  { flex:1, fontSize:7, fontWeight:'900', color:'rgba(216,36,26,0.6)', fontFamily:MONO, letterSpacing:1 },
 
   // Main row
   mainRow:    { flexDirection:'row', alignItems:'center', paddingHorizontal:12, paddingVertical:10, gap:10, zIndex:2, minHeight:86 },
@@ -583,7 +583,7 @@ const men = StyleSheet.create({
   menuHeaderTxt:{ fontSize:8.5, fontWeight:'900', color:C.teal, fontFamily:MONO, letterSpacing:2 },
   item:         { flexDirection:'row', alignItems:'center', gap:10, paddingHorizontal:14, paddingVertical:13 },
   itemBorder:   { borderTopWidth:1, borderTopColor:C.border },
-  itemIconBox:  { width:28, height:28, borderWidth:1, borderRadius:6, alignItems:'center', justifyContent:'center', backgroundColor:'#050F16' },
+  itemIconBox:  { width:28, height:28, borderWidth:1, borderRadius:6, alignItems:'center', justifyContent:'center', backgroundColor:'#0E0F12' },
   itemTxt:      { flex:1, fontSize:12, fontWeight:'700', fontFamily:MONO, letterSpacing:0.5 },
   bottomLine:   { height:2.5, opacity:0.7 },
 });

@@ -14,13 +14,13 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
   bg:      '#040200',
-  amber:   '#FF8C00',
-  amberBrt:'#FFAA00',
+  amber:   '#FF6A1F',
+  amberBrt:'#FFC400',
   amberDim:'#3A1A00',
-  redBrt:  '#FF3300',
+  redBrt:  '#FF6A1F',
   red:     '#CC2200',
   redDim:  '#3A0800',
-  green:   '#44FF22',
+  green:   '#00FF88',
   text:    '#8A4433',
   textBrt: '#CC7755',
   textHi:  '#FFB888',

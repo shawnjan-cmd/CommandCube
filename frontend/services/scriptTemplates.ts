@@ -18,7 +18,7 @@ export interface ScriptTemplate {
 export const SCRIPT_TEMPLATES: ScriptTemplate[] = [
   // ─── SYSTEM ──────────────────────────────────────────────────────
   {
-    id: 't1', cat: 'System', icon: 'computer', color: '#00A8FF', difficulty: 'basic',
+    id: 't1', cat: 'System', icon: 'computer', color: '#FF6A1F', difficulty: 'basic',
     title: 'System Snapshot', desc: 'Full OS/CPU/RAM/disk report',
     code: `import platform, psutil, socket
 print(f"HOST: {socket.gethostname()}")
@@ -31,7 +31,7 @@ print(f"DISK: {disk.used//1024**3}GB used / {disk.total//1024**3}GB ({disk.perce
 print(f"PYTHON: {platform.python_version()}")`,
   },
   {
-    id: 't2', cat: 'System', icon: 'memory', color: '#00A8FF', difficulty: 'intermediate',
+    id: 't2', cat: 'System', icon: 'memory', color: '#FF6A1F', difficulty: 'intermediate',
     title: 'Process Monitor', desc: 'Top 10 CPU-hungry processes',
     code: `import psutil
 procs = []
@@ -51,7 +51,7 @@ for p in procs[:12]:
     print(f"{p['pid']:>6}  {p.get('cpu_percent') or 0:>6.1f}  {p.get('memory_percent') or 0:>6.1f}  {(p['name'] or 'unknown')[:28]}")`,
   },
   {
-    id: 't3', cat: 'System', icon: 'power-settings-new', color: '#00A8FF', difficulty: 'basic',
+    id: 't3', cat: 'System', icon: 'power-settings-new', color: '#FF6A1F', difficulty: 'basic',
     title: 'CPU Heat Map', desc: 'Sample CPU load for 10s with bar graph',
     code: `import psutil, time
 samples = []
@@ -66,7 +66,7 @@ for i in range(10):
 print(f"\\nAvg: {sum(samples)/len(samples):.1f}%  |  Peak: {max(samples):.1f}%  |  Min: {min(samples):.1f}%")`,
   },
   {
-    id: 't4', cat: 'System', icon: 'cleaning-services', color: '#00A8FF', difficulty: 'basic',
+    id: 't4', cat: 'System', icon: 'cleaning-services', color: '#FF6A1F', difficulty: 'basic',
     title: 'Temp File Cleaner', desc: 'Delete Windows/Linux temp files',
     code: `import os, glob, shutil, platform
 tmp = os.environ.get('TEMP', os.environ.get('TMPDIR', '/tmp'))
@@ -86,7 +86,7 @@ for f in glob.glob(os.path.join(tmp, '*')):
 print(f"Removed {removed} items | Freed: {freed_bytes/1024/1024:.1f}MB")`,
   },
   {
-    id: 't5', cat: 'System', icon: 'security', color: '#00A8FF', difficulty: 'intermediate',
+    id: 't5', cat: 'System', icon: 'security', color: '#FF6A1F', difficulty: 'intermediate',
     title: 'Password Generator', desc: 'Cryptographically secure passwords',
     code: `import secrets, string
 chars = string.ascii_letters + string.digits + "!@#$%^&*-_+=?"
@@ -350,7 +350,7 @@ for f in csv_files:
   },
   // ─── GUI / AUTOMATION ────────────────────────────────────────────
   {
-    id: 't17', cat: 'GUI', icon: 'mouse', color: '#CC00FF', difficulty: 'intermediate',
+    id: 't17', cat: 'GUI', icon: 'mouse', color: '#FFC400', difficulty: 'intermediate',
     requires: ['pyautogui'],
     title: 'Mouse Jiggler', desc: 'Prevents screensaver/sleep',
     code: `import time
@@ -370,7 +370,7 @@ except ImportError:
     print("Install: pip install pyautogui")`,
   },
   {
-    id: 't18', cat: 'GUI', icon: 'screenshot', color: '#CC00FF', difficulty: 'intermediate',
+    id: 't18', cat: 'GUI', icon: 'screenshot', color: '#FFC400', difficulty: 'intermediate',
     requires: ['pillow'],
     title: 'Screenshot Capture', desc: 'Take and save screenshot',
     code: `try:

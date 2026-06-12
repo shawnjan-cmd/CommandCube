@@ -16,9 +16,9 @@ const TIER_LABEL: Record<string, string> = {
 };
 
 const TIER_COLOR: Record<string, string> = {
-  free: '#2FD98B',
-  supporter: '#5B9CF6',
-  pro: '#A366F5',
+  free: '#00FF88',
+  supporter: '#FF6A1F',
+  pro: '#FF6A1F',
   elite: '#FFD166',
 };
 

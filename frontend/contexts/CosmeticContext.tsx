@@ -73,18 +73,17 @@ export interface AppTheme {
 export const PACK_THEMES: Record<string, AppTheme> = {
 
   nexus: {
-    id: 'nexus', name: 'NEXUS CORE', isDefault: true, tier: 'free',
-    tagline: 'NexusMind Omega — dark blue-slate · electric blue', category: 'SYSTEM',
-    icon: 'hexagon-outline', badge: 'DEFAULT',
-    // NexusMind Omega palette — electric blue primary on dark blue-slate
-    // --c oklch(0.66 0.18 258) → #5B9CF6  --bg oklch(0.12 0.012 265) → #0C0E14
-    primary: '#5B9CF6', secondary: '#A366F5', tertiary: '#2FD98B',
-    bg: '#0C0E14', panel: '#131620', panelBrt: '#171A24',
-    textAccent: '#D0DFF0', textDim: '#5A6880', textHi: '#EFF4FF', textMid: '#7A8FA8',
-    glowColor: '#5B9CF6', borderColor: '#2A3A5A', borderBrt: '#5B9CF6',
-    userBubble: '#171A2E', aiBubble: '#0E1220', aiBorder: 'rgba(91,156,246,0.20)',
-    chatBarBg: '#0A0C14', chatBarTopGlow: '#5B9CF6', chatBarBorderTop: 'rgba(91,156,246,0.30)',
-    promptGlyph: '#5B9CF6',
+    id: 'nexus', name: 'ENDO CORE', isDefault: true, tier: 'free',
+    tagline: 'Terminator endoskeleton — gunmetal · endo red', category: 'SYSTEM',
+    icon: 'robot-angry-outline', badge: 'DEFAULT',
+    // Terminator T-800 endoskeleton palette — endo-red eyes on brushed gunmetal
+    primary: '#FF2A1F', secondary: '#FF6A1F', tertiary: '#FFC400',
+    bg: '#050505', panel: '#0E0F12', panelBrt: '#1A1D24',
+    textAccent: '#FFB3AD', textDim: '#4A5366', textHi: '#F4F6F9', textMid: '#8C95A6',
+    glowColor: '#FF2A1F', borderColor: '#3C424D', borderBrt: '#FF2A1F',
+    userBubble: '#241312', aiBubble: '#0C0D10', aiBorder: 'rgba(255,42,31,0.22)',
+    chatBarBg: '#0A0B0E', chatBarTopGlow: '#FF2A1F', chatBarBorderTop: 'rgba(255,42,31,0.32)',
+    promptGlyph: '#FF2A1F',
     defaultExtras: { notifSound: 'chime', bubbleAnim: 'slide', sendEffect: 'ripple', headerGlow: true, tabPulse: true, typingStyle: 'dots', chatShimmer: false },
   },
 

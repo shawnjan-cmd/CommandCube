@@ -7,7 +7,7 @@ import React, { useRef, useEffect, memo } from 'react';
 import { View, StyleSheet, Platform, Animated, Dimensions } from 'react-native';
 
 const { width: SW, height: SH } = Dimensions.get('window');
-const TEAL = '#00CCDD';
+const TEAL = '#FF2A1F';
 const TEAL_DIM = '#002233';
 
 // ─── SCRIPTS PAGE — Matrix rain columns ────────────────────────────
@@ -38,12 +38,12 @@ export const ScriptsBackground = memo(function ScriptsBackground() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {/* Dark base */}
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050505' }} />
       {/* Horizontal grid lines */}
       {Array.from({ length: 18 }).map((_, i) => (
         <View key={`h${i}`} style={{
           position: 'absolute', left: 0, right: 0, top: i * 50, height: 1,
-          backgroundColor: i % 4 === 0 ? `rgba(0,200,220,0.06)` : `rgba(0,180,200,0.02)`,
+          backgroundColor: i % 4 === 0 ? `rgba(255,42,31,0.06)` : `rgba(216,36,26,0.02)`,
         }} />
       ))}
       {/* Vertical scan columns */}
@@ -82,7 +82,7 @@ export const SettingsBackground2 = memo(function SettingsBackground2() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#02070D' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#0E0F12' }} />
       {/* Hex grid shapes */}
       {hexPositions.map((pos, i) => (
         <Animated.View key={i} style={{
@@ -98,7 +98,7 @@ export const SettingsBackground2 = memo(function SettingsBackground2() {
       {Array.from({ length: 10 }).map((_, i) => (
         <View key={`d${i}`} style={{
           position: 'absolute', left: 0, right: 0, top: 80 + i * 80, height: 1,
-          backgroundColor: `rgba(0,200,220,0.04)`,
+          backgroundColor: `rgba(255,42,31,0.04)`,
         }} />
       ))}
       {/* Right edge circuit */}
@@ -131,13 +131,13 @@ export const ButlerBackground = memo(function ButlerBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050505' }} />
       {/* Diagonal scan lines */}
       {Array.from({ length: 20 }).map((_, i) => (
         <View key={i} style={{
           position: 'absolute', left: 0, right: 0,
           top: i * 45, height: 1,
-          backgroundColor: `rgba(0,200,220,${i % 5 === 0 ? 0.06 : 0.02})`,
+          backgroundColor: `rgba(255,42,31,${i % 5 === 0 ? 0.06 : 0.02})`,
         }} />
       ))}
       {/* Neural nodes */}
@@ -145,7 +145,7 @@ export const ButlerBackground = memo(function ButlerBackground() {
         <Animated.View key={i} style={{
           position: 'absolute', left: n.x - n.size / 2, top: n.y - n.size / 2,
           width: n.size, height: n.size, borderRadius: n.size / 2,
-          backgroundColor: i % 3 === 0 ? '#00CCDD' : i % 3 === 1 ? '#44FF88' : '#FF8C00',
+          backgroundColor: i % 3 === 0 ? '#FF2A1F' : i % 3 === 1 ? '#44FF88' : '#FF6A1F',
           opacity: n.pulse,
         }} />
       ))}
@@ -163,7 +163,7 @@ export const KnowledgeBackground = memo(function KnowledgeBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050505' }} />
       {/* Amber horizontal data streams */}
       {[80, 200, 380, 560, 740].map((y, i) => (
         <Animated.View key={i} style={{
@@ -215,7 +215,7 @@ export const FileShareBackground = memo(function FileShareBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050505' }} />
       {/* Teal-green grid */}
       {Array.from({ length: 12 }).map((_, i) => (
         <View key={i} style={{
@@ -232,8 +232,8 @@ export const FileShareBackground = memo(function FileShareBackground() {
           opacity: f.anim.interpolate({ inputRange: [0, 0.1, 0.9, 1], outputRange: [0, 0.15, 0.15, 0] }),
           alignItems: 'center',
         }}>
-          <View style={{ width: 1.5, height: 8, backgroundColor: '#00CCDD' }} />
-          <View style={{ width: 0, height: 0, borderLeftWidth: 4, borderRightWidth: 4, borderBottomWidth: 5, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: '#00CCDD', marginTop: -1 }} />
+          <View style={{ width: 1.5, height: 8, backgroundColor: '#FF2A1F' }} />
+          <View style={{ width: 0, height: 0, borderLeftWidth: 4, borderRightWidth: 4, borderBottomWidth: 5, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: '#FF2A1F', marginTop: -1 }} />
         </Animated.View>
       ))}
     </View>
@@ -255,32 +255,32 @@ export const ToolsBackground = memo(function ToolsBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050505' }} />
       {/* Large gear watermark top-right */}
       <Animated.View style={{
         position: 'absolute', top: 60, right: -40, width: 100, height: 100,
-        borderRadius: 50, borderWidth: 4, borderColor: `rgba(0,200,220,0.05)`,
+        borderRadius: 50, borderWidth: 4, borderColor: `rgba(255,42,31,0.05)`,
         alignItems: 'center', justifyContent: 'center',
         transform: [{ rotate: rot1 }],
       }}>
         {Array.from({ length: 8 }).map((_, i) => (
           <View key={i} style={{
-            position: 'absolute', width: 12, height: 16, backgroundColor: `rgba(0,200,220,0.05)`,
+            position: 'absolute', width: 12, height: 16, backgroundColor: `rgba(255,42,31,0.05)`,
             borderRadius: 2, transform: [{ rotate: `${i * 45}deg` }, { translateY: -52 }],
           }} />
         ))}
-        <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: `rgba(0,200,220,0.04)` }} />
+        <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: `rgba(255,42,31,0.04)` }} />
       </Animated.View>
       {/* Small gear bottom-left */}
       <Animated.View style={{
         position: 'absolute', bottom: 300, left: -20, width: 60, height: 60,
-        borderRadius: 30, borderWidth: 3, borderColor: `rgba(0,200,220,0.04)`,
+        borderRadius: 30, borderWidth: 3, borderColor: `rgba(255,42,31,0.04)`,
         alignItems: 'center', justifyContent: 'center',
         transform: [{ rotate: rot2 }],
       }}>
         {Array.from({ length: 6 }).map((_, i) => (
           <View key={i} style={{
-            position: 'absolute', width: 8, height: 10, backgroundColor: `rgba(0,200,220,0.04)`,
+            position: 'absolute', width: 8, height: 10, backgroundColor: `rgba(255,42,31,0.04)`,
             borderRadius: 1, transform: [{ rotate: `${i * 60}deg` }, { translateY: -32 }],
           }} />
         ))}
@@ -289,7 +289,7 @@ export const ToolsBackground = memo(function ToolsBackground() {
       {Array.from({ length: 10 }).map((_, i) => (
         <View key={`g${i}`} style={{
           position: 'absolute', left: 0, right: 0, top: i * 80, height: 1,
-          backgroundColor: `rgba(0,180,200,0.03)`,
+          backgroundColor: `rgba(216,36,26,0.03)`,
         }} />
       ))}
     </View>
@@ -311,12 +311,12 @@ export const CosmeticsBackground = memo(function CosmeticsBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#000003' }} />
+      <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: '#050505' }} />
       {/* Color accent strips */}
       {[
-        { color: '#00CCDD', y: 100 },
-        { color: '#FF88FF', y: 250 },
-        { color: '#FFD700', y: 400 },
+        { color: '#FF2A1F', y: 100 },
+        { color: '#FFC400', y: 250 },
+        { color: '#FFC400', y: 400 },
         { color: '#00FF88', y: 600 },
       ].map((s, i) => (
         <Animated.View key={i} style={{
@@ -332,7 +332,7 @@ export const CosmeticsBackground = memo(function CosmeticsBackground() {
         <Animated.View key={`d${i}`} style={{
           position: 'absolute', left: pos.x, top: pos.y,
           width: 14, height: 14, transform: [{ rotate: '45deg' }],
-          borderWidth: 1.5, borderColor: '#00CCDD',
+          borderWidth: 1.5, borderColor: '#FF2A1F',
           opacity: pulse,
         }} />
       ))}
@@ -381,10 +381,10 @@ export const HomeParticleLayer = memo(function HomeParticleLayer() {
           left: p.x,
           bottom: p.anim.interpolate({ inputRange: [0, 1], outputRange: [0, 300] }),
           width: p.size, height: p.size, borderRadius: p.size / 2,
-          backgroundColor: i % 3 === 0 ? '#00CCDD' : i % 3 === 1 ? '#44FF88' : '#FFD700',
+          backgroundColor: i % 3 === 0 ? '#FF2A1F' : i % 3 === 1 ? '#44FF88' : '#FFC400',
           opacity: p.opacity,
           ...Platform.select({
-            ios: { shadowColor: '#00CCDD', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4 },
+            ios: { shadowColor: '#FF2A1F', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4 },
             android: {},
           }),
         }} />

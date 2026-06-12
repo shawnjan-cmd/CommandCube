@@ -18,21 +18,21 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // ─── Teal HUD Palette ────────────────────────────────────────────
 const C = {
-  bg:      '#040C14',
-  panel:   '#071018',
-  teal:    '#00CCDD',
-  tealBrt: '#00EEFF',
-  tealDim: '#004455',
-  tealMid: '#007788',
-  cyan:    '#00DDFF',
+  bg:      '#0A0B0D',
+  panel:   '#131418',
+  teal:    '#FF2A1F',
+  tealBrt: '#FF2A1F',
+  tealDim: '#55201A',
+  tealMid: '#8A2A20',
+  cyan:    '#FF2A1F',
   green:   '#44FF88',
-  amber:   '#FF8C00',
-  red:     '#FF3300',
-  purple:  '#8844CC',
-  text:    '#336677',
-  textBrt: '#88AACC',
-  textHi:  '#CCEEFF',
-  border:  '#0D1A24',
+  amber:   '#FF6A1F',
+  red:     '#FF6A1F',
+  purple:  '#FFC400',
+  text:    '#5A626E',
+  textBrt: '#9AA3B2',
+  textHi:  '#E6E9EF',
+  border:  '#1A1D24',
   borderHi:'#1A3344',
 };
 
@@ -555,7 +555,7 @@ const t = StyleSheet.create({
   root: { flex:1, backgroundColor:C.bg },
 
   // Header
-  header: { flexDirection:'row', alignItems:'center', gap:12, paddingHorizontal:14, paddingVertical:12, backgroundColor:'#050E18', borderBottomWidth:2, borderBottomColor:C.teal+'60', position:'relative', overflow:'hidden' },
+  header: { flexDirection:'row', alignItems:'center', gap:12, paddingHorizontal:14, paddingVertical:12, backgroundColor:'#0E0F12', borderBottomWidth:2, borderBottomColor:C.teal+'60', position:'relative', overflow:'hidden' },
   backBtn: { width:38, height:38, backgroundColor:C.tealDim, borderWidth:1.5, borderColor:C.teal+'70', borderRadius:8, alignItems:'center', justifyContent:'center',
     ...Platform.select({ ios:{shadowColor:C.teal,shadowOffset:{width:0,height:0},shadowOpacity:0.5,shadowRadius:8}, android:{elevation:4} }),
   },
@@ -569,7 +569,7 @@ const t = StyleSheet.create({
   activeTxt: { fontSize:7.5, fontWeight:'900', color:C.green, fontFamily:MONO, letterSpacing:1 },
 
   // Nav bar
-  navBar: { maxHeight:44, backgroundColor:'#060E18', borderBottomWidth:1, borderBottomColor:C.border },
+  navBar: { maxHeight:44, backgroundColor:'#0E0F12', borderBottomWidth:1, borderBottomColor:C.border },
   navChip: { flexDirection:'row', alignItems:'center', gap:5, borderWidth:1, borderColor:C.teal+'50', borderRadius:6, paddingHorizontal:10, paddingVertical:6, backgroundColor:C.teal+'10' },
   navChipTxt: { fontSize:9, fontWeight:'700', color:C.teal, fontFamily:MONO, letterSpacing:0.4 },
 
