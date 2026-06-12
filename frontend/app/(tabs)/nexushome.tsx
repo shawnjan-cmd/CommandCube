@@ -35,6 +35,7 @@ import QuickSendCard from '@/components/cards/QuickSendCard';
 import { FileShareClipboardCard } from '@/components/ui/FileShareClipboardCard';
 import { uiConfig, UIConfig, DEFAULT_UI_CONFIG, UIStrings } from '@/services/uiConfig';
 import { ButlerWordmark } from '@/components/ui/ButlerWordmark';
+import { MechBayHero, HexCommandRing } from '@/components/home/MechBay';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');
@@ -349,184 +350,13 @@ function SectionDivider({ label, color = D.cyan }: { label: string; color?: stri
 }
 
 // ─── BUTLER AI HERO ────────────────────────────────────────────────
-function ButlerAIHero({ isConnected, serverAddr, onScanQR, kbFindings, scriptCount }: {
+function ButlerAIHero(props: {
   isConnected: boolean; serverAddr: string; onScanQR: () => void;
   kbFindings: number; scriptCount: number;
 }) {
-  const shieldPulse = useRef(new Animated.Value(0)).current;
-  const sweep       = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(Animated.sequence([
-      Animated.timing(shieldPulse, { toValue: 1, duration: 1800, useNativeDriver: true }),
-      Animated.timing(shieldPulse, { toValue: 0, duration: 1800, useNativeDriver: true }),
-    ])).start();
-    Animated.loop(Animated.timing(sweep, { toValue: 1, duration: 4200, useNativeDriver: true })).start();
-  }, []);
-
-  const sweepTranslate = sweep.interpolate({ inputRange: [0, 1], outputRange: [-220, 360] });
-  const shieldHalo     = shieldPulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.95] });
-
-  const kbDisplay     = kbFindings > 0 ? (kbFindings > 1000000 ? `${(kbFindings/1000000).toFixed(1)}M` : kbFindings > 1000 ? `${(kbFindings/1000).toFixed(1)}K` : String(kbFindings)) : '—';
-  const scriptDisplay = scriptCount > 0 ? String(scriptCount) : '—';
-
-  const stats = [
-    { val: kbDisplay,                       lbl: 'VECTORS',  col: D.cyan },
-    { val: scriptDisplay,                   lbl: 'SCRIPTS',  col: D.teal },
-    { val: isConnected ? 'LIVE' : 'IDLE',   lbl: 'STATUS',   col: isConnected ? D.green : D.amber },
-    { val: 'LOCAL',                         lbl: 'RUNTIME',  col: D.purple },
-  ];
-
-  return (
-    <View style={hero.wrap}>
-      {/* Tri-color accent strip — Security-Protocols panel style */}
-      <View style={hero.accentRow} pointerEvents="none">
-        <View style={{ flex: 1, backgroundColor: D.cyan }} />
-        <View style={{ flex: 1, backgroundColor: D.green }} />
-        <View style={{ flex: 1, backgroundColor: D.purple }} />
-      </View>
-      {/* Layered backdrop — radial blue → black, scan grid, color spots */}
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <View style={hero.bgFill} />
-        <View style={hero.bgBlueOrb} />
-        <View style={hero.bgCyanOrb} />
-        <View style={hero.bgPurpleOrb} />
-        {[8, 22, 36, 50, 64, 78, 92].map((p, i) => (
-          <View key={`gh${i}`} style={[hero.gridH, { top: `${p}%` as any }]} />
-        ))}
-        {[12, 28, 44, 60, 76].map((p, i) => (
-          <View key={`gv${i}`} style={[hero.gridV, { left: `${p}%` as any }]} />
-        ))}
-        {/* Diagonal sweep */}
-        <Animated.View style={[hero.sweep, { transform: [{ translateX: sweepTranslate }] }]} />
-      </View>
-
-      {/* HUD frame */}
-      <HudCorners color={D.cyan} size={26} thickness={2} />
-      <View style={[hero.cornerTR, { borderColor: D.purple + 'CC' }]} />
-      <View style={[hero.cornerBL, { borderColor: D.amber + 'CC' }]} />
-      <View style={[hero.cornerBR, { borderColor: D.green + 'CC' }]} />
-
-      {/* Connection / mode pills (top row) */}
-      <View style={hero.pillRow}>
-        <View style={[hero.pill, { borderColor: (isConnected ? D.green : D.red) + '70', backgroundColor: (isConnected ? D.green : D.red) + '14' }]}>
-          <PulseDot color={isConnected ? D.green : D.red} size={6} />
-          <Text style={[hero.pillTxt, { color: isConnected ? D.green : D.red }]}>
-            {isConnected ? 'PC LINKED' : 'LOCAL MODE'}
-          </Text>
-        </View>
-        <View style={[hero.pill, { borderColor: D.purple + '60', backgroundColor: D.purple + '12' }]}>
-          <MaterialCommunityIcons name="brain" size={9} color={D.purple} />
-          <Text style={[hero.pillTxt, { color: D.purple }]}>OLLAMA LOCAL</Text>
-        </View>
-      </View>
-
-      {/* BUTLER AI wordmark — user-supplied vector logo, HD at any size,
-          blends seamlessly into the pure-black hero deck. */}
-      <View style={hero.logoWrap}>
-        <Animated.View style={[hero.logoGlow, { opacity: shieldHalo }]} pointerEvents="none" />
-        <ButlerWordmark width={Math.min(SW - 110, 290)} />
-        <Animated.View style={[hero.logoUnderline, { opacity: shieldHalo }]} />
-        {/* Corner tick readouts */}
-        <View style={[hero.readout, { top: 2,  left: 2  }]}><Text style={hero.readoutTxt}>SYS·01</Text></View>
-        <View style={[hero.readout, { top: 2,  right: 2 }]}><Text style={[hero.readoutTxt, { color: D.purple }]}>NEURAL</Text></View>
-        <View style={[hero.readout, { bottom: 2, left: 2  }]}><Text style={[hero.readoutTxt, { color: D.amber  }]}>MESH·OK</Text></View>
-        <View style={[hero.readout, { bottom: 2, right: 2 }]}><Text style={[hero.readoutTxt, { color: D.green  }]}>LINK·LAN</Text></View>
-      </View>
-      <View style={hero.subRow}>
-        <View style={[hero.bullet, { backgroundColor: D.cyan }]} />
-        <Text style={hero.sub}>NEXUS COMMAND CENTER</Text>
-        <View style={[hero.bullet, { backgroundColor: D.cyan }]} />
-      </View>
-
-      {/* Stats grid */}
-      <View style={hero.statsRow}>
-        {stats.map((st, i) => (
-          <View key={i} style={[hero.statCell, i < stats.length - 1 && { borderRightWidth: 1, borderRightColor: 'rgba(0,229,255,0.10)' }]}>
-            <Text
-              style={[
-                hero.statVal,
-                { color: st.col },
-                Platform.OS === 'ios' ? { textShadowColor: st.col, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 } : {},
-              ]}
-            >
-              {st.val}
-            </Text>
-            <Text style={[hero.statLbl, { color: st.col + 'A8' }]}>{st.lbl}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Primary CTA */}
-      <TouchableOpacity
-        testID="hero-scan-qr"
-        onPress={() => { haptics.medium(); onScanQR(); }}
-        style={hero.qrBtn}
-        activeOpacity={0.85}
-      >
-        <MaterialIcons name="qr-code-scanner" size={20} color={D.bg} />
-        <Text style={hero.qrTxt}>{isConnected ? 'RE-PAIR PC' : 'SCAN QR TO PAIR'}</Text>
-        <MaterialCommunityIcons name="chevron-right" size={20} color={D.bg} />
-      </TouchableOpacity>
-    </View>
-  );
+  // Replaced with MECH BAY OS theme — see /components/home/MechBay.tsx
+  return <MechBayHero {...props} />;
 }
-
-const hero = StyleSheet.create({
-  wrap: {
-    backgroundColor: '#02070D',
-    borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: D.cyan + '38',
-    overflow: 'hidden',
-    paddingTop: 14,
-    paddingHorizontal: 14,
-    paddingBottom: 0,
-    position: 'relative',
-    ...(Platform.OS === 'ios'
-      ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.28, shadowRadius: 28 }
-      : { elevation: 10 }),
-  },
-  bgFill:      { ...StyleSheet.absoluteFillObject, backgroundColor: '#02070D' },
-  bgBlueOrb:   { position: 'absolute', top: -80,  left: -80,  width: 260, height: 260, borderRadius: 130, backgroundColor: '#5B9CF6', opacity: 0.10 },
-  bgCyanOrb:   { position: 'absolute', top: 40,   right: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: D.cyan,    opacity: 0.09 },
-  bgPurpleOrb: { position: 'absolute', bottom: -100, left: '15%' as any, width: 240, height: 240, borderRadius: 120, backgroundColor: D.purple, opacity: 0.08 },
-  gridH:       { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.06)' },
-  gridV:       { position: 'absolute', top: 0, bottom: 0, width: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,229,255,0.05)' },
-  sweep:       { position: 'absolute', top: 0, bottom: 0, width: 160, backgroundColor: D.cyan, opacity: 0.05, transform: [{ skewX: '-18deg' }] },
-
-  cornerTR: { position: 'absolute', top: 0, right: 0, width: 26, height: 26, borderTopWidth: 2, borderRightWidth: 2 },
-  accentRow: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, flexDirection: 'row', zIndex: 5 },
-  cornerBL: { position: 'absolute', bottom: 78, left: 0, width: 26, height: 26, borderBottomWidth: 2, borderLeftWidth: 2 },
-  cornerBR: { position: 'absolute', bottom: 78, right: 0, width: 26, height: 26, borderBottomWidth: 2, borderRightWidth: 2 },
-
-  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignSelf: 'center', justifyContent: 'center', marginBottom: 8 },
-  pill:    { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 22, paddingHorizontal: 9, paddingVertical: 3.5 },
-  pillTxt: { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.2 },
-
-  logoWrap:      { alignItems: 'center', justifyContent: 'center', paddingVertical: 8, marginBottom: 2, position: 'relative' },
-  logoGlow:      { position: 'absolute', width: 240, height: 130, borderRadius: 70, backgroundColor: 'rgba(0,229,255,0.10)',
-                   ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.55, shadowRadius: 46 } : {}) },
-  logoUnderline: { marginTop: 4, width: 150, height: 2, borderRadius: 1, backgroundColor: D.cyan,
-                   ...(Platform.OS === 'ios' ? { shadowColor: D.cyan, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 8 } : {}) },
-  readout:    { position: 'absolute', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4,
-                backgroundColor: 'rgba(0,229,255,0.06)', borderWidth: StyleSheet.hairlineWidth, borderColor: D.cyan + '40' },
-  readoutTxt: { fontSize: 8, fontWeight: '900', fontFamily: MONO, color: D.cyan, letterSpacing: 1.4 },
-
-  subRow:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 2, marginBottom: 12 },
-  sub:     { fontSize: 11, fontWeight: '800', fontFamily: MONO, color: D.cyan + 'BB', letterSpacing: 4 },
-  bullet:  { width: 4, height: 4, borderRadius: 2 },
-
-  statsRow: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: 'rgba(0,229,255,0.18)', marginHorizontal: -14 },
-  statCell: { flex: 1, alignItems: 'center', paddingVertical: 10, gap: 3 },
-  statVal:  { fontSize: 20, fontWeight: '900', fontFamily: MONO, lineHeight: 20 },
-  statLbl:  { fontSize: 9, fontWeight: '800', fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center', lineHeight: 9 },
-
-  qrBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-           marginHorizontal: -14, paddingVertical: 12, backgroundColor: D.cyan,
-           borderBottomLeftRadius: 16, borderBottomRightRadius: 16 },
-  qrTxt: { fontSize: 14, fontWeight: '900', fontFamily: MONO, color: '#001018', letterSpacing: 2 },
-});
 
 // ─── CONNECTED PC CARD — upgraded with ring gauges + sparklines ───
 function ConnectedPCCard({ isConnected, serverAddr, metrics, ollamaOnline, cpuHistory, ramHistory, diskHistory, uptimeSeconds }: {
@@ -1022,49 +852,9 @@ const spg = StyleSheet.create({
 });
 
 // ─── QUICK ACCESS GRID ────────────────────────────────────────────
-const QUICK_ITEMS = [
-  { icon:'code-braces-box',   lib:'community', label:'Python Scripts',  desc:'Automate your PC', tag:'SYSTEM', tagCol:D.green,  lCol:D.cyan,   tab:'scripts'   },
-  { icon:'robot-excited',     lib:'community', label:'Butler AI Chat',  desc:'Ask Ollama anything', tag:'AI',  tagCol:D.purple, lCol:D.purple, tab:'butler'    },
-  { icon:'head-cog-outline',  lib:'community', label:'Knowledge Base',  desc:'SIGMA-NET indexed docs', tag:'KB', tagCol:D.amber, lCol:D.amber,  tab:'knowledge' },
-  { icon:'toolbox-outline',   lib:'community', label:'Tools Hub',       desc:'File share & utilities', tag:'HUB', tagCol:D.blue, lCol:D.blue,   tab:'fileshare' },
-];
-
 function QuickAccessGrid({ goToTab }: { goToTab: (t: string) => void }) {
-  const ITEM_W = (SW - 28 - 8) / 2;
-  return (
-    <View>
-      <SectionDivider label="QUICK ACCESS" color={D.cyan} />
-      <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginTop:8 }}>
-        {QUICK_ITEMS.map((item, i) => {
-          const Icon = item.lib === 'community' ? MaterialCommunityIcons : MaterialIcons;
-          return (
-            <TouchableOpacity key={i} testID={`quick-access-${item.tab}`} onPress={() => { haptics.light(); goToTab(item.tab); }} activeOpacity={0.8}
-              style={{ width:ITEM_W, backgroundColor:D.surface, borderRadius:12, borderWidth:1, borderColor:item.lCol+'38', overflow:'hidden', padding:11,
-                ...(Platform.OS==='ios'?{shadowColor:item.lCol, shadowOffset:{width:0,height:5}, shadowOpacity:0.16, shadowRadius:10}:{elevation:4}) }}>
-              {/* 3D bevel edges + chamfer corners */}
-              <View pointerEvents="none" style={{ position:'absolute', top:0, left:0, right:0, height:1, backgroundColor:'rgba(255,255,255,0.08)' }} />
-              <View pointerEvents="none" style={{ position:'absolute', bottom:0, left:0, right:0, height:1.5, backgroundColor:'rgba(0,0,0,0.65)' }} />
-              <View pointerEvents="none" style={{ position:'absolute', top:0, left:0, width:11, height:11, borderTopWidth:1.5, borderLeftWidth:1.5, borderColor:item.lCol+'66' }} />
-              <View pointerEvents="none" style={{ position:'absolute', bottom:0, right:0, width:11, height:11, borderBottomWidth:1.5, borderRightWidth:1.5, borderColor:item.lCol+'66' }} />
-              <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
-                <View style={{ width:32, height:32, borderRadius:9, backgroundColor:item.lCol+'16', alignItems:'center', justifyContent:'center', borderWidth:1, borderColor:item.lCol+'40' }}>
-                  <Icon name={item.icon as any} size={17} color={item.lCol} />
-                </View>
-                <View style={{ borderWidth:1, borderRadius:7, borderColor:item.tagCol+'50', backgroundColor:item.tagCol+'12', paddingHorizontal:5, paddingVertical:2 }}>
-                  <Text style={{ fontSize:8.5, fontWeight:'900', fontFamily:MONO, color:item.tagCol, letterSpacing:0.5 }}>{item.tag}</Text>
-                </View>
-              </View>
-              <Text style={{ fontSize:13.5, fontWeight:'900', fontFamily:MONO, color:D.text, marginBottom:3 }}>{item.label}</Text>
-              <Text style={{ fontSize:10.5, fontFamily:MONO, color:D.textMid, lineHeight:15 }} numberOfLines={1}>{item.desc}</Text>
-              <View style={{ marginTop:7, height:2, borderRadius:1, backgroundColor:item.lCol+'28' }}>
-                <View style={{ height:'100%', width:'60%', borderRadius:1, backgroundColor:item.lCol }} />
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </View>
-  );
+  // Replaced with MECH BAY OS theme — see /components/home/MechBay.tsx
+  return <HexCommandRing goToTab={goToTab} />;
 }
 
 // ─── KB ARTICLES FEED ─────────────────────────────────────────────
