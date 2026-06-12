@@ -22,6 +22,22 @@ db = client[os.environ['DB_NAME']]
 # Create the main app without a prefix
 app = FastAPI()
 
+
+# ── Root health endpoint ─────────────────────────────────────────────────────
+# Kubernetes liveness / readiness probes hit `GET /` directly on the pod
+# (bypassing the ingress that routes `/api/*` here). Without this route the
+# probe gets a 404, K8s marks the pod unhealthy, and we end up in a restart
+# loop. Keep this lightweight — no DB calls — so probe latency stays low.
+@app.get("/")
+async def health_root():
+    return {"status": "ok", "service": "butler-ai-backend"}
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
