@@ -274,7 +274,6 @@ export default function HUDTips({
   );
 }
 
-export { HUDTips as default };
 export function HUDTipsMini({ tips, color = '#00CCDD' }: { tips: string[]; color?: string }) {
   return (
     <HUDTips tips={tips} color={color} accentColor="#00FF88" compact />

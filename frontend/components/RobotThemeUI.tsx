@@ -7,11 +7,23 @@
 import React, { useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, Animated,
-  Platform, Dimensions, ScrollView, TextInput,
+  Platform, Dimensions, ScrollView, TextInput, Image as RNImage,
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Svg, { Circle, Path, Rect, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { Image as ExpoImage } from 'expo-image';
+
+// Web-safe Image: expo-image breaks the web bundle in SDK 54
+// (missing './build/resolveAssetSource' specifier). Use RN Image on web,
+// expo-image on native for the better caching.
+let ExpoImage: any = RNImage;
+if (Platform.OS !== 'web') {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+    ExpoImage = require('expo-image').Image;
+  } catch {
+    ExpoImage = RNImage;
+  }
+}
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');

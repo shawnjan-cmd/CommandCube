@@ -42,6 +42,42 @@ config.resolver.extraNodeModules = {
   'react-native/Libraries/Utilities/DevSettings': path.resolve(__dirname, './stubs/dev-settings-stub.js'),
 };
 
+// ── expo-asset subpath alias (web bundle fix) ────────────────────────────────
+// expo-asset@v12+ ships with a strict `exports` map that omits the
+// `./build/resolveAssetSource` subpath. react-native's Image internals try to
+// import it on web, causing a Metro 500 with:
+//   Missing "./build/resolveAssetSource" specifier in "expo-asset" package
+// The JS file exists at the path — Metro's strict ESM resolver just refuses
+// to expose it. We add a resolveRequest hook to rewrite that specific request.
+//
+// We also stub expo-image entirely on web (its compiled web code imports
+// react-native internals not exposed by react-native-web in SDK 54).
+const _origResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Web-only fixes
+  if (platform === 'web') {
+    if (moduleName === 'expo-image' || moduleName.startsWith('expo-image/')) {
+      return {
+        filePath: path.resolve(__dirname, './stubs/expo-image-web-stub.js'),
+        type: 'sourceFile',
+      };
+    }
+    if (moduleName === 'expo-asset/build/resolveAssetSource') {
+      return {
+        filePath: path.resolve(__dirname, 'node_modules/expo-asset/build/resolveAssetSource.js'),
+        type: 'sourceFile',
+      };
+    }
+  } else if (moduleName === 'expo-asset/build/resolveAssetSource') {
+    return {
+      filePath: path.resolve(__dirname, 'node_modules/expo-asset/build/resolveAssetSource.native.js'),
+      type: 'sourceFile',
+    };
+  }
+  if (_origResolveRequest) return _origResolveRequest(context, moduleName, platform);
+  return context.resolveRequest(context, moduleName, platform);
+};
+
 // ── Butler AI Export: auto-register source stubs ────────────────────────────
 // When constants/tabSourcesBundle.ts is imported, it calls registerTabSource()
 // with line-array sources. No extra Metro config needed for this approach.
