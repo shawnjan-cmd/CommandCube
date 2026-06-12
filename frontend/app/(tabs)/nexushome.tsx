@@ -906,43 +906,6 @@ function RecentActivity({ goToTab }: { goToTab: (t:string)=>void }) {
   );
 }
 
-// ─── SERVER SETUP SECTION ─────────────────────────────────────────
-function ServerSetupSection({ onScanQR, isConnected }: { onScanQR:()=>void; isConnected:boolean }) {
-  if (isConnected) return null;
-  return (
-    <View>
-      <SectionDivider label="GET STARTED" color={D.cyan} />
-      <NexusCard accentColor={D.cyan} style={{ marginTop:10 }} glowIntensity={0.20}>
-        <View style={{ padding:18, gap:12 }}>
-          <View style={{ flexDirection:'row', alignItems:'center', gap:10 }}>
-            <View style={{ width:40, height:40, borderRadius:12, backgroundColor:D.cyan+'18', alignItems:'center', justifyContent:'center', borderWidth:1, borderColor:D.cyan+'30' }}>
-              <MaterialIcons name="qr-code-scanner" size={22} color={D.cyan} />
-            </View>
-            <View style={{ flex:1 }}>
-              <Text style={{ fontSize:14, fontWeight:'900', fontFamily:MONO, color:D.text }}>PAIR YOUR PC</Text>
-              <Text style={{ fontSize:10, fontFamily:MONO, color:D.textMid, marginTop:2 }}>Scan the QR code shown on your PC server</Text>
-            </View>
-          </View>
-          <TouchableOpacity onPress={() => { haptics.medium(); onScanQR(); }} activeOpacity={0.8}
-            style={{ backgroundColor:D.cyan, borderRadius:12, paddingVertical:13, alignItems:'center', flexDirection:'row', justifyContent:'center', gap:8 }}>
-            <MaterialIcons name="qr-code-scanner" size={18} color={D.bg} />
-            <Text style={{ fontSize:13, fontWeight:'900', fontFamily:MONO, color:D.bg, letterSpacing:1 }}>SCAN QR CODE</Text>
-          </TouchableOpacity>
-          <Text style={{ fontSize:9, fontFamily:MONO, color:D.textDim, textAlign:'center', letterSpacing:0.5 }}>
-            {'Run butler_server.py on your PC · Both devices on same Wi-Fi'}
-          </Text>
-          {/* copyright notice */}
-          <View style={{ borderTopWidth:StyleSheet.hairlineWidth, borderTopColor:D.cyan+'15', paddingTop:10 }}>
-            <Text style={{ fontSize:8, fontFamily:MONO, color:D.textDim, textAlign:'center', letterSpacing:0.3 }}>
-              Butler AI © 2025–2026 · All rights reserved · Local-first · Zero telemetry
-            </Text>
-          </View>
-        </View>
-      </NexusCard>
-    </View>
-  );
-}
-
 // ─── QR MODAL ─────────────────────────────────────────────────────
 function isValidIP(ip: string): boolean {
   return /^(\d{1,3}\.){3}\d{1,3}$/.test(ip) && ip.split('.').every(n => parseInt(n) <= 255);
@@ -1168,37 +1131,76 @@ function SigmaNetCrawlerHomeCard({ isConnected }: { isConnected:boolean }) {
   );
 }
 
-// ─── NEW-USER SECTIONS: server download + how it works ────────────
+// ─── SERVER SETUP HUB — download + how-it-works + pairing in ONE panel ─────
 const SERVER_REPO_URL = 'https://github.com/shawnjan-cmd/butler-server';
 
-function ServerDownloadCard() {
+const SETUP_STEPS = [
+  { n: '01', icon: 'download-box-outline', col: D.green,  title: 'GET THE PC SERVER',  sub: 'Free download — runs on any PC with Python' },
+  { n: '02', icon: 'console',              col: D.amber,  title: 'RUN THE SERVER',     sub: 'One command — it shows a QR code' },
+  { n: '03', icon: 'qrcode-scan',          col: D.cyan,   title: 'PAIR YOUR PC',       sub: 'Scan the QR — same Wi-Fi, no cloud' },
+  { n: '04', icon: 'robot-happy',          col: D.purple, title: 'COMMAND YOUR PC',    sub: 'Run scripts, send files, chat with local AI' },
+] as const;
+
+function ServerSetupHub({ onScanQR, isConnected }: { onScanQR: () => void; isConnected: boolean }) {
   const [copied, setCopied] = useState(false);
+
+  // Connected → slim confirmation strip instead of the full checklist
+  if (isConnected) {
+    return (
+      <View>
+        <SectionDivider label="SETUP · COMPLETE" color={D.green} />
+        <NexusCard accentColor={D.green} style={{ marginTop: 8 }}>
+          <View style={hub.doneRow}>
+            <MaterialCommunityIcons name="check-decagram" size={20} color={D.green} />
+            <Text style={hub.doneTxt}>PC PAIRED · ALL SYSTEMS OPERATIONAL</Text>
+          </View>
+        </NexusCard>
+      </View>
+    );
+  }
+
   return (
     <View>
-      <SectionDivider label="PC SERVER · DOWNLOAD" color={D.green} />
+      <SectionDivider label="SETUP · GET STARTED" color={D.green} />
       <NexusCard accentColor={D.green} style={{ marginTop: 8 }}>
-        <View style={dlc.row}>
-          <View style={dlc.iconBox}>
-            <MaterialCommunityIcons name="download-box-outline" size={24} color={D.green} />
+        {/* intro line */}
+        <Text style={hub.intro}>
+          Butler AI pairs with a tiny Python server on your PC. Four steps — fully local, zero cloud.
+        </Text>
+
+        {/* STEP 01 — download */}
+        <View style={hub.stepRow}>
+          <Text style={[hub.num, { color: SETUP_STEPS[0].col }]}>01</Text>
+          <View style={[hub.iconBox, { borderColor: D.green + '45', backgroundColor: D.green + '12' }]}>
+            <MaterialCommunityIcons name="download-box-outline" size={17} color={D.green} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={dlc.title}>GET THE PC SERVER</Text>
-            <Text style={dlc.body}>
-              Butler AI pairs with a tiny Python server running on your PC. Download it, run it, then scan the QR code it shows.
-            </Text>
+            <Text style={[hub.stepTitle, { color: D.green }]}>{SETUP_STEPS[0].title}</Text>
+            <Text style={hub.stepSub}>{SETUP_STEPS[0].sub}</Text>
           </View>
         </View>
         <TouchableOpacity
-          testID="download-server-btn" activeOpacity={0.85}
-          style={dlc.btn}
+          testID="download-server-btn" activeOpacity={0.85} style={hub.btn}
           onPress={() => { haptics.medium(); Linking.openURL(SERVER_REPO_URL).catch(() => {}); }}>
           <MaterialCommunityIcons name="github" size={17} color="#001008" />
-          <Text style={dlc.btnTxt}>DOWNLOAD ON GITHUB</Text>
+          <Text style={hub.btnTxt}>DOWNLOAD ON GITHUB</Text>
           <MaterialCommunityIcons name="open-in-new" size={13} color="#001008" />
         </TouchableOpacity>
-        <View style={dlc.cmdRow}>
-          <Text style={dlc.cmdPrompt}>$</Text>
-          <Text style={dlc.cmd} numberOfLines={1}>python butler_server.py</Text>
+
+        {/* STEP 02 — run command */}
+        <View style={hub.stepRow}>
+          <Text style={[hub.num, { color: SETUP_STEPS[1].col }]}>02</Text>
+          <View style={[hub.iconBox, { borderColor: D.amber + '45', backgroundColor: D.amber + '12' }]}>
+            <MaterialCommunityIcons name="console" size={16} color={D.amber} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[hub.stepTitle, { color: D.amber }]}>{SETUP_STEPS[1].title}</Text>
+            <Text style={hub.stepSub}>{SETUP_STEPS[1].sub}</Text>
+          </View>
+        </View>
+        <View style={hub.cmdRow}>
+          <Text style={hub.cmdPrompt}>$</Text>
+          <Text style={hub.cmd} numberOfLines={1}>python butler_server.py</Text>
           <TouchableOpacity
             testID="copy-server-cmd" hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             onPress={async () => {
@@ -1208,59 +1210,65 @@ function ServerDownloadCard() {
             <MaterialCommunityIcons name={copied ? 'check-bold' : 'content-copy'} size={14} color={copied ? D.green : D.green + '99'} />
           </TouchableOpacity>
         </View>
+
+        {/* STEP 03 — pair */}
+        <View style={hub.stepRow}>
+          <Text style={[hub.num, { color: SETUP_STEPS[2].col }]}>03</Text>
+          <View style={[hub.iconBox, { borderColor: D.cyan + '45', backgroundColor: D.cyan + '12' }]}>
+            <MaterialCommunityIcons name="qrcode-scan" size={16} color={D.cyan} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[hub.stepTitle, { color: D.cyan }]}>{SETUP_STEPS[2].title}</Text>
+            <Text style={hub.stepSub}>{SETUP_STEPS[2].sub}</Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          testID="setup-scan-qr-btn" activeOpacity={0.85}
+          style={[hub.btn, { backgroundColor: D.cyan }]}
+          onPress={() => { haptics.medium(); onScanQR(); }}>
+          <MaterialIcons name="qr-code-scanner" size={17} color={D.bg} />
+          <Text style={[hub.btnTxt, { color: D.bg }]}>SCAN QR CODE</Text>
+        </TouchableOpacity>
+
+        {/* STEP 04 — command */}
+        <View style={[hub.stepRow, { marginBottom: 4 }]}>
+          <Text style={[hub.num, { color: SETUP_STEPS[3].col }]}>04</Text>
+          <View style={[hub.iconBox, { borderColor: SETUP_STEPS[3].col + '45', backgroundColor: SETUP_STEPS[3].col + '12' }]}>
+            <MaterialCommunityIcons name="robot-happy" size={16} color={SETUP_STEPS[3].col} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[hub.stepTitle, { color: SETUP_STEPS[3].col }]}>{SETUP_STEPS[3].title}</Text>
+            <Text style={hub.stepSub}>{SETUP_STEPS[3].sub}</Text>
+          </View>
+        </View>
+
+        {/* footer */}
+        <View style={hub.footer}>
+          <MaterialIcons name="verified-user" size={11} color={D.green} />
+          <Text style={hub.footerTxt}>Same Wi-Fi · HMAC-SHA256 signed · 100% local · Zero telemetry</Text>
+        </View>
+        <Text style={hub.copyright}>Butler AI © 2025–2026 · All rights reserved</Text>
       </NexusCard>
     </View>
   );
 }
-const dlc = StyleSheet.create({
-  row:       { flexDirection: 'row', gap: 11, padding: 12, paddingBottom: 8, alignItems: 'flex-start' },
-  iconBox:   { width: 42, height: 42, borderRadius: 11, backgroundColor: D.green + '14', borderWidth: 1, borderColor: D.green + '45', alignItems: 'center', justifyContent: 'center' },
-  title:     { fontSize: 13.5, fontWeight: '900', fontFamily: MONO, color: D.green, letterSpacing: 1.2, marginBottom: 3 },
-  body:      { fontSize: 10.5, fontFamily: MONO, color: D.textMid, lineHeight: 15.5 },
-  btn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: D.green, borderRadius: 10, paddingVertical: 11, marginHorizontal: 12, marginBottom: 8 },
+const hub = StyleSheet.create({
+  intro:     { fontSize: 10.5, fontFamily: MONO, color: D.textMid, lineHeight: 15.5, paddingHorizontal: 12, paddingTop: 12, paddingBottom: 4, textAlign: 'center' },
+  stepRow:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 6 },
+  num:       { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 1, width: 22 },
+  iconBox:   { width: 32, height: 32, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  stepTitle: { fontSize: 12.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
+  stepSub:   { fontSize: 10, fontFamily: MONO, color: D.textMid, marginTop: 1.5 },
+  btn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: D.green, borderRadius: 10, paddingVertical: 11, marginHorizontal: 12, marginTop: 2, marginBottom: 4 },
   btnTxt:    { fontSize: 12.5, fontWeight: '900', fontFamily: MONO, color: '#001008', letterSpacing: 1.2 },
-  cmdRow:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 12, marginBottom: 12, backgroundColor: '#050505', borderWidth: 1, borderColor: D.green + '30', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 },
+  cmdRow:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 12, marginTop: 2, marginBottom: 4, backgroundColor: '#050505', borderWidth: 1, borderColor: D.green + '30', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 },
   cmdPrompt: { fontSize: 11, fontWeight: '900', fontFamily: MONO, color: D.green },
   cmd:       { flex: 1, fontSize: 11, fontFamily: MONO, color: D.text },
-});
-
-const HOW_STEPS = [
-  { n: '01', icon: 'download-box-outline', col: D.green,  title: 'RUN THE SERVER',  sub: 'python butler_server.py on your PC' },
-  { n: '02', icon: 'qrcode-scan',          col: D.cyan,   title: 'SCAN THE QR',     sub: 'Pair phone + PC on the same Wi-Fi' },
-  { n: '03', icon: 'robot-happy',          col: D.purple, title: 'COMMAND YOUR PC', sub: 'Run scripts, send files, chat with local AI' },
-] as const;
-
-function HowItWorksCard() {
-  return (
-    <View>
-      <SectionDivider label="INFO · HOW IT WORKS" color={D.cyan} />
-      <NexusCard accentColor={D.cyan} style={{ marginTop: 8 }}>
-        <View style={{ paddingVertical: 4 }}>
-          {HOW_STEPS.map((st, i) => (
-            <View key={st.n} style={[hiw.row, i < HOW_STEPS.length - 1 && hiw.rowDivider]}>
-              <Text style={[hiw.num, { color: st.col }]}>{st.n}</Text>
-              <View style={[hiw.iconBox, { borderColor: st.col + '45', backgroundColor: st.col + '12' }]}>
-                <MaterialCommunityIcons name={st.icon as any} size={17} color={st.col} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[hiw.title, { color: st.col }]}>{st.title}</Text>
-                <Text style={hiw.sub}>{st.sub}</Text>
-              </View>
-              <MaterialCommunityIcons name="chevron-right" size={16} color={st.col + '60'} />
-            </View>
-          ))}
-        </View>
-      </NexusCard>
-    </View>
-  );
-}
-const hiw = StyleSheet.create({
-  row:        { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 9 },
-  rowDivider: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(255,42,31,0.12)' },
-  num:        { fontSize: 11, fontWeight: '900', fontFamily: MONO, letterSpacing: 1, width: 22 },
-  iconBox:    { width: 32, height: 32, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  title:      { fontSize: 12, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
-  sub:        { fontSize: 10, fontFamily: MONO, color: D.textMid, marginTop: 1.5 },
+  footer:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, marginHorizontal: 12, paddingTop: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: D.green + '20' },
+  footerTxt: { fontSize: 8.5, fontFamily: MONO, color: D.green + '90', letterSpacing: 0.3 },
+  copyright: { fontSize: 8, fontFamily: MONO, color: D.textDim, textAlign: 'center', paddingBottom: 12, paddingTop: 4, letterSpacing: 0.3 },
+  doneRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, padding: 14 },
+  doneTxt:   { fontSize: 11, fontWeight: '900', fontFamily: MONO, color: D.green, letterSpacing: 1 },
 });
 
 // ─── FULL-PAGE BACKDROP (pure black + circuit grid + drifting scan beam) ──
@@ -1497,14 +1505,13 @@ export default function NexusHomeScreen() {
       <WidgetLayer pageId="home" />
       <InlineWidgetSlot pageId="home" position="inline-top" />
 
-      {/* Hero + new-user sections + Quick Access pinned to the top */}
+      {/* Hero → COMMAND MODULES → combined setup hub */}
       <ButlerAIHero
         isConnected={isConnected} serverAddr={serverAddr}
         onScanQR={() => setShowQR(true)}
         kbFindings={kbFindings} scriptCount={scriptCount} />
-      <ServerDownloadCard />
-      <HowItWorksCard />
       <QuickAccessGrid goToTab={goToTab} />
+      <ServerSetupHub onScanQR={() => setShowQR(true)} isConnected={isConnected} />
 
       {/* Config-driven card renderer (hero & quick_access pinned above) */}
       {uiCfg.home.cards
@@ -1543,7 +1550,7 @@ export default function NexusHomeScreen() {
             case 'recent_activity':
               return <RecentActivity key={card.id} goToTab={goToTab} />;
             case 'server_setup':
-              return <ServerSetupSection key={card.id} onScanQR={() => setShowQR(true)} isConnected={isConnected} />;
+              return null; // merged into the pinned ServerSetupHub above
             case 'sigma_net':
             case 'sigma_net_crawler':
               return <SigmaNetCrawlerHomeCard key={card.id} isConnected={isConnected} />;
@@ -1573,7 +1580,6 @@ export default function NexusHomeScreen() {
             uptimeSeconds={uptimeSeconds} />
           <SmartAlertsHomeCard isConnected={isConnected} metrics={metrics} />
           <SecurityProtocolsGrid isConnected={isConnected} canaryStatus={canaryStatus} />
-          <ServerSetupSection onScanQR={() => setShowQR(true)} isConnected={isConnected} />
         </>
       )}
 

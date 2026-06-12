@@ -9,13 +9,10 @@
         "image": "latest"
       },
       "env": {
-        "NODE_ENV": "production",
         "EXPO_PUBLIC_APP_ENV": "production",
         "NODE_OPTIONS": "--max-old-space-size=8192",
         "EXPO_NO_TELEMETRY": "1",
-        "EAS_NO_VCS": "1",
-        "GRADLE_OPTS": "-Xmx6g -Xms2g -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=false",
-        "EXPO_USE_HERMES": "1"
+        "GRADLE_OPTS": "-Xmx6g -Xms2g -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=false"
       }
     },
     "development": {
@@ -27,7 +24,6 @@
         "gradleCommand": ":app:assembleDebug"
       },
       "env": {
-        "NODE_ENV": "development",
         "EXPO_PUBLIC_APP_ENV": "development"
       },
       "ios": { "simulator": true }

@@ -1,0 +1,31 @@
+{
+  "summary": "Frontend-only smoke test of restructured HOME tab on Butler AI Expo app. All restructuring goals verified: section order is correct (Hero → COMMAND MODULES 2x2 → SETUP · GET STARTED → QUICK SEND → CONNECTED PC …); old labels 'PC SERVER · DOWNLOAD' / 'INFO · HOW IT WORKS' / standalone 'GET STARTED' are NOT present. ServerSetupHub renders 4 numbered steps with required testIDs (download-server-btn, copy-server-cmd, setup-scan-qr-btn), footer 'Same Wi-Fi · HMAC-SHA256 signed · 100% local · Zero telemetry' and copyright 'Butler AI © 2025–2026 · All rights reserved'. Copy tap toggles (no crash); SCAN QR opens 'PAIR PC' modal and closes cleanly. quick-access-scripts navigates to /scripts route. Regression: all 8 tab testIDs present, all 8 tabs load with quickbar persistent, zero pageerrors, zero console.error entries.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      { "screen": "nexushome / SIGMA-NET CRAWLERS card", "issues": ["Bar chart shows 'Invalid Date' repeated as day labels when kbGrowthTracker has no buckets (web preview: documentDirectory unavailable). Pre-existing — not part of this restructure, but visible noise on the home page. File: /app/frontend/app/(tabs)/nexushome.tsx around line 560 (new Date(buckets[i].date)…) — guard with buckets[i]?.date && !isNaN(new Date(...)) before formatting."] }
+    ],
+    "react_native_issues": [
+      { "component": "Animated (useNativeDriver)", "issue": "Console warning: 'useNativeDriver is not supported because the native animated module is missing. Falling back to JS-based animation.' — expected on Expo web; safe to ignore unless targeting native build. No file change needed for web, but on web set useNativeDriver:false to silence." },
+      { "component": "Deprecated style props", "issue": "Console warnings: 'textShadow*' and 'shadow*' style props deprecated (use textShadow / boxShadow), and 'props.pointerEvents is deprecated (use style.pointerEvents)'. Widespread across nexushome.tsx (textShadowColor/textShadowOffset/textShadowRadius blocks ~lines 538, 603, 655 and shadowColor blocks throughout). Cosmetic, not blocking, but should be migrated." }
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Optional / pre-existing) Guard CrawlersGraphCard bucket date labels to avoid 'Invalid Date' x-axis on web preview where kbGrowthTracker has no data.",
+    "(Optional) Migrate textShadow*/shadow*/pointerEvents to the new RN web style API to clear deprecation warnings."
+  ],
+  "critical_code_review_comments": [
+    "nexushome.tsx is 1614 lines — exceeds the 700-line guideline. Consider extracting ServerSetupHub, ConnectedPCCard, SecurityProtocolsGrid, NexusQRModal, etc. into /components/home/* modules.",
+    "ServerSetupHub & related cards correctly use testID, View/Text/TouchableOpacity, StyleSheet.create, and read env via existing serverConnection service — implementation matches Expo/RN guidelines."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "n/a", "frontend": "100%" },
+  "seed_data_creation": "None. Used localStorage flags (@butler_onboarding_done_v2, butler_privacy_banner_dismissed_v2) to skip onboarding/privacy banner, as instructed.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "HOME restructure (iteration_8) verified PASS. Skip-onboarding flow: localStorage.setItem('@butler_onboarding_done_v2','1') + localStorage.setItem('butler_privacy_banner_dismissed_v2','1') then reload. Expo web first paint ≈5s after the supervisor restart had stabilized. Mobile viewport 390x844. Key testIDs on home: download-server-btn, copy-server-cmd, setup-scan-qr-btn, quick-access-scripts; tab bar testIDs tab-nexushome/scripts/butler/knowledge/logs/builder/skins/settings. Note pre-existing 'Invalid Date' noise in SIGMA-NET CRAWLERS bar chart on web (kbGrowthTracker reports 'documentDirectory unavailable').",
+  "rca_of_issue": "N/A — no functional regressions found."
+}
