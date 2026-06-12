@@ -63,8 +63,6 @@
         "android.permission.ACCESS_WIFI_STATE",
         "android.permission.VIBRATE"
       ],
-      "networkSecurityConfig": "@xml/network_security_config",
-      "proguardRules": "./android/proguard-rules.pro",
       "autolinking": {
         "exclude": [
           "expo-video"
@@ -94,6 +92,7 @@
       "bundler": "metro"
     },
     "plugins": [
+      "./plugins/with-lan-network-security.js",
       "expo-router",
       [
         "expo-build-properties",
@@ -107,7 +106,7 @@
             "networkInspector": false,
             "newArchEnabled": false,
             "extraMavenRepos": [],
-            "extraProguardRules": "-keep class com.facebook.hermes.unicode.** { *; }\n-keep class com.facebook.jni.** { *; }"
+            "extraProguardRules": "# React Native core\n-keep class com.facebook.react.** { *; }\n-keep class com.facebook.hermes.** { *; }\n-keep class com.facebook.jni.** { *; }\n# Expo\n-keep class expo.modules.** { *; }\n-keep class host.exp.exponent.** { *; }\n# AsyncStorage\n-keep class com.reactnativecommunity.asyncstorage.** { *; }\n# Reanimated\n-keep class com.swmansion.reanimated.** { *; }\n# Gesture Handler\n-keep class com.swmansion.gesturehandler.** { *; }\n# Camera / QR\n-keep class androidx.camera.** { *; }\n# WebSocket\n-keep class okhttp3.** { *; }\n-keep class okio.** { *; }\n# Keep annotations & line numbers (helps crash logs)\n-keepattributes *Annotation*\n-keepattributes SourceFile,LineNumberTable\n-keepattributes EnclosingMethod,InnerClasses\n# Don't warn about unused okio/okhttp internals\n-dontwarn okhttp3.**\n-dontwarn okio.**"
           },
           "ios": {
             "newArchEnabled": false,
