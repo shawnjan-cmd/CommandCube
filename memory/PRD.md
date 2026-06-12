@@ -24,6 +24,39 @@ neutral steel text (#E6E9EF bright / #8C95A6 mid / #6A7384 dim), monospace label
 - IMPORTANT (dev env): expo runs with CI=true → Metro file-watching is OFF.
   After editing frontend files run: sudo supervisorctl restart expo (wait ~25s).
 
+## Implemented (Feb 12, 2026 — session 2: home restructure + AAB build root-cause fixes)
+### Tested iteration_8.json — ALL PASS
+- HOME reordered: Hero → COMMAND MODULES (2x2) → combined "SETUP · GET STARTED" hub.
+- Merged 'PC SERVER · DOWNLOAD' + 'INFO · HOW IT WORKS' + 'GET STARTED' into ONE
+  ServerSetupHub panel (steps 01-04: download GitHub btn / run cmd + copy /
+  SCAN QR btn / command your PC, security footer + copyright). When connected
+  it collapses to a slim "SETUP · COMPLETE · PC PAIRED" strip.
+  Old components (ServerDownloadCard, HowItWorksCard, ServerSetupSection) deleted;
+  config card id 'server_setup' now returns null (hub is pinned).
+- "Invalid Date" guard added to crawlers chart bucket labels.
+### EAS/AAB BUILD FIXES (full root-cause list across sessions — ALL verified locally)
+1. slug had dots (com.butlerai.pc.automation) → EAS refuses → now 'butler-ai-pc-automation'.
+2. pnpm-lock.yaml + yarn.lock both present → wrong installer on EAS → pnpm-lock deleted.
+3. Stray android/ dir (only proguard-rules.pro) → EAS bare-workflow detection → deleted,
+   android//ios/ added to .gitignore (managed workflow; EAS runs prebuild itself).
+4. Invalid app.json props removed (privacyPolicyUrl/keywords/category/contentRating
+   top-level, android.autolinking); newArchEnabled moved to expo root.
+5. expo-video (never imported, crash-prone) + expo-modules-autolinking direct dep +
+   duplicate @react-navigation/core/elements/routers/stack/drawer pins removed.
+6. metro.config sourceExts now extends Expo defaults (was dropping cjs).
+7. **eas.json had NODE_ENV=production in build env → EAS yarn install skipped
+   devDependencies (babel-preset-expo/@babel/core) → bundling always failed. REMOVED.**
+   Also removed EAS_NO_VCS/EXPO_USE_HERMES noise; android.versionCode: 1 added.
+- VERIFIED: expo-doctor 17/18 (last = .expo git-tracked, fixed), `expo prebuild
+  --platform android` exit 0 (plugins+manifest+gradle OK, LAN cleartext config present),
+  production `expo export --platform android` exit 0 (4.05MB bundle; hermesc step
+  can't run in this container — runs natively on EAS).
+- LAN/python-server connectivity preserved: plugins/with-lan-network-security.js
+  intact, INTERNET/CAMERA perms intact, serverConnection HMAC flow untouched.
+- USER MUST: "Save to GitHub" then run `eas build -p android --profile production`
+  (AAB) or `--profile preview` (APK). First run will link/create the EAS project
+  under the new valid slug.
+
 ## Implemented (Feb 12, 2026 — session: Settings import removal + Terminator Terminal overhaul)
 ### Tested iteration_6.json — ALL PASS
 - SETTINGS: removed ALL import functionality (~1300 lines: PowerhouseCard

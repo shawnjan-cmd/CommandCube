@@ -558,7 +558,7 @@ function CrawlersGraphCard({ isConnected, kbFindings }: { isConnected: boolean; 
                   isToday && Platform.OS==='ios' ? { shadowColor:D.teal, shadowOffset:{width:0,height:0}, shadowOpacity:1, shadowRadius:8 } : {},
                 ]} />
                 <Text style={{ fontSize:7, fontFamily:MONO, color:D.textDim }}>
-                  {buckets[i] ? new Date(buckets[i].date).toLocaleDateString('en',{weekday:'narrow'}) : '--'}
+                  {buckets[i]?.date && !isNaN(new Date(buckets[i].date).getTime()) ? new Date(buckets[i].date).toLocaleDateString('en',{weekday:'narrow'}) : '--'}
                 </Text>
               </View>
             );
