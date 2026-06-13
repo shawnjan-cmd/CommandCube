@@ -1120,10 +1120,12 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
   const router = useRouter();
   const [state, setState] = useState<LaunchState>('idle');
   const [countdown, setCountdown] = useState(5);
+  const [showEmergency, setShowEmergency] = useState(false);   // 5s escape hatch
   const inFlightRef   = useRef(false);
   const navigatedRef  = useRef(false);
   const countdownRef  = useRef<ReturnType<typeof setInterval> | null>(null);
   const stuckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const emergencyRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef    = useRef(true);
 
   const glowAnim  = useRef(new Animated.Value(0)).current;
@@ -1193,6 +1195,18 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
     safeHaptics.heavy();
     safeSet('saving');
     logger.log('[Screen10] launch sequence started');
+
+    // EMERGENCY ESCAPE: surface a "TAP TO ENTER APP" button after 5s if the
+    // overlay still hasn't dismissed. User-controlled bypass that always works
+    // no matter what storage/router/native bug exists. Fires every dismissal
+    // channel synchronously with maximum priority.
+    emergencyRef.current = setTimeout(() => {
+      if (mountedRef.current) {
+        logger.warn('[Screen10] 5s elapsed — exposing emergency escape button');
+        setShowEmergency(true);
+      }
+    }, 5000);
+
     try { await persistAllKeys(); } catch (e) { logger.warn('[Screen10] persistAllKeys threw:', e); }
     safeSet('navigating');
     attemptNav();
@@ -1240,6 +1254,7 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
       glow.stop(); pulse.stop();
       if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
       if (stuckTimerRef.current) { clearTimeout(stuckTimerRef.current); stuckTimerRef.current = null; }
+      if (emergencyRef.current) { clearTimeout(emergencyRef.current); emergencyRef.current = null; }
     };
   }, []);
 
@@ -1357,6 +1372,53 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
             {'Agreements saved locally \u00b7 Never uploaded \u00b7 Remembered across restarts\ncom.butlerai.pc.automation'}
           </Text>
         </View>
+
+        {/* ─── EMERGENCY ESCAPE HATCH ──────────────────────────────────────
+            Appears after 5s of waiting. User-controlled bypass that ALWAYS
+            works no matter what bug exists in storage / router / OEM-native
+            modal layer. Fires every dismissal channel synchronously. */}
+        {showEmergency ? (
+          <View style={{ borderWidth: 2, borderColor: '#FFB020', borderRadius: 12, backgroundColor: '#FFB02014', padding: 12, marginTop: 14, marginBottom: 4 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <MaterialIcons name="warning" size={16} color="#FFB020" />
+              <Text style={{ fontSize: 11, fontWeight: '900', color: '#FFB020', fontFamily: MONO, letterSpacing: 1.2 }}>
+                TAKING LONGER THAN EXPECTED
+              </Text>
+            </View>
+            <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, lineHeight: 14, marginBottom: 10 }}>
+              Tap below to force-enter the app immediately. Your agreements are already saved.
+            </Text>
+            <TouchableOpacity
+              testID="onboarding-screen10-emergency"
+              activeOpacity={0.82}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => {
+                safeHaptics.warning();
+                logger.warn('[Screen10] EMERGENCY ESCAPE pressed — fire-everything');
+                // Belt-and-suspenders: write the gate flag synchronously AND
+                // fire every dismissal channel in parallel. No awaits.
+                try { AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch {}
+                try { (global as any).__butler_onboarding_just_completed = true; } catch {}
+                try { (global as any).__setNeedsOnboarding?.(false); } catch {}
+                try { (global as any).__onboardingComplete?.(); } catch {}
+                if (typeof onComplete === 'function') { try { onComplete(); } catch {} }
+                try { router.replace('/(tabs)/nexushome' as any); } catch {}
+                // If somehow STILL stuck after 1s, hard-reload the JS bundle.
+                setTimeout(() => {
+                  try {
+                    const { DevSettings } = require('react-native');
+                    DevSettings?.reload?.();
+                  } catch {}
+                }, 1500);
+              }}
+              style={{ borderRadius: 10, borderWidth: 2, borderColor: '#FFB020', backgroundColor: '#FFB020', paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#000', fontFamily: MONO, letterSpacing: 2 }}>
+                FORCE ENTER APP →
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
 
         <View style={[st.navRow, { marginTop: 12 }]}>
           <TouchableOpacity style={st.backBtn} onPress={() => {

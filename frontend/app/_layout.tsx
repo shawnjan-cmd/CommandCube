@@ -432,35 +432,41 @@ export default function RootLayout() {
     SplashScreen.hideAsync().catch(() => {});
   }, [splashDone, needsOnboarding]);
 
-  // Triggered by Screen10 "LAUNCH BUTLER AI" — persists the gate flag and
-  // dismisses the overlay. No router navigation needed; the tabs are already
-  // mounted underneath this modal.
-  const handleOnboardingComplete = React.useCallback(async () => {
-    console.log('[_layout] onboarding complete — persisting and dismissing overlay');
-    // Belt-and-suspenders: write twice (multiSet + setItem) with verification.
-    try {
-      await AsyncStorage.multiSet([
-        ['@butler_onboarding_done_v2', '1'],
-        ['@butler_consent_v2',         '1'],
-        ['@butler_terms_accepted_v1',  '1'],
-        ['@butler_privacy_accepted_v1','1'],
-        ['@butler_age_confirmed_v1',   '1'],
-        ['@butler_lan_consent_v1',     '1'],
-        ['@butler_server_privacy_accepted_v1', '1'],
-      ]);
-      // Verify the critical key actually landed. Some devices silently drop
-      // multiSet under memory pressure during first launch.
-      const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY);
-      if (v !== '1') {
-        console.warn('[_layout] verify miss, rewriting ONBOARDING_DONE_KEY');
-        await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1');
-      }
-    } catch (e) {
-      console.warn('[_layout] persistence threw, falling through anyway:', e);
-    }
+  // Triggered by Screen10 "LAUNCH BUTLER AI" — dismisses the overlay
+  // INSTANTLY (synchronous setState) and persists keys in the background.
+  // Persistence cannot block dismissal: if AsyncStorage hangs (low memory,
+  // failed iCloud sync, killed background process), the user is already
+  // dropped into the live app and the storage write completes whenever it
+  // can. The poller in Guard 3 also writes the flag if it sees the in-memory
+  // state mismatch, so the on-disk flag is always reconciled.
+  const handleOnboardingComplete = React.useCallback(() => {
+    console.log('[_layout] onboarding complete — dismissing overlay synchronously');
+    // STEP 1: dismiss IMMEDIATELY. No await. No promise. Pure synchronous setState.
     setNeedsOnboarding(false);
-    // Kick off background services that were gated on completion.
-    autoConnectEngine.start().catch(() => {});
+
+    // STEP 2: persistence in the background — fire-and-forget.
+    (async () => {
+      try {
+        await AsyncStorage.multiSet([
+          ['@butler_onboarding_done_v2', '1'],
+          ['@butler_consent_v2',         '1'],
+          ['@butler_terms_accepted_v1',  '1'],
+          ['@butler_privacy_accepted_v1','1'],
+          ['@butler_age_confirmed_v1',   '1'],
+          ['@butler_lan_consent_v1',     '1'],
+          ['@butler_server_privacy_accepted_v1', '1'],
+        ]);
+        const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY);
+        if (v !== '1') {
+          console.warn('[_layout] verify miss, rewriting ONBOARDING_DONE_KEY');
+          await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1');
+        }
+      } catch (e) {
+        console.warn('[_layout] background persistence threw:', e);
+      }
+      // Kick off background services AFTER persistence finishes (or fails).
+      autoConnectEngine.start().catch(() => {});
+    })();
   }, []);
 
   // ─── BULLETPROOF GUARDS ───────────────────────────────────────────────────
