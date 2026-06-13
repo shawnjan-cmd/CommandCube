@@ -348,8 +348,13 @@ export default function RootLayout() {
 
   _routerRef.current = router;
 
-  // Expose setter so Screen10 can flip the flag directly
-  (global as any).__setNeedsOnboarding = (v: boolean) => setNeedsOnboarding(v);
+  // Expose setter so Screen10 can flip the flag directly.
+  // Wrapped in useEffect with empty deps so we don't reassign the global on
+  // every render — saves a closure allocation per render.
+  useEffect(() => {
+    (global as any).__setNeedsOnboarding = (v: boolean) => setNeedsOnboarding(v);
+    return () => { delete (global as any).__setNeedsOnboarding; };
+  }, []);
 
   // Guard against double-init (Strict Mode, hot reload, etc.)
   const appInitRef = useRef(false);
@@ -513,7 +518,7 @@ export default function RootLayout() {
         }
       } catch {}
     };
-    const id = setInterval(tick, 750);
+    const id = setInterval(tick, 1500);
     return () => { cancelled = true; clearInterval(id); };
   }, [needsOnboarding]);
 
