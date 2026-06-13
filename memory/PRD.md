@@ -24,6 +24,21 @@ neutral steel text (#E6E9EF bright / #8C95A6 mid / #6A7384 dim), monospace label
 - IMPORTANT (dev env): expo runs with CI=true → Metro file-watching is OFF.
   After editing frontend files run: sudo supervisorctl restart expo (wait ~25s).
 
+## Implemented (Feb 12, 2026 — session 3: mobile build tarball failure ROOT CAUSE fixed)
+- Emergent eas-apk-build failed at "Compressing project files": ENOENT lstat
+  '/workspace/source/frontend/<binary name>'. Root cause: a git-TRACKED 0-byte file
+  with non-printable binary filename ('\001\220\370@@\320\3039@8') in frontend/ broke
+  EAS CLI's tarball packer. DELETED it + junk files 'Patches', 'devices.json', and
+  'components/_layout.RootLayout.tsx ' (trailing space in name, unused). Repo-wide
+  scan confirms no other non-printable/trailing-space filenames.
+- frontend/yarn.lock was untracked (never reached deploy zips) → now added to git
+  for deterministic EAS installs.
+- deployment_agent scan: all checks pass; its '--tunnel supervisor' blocker is the
+  KNOWN FALSE POSITIVE (do not apply — breaks preview; mobile pipeline ignores supervisor).
+- NOTE: Emergent pipeline overrides slug ('startup-fixer'), credentials/keystore,
+  and remote versionCode itself; warning about android.versionCode with remote
+  version source is harmless.
+
 ## Implemented (Feb 12, 2026 — session 2: home restructure + AAB build root-cause fixes)
 ### Tested iteration_8.json — ALL PASS
 - HOME reordered: Hero → COMMAND MODULES (2x2) → combined "SETUP · GET STARTED" hub.
