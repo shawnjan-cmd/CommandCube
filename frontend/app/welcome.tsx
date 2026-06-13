@@ -1184,6 +1184,14 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
       logger.warn('[Screen10] router.replace threw:', e);
       try { (global as any).__onboardingComplete?.(); } catch {}
     }
+
+    // Channel 6: dismissTo — Expo Router v4+ only. Guarded to avoid throwing
+    // on older Router versions where this method doesn't exist.
+    try {
+      if (typeof (router as any).dismissTo === 'function') {
+        (router as any).dismissTo('/(tabs)/nexushome');
+      }
+    } catch {}
     return true;
   };
 
@@ -1197,9 +1205,7 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
     logger.log('[Screen10] launch sequence started');
 
     // EMERGENCY ESCAPE: surface a "TAP TO ENTER APP" button after 5s if the
-    // overlay still hasn't dismissed. User-controlled bypass that always works
-    // no matter what storage/router/native bug exists. Fires every dismissal
-    // channel synchronously with maximum priority.
+    // overlay still hasn't dismissed.
     emergencyRef.current = setTimeout(() => {
       if (mountedRef.current) {
         logger.warn('[Screen10] 5s elapsed — exposing emergency escape button');
@@ -1209,21 +1215,26 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
 
     try { await persistAllKeys(); } catch (e) { logger.warn('[Screen10] persistAllKeys threw:', e); }
     safeSet('navigating');
+
+    // Fire ALL channels ONCE. We deliberately do NOT loop router.replace —
+    // the guide explicitly warns against it ("20 nav calls over 10 seconds
+    // causes chaos"). Instead we rely on the 600ms storage poller in
+    // _layout.tsx as the safety net: if the overlay somehow doesn't dismiss
+    // within 600ms, the poller catches it. Meanwhile the user-facing
+    // emergency button appears at 5s as the ultimate escape.
     attemptNav();
-    let attempts = 0;
-    const MAX_ATTEMPTS = 10;
-    const scheduleRetry = () => {
-      stuckTimerRef.current = setTimeout(() => {
-        if (!mountedRef.current) return;
-        attempts += 1;
-        if (attempts >= MAX_ATTEMPTS) { inFlightRef.current = false; safeSet('retry'); return; }
-        safeSet('navigating');
-        attemptNav();
-        scheduleRetry();
-      }, 1000);
-    };
-    scheduleRetry();
-  }, [router]);
+
+    // A SINGLE, short watchdog at 2s — if we're still mounted (overlay didn't
+    // dismiss), fire a state-flip channel one more time WITHOUT touching the
+    // router. No nav spam, no chaos.
+    stuckTimerRef.current = setTimeout(() => {
+      if (!mountedRef.current) return;
+      logger.warn('[Screen10] 2s elapsed without dismiss — re-flipping state once');
+      try { (global as any).__setNeedsOnboarding?.(false); } catch {}
+      if (typeof onComplete === 'function') { try { onComplete(); } catch {} }
+      AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
+    }, 2000);
+  }, [router, onComplete]);
 
   useEffect(() => {
     mountedRef.current = true;
