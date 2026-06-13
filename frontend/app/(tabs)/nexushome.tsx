@@ -38,6 +38,8 @@ import { uiConfig, UIConfig, DEFAULT_UI_CONFIG, UIStrings } from '@/services/uiC
 import { ButlerWordmark } from '@/components/ui/ButlerWordmark';
 import { MechBayHero, HexCommandRing, MechPanel } from '@/components/home/MechBay';
 import HomeTerminalClock from '@/components/home/HomeTerminalClock';
+import HomeGreetingBanner from '@/components/home/HomeGreetingBanner';
+import HomeSectionDivider from '@/components/home/HomeSectionDivider';
 import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
 import { useRouter } from 'expo-router';
 
@@ -1621,9 +1623,17 @@ export default function NexusHomeScreen() {
         isConnected={isConnected} serverAddr={serverAddr}
         onScanQR={() => setShowQR(true)}
         kbFindings={kbFindings} scriptCount={scriptCount} />
+
+      {/* Elegant greeting strip — time-aware, sets a confident tone */}
+      <HomeGreetingBanner />
+
       <PrivacyTrustBadge />
       <HomeTerminalClock isConnected={isConnected} />
+
+      <HomeSectionDivider label="Quick Access" />
       <QuickAccessGrid goToTab={goToTab} />
+
+      <HomeSectionDivider label="PC Server Setup" />
       <ServerSetupHub onScanQR={() => setShowQR(true)} isConnected={isConnected} />
 
       {/* Config-driven card renderer (hero & quick_access pinned above) */}
