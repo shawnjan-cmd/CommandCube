@@ -412,12 +412,6 @@ export function MechBayHero({
   scriptCount: number;
 }) {
   const WRAP_W = SW - 16;          // outer wrap width approximation
-  const sweepX = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(Animated.timing(sweepX, { toValue: 1, duration: 5500, useNativeDriver: true })).start();
-  }, []);
-  const sweepTx = sweepX.interpolate({ inputRange: [0, 1], outputRange: [-180, WRAP_W + 30] });
 
   const kbDisplay     = kbFindings > 0
     ? (kbFindings > 1_000_000 ? `${(kbFindings/1_000_000).toFixed(1)}M`
@@ -439,34 +433,54 @@ export function MechBayHero({
 
   return (
     <View style={mech.hero}>
-      {/* full background brushed metal */}
+      {/* Clean static background — single radial spotlight + faint grid */}
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-        <BrushedPanel width={WRAP_W} height={520} color={MECH.steel} />
-        {/* hex grid overlay */}
-        <Svg width={WRAP_W} height={520} style={StyleSheet.absoluteFill} pointerEvents="none">
-          {Array.from({ length: 8 }).map((_, r) =>
-            Array.from({ length: 6 }).map((__, c) => {
-              const hx = c * 56 + (r % 2 ? 28 : 0) - 20;
-              const hy = r * 48 - 10;
-              const pts = `${hx+8},${hy} ${hx+24},${hy} ${hx+32},${hy+14} ${hx+24},${hy+28} ${hx+8},${hy+28} ${hx},${hy+14}`;
-              return (
-                <Polygon
-                  key={`${r}-${c}`} points={pts} fill="none"
-                  stroke={MECH.chrome} strokeWidth={0.4} opacity={0.13}
-                />
-              );
-            })
-          )}
+        {/* Solid steel base */}
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: MECH.steelLo }]} />
+
+        {/* Centered SVG radial spotlight behind the core/title */}
+        <Svg width={WRAP_W} height={520} style={StyleSheet.absoluteFill}>
+          <Defs>
+            <RadialGradient id="hero-spot" cx="50%" cy="38%" r="55%">
+              <Stop offset="0%"   stopColor={accent} stopOpacity={0.22} />
+              <Stop offset="40%"  stopColor={accent} stopOpacity={0.08} />
+              <Stop offset="100%" stopColor="#000000" stopOpacity={0} />
+            </RadialGradient>
+            <SvgLinearGradient id="hero-veil" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%"   stopColor={MECH.steel} stopOpacity={0.4} />
+              <Stop offset="55%"  stopColor={MECH.steelLo} stopOpacity={0} />
+              <Stop offset="100%" stopColor={MECH.steelLo} stopOpacity={0.85} />
+            </SvgLinearGradient>
+          </Defs>
+          <Rect x={0} y={0} width={WRAP_W} height={520} fill="url(#hero-spot)" />
+          <Rect x={0} y={0} width={WRAP_W} height={520} fill="url(#hero-veil)" />
+
+          {/* Sparse static grid — only outside the central spotlight area */}
+          {Array.from({ length: 7 }).map((_, i) => (
+            <Line
+              key={`gh-${i}`}
+              x1={0} y1={i * 75 + 18} x2={WRAP_W} y2={i * 75 + 18}
+              stroke={MECH.chrome} strokeWidth={0.4} opacity={0.06}
+            />
+          ))}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Line
+              key={`gv-${i}`}
+              x1={i * (WRAP_W / 4)} y1={0} x2={i * (WRAP_W / 4)} y2={520}
+              stroke={MECH.chrome} strokeWidth={0.4} opacity={0.05}
+            />
+          ))}
         </Svg>
-        {/* diagonal sweep flare */}
-        <Animated.View
-          pointerEvents="none"
-          style={{
-            position: 'absolute', top: 0, bottom: 0, width: 160,
-            backgroundColor: accent, opacity: 0.05,
-            transform: [{ translateX: sweepTx }, { skewX: '-22deg' }],
-          }}
-        />
+
+        {/* Single very subtle static scan line near top — no animation */}
+        <View style={{
+          position: 'absolute', left: 0, right: 0, top: '24%',
+          height: StyleSheet.hairlineWidth, backgroundColor: accent + '40',
+        }} />
+        <View style={{
+          position: 'absolute', left: 0, right: 0, top: '72%',
+          height: StyleSheet.hairlineWidth, backgroundColor: accent + '20',
+        }} />
       </View>
 
       {/* ── TOP VISOR ────────────────────────────────────────── */}
@@ -489,10 +503,22 @@ export function MechBayHero({
         <ArcReactor size={172} accent={accent} active={isConnected} />
 
         {/* labels under core */}
-        <Text style={[mech.title, { color: MECH.text }]}>
+        <Text
+          allowFontScaling={false}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          style={[mech.title, { color: MECH.text }]}
+        >
           BUTLER<Text style={{ color: accent }}> AI</Text>
         </Text>
-        <Text style={[mech.sub, { color: accent + 'B8' }]}>AUTOMATION TERMINAL · NEURAL LINK</Text>
+        {/* tagline row with side dashes */}
+        <View style={mech.taglineRow}>
+          <View style={[mech.taglineDash, { backgroundColor: accent + 'AA' }]} />
+          <Text style={[mech.tagline, { color: accent }]}>
+            {isConnected ? 'YOUR PC · YOUR RULES · ZERO CLOUD' : 'LOCAL AI · PC AUTOMATION'}
+          </Text>
+          <View style={[mech.taglineDash, { backgroundColor: accent + 'AA' }]} />
+        </View>
 
         {/* serial code */}
         <View style={mech.serialBox}>
@@ -724,14 +750,23 @@ const mech = StyleSheet.create({
   statusTxt: { fontSize: 10.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.6 },
 
   title: {
-    marginTop: 12,
-    fontSize: 28, fontWeight: '900', fontFamily: MONO, letterSpacing: 4,
+    marginTop: 14,
+    fontSize: 40, fontWeight: '900', fontFamily: MONO, letterSpacing: 5,
+    paddingHorizontal: 6, textAlign: 'center',
     ...(Platform.OS === 'ios'
-      ? { textShadowColor: MECH.arc, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12 }
+      ? { textShadowColor: MECH.arc, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 14 }
       : {}),
   },
   sub: {
     marginTop: 1, fontSize: 11, fontWeight: '800', fontFamily: MONO, letterSpacing: 4,
+  },
+  taglineRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8,
+    paddingHorizontal: 6,
+  },
+  taglineDash: { width: 22, height: 1.2, borderRadius: 1 },
+  tagline: {
+    fontSize: 10.5, fontWeight: '800', fontFamily: MONO, letterSpacing: 2.4,
   },
   serialBox: {
     flexDirection: 'row', alignItems: 'center', gap: 6,

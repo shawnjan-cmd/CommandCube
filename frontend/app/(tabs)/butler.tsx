@@ -861,6 +861,7 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
   accentColor: string;
 }) {
   const [inputText, setInputText] = useState('');
+  const [focused, setFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const sendRef  = useRef(onSend);
   useEffect(() => { sendRef.current = onSend; }, [onSend]);
@@ -895,59 +896,91 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
   }, [inputText]);
 
   const pr = accentColor;
+  const canSend = !disabled && !!inputText.trim();
   const statusCol = isConnected ? C.green : '#FF4466';
+  const charCount = inputText.length;
 
   return (
-    <View style={[ccb.wrap, { borderTopColor: pr + '20', backgroundColor: C.bgDeep }]}>
-      <View style={[ccb.connBlock, { borderColor: statusCol + '40', backgroundColor: statusCol + '0C' }]}>
-        <View style={[ccb.connDot, { backgroundColor: statusCol }]} />
-        <Text style={[ccb.connLabel, { color: statusCol + '90' }]}>
-          {isConnected ? 'ON' : 'OFF'}
-        </Text>
+    <View style={[ccb.outer, { backgroundColor: C.bgDeep, borderTopColor: pr + '25' }]}>
+      {/* Top status strip — slim row above the input */}
+      <View style={ccb.statusStrip}>
+        <View style={[ccb.statusChip, { borderColor: statusCol + '50', backgroundColor: statusCol + '10' }]}>
+          <View style={[ccb.statusDot, {
+            backgroundColor: statusCol,
+            ...(Platform.OS === 'ios' ? { shadowColor: statusCol, shadowOpacity: 1, shadowRadius: 5, shadowOffset: { width: 0, height: 0 } } : {}),
+          }]} />
+          <Text style={[ccb.statusTxt, { color: statusCol }]}>
+            {isConnected ? 'BUTLER ONLINE' : 'OFFLINE · PAIR PC FIRST'}
+          </Text>
+        </View>
+        <View style={{ flex: 1 }} />
+        <Text style={[ccb.charTxt, {
+          color: charCount > 1700 ? '#FF4466' : C.textDim,
+        }]}>{charCount}/2000</Text>
       </View>
-      <View style={[ccb.inputWrap, { borderColor: pr + '35', backgroundColor: C.surface }]}>
-        <TextInput
-          ref={inputRef}
-          style={[ccb.input, { color: C.textBright }]}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder={isConnected ? '> Enter command for Butler AI…' : '> Connect PC from Home tab first…'}
-          placeholderTextColor={C.textDim}
-          returnKeyType="send"
-          onSubmitEditing={handleSend}
-          blurOnSubmit={false}
-          editable={!disabled}
-          multiline
-          maxLength={2000}
-          keyboardAppearance="dark"
-          scrollEnabled
-        />
+
+      {/* Input row */}
+      <View style={ccb.wrap}>
+        <View style={[ccb.inputWrap, {
+          borderColor: focused ? pr + '70' : pr + '30',
+          backgroundColor: focused ? pr + '08' : C.surface,
+          ...(focused && Platform.OS === 'ios'
+            ? { shadowColor: pr, shadowOpacity: 0.5, shadowRadius: 10, shadowOffset: { width: 0, height: 0 } }
+            : {}),
+        }]}>
+          <Text style={[ccb.prompt, { color: pr + 'AA' }]}>{'>'}</Text>
+          <TextInput
+            ref={inputRef}
+            style={[ccb.input, { color: C.textBright }]}
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder={isConnected ? 'Ask Butler AI anything…' : 'Connect PC from Home tab first…'}
+            placeholderTextColor={C.textDim}
+            returnKeyType="send"
+            onSubmitEditing={handleSend}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            blurOnSubmit={false}
+            editable={!disabled}
+            multiline
+            maxLength={2000}
+            keyboardAppearance="dark"
+            scrollEnabled
+          />
+        </View>
+        <TouchableOpacity
+          onPress={handleSend}
+          disabled={!canSend}
+          style={[ccb.sendBtn, {
+            backgroundColor: canSend ? pr : pr + '18',
+            borderColor: canSend ? pr : pr + '30',
+            ...(canSend && Platform.OS === 'ios'
+              ? { shadowColor: pr, shadowOpacity: 0.7, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } }
+              : {}),
+          }]}
+          activeOpacity={0.82}
+        >
+          {disabled
+            ? <ActivityIndicator size="small" color={pr} style={{ transform: [{ scale: 0.8 }] }} />
+            : <MaterialIcons name="send" size={20} color={canSend ? '#000' : pr + '70'} />
+          }
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={handleSend}
-        disabled={disabled || !inputText.trim()}
-        style={[ccb.sendBtn, { backgroundColor: (disabled || !inputText.trim()) ? pr + '15' : pr,
-          borderColor: pr + '40' }]}
-        activeOpacity={0.82}
-      >
-        {disabled
-          ? <ActivityIndicator size="small" color={pr} style={{ transform: [{ scale: 0.75 }] }} />
-          : <MaterialIcons name="send" size={18} color={(disabled || !inputText.trim()) ? pr + '50' : '#000'} />
-        }
-      </TouchableOpacity>
     </View>
   );
 }
 const ccb = StyleSheet.create({
-  wrap:      { flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 12, paddingVertical: 10,
-               borderTopWidth: 1.5 },
-  connBlock: { width: 36, height: 36, borderRadius: 8, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center',
-               gap: 1, flexShrink: 0 },
-  connDot:   { width: 8, height: 8, borderRadius: 4 },
-  connLabel: { fontSize: 7, fontWeight: '900', fontFamily: MONO },
-  inputWrap: { flex: 1, borderWidth: 1.5, borderRadius: 9, paddingHorizontal: 14, paddingVertical: 8, minHeight: 44, maxHeight: 120 },
-  input:     { fontSize: 14, fontFamily: BODY_FONT, lineHeight: 20, includeFontPadding: false },
-  sendBtn:   { width: 44, height: 44, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  outer:        { borderTopWidth: 1.5 },
+  statusStrip:  { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 },
+  statusChip:   { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
+  statusDot:    { width: 6, height: 6, borderRadius: 3 },
+  statusTxt:    { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.4 },
+  charTxt:      { fontSize: 9, fontFamily: MONO, fontWeight: '700', letterSpacing: 1 },
+  wrap:         { flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 12, paddingTop: 4, paddingBottom: 10 },
+  inputWrap:    { flex: 1, flexDirection: 'row', alignItems: 'flex-start', borderWidth: 1.5, borderRadius: 10, paddingLeft: 12, paddingRight: 12, paddingTop: 9, paddingBottom: 9, minHeight: 46, maxHeight: 120, gap: 8 },
+  prompt:       { fontSize: 16, fontFamily: MONO, fontWeight: '900', lineHeight: 20, marginTop: 1 },
+  input:        { flex: 1, fontSize: 14, fontFamily: BODY_FONT, lineHeight: 20, includeFontPadding: false, padding: 0 },
+  sendBtn:      { width: 46, height: 46, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
 });
 
 // ── Main Butler Screen ────────────────────────────────────────────────────────
