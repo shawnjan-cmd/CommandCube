@@ -1,0 +1,53 @@
+# ─── Root-level .easignore (belt-and-suspenders) ─────────────────────────────
+# Emergent's EAS build wrapper zips from /app root, not /app/frontend.
+# Without this file, anything outside /app/frontend (memory/, tests/, docs/,
+# old orphan native folders, dotfiles) is uploaded to EAS Build servers,
+# bloating the tarball and occasionally tripping the
+# "Gradle daemon disappeared" / unzip errors.
+
+# Heavy non-app assets that don't belong in any APK/AAB
+memory/
+**/playstore_assets/
+**/unused_images/
+**/old_orphan_android_folder/
+
+# Dev tooling and test artifacts
+tests/
+test_reports/
+__tests__/
+**/__pycache__/
+*.pyc
+
+# Python sandbox / backend files (mobile build does not need them)
+backend/
+**/.venv/
+**/venv/
+
+# Source-control / editor / OS junk
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*.tmp
+*.orig
+
+# Logs and caches
+*.log
+.cache/
+.expo/
+.metro-cache/
+node_modules/.cache/
+
+# Documentation outside the frontend project (the frontend has its own .easignore)
+*.md
+!frontend/README.md
+
+# Archive bombs
+**/*.zip
+**/*.tar
+**/*.tar.gz
+**/*.tgz
