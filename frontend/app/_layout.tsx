@@ -520,7 +520,7 @@ export default function RootLayout() {
         }
       } catch {}
     };
-    const id = setInterval(tick, 1500);
+    const id = setInterval(tick, 600);
     return () => { cancelled = true; clearInterval(id); };
   }, [needsOnboarding]);
 
@@ -558,17 +558,26 @@ export default function RootLayout() {
               <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
             </Stack>
           </View>
-          {/* Onboarding overlay — full-screen Modal rendered on top of the tabs.
-              The tabs are always mounted underneath, so dismissing this modal
-              instantly drops the user into the live app. No router race. */}
-          <Modal
-            visible={needsOnboarding === true && splashDone}
-            animationType="fade"
-            statusBarTranslucent
-            onRequestClose={() => { /* hardware back is handled by Screen back buttons */ }}
-          >
-            <WelcomeScreen onComplete={handleOnboardingComplete} />
-          </Modal>
+
+          {/* ─── ONBOARDING OVERLAY ────────────────────────────────────────────
+              Plain conditional View overlay rendered ON TOP of the tabs.
+              We deliberately do NOT use React Native's native <Modal> here —
+              on several Android OEM skins (Xiaomi/MIUI, OnePlus OxygenOS,
+              Samsung One UI variants) the Modal's `visible` prop is not
+              reliably honoured when the parent state flips during a long-
+              press launch sequence, leaving the user stuck on Screen 10 even
+              though every dismissal channel has already fired. Conditional
+              rendering inside the React tree guarantees an immediate unmount
+              the instant `needsOnboarding` becomes false.
+              z-index 10000 keeps it above the global ConnectionBadge & tab bar. */}
+          {needsOnboarding === true && splashDone ? (
+            <View
+              style={[StyleSheet.absoluteFill, { zIndex: 10_000, elevation: 30, backgroundColor: '#050505' }]}
+              pointerEvents="auto"
+            >
+              <WelcomeScreen onComplete={handleOnboardingComplete} />
+            </View>
+          ) : null}
         </TabBarProvider>
       </CosmeticProvider>
     </GlobalErrorBoundary>
