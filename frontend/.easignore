@@ -56,6 +56,12 @@ docs/
 scripts.preserve/
 scripts/scripts.preserve/
 
+# Companion-server scripts (NOT shipped in the mobile bundle)
+**/python_server/
+**/*.bat
+**/*.sh
+**/*.ps1
+
 # Playstore listing assets (do NOT belong in the APK/AAB)
 playstore_assets/
 fastlane/
