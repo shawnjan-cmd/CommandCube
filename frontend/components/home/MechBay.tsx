@@ -492,7 +492,7 @@ export function MechBayHero({
         <Text style={[mech.title, { color: MECH.text }]}>
           BUTLER<Text style={{ color: accent }}> AI</Text>
         </Text>
-        <Text style={[mech.sub, { color: accent + 'B8' }]}>MECH BAY · COMMAND DECK</Text>
+        <Text style={[mech.sub, { color: accent + 'B8' }]}>AUTOMATION TERMINAL · NEURAL LINK</Text>
 
         {/* serial code */}
         <View style={mech.serialBox}>
@@ -636,8 +636,8 @@ export function HexCommandRing({ goToTab }: { goToTab: (t: string) => void }) {
                 </View>
               </View>
 
-              {/* serial badge bottom-right */}
-              <Text style={[mech.cmdSerial, { color: t.accent + 'AA' }]}>M-{(i + 1).toString().padStart(2, '0')}</Text>
+              {/* serial badge bottom-right — generic AUTO unit designation */}
+              <Text style={[mech.cmdSerial, { color: t.accent + 'AA' }]}>AUTO-{(i + 1).toString().padStart(2, '0')}</Text>
             </TouchableOpacity>
           );
         })}

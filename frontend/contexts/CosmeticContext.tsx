@@ -74,9 +74,9 @@ export const PACK_THEMES: Record<string, AppTheme> = {
 
   nexus: {
     id: 'nexus', name: 'ENDO CORE', isDefault: true, tier: 'free',
-    tagline: 'Terminator endoskeleton — gunmetal · endo red', category: 'SYSTEM',
+    tagline: 'Industrial endoframe — gunmetal · plasma red', category: 'SYSTEM',
     icon: 'robot-angry-outline', badge: 'DEFAULT',
-    // Terminator T-800 endoskeleton palette — endo-red eyes on brushed gunmetal
+    // Industrial endoframe palette — plasma-red glow on brushed gunmetal
     primary: '#FF2A1F', secondary: '#FF6A1F', tertiary: '#FFC400',
     bg: '#050505', panel: '#0E0F12', panelBrt: '#1A1D24',
     textAccent: '#FFB3AD', textDim: '#4A5366', textHi: '#F4F6F9', textMid: '#8C95A6',
