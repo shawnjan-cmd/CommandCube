@@ -223,56 +223,70 @@ export function MechPanel({
 
 /** Arc Reactor Core — animated concentric rings + central hex + sweep */
 function ArcReactor({ size = 152, accent = MECH.arc, active = true }: { size?: number; accent?: string; active?: boolean }) {
-  const spin1 = useRef(new Animated.Value(0)).current;
-  const spin2 = useRef(new Animated.Value(0)).current;
+  // Single slow radar sweep (8s/rev) + soft heartbeat pulse on the inner core.
+  // Replaces the older twin-spinning reactor rings with a calmer terminal /
+  // automation deck readout: outer port marks + cardinal terminal glyphs
+  // (>  $  |  ⚡), a rotating sweep beam, and a centered "AI" insignia.
+  const sweep = useRef(new Animated.Value(0)).current;
   const pulse = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(Animated.timing(spin1, { toValue: 1, duration: 9000,  useNativeDriver: true })).start();
-    Animated.loop(Animated.timing(spin2, { toValue: 1, duration: 14000, useNativeDriver: true })).start();
+    Animated.loop(Animated.timing(sweep, { toValue: 1, duration: 8000, useNativeDriver: true })).start();
     Animated.loop(Animated.sequence([
-      Animated.timing(pulse, { toValue: 1, duration: 1500, useNativeDriver: true }),
-      Animated.timing(pulse, { toValue: 0, duration: 1500, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 1, duration: 1800, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 1800, useNativeDriver: true }),
     ])).start();
   }, []);
 
-  const rot1 = spin1.interpolate({ inputRange: [0,1], outputRange: ['0deg', '360deg'] });
-  const rot2 = spin2.interpolate({ inputRange: [0,1], outputRange: ['360deg', '0deg'] });
-  const halo = pulse.interpolate({ inputRange: [0,1], outputRange: [0.35, 0.85] });
+  const sweepDeg = sweep.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const halo     = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0.85] });
 
   const c   = size / 2;
   const r1  = c - 4;      // outer ring
-  const r2  = c - 16;     // mid ring
-  const r3  = c - 30;     // inner ring  
-  const r4  = c - 44;     // core hex circumscribed
-  // hex points for the central hex (flat-top)
-  const hexR = r4;
+  const r2  = c - 18;     // mid ring (port markers)
+  const r3  = c - 32;     // inner ring
+  const r4  = c - 44;     // central hex circumscribed
+
   const hexPts = Array.from({ length: 6 }).map((_, i) => {
     const a = (Math.PI / 3) * i;
-    return `${c + hexR * Math.cos(a)},${c + hexR * Math.sin(a)}`;
+    return `${c + r4 * Math.cos(a)},${c + r4 * Math.sin(a)}`;
   }).join(' ');
 
-  // outer ring "fuel-rod" tick marks
-  const ticks = Array.from({ length: 24 }).map((_, i) => {
+  // 24 outer port marks, every 3rd is a "command slot" (longer + accent)
+  const portMarks = Array.from({ length: 24 }).map((_, i) => {
     const a = (Math.PI * 2 / 24) * i;
     const x1 = c + (r1 - 1) * Math.cos(a);
     const y1 = c + (r1 - 1) * Math.sin(a);
-    const x2 = c + (r1 - 9) * Math.cos(a);
-    const y2 = c + (r1 - 9) * Math.sin(a);
-    return { x1, y1, x2, y2, on: i % 3 === 0 };
+    const isMajor = i % 6 === 0;
+    const lenOut = isMajor ? 10 : 5;
+    const x2 = c + (r1 - lenOut) * Math.cos(a);
+    const y2 = c + (r1 - lenOut) * Math.sin(a);
+    return { x1, y1, x2, y2, major: isMajor };
   });
 
-  // mid ring "energy notches" — short arcs
-  const arcCount = 8;
+  // 8 small port nodes on the mid ring — "I/O slots"
+  const portNodes = Array.from({ length: 8 }).map((_, i) => {
+    const a = (Math.PI * 2 / 8) * i - Math.PI / 2;
+    return { x: c + r2 * Math.cos(a), y: c + r2 * Math.sin(a) };
+  });
+
+  // 4 cardinal terminal glyphs around the mid ring
+  const glyphs = [
+    { sym: '>',  ang: -90 }, // N
+    { sym: '$',  ang:   0 }, // E
+    { sym: '|',  ang:  90 }, // S
+    { sym: '/',  ang: 180 }, // W
+  ];
+
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      {/* halo */}
+      {/* outer halo pulse */}
       <Animated.View
         pointerEvents="none"
         style={[
           {
-            position: 'absolute', width: size * 1.4, height: size * 1.4,
-            borderRadius: (size * 1.4) / 2, backgroundColor: accent + '22',
+            position: 'absolute', width: size * 1.35, height: size * 1.35,
+            borderRadius: (size * 1.35) / 2, backgroundColor: accent + '1A',
           },
           Platform.OS === 'ios'
             ? { shadowColor: accent, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 24 }
@@ -280,73 +294,138 @@ function ArcReactor({ size = 152, accent = MECH.arc, active = true }: { size?: n
           { opacity: halo },
         ]}
       />
-      {/* outer ring (counter-rotates) */}
-      <Animated.View style={{ position: 'absolute', transform: [{ rotate: rot2 }] }}>
+
+      {/* STATIC FRAME — outer ring + port marks + I/O nodes */}
+      <Svg width={size} height={size} style={{ position: 'absolute' }}>
+        {/* outer hairline + secondary inner hairline */}
+        <Circle cx={c} cy={c} r={r1}     fill="none" stroke={MECH.chrome}    strokeWidth={1.5} />
+        <Circle cx={c} cy={c} r={r1 - 3} fill="none" stroke={MECH.steelLo}   strokeWidth={0.8} opacity={0.6} />
+
+        {/* port marks */}
+        {portMarks.map((m, i) => (
+          <Line
+            key={i} x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
+            stroke={m.major ? accent : MECH.textDim}
+            strokeWidth={m.major ? 1.8 : 1}
+            opacity={m.major ? 0.95 : 0.5}
+            strokeLinecap="round"
+          />
+        ))}
+
+        {/* mid ring (dashed) */}
+        <Circle cx={c} cy={c} r={r2} fill="none" stroke={accent + '55'} strokeWidth={1} strokeDasharray="2 6" />
+
+        {/* I/O port nodes */}
+        {portNodes.map((p, i) => (
+          <Circle
+            key={`p${i}`} cx={p.x} cy={p.y} r={3}
+            fill={MECH.steelHi} stroke={accent} strokeWidth={1}
+            opacity={active ? 0.95 : 0.5}
+          />
+        ))}
+
+        {/* inner ring */}
+        <Circle cx={c} cy={c} r={r3} fill="none" stroke={MECH.chrome} strokeWidth={1} opacity={0.6} />
+      </Svg>
+
+      {/* ROTATING SWEEP BEAM — single arm with trail */}
+      <Animated.View style={{ position: 'absolute', width: size, height: size, transform: [{ rotate: sweepDeg }] }}>
         <Svg width={size} height={size}>
-          <Circle cx={c} cy={c} r={r1} fill="none" stroke={MECH.chrome} strokeWidth={2} />
-          <Circle cx={c} cy={c} r={r1 - 2} fill="none" stroke={MECH.steelLo} strokeWidth={1} />
-          {ticks.map((t, i) => (
-            <Line
-              key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
-              stroke={t.on ? accent : MECH.textDim}
-              strokeWidth={t.on ? 1.5 : 1}
-              opacity={t.on ? 0.95 : 0.5}
-            />
-          ))}
-          {/* 4 bolt screws at cardinal points */}
-          {[0, 90, 180, 270].map(deg => {
-            const a = (deg * Math.PI) / 180;
-            return (
-              <Circle
-                key={deg}
-                cx={c + (r1 - 5) * Math.cos(a)} cy={c + (r1 - 5) * Math.sin(a)} r={2.6}
-                fill={MECH.rivet} stroke={MECH.steelLo} strokeWidth={0.6}
-              />
-            );
-          })}
+          <Defs>
+            <SvgLinearGradient id="sweep-trail" x1={`${c}`} y1={`${c}`} x2={`${c}`} y2="0" gradientUnits="userSpaceOnUse">
+              <Stop offset="0%"   stopColor={accent} stopOpacity={0} />
+              <Stop offset="55%"  stopColor={accent} stopOpacity={0.35} />
+              <Stop offset="100%" stopColor={accent} stopOpacity={active ? 0.95 : 0.4} />
+            </SvgLinearGradient>
+          </Defs>
+          {/* triangular sweep "cone" */}
+          <Polygon
+            points={`${c},${c} ${c - 8},${c - (r1 - 4)} ${c + 8},${c - (r1 - 4)}`}
+            fill="url(#sweep-trail)"
+          />
+          {/* sharp leading line */}
+          <Line x1={c} y1={c} x2={c} y2={c - (r1 - 4)} stroke={accent} strokeWidth={1.4} opacity={active ? 1 : 0.4} />
+          {/* tip dot */}
+          <Circle cx={c} cy={c - (r1 - 4)} r={2.8} fill={accent} opacity={active ? 1 : 0.5} />
         </Svg>
       </Animated.View>
 
-      {/* mid ring (rotates clockwise) */}
-      <Animated.View style={{ position: 'absolute', transform: [{ rotate: rot1 }] }}>
-        <Svg width={size} height={size}>
-          <Circle cx={c} cy={c} r={r2} fill="none" stroke={accent + '60'} strokeWidth={1.2} strokeDasharray="2 5" />
-          {/* energy notches every 45° */}
-          {Array.from({ length: arcCount }).map((_, i) => {
-            const a = (Math.PI * 2 / arcCount) * i;
-            const x1 = c + (r2 + 2) * Math.cos(a);
-            const y1 = c + (r2 + 2) * Math.sin(a);
-            const x2 = c + (r2 + 7) * Math.cos(a);
-            const y2 = c + (r2 + 7) * Math.sin(a);
-            return <Line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={accent} strokeWidth={2} strokeLinecap="round" />;
-          })}
-        </Svg>
-      </Animated.View>
+      {/* CARDINAL TERMINAL GLYPHS — static, sit just inside the mid ring */}
+      {glyphs.map((g, i) => {
+        const rad = (g.ang * Math.PI) / 180;
+        const gx = c + (r2 - 16) * Math.cos(rad);
+        const gy = c + (r2 - 16) * Math.sin(rad);
+        return (
+          <View
+            key={`g${i}`}
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: gx - 9, top: gy - 9,
+              width: 18, height: 18,
+              alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Text style={{
+              fontSize: 13, fontWeight: '900',
+              fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
+              color: accent, letterSpacing: 0,
+              opacity: active ? 0.95 : 0.4,
+              ...(Platform.OS === 'ios' ? { textShadowColor: accent, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 4 } : {}),
+            }}>{g.sym}</Text>
+          </View>
+        );
+      })}
 
-      {/* inner static ring + central hex */}
+      {/* CENTER HEX — terminal insignia */}
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
         <Defs>
           <RadialGradient id="core-grad" cx="50%" cy="50%" r="60%">
-            <Stop offset="0%"  stopColor={accent}     stopOpacity={active ? 1 : 0.3} />
-            <Stop offset="60%" stopColor={accent}     stopOpacity={active ? 0.5 : 0.15} />
-            <Stop offset="100%" stopColor="#000"      stopOpacity={1} />
+            <Stop offset="0%"   stopColor={accent}     stopOpacity={active ? 1 : 0.3} />
+            <Stop offset="60%"  stopColor={accent}     stopOpacity={active ? 0.4 : 0.12} />
+            <Stop offset="100%" stopColor="#000"       stopOpacity={1} />
           </RadialGradient>
         </Defs>
-        {/* inner ring */}
-        <Circle cx={c} cy={c} r={r3} fill="none" stroke={MECH.chrome} strokeWidth={1} opacity={0.6} />
-        {/* central HEX */}
         <Polygon points={hexPts} fill="url(#core-grad)" stroke={accent} strokeWidth={1.6} strokeLinejoin="miter" />
-        {/* hex inner outline */}
         <Polygon
           points={Array.from({ length: 6 }).map((_, i) => {
             const a = (Math.PI / 3) * i;
-            return `${c + (hexR - 5) * Math.cos(a)},${c + (hexR - 5) * Math.sin(a)}`;
+            return `${c + (r4 - 5) * Math.cos(a)},${c + (r4 - 5) * Math.sin(a)}`;
           }).join(' ')}
           fill="none" stroke={accent + '60'} strokeWidth={0.8}
         />
-        {/* core dot */}
-        <Circle cx={c} cy={c} r={4} fill="#fff" opacity={active ? 0.95 : 0.3} />
       </Svg>
+
+      {/* CENTERED "AI" READOUT — sits dead-center inside the hex */}
+      <View pointerEvents="none" style={{
+        position: 'absolute',
+        alignItems: 'center', justifyContent: 'center',
+      }}>
+        <Text style={{
+          fontSize: Math.max(10, size * 0.08),
+          fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
+          fontWeight: '900',
+          color: accent + 'CC',
+          letterSpacing: 1.5,
+          marginBottom: -2,
+        }}>{'> _'}</Text>
+        <Text style={{
+          fontSize: Math.max(20, size * 0.18),
+          fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
+          fontWeight: '900',
+          color: '#FFFFFF',
+          letterSpacing: 3,
+          ...(Platform.OS === 'ios' ? { textShadowColor: accent, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10 } : {}),
+        }}>AI</Text>
+        <Text style={{
+          fontSize: Math.max(7, size * 0.045),
+          fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
+          fontWeight: '900',
+          color: accent + '99',
+          letterSpacing: 2,
+          marginTop: 0,
+        }}>{active ? 'AUTOMATION ONLINE' : 'STANDBY'}</Text>
+      </View>
     </View>
   );
 }
