@@ -37,6 +37,7 @@ import { FileShareClipboardCard } from '@/components/ui/FileShareClipboardCard';
 import { uiConfig, UIConfig, DEFAULT_UI_CONFIG, UIStrings } from '@/services/uiConfig';
 import { ButlerWordmark } from '@/components/ui/ButlerWordmark';
 import { MechBayHero, HexCommandRing, MechPanel } from '@/components/home/MechBay';
+import HomeTerminalClock from '@/components/home/HomeTerminalClock';
 import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
 import { useRouter } from 'expo-router';
 
@@ -1621,6 +1622,7 @@ export default function NexusHomeScreen() {
         onScanQR={() => setShowQR(true)}
         kbFindings={kbFindings} scriptCount={scriptCount} />
       <PrivacyTrustBadge />
+      <HomeTerminalClock isConnected={isConnected} />
       <QuickAccessGrid goToTab={goToTab} />
       <ServerSetupHub onScanQR={() => setShowQR(true)} isConnected={isConnected} />
 

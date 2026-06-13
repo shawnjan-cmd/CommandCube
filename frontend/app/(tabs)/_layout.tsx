@@ -6,6 +6,8 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import QuickButlerBar from '@/components/ui/QuickButlerBar';
 import FuturisticTabBar from '@/components/ui/FuturisticTabBar';
 import ConnectionBadge from '@/components/ui/ConnectionBadge';
+import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
+import { useServerConnection } from '@/hooks/useServerConnection';
 
 type MCName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 type MIName = React.ComponentProps<typeof MaterialIcons>['name'];
@@ -30,30 +32,20 @@ const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = 
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const { isConnected } = useServerConnection();
 
-  // ── Terminator-themed centered header config ─────────────────────────────
-  // Shown on every tab EXCEPT the home tab (`nexushome`), per per-screen
-  // override below. Endo-red bottom border, monospace caps title.
+  // ── Themed centered header — applied to every tab except home ────────────
+  // Uses our custom ThemedCenterHeader so titles are perfectly centered with
+  // the homepage's gunmetal+endo-red treatment. Each Tab.Screen title is
+  // automatically picked up from the `options.title` field.
   const HEADER_OPTS = {
     headerShown: true as const,
-    headerTitleAlign: 'center' as const,
-    headerStyle: {
-      backgroundColor: '#0B0F14',
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: '#FF2A1F33',
-      elevation: 0,
-      shadowOpacity: 0,
-      height: Platform.OS === 'ios' ? 52 : 56,
-    },
-    headerTintColor: '#FF2A1F',
-    headerTitleStyle: {
-      fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-      fontSize: 14,
-      fontWeight: '900' as const,
-      letterSpacing: 3,
-      color: '#E8EEF5',
-    },
-    headerShadowVisible: false,
+    header: ({ options }: any) => (
+      <ThemedCenterHeader
+        title={String(options?.title ?? '').replace(/^>\s*/, '')}
+        isConnected={isConnected}
+      />
+    ),
   };
 
   return (
@@ -62,20 +54,20 @@ export default function TabLayout() {
         screenOptions={HEADER_OPTS}
         tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
       >
-        <Tabs.Screen name="nexushome" options={{ title: 'HOME',          tabBarLabel: 'HOME',    headerShown: false }} />
-        <Tabs.Screen name="scripts"   options={{ title: '> SCRIPTS',     tabBarLabel: 'SCRIPTS' }} />
-        <Tabs.Screen name="butler"    options={{ title: '> AI TERMINAL', tabBarLabel: 'AI'      }} />
-        <Tabs.Screen name="knowledge" options={{ title: '> KNOWLEDGE',   tabBarLabel: 'KB'      }} />
-        <Tabs.Screen name="logs"      options={{ title: '> PC TELEMETRY',tabBarLabel: 'PC'      }} />
-        <Tabs.Screen name="builder"   options={{ title: '> BUILDER',     tabBarLabel: 'BUILD'   }} />
-        <Tabs.Screen name="skins"     options={{ title: '> SKINS',       tabBarLabel: 'SKINS'   }} />
-        <Tabs.Screen name="settings"  options={{ title: '> CONFIG',      tabBarLabel: 'CONFIG'  }} />
+        <Tabs.Screen name="nexushome" options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
+        <Tabs.Screen name="scripts"   options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
+        <Tabs.Screen name="butler"    options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />
+        <Tabs.Screen name="knowledge" options={{ title: 'KNOWLEDGE',      tabBarLabel: 'KB'      }} />
+        <Tabs.Screen name="logs"      options={{ title: 'PC TELEMETRY',   tabBarLabel: 'PC'      }} />
+        <Tabs.Screen name="builder"   options={{ title: 'BUILDER',        tabBarLabel: 'BUILD'   }} />
+        <Tabs.Screen name="skins"     options={{ title: 'SKINS',          tabBarLabel: 'SKINS'   }} />
+        <Tabs.Screen name="settings"  options={{ title: 'CONFIG',         tabBarLabel: 'CONFIG'  }} />
 
         {/* Hidden routes — accessible via navigation but not shown in the bar */}
-        <Tabs.Screen name="terminal"  options={{ href: null, title: '> TERMINAL'   }} />
-        <Tabs.Screen name="index"     options={{ href: null, headerShown: false    }} />
-        <Tabs.Screen name="fileshare" options={{ href: null, title: '> FILE SHARE' }} />
-        <Tabs.Screen name="support"   options={{ href: null, title: '> SUPPORT'    }} />
+        <Tabs.Screen name="terminal"  options={{ href: null, title: 'TERMINAL'    }} />
+        <Tabs.Screen name="index"     options={{ href: null, headerShown: false   }} />
+        <Tabs.Screen name="fileshare" options={{ href: null, title: 'FILE SHARE'  }} />
+        <Tabs.Screen name="support"   options={{ href: null, title: 'SUPPORT'     }} />
       </Tabs>
 
       {/* Global persistent connection status — visible on every tab.
