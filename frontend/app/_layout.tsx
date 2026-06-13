@@ -16,6 +16,7 @@ import { TabBarProvider } from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { deviceIdentifier } from '@/services/deviceIdentifier';
 import { errorInterceptor } from '@/services/errorInterceptor';
+import { privacyAudit } from '@/services/privacyAudit';
 import { autoConnectEngine } from '@/services/autoConnectEngine';
 import { connectionPersistence } from '@/services/connectionPersistence';
 import { proLicense } from '@/services/proLicense';
@@ -28,6 +29,7 @@ import '@/services/imageRegistry';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 errorInterceptor.install();
+privacyAudit.install();
 proLicense.load().catch(() => {});
 import('@/services/systemUpgrade').then(m => m.applyBootOverrides()).catch(() => {});
 import('@/services/encryptedStorage').then(async m => {
@@ -553,6 +555,7 @@ export default function RootLayout() {
               <Stack.Screen name="main-menu"      options={{ headerShown: false }} />
               <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
               <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
             </Stack>
           </View>
           {/* Onboarding overlay — full-screen Modal rendered on top of the tabs.

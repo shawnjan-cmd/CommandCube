@@ -2203,6 +2203,7 @@ export default function SettingsScreen() {
           <View style={{ marginTop: 10, gap: 3 }}>
             <Text style={[g.cardTitle, { marginBottom: 6, fontSize: 9 }]}>LEGAL DOCUMENTS</Text>
             {([
+              { icon: 'verified-user' as any, col: N.green, label: 'Privacy Audit · Live', onPress: () => { try { router.push('/privacy-audit' as any); } catch {} } },
               { icon: 'shield' as any,      col: N.green,  label: 'Data Safety Declaration', onPress: () => { try { router.push('/data-safety' as any); } catch { Linking.openURL('https://shawnjan-cmd.github.io/privacy-policy-/'); } } },
               { icon: 'privacy-tip' as any, col: N.green,  label: 'Privacy Policy',           onPress: () => { try { router.push('/privacy-policy' as any); } catch { Linking.openURL('https://shawnjan-cmd.github.io/privacy-policy-/'); } } },
               { icon: 'gavel' as any,       col: N.amber,  label: 'Terms of Service',         onPress: () => { try { router.push('/terms' as any); } catch { Linking.openURL('https://shawnjan-cmd.github.io/privacy-policy-/'); } } },
