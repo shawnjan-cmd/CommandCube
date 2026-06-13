@@ -36,7 +36,8 @@ __tests__/
 *.spec.tsx
 
 # Source-control & editor
-.git/
+# NOTE: .git/ is kept in the upload so EAS CLI can run `git rev-parse --show-toplevel`
+# without erroring on the build runner. We keep history minimal (single stub commit).
 .gitignore
 .vscode/
 .idea/

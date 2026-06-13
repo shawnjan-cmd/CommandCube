@@ -24,7 +24,11 @@ backend/
 **/venv/
 
 # Source-control / editor / OS junk
-.git/
+# Exclude the heavy 94 MB root .git/, but KEEP frontend/.git/ so EAS CLI's
+# `git rev-parse --show-toplevel` succeeds on the build runner.
+/.git/
+!frontend/.git/
+!frontend/.git/**
 .gitignore
 .vscode/
 .idea/
