@@ -1,7 +1,12 @@
 /**
  * 🐍 BUTLER SERVER v6.0 — Reference constants
- * Points users to butler_server.py in the python_server/ folder
+ * Self-hosted Python server. Source code lives on GitHub —
+ * users download and run it on their own PC. Nothing about the
+ * server is bundled into this mobile app.
  */
+
+export const SERVER_GITHUB_URL  = 'https://github.com/AndroidNewWatchAll/PlaystoreOpenSourcre';
+export const SERVER_DOWNLOAD_URL = 'https://github.com/AndroidNewWatchAll/PlaystoreOpenSourcre/raw/d52a25acefbd591e74a4590176e67b0c79ea8eba/AIBUTLERENCRYPTEDSELFHOST%20(24).zip';
 
 export const SERVER_VERSION  = '6.0.0';
 export const SERVER_FILENAME = 'butler_server.py';

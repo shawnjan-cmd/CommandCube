@@ -51,3 +51,9 @@ node_modules/.cache/
 **/*.tar
 **/*.tar.gz
 **/*.tgz
+
+# Companion-server scripts (NOT shipped in the mobile bundle)
+**/python_server/
+**/*.bat
+**/*.sh
+**/*.ps1
