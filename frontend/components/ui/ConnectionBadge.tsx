@@ -4,9 +4,8 @@
  * Subscribes to serverConnection singleton for real-time state
  */
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { Text, StyleSheet, Platform, TouchableOpacity, Animated } from 'react-native';
 import { serverConnection } from '@/services/serverConnection';
 import { haptics } from '@/services/haptics';
 
@@ -19,6 +18,7 @@ interface Props {
 export default function ConnectionBadge({ tappable = false, style }: Props) {
   const [connected, setConnected] = useState(serverConnection.isConnected());
   const [checking, setChecking] = useState(false);
+  const pulse = useRef(new Animated.Value(0.6)).current;
 
   useEffect(() => {
     // Subscribe to live state changes
@@ -27,6 +27,17 @@ export default function ConnectionBadge({ tappable = false, style }: Props) {
     });
     return unsub;
   }, []);
+
+  // Soft pulse only when connected — never when offline (saves frames + draws eye when alive)
+  useEffect(() => {
+    if (!connected) { pulse.setValue(0.6); return; }
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1,   duration: 1200, useNativeDriver: false }),
+      Animated.timing(pulse, { toValue: 0.5, duration: 1200, useNativeDriver: false }),
+    ]));
+    loop.start();
+    return () => { loop.stop(); };
+  }, [connected]);
 
   const handlePress = async () => {
     if (!tappable || checking) return;
@@ -41,6 +52,10 @@ export default function ConnectionBadge({ tappable = false, style }: Props) {
     }
   };
 
+  const dotShadow = connected && Platform.OS === 'ios'
+    ? { shadowColor: '#00FF41', shadowOpacity: 1, shadowRadius: 6, shadowOffset: { width: 0, height: 0 } }
+    : {};
+
   return (
     <TouchableOpacity
       style={[styles.badge, connected ? styles.connected : styles.offline, style]}
@@ -48,7 +63,13 @@ export default function ConnectionBadge({ tappable = false, style }: Props) {
       disabled={!tappable || checking}
       activeOpacity={tappable ? 0.7 : 1}
     >
-      <View style={[styles.dot, { backgroundColor: connected ? '#00FF41' : '#FF003C' }]} />
+      <Animated.View
+        style={[
+          styles.dot,
+          { backgroundColor: connected ? '#00FF41' : '#FF003C', opacity: connected ? pulse : 1 },
+          dotShadow,
+        ]}
+      />
       <Text style={[styles.label, { color: connected ? '#00FF41' : '#FF003C' }]}>
         {checking ? 'CHECKING' : connected ? 'CONNECTED' : 'OFFLINE'}
       </Text>
