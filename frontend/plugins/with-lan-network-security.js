@@ -25,7 +25,7 @@ const path = require('path');
 const NSC_XML = `<?xml version="1.0" encoding="utf-8"?>
 <!--
   Butler AI Network Security Configuration
-  ----------------------------------------
+  ========================================
   This app connects ONLY to the user's own PC over their own home/office WiFi.
   butler_server.py runs plain HTTP on the user's local machine and is never
   reachable from the public internet — it is a purely local LAN connection.

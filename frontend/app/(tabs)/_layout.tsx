@@ -38,8 +38,19 @@ export default function TabLayout() {
   // Uses our custom ThemedCenterHeader so titles are perfectly centered with
   // the homepage's gunmetal+endo-red treatment. Each Tab.Screen title is
   // automatically picked up from the `options.title` field.
+  //
+  // PERF flags applied to every tab:
+  //   • freezeOnBlur — background tabs stop updating state/animations until
+  //     they regain focus. Massive battery + frame-rate win on tab switches.
+  //   • lazy — tabs aren't rendered until the user visits them the first time,
+  //     so cold-start only mounts the home tab instead of all 8.
+  //   • animation: none — eliminates the slide/cross-fade between tabs which
+  //     was the single biggest cause of frame drops on lower-end Androids.
   const HEADER_OPTS = {
     headerShown: true as const,
+    freezeOnBlur: true,
+    lazy: true,
+    animation: 'none' as const,
     header: ({ options }: any) => (
       <ThemedCenterHeader
         title={String(options?.title ?? '').replace(/^>\s*/, '')}

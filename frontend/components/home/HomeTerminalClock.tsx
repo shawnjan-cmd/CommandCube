@@ -52,7 +52,7 @@ interface Props {
   isConnected?: boolean;
 }
 
-export default function HomeTerminalClock({ isConnected }: Props) {
+function HomeTerminalClockImpl({ isConnected }: Props) {
   const [now, setNow] = useState(new Date());
   const startedAt = useRef(Date.now()).current;
   const [todayOps, setTodayOps] = useState<number>(0);

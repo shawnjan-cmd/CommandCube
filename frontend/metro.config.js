@@ -41,6 +41,11 @@ config.resolver.extraNodeModules = {
   // Stub DevSettings for web bundling — DevSettings.js imports Platform via
   // a relative path that has no .web.js variant, causing Metro web to fail.
   'react-native/Libraries/Utilities/DevSettings': path.resolve(__dirname, './stubs/dev-settings-stub.js'),
+  // Force CJS punycode — resolverMainFields has 'module' before 'main', so Metro
+  // picks punycode.es6.js (ESM). That file's CJS interop exposes ucs2decode/ucs2encode
+  // as flat named exports but NOT the .ucs2 object. Both whatwg-url packages call
+  // punycode.ucs2.decode(), crashing with "Cannot read property 'decode' of undefined".
+  'punycode': path.resolve(__dirname, 'node_modules/punycode/punycode.js'),
 };
 
 // ── expo-asset subpath alias (web bundle fix) ────────────────────────────────
