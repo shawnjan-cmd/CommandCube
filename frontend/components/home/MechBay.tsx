@@ -223,23 +223,23 @@ export function MechPanel({
 
 /** Arc Reactor Core — animated concentric rings + central hex + sweep */
 function ArcReactor({ size = 152, accent = MECH.arc, active = true }: { size?: number; accent?: string; active?: boolean }) {
-  // Single slow radar sweep (8s/rev) + soft heartbeat pulse on the inner core.
-  // Replaces the older twin-spinning reactor rings with a calmer terminal /
-  // automation deck readout: outer port marks + cardinal terminal glyphs
-  // (>  $  |  ⚡), a rotating sweep beam, and a centered "AI" insignia.
-  const sweep = useRef(new Animated.Value(0)).current;
+  // ── TERMINAL AUTOMATION DISC ─────────────────────────────────────────────
+  // A retro-CRT-style readout disc: phosphor-only colors (no chrome, no
+  // brushed metal, no rivets), a vertical scan line sweeping across the face,
+  // hex address ticks on the outer rim, command-prompt insignia in the center.
+  const scanY = useRef(new Animated.Value(0)).current;
   const pulse = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(Animated.timing(sweep, { toValue: 1, duration: 8000, useNativeDriver: true })).start();
+    Animated.loop(Animated.timing(scanY, { toValue: 1, duration: 4200, useNativeDriver: true })).start();
     Animated.loop(Animated.sequence([
-      Animated.timing(pulse, { toValue: 1, duration: 1800, useNativeDriver: true }),
-      Animated.timing(pulse, { toValue: 0, duration: 1800, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 1, duration: 1600, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 1600, useNativeDriver: true }),
     ])).start();
   }, []);
 
-  const sweepDeg = sweep.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
-  const halo     = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0.85] });
+  const halo  = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.85] });
+  const scanT = scanY.interpolate({ inputRange: [0, 1], outputRange: [-2, size + 2] });
 
   const c   = size / 2;
   const r1  = c - 4;      // outer ring
@@ -252,25 +252,19 @@ function ArcReactor({ size = 152, accent = MECH.arc, active = true }: { size?: n
     return `${c + r4 * Math.cos(a)},${c + r4 * Math.sin(a)}`;
   }).join(' ');
 
-  // 24 outer port marks, every 3rd is a "command slot" (longer + accent)
-  const portMarks = Array.from({ length: 24 }).map((_, i) => {
-    const a = (Math.PI * 2 / 24) * i;
+  // 32 hex-address ticks around the outer rim — every 4th is a longer accent
+  const portMarks = Array.from({ length: 32 }).map((_, i) => {
+    const a = (Math.PI * 2 / 32) * i;
     const x1 = c + (r1 - 1) * Math.cos(a);
     const y1 = c + (r1 - 1) * Math.sin(a);
-    const isMajor = i % 6 === 0;
+    const isMajor = i % 4 === 0;
     const lenOut = isMajor ? 10 : 5;
     const x2 = c + (r1 - lenOut) * Math.cos(a);
     const y2 = c + (r1 - lenOut) * Math.sin(a);
     return { x1, y1, x2, y2, major: isMajor };
   });
 
-  // 8 small port nodes on the mid ring — "I/O slots"
-  const portNodes = Array.from({ length: 8 }).map((_, i) => {
-    const a = (Math.PI * 2 / 8) * i - Math.PI / 2;
-    return { x: c + r2 * Math.cos(a), y: c + r2 * Math.sin(a) };
-  });
-
-  // 4 cardinal terminal glyphs around the mid ring
+  // 4 cardinal terminal glyphs — shell symbols, no compass / no mech feel
   const glyphs = [
     { sym: '>',  ang: -90 }, // N
     { sym: '$',  ang:   0 }, // E
@@ -278,8 +272,11 @@ function ArcReactor({ size = 152, accent = MECH.arc, active = true }: { size?: n
     { sym: '/',  ang: 180 }, // W
   ];
 
+  // Hex addresses orbiting the mid ring — pure "data feed" terminal vibe
+  const hexAddrs = ['0xA1', '0xB2', '0xC3', '0xD4', '0xE5', '0xF6'];
+
   return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       {/* outer halo pulse */}
       <Animated.View
         pointerEvents="none"
@@ -289,95 +286,89 @@ function ArcReactor({ size = 152, accent = MECH.arc, active = true }: { size?: n
             borderRadius: (size * 1.35) / 2, backgroundColor: accent + '1A',
           },
           Platform.OS === 'ios'
-            ? { shadowColor: accent, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 24 }
+            ? { shadowColor: accent, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.7, shadowRadius: 22 }
             : null,
           { opacity: halo },
         ]}
       />
 
-      {/* STATIC FRAME — outer ring + port marks + I/O nodes */}
+      {/* STATIC FRAME — phosphor rings + hex address ticks */}
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
-        {/* outer hairline + secondary inner hairline */}
-        <Circle cx={c} cy={c} r={r1}     fill="none" stroke={MECH.chrome}    strokeWidth={1.5} />
-        <Circle cx={c} cy={c} r={r1 - 3} fill="none" stroke={MECH.steelLo}   strokeWidth={0.8} opacity={0.6} />
+        {/* outer ring — single accent hairline, no double chrome */}
+        <Circle cx={c} cy={c} r={r1} fill="none" stroke={accent + 'BB'} strokeWidth={1.3} />
 
-        {/* port marks */}
+        {/* hex address ticks */}
         {portMarks.map((m, i) => (
           <Line
             key={i} x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2}
-            stroke={m.major ? accent : MECH.textDim}
-            strokeWidth={m.major ? 1.8 : 1}
-            opacity={m.major ? 0.95 : 0.5}
+            stroke={accent}
+            strokeWidth={m.major ? 1.5 : 0.8}
+            opacity={m.major ? 0.95 : 0.4}
             strokeLinecap="round"
           />
         ))}
 
-        {/* mid ring (dashed) */}
-        <Circle cx={c} cy={c} r={r2} fill="none" stroke={accent + '55'} strokeWidth={1} strokeDasharray="2 6" />
+        {/* mid ring dashed — phosphor only */}
+        <Circle cx={c} cy={c} r={r2} fill="none" stroke={accent + '70'} strokeWidth={1} strokeDasharray="2 6" />
 
-        {/* I/O port nodes */}
-        {portNodes.map((p, i) => (
-          <Circle
-            key={`p${i}`} cx={p.x} cy={p.y} r={3}
-            fill={MECH.steelHi} stroke={accent} strokeWidth={1}
-            opacity={active ? 0.95 : 0.5}
-          />
-        ))}
-
-        {/* inner ring */}
-        <Circle cx={c} cy={c} r={r3} fill="none" stroke={MECH.chrome} strokeWidth={1} opacity={0.6} />
+        {/* inner ring — phosphor faint */}
+        <Circle cx={c} cy={c} r={r3} fill="none" stroke={accent + '40'} strokeWidth={0.8} />
       </Svg>
 
-      {/* ROTATING SWEEP BEAM — single arm with trail */}
-      <Animated.View style={{ position: 'absolute', width: size, height: size, transform: [{ rotate: sweepDeg }] }}>
-        <Svg width={size} height={size}>
-          <Defs>
-            <SvgLinearGradient id="sweep-trail" x1={`${c}`} y1={`${c}`} x2={`${c}`} y2="0" gradientUnits="userSpaceOnUse">
-              <Stop offset="0%"   stopColor={accent} stopOpacity={0} />
-              <Stop offset="55%"  stopColor={accent} stopOpacity={0.35} />
-              <Stop offset="100%" stopColor={accent} stopOpacity={active ? 0.95 : 0.4} />
-            </SvgLinearGradient>
-          </Defs>
-          {/* triangular sweep "cone" */}
-          <Polygon
-            points={`${c},${c} ${c - 8},${c - (r1 - 4)} ${c + 8},${c - (r1 - 4)}`}
-            fill="url(#sweep-trail)"
-          />
-          {/* sharp leading line */}
-          <Line x1={c} y1={c} x2={c} y2={c - (r1 - 4)} stroke={accent} strokeWidth={1.4} opacity={active ? 1 : 0.4} />
-          {/* tip dot */}
-          <Circle cx={c} cy={c - (r1 - 4)} r={2.8} fill={accent} opacity={active ? 1 : 0.5} />
-        </Svg>
-      </Animated.View>
+      {/* Hex address labels orbiting the mid ring — terminal data feed vibe */}
+      {hexAddrs.map((label, i) => {
+        const a = (Math.PI * 2 / hexAddrs.length) * i - Math.PI / 2;
+        const lx = c + (r2 - 14) * Math.cos(a);
+        const ly = c + (r2 - 14) * Math.sin(a);
+        return (
+          <View
+            key={`h${i}`}
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: lx - 14, top: ly - 6,
+              width: 28, height: 12,
+              alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Text style={{
+              fontSize: 7.5, fontWeight: '900',
+              fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
+              color: accent + 'AA', letterSpacing: 0.5,
+              opacity: active ? 0.9 : 0.3,
+            }}>{label}</Text>
+          </View>
+        );
+      })}
 
-      {/* CARDINAL TERMINAL GLYPHS — static, sit just inside the mid ring */}
+      {/* CARDINAL TERMINAL GLYPHS — shell symbols at N/E/S/W */}
       {glyphs.map((g, i) => {
         const rad = (g.ang * Math.PI) / 180;
-        const gx = c + (r2 - 16) * Math.cos(rad);
-        const gy = c + (r2 - 16) * Math.sin(rad);
+        const gx = c + (r1 - 22) * Math.cos(rad);
+        const gy = c + (r1 - 22) * Math.sin(rad);
         return (
           <View
             key={`g${i}`}
             pointerEvents="none"
             style={{
               position: 'absolute',
-              left: gx - 9, top: gy - 9,
-              width: 18, height: 18,
+              left: gx - 10, top: gy - 10,
+              width: 20, height: 20,
               alignItems: 'center', justifyContent: 'center',
             }}
           >
             <Text style={{
-              fontSize: 13, fontWeight: '900',
+              fontSize: 14, fontWeight: '900',
               fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
               color: accent, letterSpacing: 0,
               opacity: active ? 0.95 : 0.4,
-              ...(Platform.OS === 'ios' ? { textShadowColor: accent, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 4 } : {}),
+              ...(Platform.OS === 'ios' ? { textShadowColor: accent, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 5 } : {}),
             }}>{g.sym}</Text>
           </View>
         );
       })}
 
-      {/* CENTER HEX — terminal insignia */}
+      {/* CENTER HEX — phosphor terminal insignia */}
       <Svg width={size} height={size} style={{ position: 'absolute' }}>
         <Defs>
           <RadialGradient id="core-grad" cx="50%" cy="50%" r="60%">
@@ -395,6 +386,18 @@ function ArcReactor({ size = 152, accent = MECH.arc, active = true }: { size?: n
           fill="none" stroke={accent + '60'} strokeWidth={0.8}
         />
       </Svg>
+
+      {/* CRT SCAN LINE — vertical sweep across the face (replaces rotating sweep) */}
+      <Animated.View
+        pointerEvents="none"
+        style={{
+          position: 'absolute', left: 0, right: 0, height: 2,
+          backgroundColor: accent + '80',
+          transform: [{ translateY: scanT }],
+          opacity: active ? 0.7 : 0,
+          ...(Platform.OS === 'ios' ? { shadowColor: accent, shadowOpacity: 1, shadowRadius: 4, shadowOffset: { width: 0, height: 0 } } : {}),
+        }}
+      />
 
       {/* CENTERED "AI" READOUT — sits dead-center inside the hex */}
       <View pointerEvents="none" style={{
@@ -581,15 +584,39 @@ export function MechBayHero({
 
         <ArcReactor size={172} accent={accent} active={isConnected} />
 
-        {/* labels under core */}
-        <Text
-          allowFontScaling={false}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          style={[mech.title, { color: MECH.text }]}
-        >
-          BUTLER<Text style={{ color: accent }}> AI</Text>
-        </Text>
+        {/* labels under core — BUTLER AI in 3D extruded layered text */}
+        <View style={{ width: '100%', alignItems: 'center', marginTop: 18, height: 100, justifyContent: 'center' }}>
+          {/* Back-most layer — dimmed accent, large offset = extruded depth */}
+          <Text
+            allowFontScaling={false}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={[mech.titleShadowLayer, { color: accent + '22', transform: [{ translateY: 7 }, { translateX: 5 }] }]}
+          >BUTLER AI</Text>
+          {/* Mid layer — slight offset, mid-opacity */}
+          <Text
+            allowFontScaling={false}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={[mech.titleShadowLayer, { color: accent + '55', transform: [{ translateY: 4 }, { translateX: 3 }] }]}
+          >BUTLER AI</Text>
+          {/* Mid layer — accent edge */}
+          <Text
+            allowFontScaling={false}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={[mech.titleShadowLayer, { color: accent + '88', transform: [{ translateY: 2 }, { translateX: 1.5 }] }]}
+          >BUTLER AI</Text>
+          {/* Front face — bold white with accent glow */}
+          <Text
+            allowFontScaling={false}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={[mech.title, { color: MECH.text, marginTop: 0 }]}
+          >
+            BUTLER<Text style={{ color: accent }}> AI</Text>
+          </Text>
+        </View>
         {/* tagline row with side dashes */}
         <View style={mech.taglineRow}>
           <View style={[mech.taglineDash, { backgroundColor: accent + 'AA' }]} />
@@ -829,12 +856,25 @@ const mech = StyleSheet.create({
   statusTxt: { fontSize: 10.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.6 },
 
   title: {
-    marginTop: 14,
-    fontSize: 40, fontWeight: '900', fontFamily: MONO, letterSpacing: 5,
+    marginTop: 18,
+    fontSize: 84, fontWeight: '900', fontFamily: MONO, letterSpacing: 6,
     paddingHorizontal: 6, textAlign: 'center',
+    lineHeight: 88,
+    // Layered "3D extrude" effect — fakes depth using multiple stacked text shadows.
+    // Bottom-right offsets in a dimmed accent create a chunky terminal extrusion,
+    // while a glow halo around the strokes keeps the futuristic readout vibe.
     ...(Platform.OS === 'ios'
-      ? { textShadowColor: MECH.arc, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 14 }
+      ? {
+          textShadowColor: MECH.arc,
+          textShadowOffset: { width: 0, height: 0 },
+          textShadowRadius: 22,
+        }
       : {}),
+  },
+  titleShadowLayer: {
+    position: 'absolute', textAlign: 'center', width: '100%',
+    fontSize: 84, fontWeight: '900', fontFamily: MONO, letterSpacing: 6, lineHeight: 88,
+    paddingHorizontal: 6,
   },
   sub: {
     marginTop: 1, fontSize: 11, fontWeight: '800', fontFamily: MONO, letterSpacing: 4,

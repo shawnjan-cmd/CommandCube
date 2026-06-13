@@ -32,10 +32,11 @@ function greetingFor(d: Date) {
 }
 
 interface Props {
+  /** Reserved for future use — kept for backwards compatibility but no longer rendered. */
   callsign?: string;
 }
 
-export default function HomeGreetingBanner({ callsign = 'COMMANDER' }: Props) {
+export default function HomeGreetingBanner(_props: Props) {
   const [now, setNow] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);  // refresh greeting every 30s
@@ -60,10 +61,10 @@ export default function HomeGreetingBanner({ callsign = 'COMMANDER' }: Props) {
         <Text style={s.greeting} numberOfLines={1}>
           {greeting}
           <Text style={s.dot}>  ·  </Text>
-          <Text style={s.callsign}>{callsign}</Text>
+          <Text style={s.callsign}>BUTLER AI ONLINE</Text>
         </Text>
         <Text style={s.tagline} numberOfLines={1}>
-          BUTLER AI IS READY · LAN-ONLY · ZERO TELEMETRY
+          LAN-ONLY  ·  ZERO TELEMETRY  ·  YOUR PC · YOUR RULES
         </Text>
       </View>
 
