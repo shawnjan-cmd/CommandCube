@@ -37,6 +37,8 @@ import { FileShareClipboardCard } from '@/components/ui/FileShareClipboardCard';
 import { uiConfig, UIConfig, DEFAULT_UI_CONFIG, UIStrings } from '@/services/uiConfig';
 import { ButlerWordmark } from '@/components/ui/ButlerWordmark';
 import { MechBayHero, HexCommandRing, MechPanel } from '@/components/home/MechBay';
+import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
+import { useRouter } from 'expo-router';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');
@@ -321,6 +323,114 @@ const nc = StyleSheet.create({
 function SectionDivider({ label, color = D.cyan }: { label: string; color?: string }) {
   return <SectionTitle3D title={label} accent={color} style={{ marginTop: 10, marginBottom: 2 }} />;
 }
+
+// ─── PRIVACY TRUST BADGE ──────────────────────────────────────────
+// Compact home-screen badge that proves the app is local-only in real time.
+// Subscribes to privacyAudit and shows live LAN vs CLOUD counters.
+// Tap → opens the full /privacy-audit screen.
+function PrivacyTrustBadge() {
+  const router = useRouter();
+  const [counters, setCounters] = useState<AuditCounters>(privacyAudit.getCounters());
+  const pulse = useRef(new Animated.Value(0)).current;
+  const shimmer = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const unsub = privacyAudit.subscribe((_e, c) => setCounters(c));
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1, duration: 1300, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 1300, useNativeDriver: true }),
+    ]));
+    loop.start();
+    const sh = Animated.loop(Animated.sequence([
+      Animated.timing(shimmer, { toValue: 1, duration: 2600, useNativeDriver: true }),
+      Animated.timing(shimmer, { toValue: 0, duration: 0,    useNativeDriver: true }),
+      Animated.delay(900),
+    ]));
+    sh.start();
+    return () => { loop.stop(); sh.stop(); };
+  }, []);
+
+  const isClean = counters.cloud === 0 && counters.blocked === 0;
+  const accent  = isClean ? '#00FF88' : '#FF2A1F';
+  const dotOp   = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1] });
+  const dotScl  = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.55] });
+  const shineX  = shimmer.interpolate({ inputRange: [0, 1], outputRange: [-180, 320] });
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={() => { haptics.light(); router.push('/privacy-audit' as any); }}
+      style={ptb.wrap}
+    >
+      <View style={[ptb.card, { borderColor: accent + '50', backgroundColor: accent + '06' }]}>
+        {/* Animated shimmer sweep — pure cosmetic, signals "live" */}
+        <Animated.View pointerEvents="none" style={[ptb.shimmer, { transform: [{ translateX: shineX }] }]} />
+        {/* HUD corner ticks */}
+        <View style={[ptb.corner, { top: 0, left: 0, borderTopWidth: 1.5, borderLeftWidth: 1.5, borderColor: accent + 'AA' }]} />
+        <View style={[ptb.corner, { bottom: 0, right: 0, borderBottomWidth: 1.5, borderRightWidth: 1.5, borderColor: accent + 'AA' }]} />
+
+        {/* Left icon column */}
+        <View style={[ptb.iconBox, { borderColor: accent + '88', backgroundColor: accent + '14' }]}>
+          <MaterialCommunityIcons name={isClean ? 'shield-lock' : 'shield-alert'} size={20} color={accent} />
+        </View>
+
+        {/* Center text */}
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+            <Animated.View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: accent, opacity: dotOp, transform: [{ scale: dotScl }] }} />
+            <Text style={[ptb.title, { color: accent }]} numberOfLines={1}>
+              {isClean ? 'SECURED · LAN-ONLY' : 'CLOUD CALL DETECTED'}
+            </Text>
+          </View>
+          <Text style={ptb.sub} numberOfLines={1}>
+            {`${counters.cloud} cloud · ${counters.lan} LAN · 0 trackers · 0 ads`}
+          </Text>
+        </View>
+
+        {/* Right CTA */}
+        <View style={ptb.cta}>
+          <Text style={[ptb.ctaTxt, { color: accent }]}>AUDIT</Text>
+          <MaterialIcons name="chevron-right" size={16} color={accent} />
+        </View>
+      </View>
+
+      {/* Tiny tag-line under card to seal trust */}
+      <View style={ptb.tagRow}>
+        <MaterialIcons name="lock" size={9} color={D.textMid} />
+        <Text style={ptb.tagTxt}>END-TO-END PRIVATE · NO ACCOUNTS · NO TELEMETRY · HMAC-SIGNED</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+const ptb = StyleSheet.create({
+  wrap:    { marginHorizontal: 12, marginTop: 10, marginBottom: 4 },
+  card:    {
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12,
+    overflow: 'hidden',
+  },
+  shimmer: {
+    position: 'absolute', top: 0, bottom: 0, width: 90,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    transform: [{ skewX: '-22deg' }],
+  },
+  corner:  { position: 'absolute', width: 10, height: 10 },
+  iconBox: {
+    width: 36, height: 36, borderRadius: 8, borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  title:   { fontFamily: MONO, fontSize: 11, fontWeight: '900', letterSpacing: 1.5 },
+  sub:     { fontFamily: MONO, fontSize: 9, color: D.textMid, marginTop: 3, letterSpacing: 0.6 },
+  cta:     { flexDirection: 'row', alignItems: 'center', gap: 1, marginLeft: 8 },
+  ctaTxt:  { fontFamily: MONO, fontSize: 10, fontWeight: '900', letterSpacing: 1.5 },
+  tagRow:  { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, paddingHorizontal: 4 },
+  tagTxt:  { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1, flex: 1 },
+});
 
 // ─── BUTLER AI HERO ────────────────────────────────────────────────
 function ButlerAIHero(props: {
@@ -1510,6 +1620,7 @@ export default function NexusHomeScreen() {
         isConnected={isConnected} serverAddr={serverAddr}
         onScanQR={() => setShowQR(true)}
         kbFindings={kbFindings} scriptCount={scriptCount} />
+      <PrivacyTrustBadge />
       <QuickAccessGrid goToTab={goToTab} />
       <ServerSetupHub onScanQR={() => setShowQR(true)} isConnected={isConnected} />
 
