@@ -76,7 +76,8 @@ function devWarn(msg: string, ...args: unknown[]): void {
  * ## devResetOnboarding
  *
  * Wipes **all** onboarding keys for the current user.
- * Restart the app (or call `router.replace('/welcome')`) to re-enter the flow.
+ * Re-show the overlay immediately by calling
+ * `(global as any).__setNeedsOnboarding?.(true)`, or just restart the app.
  *
  * ### Typical uses
  * - Hidden long-press on the settings avatar

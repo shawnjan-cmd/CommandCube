@@ -154,6 +154,35 @@ class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState & {
     return <React.Fragment key={`eb-${this.state.resetCount}`}>{this.props.children}</React.Fragment>;
   }
 }
+// ─── ONBOARDING ERROR BOUNDARY ──────────────────────────────────────────────
+// Wraps the OnboardingOverlay. If anything inside the overlay crashes, this
+// boundary calls onRecover() to dismiss it and drop the user into the app,
+// rather than trapping them in a broken onboarding screen forever.
+class OnboardingErrorBoundary extends Component<
+  { children: ReactNode; onRecover: () => void },
+  { error: Error | null }
+> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error): any { return { error }; }
+  componentDidCatch(error: Error) {
+    try { require('@/services/autoErrorLogger').autoErrorLogger.log('error', 'OnboardingErrorBoundary', error.message); } catch {}
+    console.error('[OnboardingErrorBoundary] crash inside overlay — auto-recovering:', error?.message);
+    // Auto-dismiss the overlay so the user lands in the app instead of being trapped.
+    setTimeout(() => { try { this.props.onRecover(); } catch {} }, 50);
+  }
+  render() {
+    if (this.state.error) {
+      // Tiny dark spinner shown for ~50ms before onRecover fires.
+      return (
+        <View style={{ flex: 1, backgroundColor: '#050505', alignItems: 'center', justifyContent: 'center' }}>
+          <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#FF2A1F', opacity: 0.6 }} />
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const eb = StyleSheet.create({
   root:      { flex: 1, backgroundColor: '#030608', alignItems: 'center', justifyContent: 'center', padding: 28 },
   gridH:     { position: 'absolute', top: '50%', left: 0, right: 0, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(255,49,49,0.06)' },
@@ -410,11 +439,17 @@ export default function RootLayout() {
 
   _routerRef.current = router;
 
-  // Expose setter so Screen10 can flip the flag directly.
-  // Wrapped in useEffect with empty deps so we don't reassign the global on
-  // every render — saves a closure allocation per render.
+  // Expose setter so settings/dev tools can re-trigger the overlay directly.
+  // Hardened: validates input type, logs all calls, ignores no-op writes.
   useEffect(() => {
-    (global as any).__setNeedsOnboarding = (v: boolean) => setNeedsOnboarding(v);
+    (global as any).__setNeedsOnboarding = (v: boolean) => {
+      if (typeof v !== 'boolean') {
+        console.warn('[_layout] __setNeedsOnboarding called with non-boolean:', v, '— ignored');
+        return;
+      }
+      console.log('[_layout] __setNeedsOnboarding(' + v + ') called');
+      setNeedsOnboarding(v);
+    };
     return () => { delete (global as any).__setNeedsOnboarding; };
   }, []);
 
@@ -648,16 +683,21 @@ export default function RootLayout() {
               )
             ) : null}
 
-            {/* ── ONBOARDING OVERLAY (covers tabs while needsOnboarding=true) ── */}
+            {/* ── ONBOARDING OVERLAY (covers tabs while needsOnboarding=true) ──
+                Wrapped in its own ErrorBoundary so any render error inside the
+                overlay does NOT trap the user — the boundary calls onComplete
+                automatically to recover. */}
             {needsOnboarding === true && (
               <View style={[StyleSheet.absoluteFill, { backgroundColor: '#050505', zIndex: 9999, elevation: 9999 }]} pointerEvents="auto" accessibilityViewIsModal={true}>
-                <OnboardingOverlay
-                  onComplete={() => {
-                    // Just flip the state. OnboardingOverlay's Screen 10 button
-                    // already persisted all 7 keys before calling this.
-                    setNeedsOnboarding(false);
-                  }}
-                />
+                <OnboardingErrorBoundary onRecover={() => setNeedsOnboarding(false)}>
+                  <OnboardingOverlay
+                    onComplete={() => {
+                      // Just flip the state. OnboardingOverlay's Screen 10 button
+                      // already persisted all 7 keys before calling this.
+                      setNeedsOnboarding(false);
+                    }}
+                  />
+                </OnboardingErrorBoundary>
               </View>
             )}
           </View>

@@ -2130,20 +2130,42 @@ export default function SettingsScreen() {
               style={[g.actionBtn, { flex: 1, borderColor: N.cyan + '55', backgroundColor: N.cyan + '0A' }]}
               onPress={() => {
                 haptics.medium();
-                AsyncStorage.multiRemove([
-                  '@butler_consent_v2',
-                  '@butler_lan_consent_v1',
-                  '@butler_onboarding_done_v2',
-                  '@butler_terms_accepted_v1',
-                  '@butler_privacy_accepted_v1',
-                  '@butler_age_confirmed_v1',
-                  '@butler_remote_exec_consent_v1',
-                  '@butler_camera_consent_v1',
-                  '@butler_welcome_complete_v1',
-                ]).then(() => {
-                  haptics.success();
-                  Alert.alert('Reset Complete', 'All consents cleared. The onboarding screens will appear on next app launch.');
-                }).catch(() => {});
+                Alert.alert(
+                  'Reset All Consents?',
+                  'This will clear all your saved agreements and re-show the onboarding flow immediately.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Reset',
+                      style: 'destructive',
+                      onPress: () => {
+                        AsyncStorage.multiRemove([
+                          '@butler_consent_v2',
+                          '@butler_lan_consent_v1',
+                          '@butler_onboarding_done_v2',
+                          '@butler_terms_accepted_v1',
+                          '@butler_privacy_accepted_v1',
+                          '@butler_age_confirmed_v1',
+                          '@butler_remote_exec_consent_v1',
+                          '@butler_camera_consent_v1',
+                          '@butler_welcome_complete_v1',
+                          '@butler_server_privacy_accepted_v1',
+                          '@butler_show_post_onboarding_chat',
+                          '@butler_stable_state',
+                        ]).then(() => {
+                          haptics.success();
+                          // Immediately re-show overlay (no restart needed)
+                          const setter = (global as any).__setNeedsOnboarding;
+                          if (typeof setter === 'function') {
+                            setter(true);
+                          } else {
+                            Alert.alert('Reset Complete', 'Restart the app to view the onboarding flow.');
+                          }
+                        }).catch(() => {});
+                      },
+                    },
+                  ]
+                );
               }}
               activeOpacity={0.8}
             >
@@ -2154,7 +2176,14 @@ export default function SettingsScreen() {
               style={[g.actionBtn, { flex: 1, borderColor: N.green + '55', backgroundColor: N.green + '0A' }]}
               onPress={() => {
                 haptics.light();
-                router.push('/welcome' as any);
+                // Onboarding is now an in-app overlay (not a route).
+                // Setting needsOnboarding=true re-mounts the overlay instantly.
+                const setter = (global as any).__setNeedsOnboarding;
+                if (typeof setter === 'function') {
+                  setter(true);
+                } else {
+                  Alert.alert('View Onboarding', 'Restart the app to view the onboarding flow.');
+                }
               }}
               activeOpacity={0.8}
             >
