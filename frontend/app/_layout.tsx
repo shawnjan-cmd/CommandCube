@@ -634,9 +634,8 @@ export default function RootLayout() {
             <StatusBar style="light" />
             <WelcomeScreen
               onComplete={() => {
-                // Persist and flip state — that's it. No router calls.
-                AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
                 setNeedsOnboarding(false);
+                AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
               }}
             />
           </TabBarProvider>

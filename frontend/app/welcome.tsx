@@ -1,6 +1,6 @@
 /**
  * Butler AI — Play Store Compliance Onboarding v7.3.0
- * 10 screens — fixed navigation, new logo, 5-second auto-launch countdown
+ * 10 screens — single onComplete prop, no router calls, no timers
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -1112,272 +1112,93 @@ function Screen9Download({ onNext, onBack }: { onNext: () => void; onBack: () =>
 }
 
 // ─────────────────────────────────────────────────────────────────
-// SCREEN 10: LAUNCH — Bulletproof 7-path navigation
+// SCREEN 10: LAUNCH — Stripped down to one button (v6)
 // ─────────────────────────────────────────────────────────────────
-type LaunchState = 'idle' | 'saving' | 'navigating' | 'retry' | 'error';
 
-function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?: () => void }) {
-  const router = useRouter();
-  const [state, setState] = useState<LaunchState>('idle');
-  const [countdown, setCountdown] = useState(5);
-  const [showEmergency, setShowEmergency] = useState(false);   // 5s escape hatch
-  const inFlightRef   = useRef(false);
-  const navigatedRef  = useRef(false);
-  const countdownRef  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const stuckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const emergencyRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const mountedRef    = useRef(true);
-
-  const glowAnim  = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const fadeAnim  = useRef(new Animated.Value(0)).current;
-
-  const safeSet = (s: LaunchState) => { if (mountedRef.current) setState(s); };
-
-  const persistAllKeys = async (): Promise<boolean> => {
-    try {
-      await AsyncStorage.multiSet([
-        [ONBOARDING_DONE_KEY,         '1'],
-        [CONSENT_KEY,                 '1'],
-        [TERMS_ACCEPTED_KEY,          '1'],
-        [PRIVACY_ACCEPTED_KEY,        '1'],
-        [AGE_CONFIRMED_KEY,           '1'],
-        [LAN_CONSENT_KEY,             '1'],
-        [REMOTE_EXEC_CONSENT_KEY,     '1'],
-        [CAMERA_CONSENT_KEY,          '1'],
-        [SERVER_PRIVACY_ACCEPTED_KEY, '1'],
-      ]);
-      const check = await AsyncStorage.getItem(ONBOARDING_DONE_KEY);
-      if (check !== '1') await AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1');
-      logger.log('[Screen10] all keys persisted');
-      return true;
-    } catch (e) {
-      logger.error('[Screen10] storage write failed:', e);
-      return false;
-    }
-  };
-
-  // ── BULLETPROOF v5: ONE PATH ONLY ───────────────────────────────────────
-  // onComplete is now a real prop from a real component (not a route).
-  // It is guaranteed to be defined. Call it. Nothing else.
-  const handleLaunch = useCallback(() => {
-    if (inFlightRef.current) return;
-    inFlightRef.current = true;
-    if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
-    safeHaptics.heavy();
-    safeSet('navigating');
-    logger.log('[Screen10] LAUNCH pressed — calling onComplete()');
-    if (onComplete) {
-      onComplete();
-    } else {
-      logger.error('[Screen10] onComplete prop is missing — this should never happen under the v5 architecture');
-    }
-  }, [onComplete]);
-
-  const doLaunch = handleLaunch;
-
-  useEffect(() => {
-    mountedRef.current = true;
-    Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
-    const glow = Animated.loop(Animated.sequence([
-      Animated.timing(glowAnim, { toValue: 1, duration: 1400, useNativeDriver: true }),
-      Animated.timing(glowAnim, { toValue: 0, duration: 1400, useNativeDriver: true }),
-    ]));
-    glow.start();
-    const pulse = Animated.loop(Animated.sequence([
-      Animated.timing(pulseAnim, { toValue: 1.03, duration: 900, useNativeDriver: true }),
-      Animated.timing(pulseAnim, { toValue: 0.97, duration: 900, useNativeDriver: true }),
-    ]));
-    pulse.start();
-    countdownRef.current = setInterval(() => {
-      setCountdown(prev => {
-        const next = prev - 1;
-        if (next <= 0) {
-          if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
-          doLaunchRef.current();
-          return 0;
-        }
-        return next;
-      });
-    }, 1000);
-    return () => {
-      mountedRef.current = false;
-      glow.stop(); pulse.stop();
-      if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
-      if (stuckTimerRef.current) { clearTimeout(stuckTimerRef.current); stuckTimerRef.current = null; }
-      if (emergencyRef.current) { clearTimeout(emergencyRef.current); emergencyRef.current = null; }
-    };
-  }, []);
-
-  const doLaunchRef = useRef(doLaunch);
-  useEffect(() => { doLaunchRef.current = doLaunch; }, [doLaunch]);
-
-  const isActive = state === 'saving' || state === 'navigating';
-  const btnLabel = { idle: 'LAUNCH BUTLER AI', saving: 'SAVING...', navigating: 'OPENING APP...', retry: 'TAP TO RETRY', error: 'TAP TO RETRY' }[state];
-  const btnIcon  = { idle: 'rocket-launch', saving: 'save', navigating: 'open-in-new', retry: 'refresh', error: 'error-outline' }[state] as any;
-  const btnColor = (state === 'error' || state === 'retry') ? C.red : C.green;
-
+function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete: () => void }) {
   return (
-    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
 
-        {/* Hero */}
-        <View style={{ alignItems: 'center', paddingVertical: 28, gap: 14 }}>
-          <View style={{ width: 110, height: 110, borderRadius: 22, borderWidth: 2, borderColor: C.green + '60', backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-            <ButlerRobotLogo size={98} glow />
+      {/* Hero */}
+      <View style={{ alignItems: 'center', paddingVertical: 28, gap: 14 }}>
+        <View style={{ width: 110, height: 110, borderRadius: 22, borderWidth: 2, borderColor: C.green + '60', backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          <ButlerRobotLogo size={98} glow />
+        </View>
+        <Text style={{ fontSize: 30, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 3 }}>ALL DONE!</Text>
+        <Text style={{ fontSize: 14, color: C.textMid, textAlign: 'center', lineHeight: 22, paddingHorizontal: 24 }}>
+          All agreements accepted. Your privacy is fully protected.
+        </Text>
+      </View>
+
+      {/* Completion badges */}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20, justifyContent: 'center' }}>
+        {['✓ Safety Consent','✓ Safety Pledge','✓ Legal Docs','✓ Permissions','✓ Q & A','✓ Server Privacy','✓ Setup Guide'].map(b => (
+          <View key={b} style={{ borderRadius: 8, borderWidth: 1, borderColor: C.green + '45', backgroundColor: C.green + '08', paddingHorizontal: 10, paddingVertical: 5 }}>
+            <Text style={{ fontSize: 10, fontWeight: '900', color: C.green, fontFamily: MONO }}>{b}</Text>
           </View>
-          <Text style={{ fontSize: 30, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 3 }}>ALL DONE!</Text>
-          <Text style={{ fontSize: 14, color: C.textMid, textAlign: 'center', lineHeight: 22, paddingHorizontal: 24 }}>
-            All agreements accepted. Your privacy is fully protected.
-          </Text>
-        </View>
+        ))}
+      </View>
 
-        {/* Completion badges */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20, justifyContent: 'center' }}>
-          {['✓ Safety Consent','✓ Safety Pledge','✓ Legal Docs','✓ Permissions','✓ Q & A','✓ Server Privacy','✓ Setup Guide'].map(b => (
-            <View key={b} style={{ borderRadius: 8, borderWidth: 1, borderColor: C.green + '45', backgroundColor: C.green + '08', paddingHorizontal: 10, paddingVertical: 5 }}>
-              <Text style={{ fontSize: 10, fontWeight: '900', color: C.green, fontFamily: MONO }}>{b}</Text>
-            </View>
-          ))}
-        </View>
+      <ComplianceBadge />
 
-        <ComplianceBadge />
+      {/* LAUNCH BUTTON */}
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => onComplete()}
+        style={{
+          backgroundColor: '#00ff88',
+          borderRadius: 16,
+          paddingVertical: 22,
+          paddingHorizontal: 40,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: 32,
+          marginHorizontal: 24,
+          borderWidth: 2,
+          borderColor: '#00cc66',
+        }}
+      >
+        <Text style={{
+          color: '#000000',
+          fontSize: 22,
+          fontWeight: 'bold',
+          fontFamily: 'monospace',
+          letterSpacing: 2,
+        }}>
+          🚀  LAUNCH BUTLER AI
+        </Text>
+        <Text style={{
+          color: '#004422',
+          fontSize: 12,
+          marginTop: 4,
+          fontFamily: 'monospace',
+        }}>
+          TAP TO ENTER THE APP
+        </Text>
+      </TouchableOpacity>
 
-        {/* Auto-launch strip with progress bar */}
-        {state === 'idle' && (
-          <View style={{ borderWidth: 1.5, borderRadius: 12, borderColor: C.green + '40', backgroundColor: C.green + '06', padding: 14, marginBottom: 16, gap: 8 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <MaterialIcons name="rocket-launch" size={16} color={C.green} />
-              <Text style={{ fontSize: 12, fontWeight: '900', color: C.green, fontFamily: MONO, flex: 1 }}>
-                AUTO-LAUNCHING IN {countdown}s
-              </Text>
-              <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: C.green + '20', overflow: 'hidden' }}>
-                <View style={{ width: `${(countdown / 5) * 100}%`, height: '100%', borderRadius: 2, backgroundColor: C.green }} />
-              </View>
-            </View>
-            <Text style={{ fontSize: 9, color: C.green + '70', fontFamily: MONO, letterSpacing: 0.5 }}>Tap the button above to launch immediately</Text>
-          </View>
-        )}
+      {/* Footer */}
+      <View style={{ borderWidth: 1, borderRadius: 10, borderColor: C.cyan + '20', backgroundColor: C.cyan + '06', padding: 12, marginTop: 20, marginBottom: 4 }}>
+        <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, textAlign: 'center', lineHeight: 16 }}>
+          {'Agreements saved locally \u00b7 Never uploaded \u00b7 Remembered across restarts\ncom.butlerai.pc.automation'}
+        </Text>
+      </View>
 
-        {/* Launch button */}
-        <Animated.View style={{ transform: [{ scale: isActive ? 1 : pulseAnim }], marginBottom: 20 }}>
-          <Animated.View pointerEvents="none" style={{
-            position: 'absolute', top: -12, left: -12, right: -12, bottom: -12, borderRadius: 30,
-            borderWidth: 2, borderColor: btnColor,
-            opacity: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.06, state === 'error' ? 0.7 : 0.4] }),
-          }} />
-          <TouchableOpacity
-            testID="onboarding-screen10-launch"
-            onPress={() => {
-              if (state === 'error' || state === 'retry') {
-                inFlightRef.current = false;
-                if (stuckTimerRef.current) { clearTimeout(stuckTimerRef.current); stuckTimerRef.current = null; }
-              }
-              doLaunch();
-            }}
-            disabled={state === 'saving' || state === 'navigating'}
-            activeOpacity={0.85}
-            accessibilityRole="button"
-            accessibilityLabel="Launch Butler AI"
-            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-            style={{ borderRadius: 22, borderWidth: 2.5, borderColor: btnColor, overflow: 'hidden', backgroundColor: '#070a0f' }}
-          >
-            <View style={{ height: 3, backgroundColor: btnColor, width: '100%' }} />
-            <View style={{ alignItems: 'center', paddingTop: 28, paddingBottom: 16 }}>
-              <View style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: btnColor + '80', backgroundColor: btnColor + '12', alignItems: 'center', justifyContent: 'center' }}>
-                {isActive ? <ActivityIndicator size="large" color={btnColor} /> : <MaterialIcons name={btnIcon} size={34} color={btnColor} />}
-              </View>
-            </View>
-            <View style={{ alignItems: 'center', paddingBottom: 28, gap: 6 }}>
-              <Text style={{ fontSize: 20, fontWeight: '900', color: btnColor, fontFamily: MONO, letterSpacing: 3 }}>{btnLabel}</Text>
-              <Text style={{ fontSize: 10, color: btnColor + '70', fontFamily: MONO }}>
-                {state === 'idle'       && '7-path bulletproof navigation'}
-                {state === 'saving'     && 'Writing consent keys to storage...'}
-                {state === 'navigating' && 'Handing off to app router...'}
-                {state === 'retry'      && 'Trying alternate routes — tap to force retry'}
-                {state === 'error'      && 'All paths failed — tap to try again'}
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, borderTopColor: btnColor + '25', backgroundColor: btnColor + '08', paddingHorizontal: 16, paddingVertical: 10 }}>
-              {[
-                { label: 'STATE',   ok: state !== 'error' },
-                { label: 'HOOK',    ok: !!(global as any).__setNeedsOnboarding },
-                { label: 'REF',     ok: !!(global as any).__onboardingComplete },
-                { label: 'REPLACE', ok: true },
-                { label: 'NAV',     ok: true },
-                { label: 'TAB',     ok: true },
-                { label: 'STORAGE', ok: true },
-              ].map((p, i) => (
-                <View key={i} style={{ flex: 1, alignItems: 'center', gap: 3 }}>
-                  <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: p.ok ? C.green : C.red, opacity: 0.85 }} />
-                  <Text style={{ fontSize: 8, color: C.textMid, fontFamily: MONO }}>{p.label}</Text>
-                </View>
-              ))}
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
+      <View style={[st.navRow, { marginTop: 12 }]}>
+        <TouchableOpacity style={st.backBtn} onPress={onBack} activeOpacity={0.85}>
+          <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
+          <Text style={st.backBtnTxt}>BACK</Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* Footer */}
-        <View style={{ borderWidth: 1, borderRadius: 10, borderColor: C.cyan + '20', backgroundColor: C.cyan + '06', padding: 12, marginBottom: 4 }}>
-          <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, textAlign: 'center', lineHeight: 16 }}>
-            {'Agreements saved locally \u00b7 Never uploaded \u00b7 Remembered across restarts\ncom.butlerai.pc.automation'}
-          </Text>
-        </View>
-
-        {/* ─── EMERGENCY ESCAPE HATCH ──────────────────────────────────────
-            Appears after 5s of waiting. User-controlled bypass that ALWAYS
-            works no matter what bug exists in storage / router / OEM-native
-            modal layer. Fires every dismissal channel synchronously. */}
-        {showEmergency ? (
-          <View style={{ borderWidth: 2, borderColor: '#FFB020', borderRadius: 12, backgroundColor: '#FFB02014', padding: 12, marginTop: 14, marginBottom: 4 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <MaterialIcons name="warning" size={16} color="#FFB020" />
-              <Text style={{ fontSize: 11, fontWeight: '900', color: '#FFB020', fontFamily: MONO, letterSpacing: 1.2 }}>
-                TAKING LONGER THAN EXPECTED
-              </Text>
-            </View>
-            <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, lineHeight: 14, marginBottom: 10 }}>
-              Tap below to force-enter the app immediately. Your agreements are already saved.
-            </Text>
-            <TouchableOpacity
-              testID="onboarding-screen10-emergency"
-              activeOpacity={0.82}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => {
-                safeHaptics.heavy();
-                logger.warn('[Screen10] EMERGENCY ESCAPE pressed');
-                // v5: call onComplete only. No router calls. No globals.
-                if (onComplete) onComplete();
-              }}
-              style={{ borderRadius: 10, borderWidth: 2, borderColor: '#FFB020', backgroundColor: '#FFB020', paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
-            >
-              <Text style={{ fontSize: 14, fontWeight: '900', color: '#000', fontFamily: MONO, letterSpacing: 2 }}>
-                FORCE ENTER APP →
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
-
-        <View style={[st.navRow, { marginTop: 12 }]}>
-          <TouchableOpacity style={st.backBtn} onPress={() => {
-            safeHaptics.light();
-            if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
-            onBack();
-          }} activeOpacity={0.85} disabled={isActive}>
-            <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
-            <Text style={st.backBtnTxt}>BACK</Text>
-          </TouchableOpacity>
-        </View>
-
-      </ScrollView>
-    </Animated.View>
+    </ScrollView>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────
 // MAIN WELCOME SCREEN
 // ─────────────────────────────────────────────────────────────────
-export default function WelcomeScreen({ onComplete }: { onComplete?: () => void } = {}) {
+export default function WelcomeScreen({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
   const [consents, setConsents] = useState<Record<string, boolean>>({});
   const [serverAccepts, setServerAccepts] = useState<Record<string, boolean>>({});
