@@ -21,6 +21,7 @@ const mi = (name: MIName) => (color: string, size: number) =>
 // Map route name → icon renderer. Order doesn't matter; the Tabs definitions
 // below decide the on-screen ordering.
 const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = {
+  onboarding: mc('rocket-launch-outline'),
   nexushome:  mc('view-dashboard-variant'),
   scripts:    mc('code-braces-box'),
   butler:     mc('robot-happy'),
@@ -70,6 +71,7 @@ export default function TabLayout() {
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
         tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
       >
+        <Tabs.Screen name="onboarding" options={{ title: 'ONBOARDING',     tabBarLabel: 'START',   headerShown: false }} />
         <Tabs.Screen name="nexushome" options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
         <Tabs.Screen name="scripts"   options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
         <Tabs.Screen name="butler"    options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />

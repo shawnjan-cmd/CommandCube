@@ -1,12 +1,12 @@
 /**
  * Bootstrap route — `/`
  *
- * Reads the onboarding completion flag from AsyncStorage and redirects:
- *   • Onboarding done  → /(tabs)/nexushome
- *   • Not done         → /onboarding
+ * Reads the onboarding completion flag and redirects:
+ *   • Done  → /(tabs)/nexushome
+ *   • Not done → /(tabs)/onboarding  (the new onboarding TAB)
  *
- * This is the single source of truth for first-launch routing. No overlay,
- * no conditional render — just a clean redirect on the very first frame.
+ * Onboarding is now a regular tab inside (tabs), so users always land
+ * inside the main app shell with the tab bar visible.
  */
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -20,18 +20,14 @@ export default function Index() {
     (async () => {
       try {
         const v = await AsyncStorage.getItem('@butler_onboarding_done_v2');
-        // Accept both 'true' and '1' (legacy format compatibility)
         const done = v === 'true' || v === '1';
-        setTarget(done ? '/(tabs)/nexushome' : '/onboarding');
+        setTarget(done ? '/(tabs)/nexushome' : '/(tabs)/onboarding');
       } catch {
-        setTarget('/onboarding');
+        setTarget('/(tabs)/onboarding');
       }
     })();
   }, []);
 
-  if (target === null) {
-    // Dark screen while AsyncStorage reads — prevents white flash
-    return <View style={{ flex: 1, backgroundColor: '#050505' }} />;
-  }
+  if (target === null) return <View style={{ flex: 1, backgroundColor: '#050505' }} />;
   return <Redirect href={target as any} />;
 }

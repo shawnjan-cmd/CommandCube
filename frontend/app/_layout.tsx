@@ -623,7 +623,6 @@ export default function RootLayout() {
             <StatusBar style="light" />
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
               <Stack.Screen name="index"          options={{ headerShown: false }} />
-              <Stack.Screen name="onboarding"     options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
               <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
               <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />

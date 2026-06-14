@@ -2182,7 +2182,7 @@ export default function SettingsScreen() {
                   '@butler_welcome_complete_v1',
                   '@butler_stable_state',
                 ]).finally(() => {
-                  router.push('/onboarding' as any);
+                  router.push('/(tabs)/onboarding' as any);
                 });
               }}
               activeOpacity={0.8}
