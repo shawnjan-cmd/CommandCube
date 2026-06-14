@@ -11,7 +11,6 @@ import {
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Svg, { Circle, Path, Rect, G, Defs, RadialGradient, Stop, LinearGradient } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
 import { haptics } from '@/services/haptics';
 import { logger } from '@/utils/logger';
 
