@@ -660,6 +660,21 @@ export default function RootLayout() {
                     exits via the LAUNCH button on Screen 10) */}
                 <View style={s.onboardingScrimDim} pointerEvents="none" />
                 <View style={s.onboardingWindow}>
+                  {/* HUD top accent bar */}
+                  <View style={s.onboardingTopBar} />
+                  {/* HUD header strip — like a terminal title bar */}
+                  <View style={s.onboardingHeaderStrip}>
+                    <View style={s.onboardingHeaderLeft}>
+                      <View style={s.onboardingHeaderDot} />
+                      <Text style={s.onboardingHeaderLabel}>BUTLER-CORE · INITIALIZATION</Text>
+                    </View>
+                    <Text style={s.onboardingHeaderId}>UNIT-01 · 0xA1</Text>
+                  </View>
+                  {/* Corner brackets inside the window */}
+                  <View style={[s.onboardingCornerBracket, { top: 32,    left: 6,  borderTopWidth: 1.5, borderLeftWidth: 1.5 }]}     pointerEvents="none" />
+                  <View style={[s.onboardingCornerBracket, { top: 32,    right: 6, borderTopWidth: 1.5, borderRightWidth: 1.5 }]}    pointerEvents="none" />
+                  <View style={[s.onboardingCornerBracket, { bottom: 6, left: 6,  borderBottomWidth: 1.5, borderLeftWidth: 1.5 }]}  pointerEvents="none" />
+                  <View style={[s.onboardingCornerBracket, { bottom: 6, right: 6, borderBottomWidth: 1.5, borderRightWidth: 1.5 }]} pointerEvents="none" />
                   <OnboardingErrorBoundary onRecover={() => setNeedsOnboarding(false)}>
                     <OnboardingOverlay
                       onComplete={() => {
@@ -694,41 +709,89 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 9998,
   },
-  /* ─── ONBOARDING WINDOW ─────────────────────────────────────────────
-     A floating panel above the home tab. Home tab is visible:
-       • ~60px top  (status bar + a slice of header content)
-       • ~80px bottom (tab bar + a slice)
-       • ~16px left/right
-     The scrim dims the visible home-tab portions to ~60% opacity so
-     the user knows the panel is modal but they can still see they're
-     inside the live app.  */
+  /* ─── ONBOARDING WINDOW (Terminator HUD-themed, 70% coverage) ──────
+     A floating panel matching the home tab's red/gunmetal HUD theme.
+     Covers ~70% of screen so home tab is clearly visible on all sides.  */
   onboardingScrim: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 9999,
     elevation: 9999,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 60,
-    paddingBottom: 80,
+    paddingHorizontal: '8%',   // ~32px on 414w → leaves ~84% wide
+    paddingVertical:   '15%',  // ~134px on 896h → ~70% tall
   },
   onboardingScrimDim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(2,4,6,0.62)',
+    backgroundColor: 'rgba(2,4,6,0.72)',
   },
+  /* HUD shell — outer red glow + bracket frame matching home tab vibe */
   onboardingWindow: {
     flex: 1,
     width: '100%',
-    maxWidth: 520,
-    borderRadius: 22,
-    overflow: 'hidden',
-    backgroundColor: '#050505',
-    borderWidth: 2,
-    borderColor: 'rgba(255,42,31,0.55)',
+    maxWidth: 560,
+    backgroundColor: '#070A0E',
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,42,31,0.75)',
     shadowColor: '#FF2A1F',
-    shadowOpacity: 0.65,
-    shadowRadius: 28,
+    shadowOpacity: 0.85,
+    shadowRadius: 32,
     shadowOffset: { width: 0, height: 0 },
-    elevation: 24,
+    elevation: 28,
+    overflow: 'hidden',
+  },
+  /* Top accent bar — like home tab section headers */
+  onboardingTopBar: {
+    height: 3,
+    backgroundColor: '#FF2A1F',
+    shadowColor: '#FF2A1F',
+    shadowOpacity: 0.9,
+    shadowRadius: 8,
+  },
+  /* HUD header strip inside the window */
+  onboardingHeaderStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    backgroundColor: 'rgba(255,42,31,0.08)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,42,31,0.22)',
+  },
+  onboardingHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  onboardingHeaderDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FF2A1F',
+    shadowColor: '#FF2A1F',
+    shadowOpacity: 1,
+    shadowRadius: 4,
+  },
+  onboardingHeaderLabel: {
+    color: '#FF2A1F',
+    fontSize: 9,
+    fontWeight: '900',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    letterSpacing: 1.5,
+  },
+  onboardingHeaderId: {
+    color: 'rgba(255,42,31,0.65)',
+    fontSize: 8,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    letterSpacing: 1,
+  },
+  /* Corner brackets inside the window (HUD target-lock vibe) */
+  onboardingCornerBracket: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderColor: '#FF2A1F',
   },
 });

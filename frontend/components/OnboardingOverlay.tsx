@@ -1314,6 +1314,30 @@ export default function OnboardingOverlay({ onComplete }: { onComplete: () => vo
     });
   }, [step, slideAnim]);
 
+  // ── Android hardware back-button handler ────────────────────────────────
+  // Prevents the OS back button from breaking the overlay state. On screens
+  // 1–9 it goes back one screen. On screen 0 (Welcome) it returns true to
+  // block the back action entirely (so the app doesn't quit mid-onboarding).
+  useEffect(() => {
+    const { BackHandler, Platform } = require('react-native');
+    if (Platform.OS !== 'android') return;
+    const onBack = () => {
+      if (step > 0) {
+        // Trigger the same slide-back animation as the BACK button
+        const prev = Math.max(0, step - 1);
+        Animated.timing(slideAnim, { toValue: SW, duration: 220, useNativeDriver: true }).start(() => {
+          slideAnim.setValue(-SW);
+          setStep(prev);
+          Animated.timing(slideAnim, { toValue: 0, duration: 220, useNativeDriver: true }).start();
+        });
+        return true; // consume
+      }
+      return true; // on screen 0, block back so app doesn't quit
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
+    return () => sub?.remove?.();
+  }, [step, slideAnim]);
+
   const goBack = useCallback(() => {
     if (step === 0) return;
     const prev = step - 1;
