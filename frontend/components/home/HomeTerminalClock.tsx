@@ -157,6 +157,10 @@ function HomeTerminalClockImpl({ isConnected }: Props) {
   );
 }
 
+// Memoized export — avoids re-renders when the parent (nexushome) state ticks.
+const HomeTerminalClock = React.memo(HomeTerminalClockImpl);
+export default HomeTerminalClock;
+
 const s = StyleSheet.create({
   wrap: {
     marginHorizontal: 12,
