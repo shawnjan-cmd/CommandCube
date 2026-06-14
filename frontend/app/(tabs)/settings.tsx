@@ -677,8 +677,8 @@ function OmegaScannerCard({
 
   // FIX: store loop refs so stopScanAnim and unmount cleanup can stop them.
   // logger.FIX_PATTERNS.ANIM_CLEANUP shows the pattern.
-  const scanLoopRef  = useRef<{ stop: () => void } | null>(null);
-  const radarLoopRef = useRef<{ stop: () => void } | null>(null);
+  const scanLoopRef  = useRef<Animated.CompositeAnimation | null>(null);
+  const radarLoopRef = useRef<Animated.CompositeAnimation | null>(null);
   const startScanAnim = () => {
     scanLoopRef.current  = Animated.loop(
       Animated.timing(scanAnim, { toValue: 1, duration: 1800, useNativeDriver: true })

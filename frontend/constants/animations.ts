@@ -243,8 +243,8 @@ export const BackgroundAnimations = {
     continuous: (amplitude: number = 10, frequency: number = 2000) =>
       withRepeat(
         withSequence(
-          withTiming(amplitude, { duration: frequency, easing: Easing.inOut(Easing.sine) }),
-          withTiming(-amplitude, { duration: frequency, easing: Easing.inOut(Easing.sine) })
+          withTiming(amplitude, { duration: frequency, easing: Easing.inOut(Easing.sin) }),
+          withTiming(-amplitude, { duration: frequency, easing: Easing.inOut(Easing.sin) })
         ),
         -1,
         false

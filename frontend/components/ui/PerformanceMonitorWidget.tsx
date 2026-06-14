@@ -178,7 +178,7 @@ function StatsFeed({ isConnected, metrics }: {
   useEffect(() => {
     if (!isConnected) { setFeed(STATIC_FEED); return; }
     const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const alerts = [];
+    const alerts: { time: string; msg: string; col: string }[] = [];
     if (metrics.cpu > 80) alerts.push({ time: now(), msg: `CPU spike: ${Math.round(metrics.cpu)}% usage`, col: PM.red });
     if (metrics.ram > 85) alerts.push({ time: now(), msg: `RAM high: ${Math.round(metrics.ram)}% used`, col: PM.amber });
     if (metrics.disk > 90) alerts.push({ time: now(), msg: `Disk critical: ${Math.round(metrics.disk)}% full`, col: PM.red });
