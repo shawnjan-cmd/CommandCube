@@ -15,7 +15,6 @@
         "NODE_OPTIONS": "--max-old-space-size=8192",
         "EXPO_NO_TELEMETRY": "1",
         "EAS_NO_VCS": "1",
-        "EAS_SKIP_AUTO_FINGERPRINT": "1",
         "GRADLE_OPTS": "-Xmx6g -Xms2g -XX:MaxMetaspaceSize=1024m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=false"
       }
     },
