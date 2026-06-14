@@ -19,7 +19,9 @@ export default function OnboardingTab() {
 
   const handleComplete = () => {
     // Persist completion keys in background — never awaited so the user
-    // never has to wait on storage.
+    // never has to wait on storage. We also stamp a diagnostic key with the
+    // timestamp so a returning agent / debug screen can verify the LAUNCH
+    // button was actually tapped (independent of routing success).
     AsyncStorage.multiSet([
       ['@butler_onboarding_done_v2',        'true'],
       ['@butler_welcome_complete_v1',       'true'],
@@ -28,9 +30,27 @@ export default function OnboardingTab() {
       ['@butler_age_confirmed_v1',          'true'],
       ['@butler_show_post_onboarding_chat', 'true'],
       ['@butler_stable_state',              'onboarded'],
+      ['@butler_onboarding_exit_at',        String(Date.now())],
     ]).catch(() => {});
-    // Hand off to home tab. router.replace so back button doesn't return here.
-    router.replace('/(tabs)/nexushome' as any);
+
+    // Multi-path navigation to be bulletproof against any single-method
+    // failure. router.replace is preferred (no back-button history) but
+    // we fall through to router.push, then router.navigate, in case the
+    // expo-router version on the user's device has a quirk.
+    const target = '/(tabs)/nexushome' as const;
+    try {
+      console.log('[onboarding] LAUNCH → router.replace(' + target + ')');
+      router.replace(target as any);
+      return;
+    } catch (e) {
+      console.warn('[onboarding] replace failed, trying push:', e);
+    }
+    try { router.push(target as any); return; } catch (e) {
+      console.warn('[onboarding] push failed, trying navigate:', e);
+    }
+    try { (router as any).navigate?.(target); } catch (e) {
+      console.error('[onboarding] ALL navigation paths failed:', e);
+    }
   };
 
   return (

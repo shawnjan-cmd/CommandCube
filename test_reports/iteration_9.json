@@ -1,0 +1,55 @@
+{
+  "summary": "All 5 requested verification tests PASS for the Butler AI onboarding-as-tab refactor. (1) Fresh boot lands on /onboarding with no tab bar, no role=tablist, no ASK BUTLER, no OFFLINE badge visible, and Screen 1 contains every required token (WELCOME, BUTLER, MODULE REGISTRY, ~/butler, 9/9 ARMED, load home, load config, STACK:). (2) Returning user with @butler_onboarding_done_v2='true' boots directly to /nexushome with all 8 tab labels (HOME, SCRIPTS, AI, KB, PC, BUILD, SKINS, CONFIG) visible and ASK BUTLER QuickButlerBar rendered (placeholder text). (3) Tab-bar is fully locked during onboarding — no role=tablist node, ASK BUTLER hidden. (4) MODULE REGISTRY redesign renders all 9 modules (load home/scripts/butler.ai/knowledge/tools/pc.health/builder/skins/config) and all 9 status tags (DASHBOARD, 70+ LIBRARY, LLM·LOCAL, SIGMA-NET, PHONE→PC, REALTIME, VISUAL·NODE, THEMES, SETTINGS); legacy string 'FEATURE-PACKED PAGES' is absent. (5) Full 10-screen walkthrough succeeded — GET STARTED → 8x CONTINUE/I ACCEPT/I PLEDGE → ALL DONE! Screen 10 → LAUNCH BUTLER AI tap → pathname=/nexushome within ~3.5s; @butler_onboarding_done_v2='true' and @butler_onboarding_exit_at=1781480166143 (numeric timestamp) persisted. BACK button present on every transitional screen. ONE NOTABLE ISSUE: the onboarding tab is still registered as a visible bottom-bar tab labeled 'START' on the home screen — tapping it routes a returning user back into /onboarding, which is an escape route the cleanup likely intended to remove.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "(tabs)/_layout.tsx — Tabs.Screen 'onboarding'",
+        "issue": "Onboarding tab still appears in the bottom tab bar as 'START' on every non-onboarding tab. Tapping it from /nexushome navigates the user back to /onboarding — an unintended escape route for returning users. tabBarStyle:{display:'none'} only hides the bar while on that tab; it does not remove the tab button itself. Recommend `href: null` (or `tabBarButton: () => null`) on the onboarding Tabs.Screen to keep the route reachable via router.replace but invisible in the bar.",
+        "testID": "n/a — no testID on tab buttons",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "/nexushome (tab bar)",
+        "issues": [
+          "Bottom tab bar shows 9 tabs (START + 8) instead of the 8 documented in the spec. The extra 'START' tab is the onboarding entry; cosmetically clutters the bar and is functionally an escape route."
+        ]
+      }
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_9.json",
+    "/app/test_reports/module_registry_check.png",
+    "/app/test_reports/screens_iter9_t1_screen1.png",
+    "/app/test_reports/screens_iter9_t2_home.png",
+    "/app/test_reports/screens_iter9_t5_screen10.png",
+    "/app/test_reports/screens_iter9_t5_after_launch.png",
+    "/app/test_reports/screens_iter9_verify.png"
+  ],
+  "action_items": [
+    "Hide the onboarding tab button from the bottom bar for returning users — change `<Tabs.Screen name=\"onboarding\" ...>` in /app/frontend/app/(tabs)/_layout.tsx to include `href: null` (or `tabBarButton: () => null`) so the route stays addressable via router.replace('/(tabs)/onboarding') for first-boot redirect but never appears as a tappable 'START' tab on /nexushome.",
+    "Optional polish: add a testID on the ASK BUTLER TextInput placeholder (e.g. testID=\"quick-butler-input\") to make future returning-user tests deterministic without relying on innerText fallback."
+  ],
+  "critical_code_review_comments": [
+    "OnboardingOverlay.tsx is 1490 lines — exceeds the 700-line guideline. Recommend splitting per-screen renderers into separate files under components/onboarding/screens/ for maintainability (post-MVP).",
+    "/(tabs)/onboarding.tsx handleComplete fires AsyncStorage.multiSet without awaiting and immediately router.replace — the diagnostic key @butler_onboarding_exit_at may race the navigation on slow devices, but verified persisted in this run (value=1781480166143).",
+    "Index.tsx redirect gate is clean and correctly handles both 'true' and '1' values for the flag; no issues."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "skipped",
+    "frontend": "100% on the 5 requested verifications; 1 design/UX side-finding (extra START tab) flagged"
+  },
+  "seed_data_creation": "None — localStorage flag set/cleared in-test only.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All 5 spec requirements verified passing on http://localhost:3000 at 414x896 viewport. The 10-screen walkthrough is deterministic: screen 1 button has testID=onboarding-screen1-next, screens 2-9 use exact-text 'CONTINUE'/'I ACCEPT'/'I PLEDGE', screen 10 launch uses testID=onboarding-launch-primary. AsyncStorage maps directly to localStorage on web. Cache buster via ?_b=<ns> works. One side-finding to verify after main-agent fix: tapping the bottom-bar 'START' tab from /nexushome should NOT take the user to /onboarding (currently does).",
+  "rca_of_issue": "Escape-route RCA: in /app/frontend/app/(tabs)/_layout.tsx line 85, the onboarding Tabs.Screen has `tabBarStyle: { display: 'none' }` which only hides the *entire bar* while the onboarding tab is focused. It does NOT prevent the tab button itself from rendering inside FuturisticTabBar on every other tab. The label 'START' (from `tabBarLabel: 'START'`) thus appears in the bar on /nexushome and all other tabs. Fix: use `href: null` (Expo Router convention to keep the route in the navigator but hidden from the bar) OR `tabBarButton: () => null`. The same line-85 declaration also already sets `headerShown: false` which is correct for onboarding."
+}

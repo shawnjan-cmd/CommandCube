@@ -427,24 +427,109 @@ function Screen1Welcome({ onNext, allAccepted }: { onNext: () => void; allAccept
           </View>
         </View>
 
-        {/* 9 pages summary */}
-        <View style={[st.card, { borderColor: C.cyan + '35', marginBottom: 14 }]}>
+        {/* ── MODULE REGISTRY ── Automation-Terminal themed module listing ── */}
+        <View style={[st.card, { borderColor: C.cyan + '35', marginBottom: 14, padding: 0, overflow: 'hidden' }]}>
+          {/* HUD top accent bar */}
           <View style={{ height: 2, backgroundColor: C.cyan }} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 }}>
-            <View style={{ width: 52, height: 52, borderRadius: 14, borderWidth: 2, borderColor: C.cyan + '60', backgroundColor: C.cyan + '12', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 28, fontWeight: '900', color: C.cyan, fontFamily: MONO }}>9</Text>
-            </View>
-            <View style={{ flex: 1, gap: 5 }}>
-              <Text style={{ fontSize: 17, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO }}>FEATURE-PACKED PAGES</Text>
-              <Text style={{ fontSize: 12, color: C.textMid, lineHeight: 18 }}>Home · Scripts · AI Chat · Knowledge Base · Tools Hub · PC Health · Script Builder · Themes · Settings</Text>
+
+          {/* Terminal-style title bar */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 6 }}>
+            <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.green }} />
+            <Text style={{ fontSize: 9, fontWeight: '900', color: C.cyan + 'AA', fontFamily: MONO, letterSpacing: 1.6 }}>~/butler ❯</Text>
+            <Text style={{ fontSize: 9, fontWeight: '700', color: C.text + '99', fontFamily: MONO, letterSpacing: 1 }}>list --modules</Text>
+            <View style={{ flex: 1 }} />
+            <View style={{ borderRadius: 4, borderWidth: 1, borderColor: C.green + '50', backgroundColor: C.green + '10', paddingHorizontal: 6, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 8, fontWeight: '900', color: C.green, fontFamily: MONO }}>9/9 ARMED</Text>
             </View>
           </View>
-          <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', padding: 14, paddingTop: 0 }}>
-            {['70+ Scripts', 'Local AI', 'Crawler KB', 'Widget Studio', 'Script Builder', 'Undo System'].map(b => (
-              <View key={b} style={{ borderRadius: 6, borderWidth: 1, borderColor: C.green + '45', backgroundColor: C.green + '08', paddingHorizontal: 9, paddingVertical: 4 }}>
-                <Text style={{ fontSize: 10, fontWeight: '900', color: C.green, fontFamily: MONO }}>✓ {b}</Text>
+
+          {/* Hex-chip icon + headline row */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 14, paddingVertical: 10 }}>
+            {/* Custom hexagonal automation-chip icon (replaces the plain "9") */}
+            <Svg width={56} height={56} viewBox="0 0 56 56">
+              <Defs>
+                <LinearGradient id="hexBody" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0%" stopColor={C.cyan} stopOpacity="0.22" />
+                  <Stop offset="100%" stopColor={C.cyan} stopOpacity="0.05" />
+                </LinearGradient>
+                <RadialGradient id="hexCoreGlow" cx="50%" cy="50%" r="50%">
+                  <Stop offset="0%"  stopColor="#FFFFFF" stopOpacity="0.95" />
+                  <Stop offset="100%" stopColor={C.cyan} stopOpacity="0.12" />
+                </RadialGradient>
+              </Defs>
+              {/* Hex shell */}
+              <Path d="M28 3 L51 16 L51 40 L28 53 L5 40 L5 16 Z"
+                    fill="url(#hexBody)" stroke={C.cyan} strokeOpacity={0.85} strokeWidth={1.4}/>
+              {/* Inner hex outline */}
+              <Path d="M28 9 L46 19 L46 37 L28 47 L10 37 L10 19 Z"
+                    fill="none" stroke={C.cyan} strokeOpacity={0.35} strokeWidth={1} strokeDasharray="3 2"/>
+              {/* Circuit traces */}
+              <Path d="M5 28 L13 28 M43 28 L51 28 M28 3 L28 9 M28 47 L28 53" stroke={C.cyan} strokeOpacity={0.7} strokeWidth={1.2}/>
+              <Circle cx="13" cy="28" r="1.6" fill={C.cyan} />
+              <Circle cx="43" cy="28" r="1.6" fill={C.cyan} />
+              <Circle cx="28" cy="9"  r="1.6" fill={C.cyan} />
+              <Circle cx="28" cy="47" r="1.6" fill={C.cyan} />
+              {/* Diagonal traces */}
+              <Path d="M14 17 L20 23 M42 17 L36 23 M14 39 L20 33 M42 39 L36 33" stroke={C.cyan} strokeOpacity={0.45} strokeWidth={0.9}/>
+              {/* Central core */}
+              <Circle cx="28" cy="28" r="9" fill="url(#hexCoreGlow)" />
+              <Circle cx="28" cy="28" r="7" fill="none" stroke={C.cyan} strokeWidth={1.2}/>
+              <Circle cx="28" cy="28" r="3" fill={C.cyan} />
+              <Path d="M25 28 L31 28 M28 25 L28 31" stroke="#FFFFFF" strokeWidth={1.1} strokeLinecap="round" opacity={0.9}/>
+              {/* Corner notches */}
+              <Path d="M5 16 L9 16 M5 40 L9 40 M51 16 L47 16 M51 40 L47 40" stroke={C.cyan} strokeOpacity={0.7} strokeWidth={1.4}/>
+            </Svg>
+
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, letterSpacing: 1.2 }}>MODULE REGISTRY</Text>
+              <Text style={{ fontSize: 10, color: C.textMid, fontFamily: MONO, letterSpacing: 0.5 }}>v8.0 · 9 modules online · 0 fault · 0 pending</Text>
+            </View>
+          </View>
+
+          {/* Divider line */}
+          <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: C.cyan + '25', marginHorizontal: 14 }} />
+
+          {/* Terminal module listing */}
+          <View style={{ paddingHorizontal: 14, paddingVertical: 10, gap: 4 }}>
+            {[
+              { id: '01', name: 'home',         tag: 'DASHBOARD',  hint: 'Live PC HUD'        },
+              { id: '02', name: 'scripts',      tag: '70+ LIBRARY', hint: 'Python automation'  },
+              { id: '03', name: 'butler.ai',    tag: 'LLM·LOCAL',  hint: 'Ollama on YOUR PC'  },
+              { id: '04', name: 'knowledge',    tag: 'SIGMA-NET',  hint: 'Self-growing KB'    },
+              { id: '05', name: 'tools',        tag: 'PHONE→PC',   hint: 'File / clipboard'   },
+              { id: '06', name: 'pc.health',    tag: 'REALTIME',   hint: 'CPU·RAM·Disk·Net'   },
+              { id: '07', name: 'builder',      tag: 'VISUAL·NODE', hint: 'Drag-drop pipelines' },
+              { id: '08', name: 'skins',        tag: 'THEMES',     hint: 'Cosmetic packs'     },
+              { id: '09', name: 'config',       tag: 'SETTINGS',   hint: 'Server·keys·data'   },
+            ].map((m) => (
+              <View key={m.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, width: 18 }}>{m.id}</Text>
+                <Text style={{ fontSize: 11, color: C.cyan, fontFamily: MONO, fontWeight: '700' }}>❯</Text>
+                <Text style={{ fontSize: 11, color: C.text, fontFamily: MONO, fontWeight: '700', minWidth: 78 }}>load {m.name}</Text>
+                <Text style={{ fontSize: 10, color: C.textMid, fontFamily: MONO, flex: 1 }} numberOfLines={1}>{m.hint}</Text>
+                <View style={{ borderRadius: 3, paddingHorizontal: 5, paddingVertical: 1, backgroundColor: C.cyan + '14', borderWidth: 1, borderColor: C.cyan + '35' }}>
+                  <Text style={{ fontSize: 8, color: C.cyan, fontFamily: MONO, fontWeight: '900', letterSpacing: 0.5 }}>{m.tag}</Text>
+                </View>
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.green }} />
               </View>
             ))}
+          </View>
+
+          {/* Bottom status line — feature highlights as terminal tags */}
+          <View style={{ paddingHorizontal: 14, paddingBottom: 14, paddingTop: 4 }}>
+            <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: C.cyan + '20', marginBottom: 10 }} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+              <Text style={{ fontSize: 9, color: C.cyan + '80', fontFamily: MONO, fontWeight: '900', letterSpacing: 1 }}>STACK:</Text>
+              <Text style={{ fontSize: 9, color: C.textMid, fontFamily: MONO }}>capabilities loaded</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
+              {['70+ Scripts', 'Local AI', 'Crawler KB', 'Widget Studio', 'Script Builder', 'Undo System'].map(b => (
+                <View key={b} style={{ borderRadius: 4, borderWidth: 1, borderColor: C.green + '45', backgroundColor: C.green + '08', paddingHorizontal: 8, paddingVertical: 3, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 9, fontWeight: '900', color: C.green, fontFamily: MONO }}>✓</Text>
+                  <Text style={{ fontSize: 9, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 0.3 }}>{b.toUpperCase()}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         </View>
 

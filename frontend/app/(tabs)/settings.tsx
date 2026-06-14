@@ -2154,11 +2154,10 @@ export default function SettingsScreen() {
                           '@butler_stable_state',
                         ]).then(() => {
                           haptics.success();
-                          // Immediately re-show overlay (no restart needed)
-                          const setter = (global as any).__setNeedsOnboarding;
-                          if (typeof setter === 'function') {
-                            setter(true);
-                          } else {
+                          // Onboarding is a tab route — navigate directly.
+                          try {
+                            router.push('/(tabs)/onboarding' as any);
+                          } catch {
                             Alert.alert('Reset Complete', 'Restart the app to view the onboarding flow.');
                           }
                         }).catch(() => {});
@@ -2537,7 +2536,6 @@ export default function SettingsScreen() {
               { text: 'Clear', style: 'destructive', onPress: async () => {
                 haptics.heavy();
                 await AsyncStorage.multiRemove(['commandcube_server_ip','commandcube_server_port','commandcube_session_token','commandcube_alien_403','@botler_exec_history','boter_exec_counts_v1','@botler_auto_crawler_state','@botler_quick_slots_v1','@botler_quick_slots_v3']);
-                await AsyncStorage.setItem('tutorial_completed', 'true');
                 Alert.alert('Done', 'App data cleared. Restart the app.');
               }},
             ]);

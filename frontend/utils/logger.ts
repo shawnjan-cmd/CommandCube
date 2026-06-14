@@ -96,7 +96,7 @@ const FIX_PATTERNS: Record<FixHint, string> = {
   │    try { router.replace(route as any); }                 │
   │    catch (e) {                                           │
   │      logger.error('[Tag] nav failed:', e);               │
-  │      try { router.replace('/main-menu' as any); }        │
+  │      try { router.replace('/(tabs)/nexushome' as any); }   │
   │      catch { /* last resort — user must tap back */ }    │
   │    }                                                     │
   │  };                                                      │
@@ -267,13 +267,13 @@ function safeJSON<T>(raw: string | null | undefined, fallback: T, tag = '[App]')
  * Tries primary route, then each fallback in order.
  *
  * @example
- *   logger.safeNav(router, '/(tabs)', '[Screen10]', ['/main-menu', '/']);
+ *   logger.safeNav(router, '/(tabs)/nexushome', '[Screen10]');
  */
 function safeNav(
   router: { replace: (href: any) => void },
   primary: string,
   tag = '[App]',
-  fallbacks: string[] = ['/main-menu']
+  fallbacks: string[] = ['/(tabs)/nexushome', '/(tabs)']
 ): boolean {
   const targets = [primary, ...fallbacks];
   for (const target of targets) {

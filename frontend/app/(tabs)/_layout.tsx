@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import React from 'react';
 import { View, Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -35,6 +35,11 @@ const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const { isConnected } = useServerConnection();
+  const pathname = usePathname();
+  // True whenever the user is on the onboarding tab — drives hiding of the
+  // tab bar, the Ask-Butler composer and the floating connection badge so
+  // there is absolutely no way to bypass onboarding before completion.
+  const onOnboarding = pathname?.includes('onboarding') ?? false;
 
   // ── Themed centered header — applied to every tab except home ────────────
   // Uses our custom ThemedCenterHeader so titles are perfectly centered with
@@ -69,9 +74,15 @@ export default function TabLayout() {
       <CyberneticBackdrop intensity={0.7} />
       <Tabs
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
-        tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
+        tabBar={(props) => {
+          // Hide tab bar entirely while user is on the onboarding tab so
+          // they cannot switch to other tabs until they complete onboarding.
+          const focusedRoute = props.state.routes[props.state.index];
+          if (focusedRoute?.name === 'onboarding') return null;
+          return <FuturisticTabBar {...props} iconMap={ICONS} />;
+        }}
       >
-        <Tabs.Screen name="onboarding" options={{ title: 'ONBOARDING',     tabBarLabel: 'START',   headerShown: false }} />
+        <Tabs.Screen name="onboarding" options={{ title: 'ONBOARDING', tabBarLabel: 'START', headerShown: false, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen name="nexushome" options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
         <Tabs.Screen name="scripts"   options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
         <Tabs.Screen name="butler"    options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />
@@ -88,23 +99,27 @@ export default function TabLayout() {
         <Tabs.Screen name="support"   options={{ href: null, title: 'SUPPORT'     }} />
       </Tabs>
 
-      {/* Global persistent connection status — visible on every tab.
-          Floats at the top-right edge of the screen, respecting safe area.
-          Tappable so users can manually retry the LAN handshake. */}
-      <View
-        pointerEvents="box-none"
-        style={{
-          position: 'absolute',
-          top: (insets.top || (Platform.OS === 'ios' ? 44 : 12)) + 6,
-          right: 12,
-          zIndex: 100,
-        }}
-      >
-        <ConnectionBadge tappable />
-      </View>
+      {/* Global persistent connection status — visible on every tab EXCEPT
+          onboarding. Floats at the top-right edge of the screen, respecting
+          safe area. Tappable so users can manually retry the LAN handshake. */}
+      {!onOnboarding && (
+        <View
+          pointerEvents="box-none"
+          style={{
+            position: 'absolute',
+            top: (insets.top || (Platform.OS === 'ios' ? 44 : 12)) + 6,
+            right: 12,
+            zIndex: 100,
+          }}
+        >
+          <ConnectionBadge tappable />
+        </View>
+      )}
 
-      {/* Persistent Ask-Butler composer floating above the tab bar */}
-      <QuickButlerBar />
+      {/* Persistent Ask-Butler composer floating above the tab bar.
+          Hidden during onboarding so users can't bypass the flow by
+          sending a prompt that navigates to the AI tab. */}
+      {!onOnboarding && <QuickButlerBar />}
     </View>
   );
 }
