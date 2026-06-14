@@ -23,6 +23,37 @@ import { proLicense } from '@/services/proLicense';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 import WelcomeScreen from './welcome';
 import '@/services/imageRegistry';
+import RootSafeShell from '@/components/ui/RootSafeShell';
+
+// ── GLOBAL UNHANDLED PROMISE & ERROR GUARD ──────────────────────────────────
+// Captures any unhandled promise rejection / global error and writes a single
+// console.warn instead of letting them crash the dev red-box or surface as
+// silent app freezes. Pure passive listener — does NOT swallow real errors,
+// only ensures they're logged. Safe to install at module load.
+(() => {
+  try {
+    const g: any = global as any;
+    if (!g.__butler_global_guards_installed) {
+      g.__butler_global_guards_installed = true;
+      const orig = g.HermesInternal?.setPromiseRejectionTracker;
+      if (orig) {
+        orig.call(g.HermesInternal, {
+          allRejections: true,
+          onUnhandled: (id: number, error: any) => {
+            console.warn('[GlobalGuard] unhandled rejection #' + id + ':', error?.message || error);
+          },
+          onHandled: () => {},
+        });
+      }
+      // Fallback for non-Hermes JS engines:
+      if (typeof g.process?.on === 'function') {
+        g.process.on('unhandledRejection', (reason: any) => {
+          console.warn('[GlobalGuard] unhandledRejection:', reason?.message || reason);
+        });
+      }
+    }
+  } catch {}
+})();
 
 // Keep the native splash visible until the gate check + first navigation are done.
 // MUST be at module scope.
@@ -42,12 +73,29 @@ import('@/services/encryptedStorage').then(async m => {
 
 // ─── GLOBAL ERROR BOUNDARY ──────────────────────────────────────────────────
 interface EBState { error: Error | null; }
-class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState> {
-  state: EBState = { error: null };
-  static getDerivedStateFromError(error: Error): EBState { return { error }; }
+class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState & { resetCount: number; reloadConfirm: boolean }> {
+  state = { error: null as Error | null, resetCount: 0, reloadConfirm: false };
+  static getDerivedStateFromError(error: Error): any { return { error }; }
   componentDidCatch(error: Error) {
     try { require('@/services/autoErrorLogger').autoErrorLogger.log('error', 'GlobalErrorBoundary', error.message); } catch {}
+    console.error('[GlobalErrorBoundary] uncaught:', error?.message);
   }
+  private handleReinit = () => {
+    // Cheap recovery: clear error state + bump key to force subtree re-mount.
+    this.setState({ error: null, resetCount: this.state.resetCount + 1, reloadConfirm: false });
+  };
+  private handleHardReload = () => {
+    // Two-tap confirm to avoid accidental nuclear reload.
+    if (!this.state.reloadConfirm) {
+      this.setState({ reloadConfirm: true });
+      setTimeout(() => { try { this.setState({ reloadConfirm: false }); } catch {} }, 4000);
+      return;
+    }
+    try { require('react-native').DevSettings?.reload?.(); } catch (e) {
+      console.warn('[GlobalErrorBoundary] DevSettings.reload failed:', e);
+      this.handleReinit();
+    }
+  };
   render() {
     if (this.state.error) {
       const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
@@ -76,10 +124,23 @@ class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState> {
           </View>
           <TouchableOpacity
             style={eb.btn}
-            onPress={() => this.setState({ error: null })}
+            onPress={this.handleReinit}
             activeOpacity={0.8}>
             <MaterialIcons name="refresh" size={16} color="#FFFFFF" />
             <Text style={[eb.btnTxt, { fontFamily: MONO }]}>REINITIALIZE</Text>
+          </TouchableOpacity>
+          {/* Hard-reload fallback — last resort. Two-tap confirm. */}
+          <TouchableOpacity
+            style={[eb.btn, {
+              backgroundColor: this.state.reloadConfirm ? '#FFB020' : 'transparent',
+              borderWidth: 1.5, borderColor: '#FFB020', marginTop: 10,
+            }]}
+            onPress={this.handleHardReload}
+            activeOpacity={0.8}>
+            <MaterialIcons name="restart-alt" size={16} color={this.state.reloadConfirm ? '#000' : '#FFB020'} />
+            <Text style={[eb.btnTxt, { fontFamily: MONO, color: this.state.reloadConfirm ? '#000' : '#FFB020' }]}>
+              {this.state.reloadConfirm ? 'TAP AGAIN TO CONFIRM' : 'HARD RELOAD'}
+            </Text>
           </TouchableOpacity>
           <View style={eb.badge}>
             <Text style={[eb.badgeTxt, { fontFamily: MONO }]}>
@@ -89,7 +150,8 @@ class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState> {
         </View>
       );
     }
-    return this.props.children;
+    // Bump key on reinit so any stale subscriptions / refs are torn down cleanly.
+    return <React.Fragment key={`eb-${this.state.resetCount}`}>{this.props.children}</React.Fragment>;
   }
 }
 const eb = StyleSheet.create({
