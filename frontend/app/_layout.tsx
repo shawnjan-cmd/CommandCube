@@ -614,38 +614,45 @@ export default function RootLayout() {
           ) : null}
           <StatusBar style="light" />
           <View style={[s.container, showHoldingScreen && { opacity: 0 }]}>
+            {/* ─── ROUTING WITH Stack.Protected ────────────────────────────────
+                SDK 54+ pattern. `welcome` and `(tabs)` are guarded by
+                opposing booleans so EXACTLY ONE mounts at any time:
+                  • !needsOnboarding ? show tabs : show welcome
+                Tabs literally cannot bleed through the welcome screen
+                because they aren't rendered at all while needsOnboarding
+                is true. When WelcomeScreen flips `setNeedsOnboarding(false)`
+                via the global setter, Stack.Protected automatically
+                re-evaluates guards and navigates to (tabs).
+
+                Until needsOnboarding resolves from AsyncStorage we render
+                NEITHER — the holding-screen splash above covers the void. */}
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
-              <Stack.Screen name="welcome"        options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
-              <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="tutorial"       options={{ headerShown: false }} />
-              <Stack.Screen name="main-menu"      options={{ headerShown: false }} />
-              <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
-              <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+              {/* Onboarding-only route. Mounts ONLY while user hasn't completed onboarding. */}
+              <Stack.Protected guard={needsOnboarding === true}>
+                <Stack.Screen name="welcome" options={{ headerShown: false, gestureEnabled: false }} />
+              </Stack.Protected>
+
+              {/* Main app — tabs + all secondary routes. Mounts ONLY after onboarding done. */}
+              <Stack.Protected guard={needsOnboarding === false}>
+                <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
+                <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+                <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+                <Stack.Screen name="tutorial"       options={{ headerShown: false }} />
+                <Stack.Screen name="main-menu"      options={{ headerShown: false }} />
+                <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
+                <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+                <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+              </Stack.Protected>
             </Stack>
           </View>
 
-          {/* ─── ONBOARDING OVERLAY ────────────────────────────────────────────
-              Plain conditional View overlay rendered ON TOP of the tabs.
-              We deliberately do NOT use React Native's native <Modal> here —
-              on several Android OEM skins (Xiaomi/MIUI, OnePlus OxygenOS,
-              Samsung One UI variants) the Modal's `visible` prop is not
-              reliably honoured when the parent state flips during a long-
-              press launch sequence, leaving the user stuck on Screen 10 even
-              though every dismissal channel has already fired. Conditional
-              rendering inside the React tree guarantees an immediate unmount
-              the instant `needsOnboarding` becomes false.
-              z-index 10000 keeps it above the global ConnectionBadge & tab bar. */}
-          {needsOnboarding === true && splashDone ? (
-            <View
-              style={[StyleSheet.absoluteFill, { zIndex: 10_000, elevation: 30, backgroundColor: '#050505' }]}
-              pointerEvents="auto"
-            >
-              <WelcomeScreen onComplete={handleOnboardingComplete} />
-            </View>
-          ) : null}
+          {/* ─── LEGACY OVERLAY — disabled in favour of Stack.Protected ────────
+              The previous architecture rendered WelcomeScreen as a sibling
+              View overlay on top of the mounted tabs. That approach worked
+              but tabs were always mounted underneath, which could bleed
+              through on some Android OEM skins during the transition frame.
+              Stack.Protected (above) replaces this entirely — the tabs do
+              not mount at all until onboarding is complete. */}
         </TabBarProvider>
       </CosmeticProvider>
     </GlobalErrorBoundary>
