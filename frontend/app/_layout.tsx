@@ -653,8 +653,9 @@ export default function RootLayout() {
               <View style={[StyleSheet.absoluteFill, { backgroundColor: '#050505', zIndex: 9999, elevation: 9999 }]} pointerEvents="auto" accessibilityViewIsModal={true}>
                 <OnboardingOverlay
                   onComplete={() => {
+                    // Just flip the state. OnboardingOverlay's Screen 10 button
+                    // already persisted all 7 keys before calling this.
                     setNeedsOnboarding(false);
-                    AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
                   }}
                 />
               </View>

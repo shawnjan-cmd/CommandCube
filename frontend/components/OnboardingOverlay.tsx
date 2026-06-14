@@ -1112,10 +1112,51 @@ function Screen9Download({ onNext, onBack }: { onNext: () => void; onBack: () =>
 }
 
 // ─────────────────────────────────────────────────────────────────
-// SCREEN 10: LAUNCH — Stripped down to one button (v6)
 // ─────────────────────────────────────────────────────────────────
+// SCREEN 10: LAUNCH — Bulletproof v7 (synchronous-first)
+// ─────────────────────────────────────────────────────────────────
+// Design principles:
+//   1. onComplete() is called SYNCHRONOUSLY on the very first tap.
+//      No awaits, no setStates blocking it, no race conditions.
+//      The parent unmounts us in the same render cycle.
+//   2. AsyncStorage persistence runs in the BACKGROUND via .then() —
+//      it cannot delay or block the dismissal.
+//   3. Two independent tap targets call the same handler. Either one
+//      working guarantees exit.
+//   4. Local `tapped` state gives instant visual feedback even before
+//      the unmount happens (~16ms later).
+
+const PERSIST_KEYS: [string, string][] = [
+  ['@butler_onboarding_done_v2',        'true'],
+  ['@butler_welcome_complete_v1',       'true'],
+  ['@butler_terms_accepted_v1',         'true'],
+  ['@butler_consent_v2',                '1.0.0'],
+  ['@butler_age_confirmed_v1',          'true'],
+  ['@butler_show_post_onboarding_chat', 'true'],
+  ['@butler_stable_state',              'onboarded'],
+];
+
+function persistInBackground() {
+  // Fire-and-forget. Storage failure cannot block the user from entering the app.
+  AsyncStorage.multiSet(PERSIST_KEYS).catch(() => {
+    // Fallback: try each individually if multiSet fails (low memory devices)
+    PERSIST_KEYS.forEach(([k, v]) => {
+      AsyncStorage.setItem(k, v).catch(() => {});
+    });
+  });
+}
 
 function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete: () => void }) {
+  const [tapped, setTapped] = useState(false);
+
+  // The ONE handler. Both tap targets call this. Synchronous-first.
+  const enterApp = () => {
+    if (tapped) return;          // Idempotent: second tap is a no-op
+    setTapped(true);             // Visual feedback (1 frame)
+    persistInBackground();       // Fire-and-forget. Never awaited.
+    onComplete();                // Parent unmounts us NOW.
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
 
@@ -1141,71 +1182,95 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete:
 
       <ComplianceBadge />
 
-      {/* LAUNCH BUTTON */}
+      {/* ─── PRIMARY LAUNCH BUTTON ───────────────────────────────────── */}
       <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={async () => {
-          // Persist all completion keys, THEN hide the overlay.
-          // No navigation, no router calls. The parent simply unmounts us.
-          const pairs: [string, string][] = [
-            ['@butler_onboarding_done_v2',       'true'],
-            ['@butler_welcome_complete_v1',      'true'],
-            ['@butler_terms_accepted_v1',        'true'],
-            ['@butler_consent_v2',               '1.0.0'],
-            ['@butler_age_confirmed_v1',         'true'],
-            ['@butler_show_post_onboarding_chat','true'],
-            ['@butler_stable_state',             'onboarded'],
-          ];
-          try {
-            await AsyncStorage.multiSet(pairs);
-          } catch {
-            for (const [k, v] of pairs) {
-              try { await AsyncStorage.setItem(k, v); } catch {}
-            }
-          }
-          onComplete();
-        }}
+        testID="onboarding-launch-primary"
+        activeOpacity={0.7}
+        onPress={enterApp}
+        hitSlop={{ top: 24, bottom: 24, left: 24, right: 24 }}
+        accessibilityRole="button"
+        accessibilityLabel="Launch Butler AI and enter the app"
         style={{
-          backgroundColor: '#00ff88',
-          borderRadius: 16,
-          paddingVertical: 22,
-          paddingHorizontal: 40,
+          backgroundColor: tapped ? '#00cc66' : '#00ff88',
+          borderRadius: 18,
+          paddingVertical: 24,
+          paddingHorizontal: 32,
           alignItems: 'center',
           justifyContent: 'center',
           marginTop: 32,
-          marginHorizontal: 24,
-          borderWidth: 2,
-          borderColor: '#00cc66',
+          marginHorizontal: 20,
+          borderWidth: 3,
+          borderColor: tapped ? '#00ff88' : '#00cc66',
+          shadowColor: '#00ff88',
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.6,
+          shadowRadius: 18,
+          elevation: 12,
         }}
       >
         <Text style={{
           color: '#000000',
-          fontSize: 22,
-          fontWeight: 'bold',
-          fontFamily: 'monospace',
+          fontSize: 24,
+          fontWeight: '900',
+          fontFamily: MONO,
           letterSpacing: 2,
+          textAlign: 'center',
         }}>
-          🚀  LAUNCH BUTLER AI
+          {tapped ? 'ENTERING APP...' : '🚀  LAUNCH BUTLER AI'}
         </Text>
         <Text style={{
-          color: '#004422',
+          color: '#003322',
           fontSize: 12,
-          marginTop: 4,
-          fontFamily: 'monospace',
+          marginTop: 6,
+          fontFamily: MONO,
+          fontWeight: '700',
+          letterSpacing: 1,
         }}>
-          TAP TO ENTER THE APP
+          {tapped ? 'PLEASE WAIT' : 'TAP HERE TO ENTER THE APP'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* ─── SECONDARY EXIT (always visible safety net) ─────────────── */}
+      <TouchableOpacity
+        testID="onboarding-launch-secondary"
+        activeOpacity={0.6}
+        onPress={enterApp}
+        hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+        accessibilityRole="button"
+        accessibilityLabel="Enter the app"
+        style={{
+          marginTop: 16,
+          marginHorizontal: 20,
+          paddingVertical: 14,
+          paddingHorizontal: 20,
+          borderRadius: 12,
+          borderWidth: 1.5,
+          borderColor: C.cyan + '60',
+          backgroundColor: C.cyan + '0A',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{
+          color: C.cyan,
+          fontSize: 13,
+          fontWeight: '900',
+          fontFamily: MONO,
+          letterSpacing: 1.5,
+        }}>
+          OR TAP HERE → ENTER APP
         </Text>
       </TouchableOpacity>
 
       {/* Footer */}
-      <View style={{ borderWidth: 1, borderRadius: 10, borderColor: C.cyan + '20', backgroundColor: C.cyan + '06', padding: 12, marginTop: 20, marginBottom: 4 }}>
+      <View style={{ borderWidth: 1, borderRadius: 10, borderColor: C.cyan + '20', backgroundColor: C.cyan + '06', padding: 12, marginTop: 24, marginHorizontal: 20, marginBottom: 4 }}>
         <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, textAlign: 'center', lineHeight: 16 }}>
           {'Agreements saved locally \u00b7 Never uploaded \u00b7 Remembered across restarts\ncom.butlerai.pc.automation'}
         </Text>
       </View>
 
       <View style={[st.navRow, { marginTop: 12 }]}>
-        <TouchableOpacity style={st.backBtn} onPress={onBack} activeOpacity={0.85}>
+        <TouchableOpacity style={st.backBtn} onPress={onBack} activeOpacity={0.85} disabled={tapped}>
           <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
           <Text style={st.backBtnTxt}>BACK</Text>
         </TouchableOpacity>
