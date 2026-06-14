@@ -619,11 +619,11 @@ export default function RootLayout() {
     <GlobalErrorBoundary>
       <CosmeticProvider>
         <TabBarProvider>
-          <View style={{ flex: 1, backgroundColor: '#050505' }}>
+          <View style={s.container}>
             <StatusBar style="light" />
-
-            {/* ── ALWAYS-MOUNTED TABS STACK ─────────────────────────────── */}
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
+              <Stack.Screen name="index"          options={{ headerShown: false }} />
+              <Stack.Screen name="onboarding"     options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
               <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
               <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
@@ -633,61 +633,6 @@ export default function RootLayout() {
               <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
               <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
             </Stack>
-
-            {/* ── LOADING / SPLASH (covers everything while AsyncStorage reads) ── */}
-            {needsOnboarding === null ? (
-              showSplash && !splashDone ? (
-                <View style={StyleSheet.absoluteFill}>
-                  <NexusSplash onDone={() => { setShowSplash(false); setSplashDone(true); }} />
-                </View>
-              ) : (
-                <View style={[StyleSheet.absoluteFill, s.holdingScreen]}>
-                  <View style={{ width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(255,42,31,0.30)', backgroundColor: 'rgba(255,42,31,0.06)', alignItems: 'center', justifyContent: 'center' }}>
-                    <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#FF2A1F', opacity: 0.6 }} />
-                  </View>
-                </View>
-              )
-            ) : null}
-
-            {/* ── ONBOARDING WINDOW (floating panel above home tab) ──
-                Renders as a CENTERED WINDOW with the home tab visible on
-                all sides — gives the user context that they're inside the
-                app, not in a separate flow. Has a 2px red border + neon
-                shadow so it stands out cleanly against the HUD backdrop. */}
-            {needsOnboarding === true && (
-              <View style={s.onboardingScrim} pointerEvents="auto" accessibilityViewIsModal={true}>
-                {/* Tap-outside dimming layer (does NOT close — onboarding only
-                    exits via the LAUNCH button on Screen 10) */}
-                <View style={s.onboardingScrimDim} pointerEvents="none" />
-                <View style={s.onboardingWindow}>
-                  {/* HUD top accent bar */}
-                  <View style={s.onboardingTopBar} />
-                  {/* HUD header strip — like a terminal title bar */}
-                  <View style={s.onboardingHeaderStrip}>
-                    <View style={s.onboardingHeaderLeft}>
-                      <View style={s.onboardingHeaderDot} />
-                      <Text style={s.onboardingHeaderLabel}>BUTLER-CORE · INITIALIZATION</Text>
-                    </View>
-                    <Text style={s.onboardingHeaderId}>UNIT-01 · 0xA1</Text>
-                  </View>
-                  {/* Corner brackets inside the window */}
-                  <View style={[s.onboardingCornerBracket, { top: 32,    left: 6,  borderTopWidth: 1.5, borderLeftWidth: 1.5 }]}     pointerEvents="none" />
-                  <View style={[s.onboardingCornerBracket, { top: 32,    right: 6, borderTopWidth: 1.5, borderRightWidth: 1.5 }]}    pointerEvents="none" />
-                  <View style={[s.onboardingCornerBracket, { bottom: 6, left: 6,  borderBottomWidth: 1.5, borderLeftWidth: 1.5 }]}  pointerEvents="none" />
-                  <View style={[s.onboardingCornerBracket, { bottom: 6, right: 6, borderBottomWidth: 1.5, borderRightWidth: 1.5 }]} pointerEvents="none" />
-                  <OnboardingErrorBoundary onRecover={() => setNeedsOnboarding(false)}>
-                    <OnboardingOverlay
-                      onComplete={() => {
-                        setNeedsOnboarding(false);
-                        hasFirstBootPlayed().then((played) => {
-                          if (!played) setShowCinematic(true);
-                        });
-                      }}
-                    />
-                  </OnboardingErrorBoundary>
-                </View>
-              </View>
-            )}
 
             {/* ── FIRST-BOOT CINEMATIC (plays ONCE after onboarding) ─────── */}
             {showCinematic && (

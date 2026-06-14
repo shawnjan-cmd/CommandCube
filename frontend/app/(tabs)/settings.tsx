@@ -2176,21 +2176,13 @@ export default function SettingsScreen() {
               style={[g.actionBtn, { flex: 1, borderColor: N.green + '55', backgroundColor: N.green + '0A' }]}
               onPress={() => {
                 haptics.light();
-                // Onboarding is now an in-app overlay. We MUST clear the
-                // completion flag first — otherwise the 600ms storage poller
-                // in _layout.tsx will detect "done = true" and auto-close
-                // the overlay within half a second.
+                // Clear gate keys then navigate to /onboarding route.
                 AsyncStorage.multiRemove([
                   '@butler_onboarding_done_v2',
                   '@butler_welcome_complete_v1',
                   '@butler_stable_state',
                 ]).finally(() => {
-                  const setter = (global as any).__setNeedsOnboarding;
-                  if (typeof setter === 'function') {
-                    setter(true);
-                  } else {
-                    Alert.alert('View Onboarding', 'Restart the app to view the onboarding flow.');
-                  }
+                  router.push('/onboarding' as any);
                 });
               }}
               activeOpacity={0.8}
