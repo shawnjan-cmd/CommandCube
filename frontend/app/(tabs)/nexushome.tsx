@@ -40,6 +40,8 @@ import { MechBayHero, HexCommandRing, MechPanel } from '@/components/home/MechBa
 import HomeTerminalClock from '@/components/home/HomeTerminalClock';
 import HomeGreetingBanner from '@/components/home/HomeGreetingBanner';
 import HomeSectionDivider from '@/components/home/HomeSectionDivider';
+import AutomationFeed from '@/components/home/AutomationFeed';
+import SafeBoundary from '@/components/ui/SafeBoundary';
 import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
 import { useRouter } from 'expo-router';
 
@@ -1625,13 +1627,16 @@ export default function NexusHomeScreen() {
         kbFindings={kbFindings} scriptCount={scriptCount} />
 
       {/* Elegant greeting strip — time-aware, sets a confident tone */}
-      <HomeGreetingBanner />
+      <SafeBoundary label="GREETING"><HomeGreetingBanner /></SafeBoundary>
 
       <PrivacyTrustBadge />
-      <HomeTerminalClock isConnected={isConnected} />
+      <SafeBoundary label="COMMAND DECK"><HomeTerminalClock isConnected={isConnected} /></SafeBoundary>
 
       <HomeSectionDivider label="Quick Access" />
       <QuickAccessGrid goToTab={goToTab} />
+
+      <HomeSectionDivider label="Live Process Feed" />
+      <SafeBoundary label="PROCESS FEED"><AutomationFeed isConnected={isConnected} /></SafeBoundary>
 
       <HomeSectionDivider label="PC Server Setup" />
       <ServerSetupHub onScanQR={() => setShowQR(true)} isConnected={isConnected} />

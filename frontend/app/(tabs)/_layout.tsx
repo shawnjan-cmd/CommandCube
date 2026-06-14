@@ -55,6 +55,8 @@ export default function TabLayout() {
       <ThemedCenterHeader
         title={String(options?.title ?? '').replace(/^>\s*/, '')}
         isConnected={isConnected}
+        showStatusPills
+        version="v1.0"
       />
     ),
   };

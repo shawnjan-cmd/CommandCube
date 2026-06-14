@@ -44,11 +44,14 @@ interface Props {
   onRightPress?: () => void;
   showBack?: boolean;
   onBackPress?: () => void;
+  /** Show OFFLINE/ONLINE · SECURE · v1.0 pills below the title row */
+  showStatusPills?: boolean;
+  version?: string;
 }
 
 export default function ThemedCenterHeader({
   title, subtitle, isConnected, rightLabel, rightIcon, onRightPress,
-  showBack, onBackPress,
+  showBack, onBackPress, showStatusPills = false, version = 'v1.0',
 }: Props) {
   const insets   = useSafeAreaInsets();
   const statusOk = isConnected === true;
@@ -126,6 +129,23 @@ export default function ThemedCenterHeader({
       {/* Bottom corner brackets */}
       <View pointerEvents="none" style={[s.corner, s.cornerBL]} />
       <View pointerEvents="none" style={[s.corner, s.cornerBR]} />
+
+      {/* Optional status pills row — OFFLINE/ONLINE · SECURE · vX.X */}
+      {showStatusPills ? (
+        <View style={s.pillsRow}>
+          <View style={[s.pill, { borderColor: connColor + '50', backgroundColor: connColor + '12' }]}>
+            <View style={[s.pillDot, { backgroundColor: connColor }]} />
+            <Text style={[s.pillTxt, { color: connColor }]}>{statusOk ? 'ONLINE' : 'OFFLINE'}</Text>
+          </View>
+          <View style={[s.pill, { borderColor: C.accent + '55', backgroundColor: C.accent + '12' }]}>
+            <View style={[s.pillDot, { backgroundColor: C.accent }]} />
+            <Text style={[s.pillTxt, { color: C.accent }]}>SECURE</Text>
+          </View>
+          <View style={[s.pill, { borderColor: C.textDim + '60', backgroundColor: 'transparent' }]}>
+            <Text style={[s.pillTxt, { color: C.textMid }]}>⚙ {version}</Text>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -212,4 +232,19 @@ const s = StyleSheet.create({
   cornerTR: { right: 6,                      borderTopWidth: 1.5, borderRightWidth: 1.5 },
   cornerBL: { left: 6,  bottom: 4,           borderBottomWidth: 1.5, borderLeftWidth: 1.5  },
   cornerBR: { right: 6, bottom: 4,           borderBottomWidth: 1.5, borderRightWidth: 1.5 },
+  pillsRow: {
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 2,
+    justifyContent: 'center',
+  },
+  pill: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderWidth: 1, borderRadius: 100,
+    paddingHorizontal: 9, paddingVertical: 3,
+  },
+  pillDot: { width: 5, height: 5, borderRadius: 3 },
+  pillTxt: { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
 });
