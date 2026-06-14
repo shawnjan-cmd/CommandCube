@@ -1160,38 +1160,37 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
   const attemptNav = (): boolean => {
     if (navigatedRef.current) return true;
     navigatedRef.current = true;
-    logger.log('[Screen10] LAUNCH pressed — firing all dismissal channels');
+    logger.log('[Screen10] LAUNCH pressed — flipping onboarding guard');
 
-    // Channel 1: write the gate flag to AsyncStorage (the source of truth).
+    // ── Stack.Protected architecture (SDK 54+) ──────────────────────────────
+    // We DO NOT call router.replace() / router.dismissTo() / __onboardingComplete()
+    // here anymore. Those legacy router calls would target /(tabs)/nexushome
+    // BEFORE Stack.Protected has mounted the (tabs) navigator, which could
+    // throw "unmatched route" warnings or flicker.
+    //
+    // Instead we just flip the gate state. Stack.Protected re-evaluates its
+    // guards synchronously and atomically swaps welcome → (tabs). No race.
+
+    // Channel 1: persist the gate flag (source of truth on next launch).
     AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
 
-    // Channel 2: set a synchronous global so the _layout poller picks it up.
+    // Channel 2: synchronous global flag — picked up by the _layout
+    // 600ms storage poller as a safety-net within ~600ms even if Channel 3
+    // somehow misses (e.g. global setter not registered yet on cold start).
     try { (global as any).__butler_onboarding_just_completed = true; } catch {}
 
-    // Channel 3: call the explicit overlay-close callback if provided.
+    // Channel 3: the canonical path — flip the gate. Stack.Protected does
+    // the rest automatically.
+    try { (global as any).__setNeedsOnboarding?.(false); } catch {}
+
+    // Channel 4: legacy explicit callback (no-op under Stack.Protected, but
+    // kept for backwards compatibility with the standalone /welcome route
+    // when used outside the gated layout).
     if (typeof onComplete === 'function') {
       try { onComplete(); } catch (e) {
         logger.warn('[Screen10] onComplete threw:', e);
       }
     }
-
-    // Channel 4: flip the legacy global setter (for the stand-alone /welcome route).
-    try { (global as any).__setNeedsOnboarding?.(false); } catch {}
-
-    // Channel 5: as a final fallback, navigate. Tabs may not be mounted if the
-    // user reached /welcome as a standalone route; this covers that case.
-    try { router.replace('/(tabs)/nexushome' as any); } catch (e) {
-      logger.warn('[Screen10] router.replace threw:', e);
-      try { (global as any).__onboardingComplete?.(); } catch {}
-    }
-
-    // Channel 6: dismissTo — Expo Router v4+ only. Guarded to avoid throwing
-    // on older Router versions where this method doesn't exist.
-    try {
-      if (typeof (router as any).dismissTo === 'function') {
-        (router as any).dismissTo('/(tabs)/nexushome');
-      }
-    } catch {}
     return true;
   };
 
