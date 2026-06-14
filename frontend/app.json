@@ -37,7 +37,7 @@
         "backgroundColor": "#050202"
       },
       "package": "com.butlerai.pc.automation",
-      "versionCode": 1015,
+      "versionCode": 1016,
       "jsEngine": "hermes",
       "permissions": [
         "android.permission.INTERNET",

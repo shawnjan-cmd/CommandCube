@@ -92,6 +92,9 @@ const CRASH_SIGS = [
   'VideoPlayer', 'IllegalStateException', 'Another SimpleCache',
   'NativeUnimoduleProxy', 'expo.modules.video', 'media3.datasource.cache',
   'ExoPlayer', 'VideoManager.onModuleCreated', 'HostObject::get for prop',
+  // Reanimated Worklets v2 dev-mode noise (does not affect production):
+  'createSerializableObject', 'JSWorklets', 'WorkletsError',
+  'should never be called in JSWorklets',
 ];
 
 const isCrash = (v) => {
