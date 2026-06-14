@@ -1144,7 +1144,27 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete:
       {/* LAUNCH BUTTON */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => onComplete()}
+        onPress={async () => {
+          // Persist all completion keys, THEN hide the overlay.
+          // No navigation, no router calls. The parent simply unmounts us.
+          const pairs: [string, string][] = [
+            ['@butler_onboarding_done_v2',       'true'],
+            ['@butler_welcome_complete_v1',      'true'],
+            ['@butler_terms_accepted_v1',        'true'],
+            ['@butler_consent_v2',               '1.0.0'],
+            ['@butler_age_confirmed_v1',         'true'],
+            ['@butler_show_post_onboarding_chat','true'],
+            ['@butler_stable_state',             'onboarded'],
+          ];
+          try {
+            await AsyncStorage.multiSet(pairs);
+          } catch {
+            for (const [k, v] of pairs) {
+              try { await AsyncStorage.setItem(k, v); } catch {}
+            }
+          }
+          onComplete();
+        }}
         style={{
           backgroundColor: '#00ff88',
           borderRadius: 16,
@@ -1196,9 +1216,9 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete:
 }
 
 // ─────────────────────────────────────────────────────────────────
-// MAIN WELCOME SCREEN
+// MAIN ONBOARDING OVERLAY
 // ─────────────────────────────────────────────────────────────────
-export default function WelcomeScreen({ onComplete }: { onComplete: () => void }) {
+export default function OnboardingOverlay({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
   const [consents, setConsents] = useState<Record<string, boolean>>({});
   const [serverAccepts, setServerAccepts] = useState<Record<string, boolean>>({});

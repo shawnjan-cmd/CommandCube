@@ -21,7 +21,7 @@ import { autoConnectEngine } from '@/services/autoConnectEngine';
 import { connectionPersistence } from '@/services/connectionPersistence';
 import { proLicense } from '@/services/proLicense';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
-import WelcomeScreen from './welcome';
+import OnboardingOverlay from '@/components/OnboardingOverlay';
 import '@/services/imageRegistry';
 import RootSafeShell from '@/components/ui/RootSafeShell';
 
@@ -430,7 +430,9 @@ export default function RootLayout() {
           AsyncStorage.getItem(ONBOARDING_DONE_KEY).catch(() => null),
           AsyncStorage.getItem(FIRST_LAUNCH_KEY).catch(() => null),
         ]);
-        const needs = onboardingDone !== '1';
+        // Accept both '1' (legacy) and 'true' (overlay v7) for backwards compat.
+        const isDone = onboardingDone === '1' || onboardingDone === 'true';
+        const needs = !isDone;
         setNeedsOnboarding(needs);
         // Show splash on Android first launch only when onboarding is done
         if (Platform.OS === 'android' && !firstLaunch && !needs) {
@@ -596,70 +598,68 @@ export default function RootLayout() {
   // to prevent the white/black flash before navigation fires
   const showHoldingScreen = needsOnboarding === null && !showSplash;
 
-  // ─── BULLETPROOF v5: ONBOARDING IS NOT A ROUTE ─────────────────────────
-  // Per user direction: WelcomeScreen is rendered as a plain React component,
-  // NOT as a Stack.Screen. This guarantees `onComplete` is a real prop on a
-  // real component and can never be undefined. setNeedsOnboarding(false)
-  // triggers a normal React re-render which mounts the Stack (tabs) for the
-  // first time. Zero router calls. Zero race conditions.
+  // ─── BULLETPROOF v7: IN-APP OVERLAY ARCHITECTURE ───────────────────────
+  // Tabs are ALWAYS mounted from app start. Onboarding renders as an
+  // absolute-positioned full-screen overlay on top of the tabs.
+  //
+  // When the user completes onboarding:
+  //   1. AsyncStorage keys are persisted by the OnboardingOverlay
+  //   2. setNeedsOnboarding(false) is called via onComplete
+  //   3. The overlay component unmounts
+  //   4. The tabs (already mounted, fully rendered) are immediately visible
+  //
+  // ZERO navigation. ZERO router calls. ZERO race conditions.
+  //
+  // On subsequent app launches, needsOnboarding resolves to `false` from
+  // AsyncStorage before the overlay ever renders, so returning users see
+  // only the tabs.
 
-  // 1) Still loading — show nothing; splash/holding screen covers the void.
-  if (needsOnboarding === null) {
-    return (
-      <GlobalErrorBoundary>
-        <CosmeticProvider>
-          <TabBarProvider>
-            {showSplash && !splashDone ? (
-              <NexusSplash onDone={() => { setShowSplash(false); setSplashDone(true); }} />
-            ) : (
-              <View style={s.holdingScreen}>
-                <View style={{ width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(255,42,31,0.30)', backgroundColor: 'rgba(255,42,31,0.06)', alignItems: 'center', justifyContent: 'center' }}>
-                  <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#FF2A1F', opacity: 0.6 }} />
-                </View>
-              </View>
-            )}
-            <StatusBar style="light" />
-          </TabBarProvider>
-        </CosmeticProvider>
-      </GlobalErrorBoundary>
-    );
-  }
-
-  // 2) Onboarding active — render WelcomeScreen as a plain component.
-  if (needsOnboarding === true) {
-    return (
-      <GlobalErrorBoundary>
-        <CosmeticProvider>
-          <TabBarProvider>
-            <StatusBar style="light" />
-            <WelcomeScreen
-              onComplete={() => {
-                setNeedsOnboarding(false);
-                AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
-              }}
-            />
-          </TabBarProvider>
-        </CosmeticProvider>
-      </GlobalErrorBoundary>
-    );
-  }
-
-  // 3) needsOnboarding === false — render the real app.
   return (
     <GlobalErrorBoundary>
       <CosmeticProvider>
         <TabBarProvider>
-          <StatusBar style="light" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
-            <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
-            <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="tutorial"       options={{ headerShown: false }} />
-            <Stack.Screen name="main-menu"      options={{ headerShown: false }} />
-            <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
-            <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
-          </Stack>
+          <View style={{ flex: 1, backgroundColor: '#050505' }}>
+            <StatusBar style="light" />
+
+            {/* ── ALWAYS-MOUNTED TABS STACK ─────────────────────────────── */}
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
+              <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
+              <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="tutorial"       options={{ headerShown: false }} />
+              <Stack.Screen name="main-menu"      options={{ headerShown: false }} />
+              <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
+              <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+            </Stack>
+
+            {/* ── LOADING / SPLASH (covers everything while AsyncStorage reads) ── */}
+            {needsOnboarding === null ? (
+              showSplash && !splashDone ? (
+                <View style={StyleSheet.absoluteFill}>
+                  <NexusSplash onDone={() => { setShowSplash(false); setSplashDone(true); }} />
+                </View>
+              ) : (
+                <View style={[StyleSheet.absoluteFill, s.holdingScreen]}>
+                  <View style={{ width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(255,42,31,0.30)', backgroundColor: 'rgba(255,42,31,0.06)', alignItems: 'center', justifyContent: 'center' }}>
+                    <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#FF2A1F', opacity: 0.6 }} />
+                  </View>
+                </View>
+              )
+            ) : null}
+
+            {/* ── ONBOARDING OVERLAY (covers tabs while needsOnboarding=true) ── */}
+            {needsOnboarding === true && (
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: '#050505', zIndex: 9999, elevation: 9999 }]} pointerEvents="auto" accessibilityViewIsModal={true}>
+                <OnboardingOverlay
+                  onComplete={() => {
+                    setNeedsOnboarding(false);
+                    AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
+                  }}
+                />
+              </View>
+            )}
+          </View>
         </TabBarProvider>
       </CosmeticProvider>
     </GlobalErrorBoundary>
