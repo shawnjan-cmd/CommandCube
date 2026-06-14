@@ -7,6 +7,7 @@ import QuickButlerBar from '@/components/ui/QuickButlerBar';
 import FuturisticTabBar from '@/components/ui/FuturisticTabBar';
 import ConnectionBadge from '@/components/ui/ConnectionBadge';
 import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
+import CyberneticBackdrop from '@/components/backgrounds/CyberneticBackdrop';
 import { useServerConnection } from '@/hooks/useServerConnection';
 
 type MCName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -63,8 +64,10 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#040608' }}>
+      {/* Animated Terminator-HUD backdrop visible across all tabs */}
+      <CyberneticBackdrop intensity={0.7} />
       <Tabs
-        screenOptions={HEADER_OPTS}
+        screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
         tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
       >
         <Tabs.Screen name="nexushome" options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />

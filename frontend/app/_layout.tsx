@@ -22,6 +22,7 @@ import { connectionPersistence } from '@/services/connectionPersistence';
 import { proLicense } from '@/services/proLicense';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 import OnboardingOverlay from '@/components/OnboardingOverlay';
+import FirstBootCinematic, { hasFirstBootPlayed } from '@/components/FirstBootCinematic';
 import '@/services/imageRegistry';
 import RootSafeShell from '@/components/ui/RootSafeShell';
 
@@ -433,6 +434,7 @@ export default function RootLayout() {
   const [showSplash, setShowSplash] = useState(false);
   const [splashDone, setSplashDone] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
+  const [showCinematic, setShowCinematic] = useState(false);
   const [appReady, setAppReady] = useState(false);
 
   useAppSync();
@@ -659,10 +661,19 @@ export default function RootLayout() {
                       // Just flip the state. OnboardingOverlay's Screen 10 button
                       // already persisted all 7 keys before calling this.
                       setNeedsOnboarding(false);
+                      // Trigger the WOW first-boot cinematic — only if it hasn't played before.
+                      hasFirstBootPlayed().then((played) => {
+                        if (!played) setShowCinematic(true);
+                      });
                     }}
                   />
                 </OnboardingErrorBoundary>
               </View>
+            )}
+
+            {/* ── FIRST-BOOT CINEMATIC (plays ONCE after onboarding) ─────── */}
+            {showCinematic && (
+              <FirstBootCinematic onDone={() => setShowCinematic(false)} />
             )}
           </View>
         </TabBarProvider>
