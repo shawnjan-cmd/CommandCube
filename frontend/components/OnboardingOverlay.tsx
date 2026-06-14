@@ -13,6 +13,7 @@ import Svg, { Circle, Path, Rect, G, Defs, RadialGradient, Stop, LinearGradient 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { haptics } from '@/services/haptics';
 import { logger } from '@/utils/logger';
+import ButlerHeroSvg from '@/components/ui/ButlerHeroSvg';
 
 
 // ── Persistent keys ──────────────────────────────────────────────
@@ -406,6 +407,11 @@ function Screen1Welcome({ onNext, allAccepted }: { onNext: () => void; allAccept
               <Text style={{ fontSize: 10, fontWeight: '700', fontFamily: MONO, color: C.cyan + 'AA', letterSpacing: 5, textAlign: 'center', marginTop: 10 }}>
                 COMMAND CENTER
               </Text>
+
+              {/* ── Animated hero illustration (user-supplied SVG) ─────── */}
+              <View style={{ marginTop: 16, marginBottom: 4, width: '100%', alignItems: 'center' }}>
+                <ButlerHeroSvg />
+              </View>
 
               {/* Tag strip with LAN ONLY added */}
               <View style={{ flexDirection: 'row', gap: 6, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center' }}>

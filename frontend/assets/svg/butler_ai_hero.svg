@@ -1,0 +1,521 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="100%">
+  <defs>
+    
+    <pattern id="bgGrid" width="25" height="25" patternUnits="userSpaceOnUse">
+      <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#2a3040" stroke-width="0.5" opacity="0.5"></path>
+    </pattern>
+
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#141a26"></stop>
+      <stop offset="100%" stop-color="#0a0d14"></stop>
+    </linearGradient>
+
+    <linearGradient id="outerFrame" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d0d5e0"></stop>
+      <stop offset="50%" stop-color="#8a92a3"></stop>
+      <stop offset="100%" stop-color="#555a68"></stop>
+    </linearGradient>
+
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"></stop>
+      <stop offset="40%" stop-color="#00d8ff"></stop>
+      <stop offset="70%" stop-color="#a366f5"></stop>
+      <stop offset="100%" stop-color="#b0b5c0"></stop>
+      <animateTransform attributeName="gradientTransform" type="translate" values="-1 0;1 0;-1 0" dur="4s" repeatCount="indefinite"></animateTransform>
+    </linearGradient>
+
+    <linearGradient id="leftPanelBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#242b3d"></stop>
+      <stop offset="100%" stop-color="#11151e"></stop>
+    </linearGradient>
+
+    <linearGradient id="lapelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a3b69"></stop>
+      <stop offset="100%" stop-color="#222738"></stop>
+    </linearGradient>
+
+    <linearGradient id="scanline" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00d8ff" stop-opacity="0"></stop>
+      <stop offset="50%" stop-color="#00d8ff" stop-opacity="0.25"></stop>
+      <stop offset="100%" stop-color="#00d8ff" stop-opacity="0"></stop>
+    </linearGradient>
+
+    <linearGradient id="titleShimmer" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7ed4e6" stop-opacity="1"></stop>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="1"></stop>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="1"></stop>
+      <stop offset="100%" stop-color="#7ed4e6" stop-opacity="1"></stop>
+      
+      
+    </linearGradient>
+
+    
+    <radialGradient id="chipGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0.4"></stop>
+      <stop offset="100%" stop-color="#00ffff" stop-opacity="0"></stop>
+    </radialGradient>
+
+    <radialGradient id="activeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0.8"></stop>
+      <stop offset="100%" stop-color="#00ffff" stop-opacity="0"></stop>
+    </radialGradient>
+
+    <radialGradient id="robotGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a366f5" stop-opacity="0.35"></stop>
+      <stop offset="100%" stop-color="#a366f5" stop-opacity="0"></stop>
+    </radialGradient>
+
+    <radialGradient id="orbitGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00d8ff" stop-opacity="1"></stop>
+      <stop offset="100%" stop-color="#00d8ff" stop-opacity="0"></stop>
+    </radialGradient>
+
+    
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"></feDropShadow>
+    </filter>
+
+    <filter id="glowBlue" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3" result="blur"></feGaussianBlur>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"></feComposite>
+    </filter>
+
+    <filter id="glowPurple" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="blur"></feGaussianBlur>
+      <feFlood flood-color="#a366f5" flood-opacity="0.6" result="color"></feFlood>
+      <feComposite in="color" in2="blur" operator="in" result="glow"></feComposite>
+      <feMerge><feMergeNode in="glow"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+
+    <filter id="glowCyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"></feGaussianBlur>
+      <feFlood flood-color="#00d8ff" flood-opacity="0.7" result="color"></feFlood>
+      <feComposite in="color" in2="blur" operator="in" result="glow"></feComposite>
+      <feMerge><feMergeNode in="glow"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+
+    <filter id="titleGlow" x="-5%" y="-30%" width="110%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"></feGaussianBlur>
+      <feFlood flood-color="#00d8ff" flood-opacity="0.5" result="color"></feFlood>
+      <feComposite in="color" in2="blur" operator="in" result="glow"></feComposite>
+      <feMerge><feMergeNode in="glow"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+
+    
+    <clipPath id="rightPanelClip">
+      <rect x="295" y="32" width="450" height="236" rx="10"></rect>
+    </clipPath>
+
+    
+    <clipPath id="leftPanelClip">
+      <rect x="50" y="32" width="235" height="236" rx="10"></rect>
+    </clipPath>
+
+    
+    <circle id="particle" r="1.5" fill="#00d8ff" opacity="0.8"></circle>
+  </defs>
+
+  
+  <rect width="800" height="400" fill="url(#bgGradient)"></rect>
+
+  
+  <rect width="800" height="400" fill="#00a0ff" opacity="0">
+    
+  </rect>
+
+  <rect width="800" height="400" fill="url(#bgGrid)">
+    
+  </rect>
+
+  
+  <g opacity="0.07">
+    <polygon points="720,50 740,62 740,86 720,98 700,86 700,62" fill="none" stroke="#00d8ff" stroke-width="1">
+      
+    </polygon>
+    <polygon points="760,100 775,109 775,127 760,136 745,127 745,109" fill="none" stroke="#a366f5" stroke-width="1">
+      
+    </polygon>
+    <polygon points="50,330 65,339 65,357 50,366 35,357 35,339" fill="none" stroke="#00d8ff" stroke-width="1">
+      
+    </polygon>
+    <polygon points="780,310 795,319 795,337 780,346 765,337 765,319" fill="none" stroke="#00d8ff" stroke-width="1">
+      
+    </polygon>
+  </g>
+
+  
+  <rect x="38" y="22" width="724" height="264" rx="18" fill="#000000" opacity="0.6"></rect>
+  <rect x="36" y="18" width="724" height="264" rx="16" fill="url(#outerFrame)"></rect>
+
+  
+  <rect x="36" y="18" width="724" height="264" rx="16" fill="none" stroke="#00d8ff" stroke-width="1" opacity="0">
+    
+    
+  </rect>
+
+  <rect x="42" y="24" width="712" height="252" rx="12" fill="#181e2b"></rect>
+
+  
+  <rect x="50" y="32" width="235" height="236" rx="10" fill="url(#leftPanelBg)" stroke="#000000" stroke-width="2"></rect>
+
+  
+  <rect x="50" y="32" width="235" height="50" fill="url(#scanline)" clip-path="url(#leftPanelClip)" opacity="0.6">
+    <animateTransform attributeName="transform" type="translate" values="0,-50;0,286" dur="3s" repeatCount="indefinite"></animateTransform>
+  </rect>
+
+  
+  <g stroke="#00d8ff" stroke-width="1.5" fill="none" opacity="0.7">
+    <path d="M 58 40 L 50 40 L 50 48"></path>
+    <path d="M 277 40 L 285 40 L 285 48"></path>
+    <path d="M 58 260 L 50 260 L 50 252"></path>
+    <path d="M 277 260 L 285 260 L 285 252"></path>
+  </g>
+
+  
+  <g transform="translate(167, 150)">
+    
+    <circle cx="0" cy="0" r="90" fill="url(#robotGlow)">
+      
+      
+    </circle>
+
+    
+    <path d="M 0 100 C -70 40, -80 -40, -80 -70 L 80 -70 C 80 -40, 70 40, 0 100 Z" fill="#121621" filter="url(#dropShadow)">
+      <animateTransform attributeName="transform" type="scale" values="1;1.02;1" dur="4s" repeatCount="indefinite"></animateTransform>
+    </path>
+
+    
+    <g>
+      <animateTransform attributeName="transform" type="translate" values="0,0;0,-4;0,0" dur="4s" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"></animateTransform>
+
+      <path d="M 0 80 L -50 -50 L 0 -80 L 50 -50 Z" fill="#d1d6e0"></path>
+
+      <path d="M 0 100 L -80 -20 C -80 -60, -50 -80, 0 -80 C 50 -80, 80 -60, 80 -20 Z" fill="none" stroke="#2c354f" stroke-width="3"></path>
+
+      
+      <path d="M 0 95 L -75 -15 L -25 -70 Z" fill="url(#lapelGradient)" stroke="#1a1f2e" stroke-width="1"></path>
+      <path d="M 0 95 L 75 -15 L 25 -70 Z" fill="url(#lapelGradient)" stroke="#1a1f2e" stroke-width="1"></path>
+
+      
+      <path d="M 0 90 L -50 -10 L -30 -60 Z" fill="#1e2536" stroke="#00d8ff" stroke-width="1.5">
+        
+        
+      </path>
+      <path d="M 0 90 L 50 -10 L 30 -60 Z" fill="#1e2536" stroke="#00d8ff" stroke-width="1.5">
+        
+        
+      </path>
+
+      
+      <polygon points="-40,-70 0,-30 0,-80" fill="#f4f6fa"></polygon>
+      <polygon points="40,-70 0,-30 0,-80" fill="#f4f6fa"></polygon>
+
+      
+      <circle cx="0" cy="15" r="3" fill="#121621">
+        
+        
+      </circle>
+      <circle cx="0" cy="45" r="3" fill="#121621">
+        
+        
+      </circle>
+      <circle cx="0" cy="75" r="3" fill="#121621">
+        
+        
+      </circle>
+
+      
+      <circle cx="0" cy="-45" r="40" fill="url(#chipGlow)">
+        
+        
+      </circle>
+
+      
+      <rect x="-28" y="-65" width="56" height="42" rx="4" fill="#0b121c" stroke="#00d8ff" stroke-width="2" filter="url(#dropShadow)">
+        
+        
+      </rect>
+
+      
+      <path d="M -28 -55 L -15 -55 M 28 -55 L 15 -55 M -28 -35 L -15 -35 M 28 -35 L 15 -35" stroke="#00d8ff" stroke-width="1.5">
+        
+      </path>
+      <path d="M -15 -65 L -15 -60 M 15 -65 L 15 -60 M -15 -23 L -15 -28 M 15 -23 L 15 -28" stroke="#00d8ff" stroke-width="1.5">
+        
+      </path>
+
+      
+      <text x="0" y="-39" fill="#00d8ff" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="18" text-anchor="middle" letter-spacing="1" filter="url(#glowCyan)">
+        AI
+        
+      </text>
+
+      
+      <rect x="-26" y="-63" width="52" height="6" rx="1" fill="#00d8ff" opacity="0.2">
+        
+        
+      </rect>
+    </g>
+
+    
+    <circle cx="0" cy="-45" r="52" fill="none" stroke="#00d8ff" stroke-width="0.8" stroke-dasharray="8 6" opacity="0.3">
+      <animateTransform attributeName="transform" type="rotate" values="0 0 -45;360 0 -45" dur="8s" repeatCount="indefinite"></animateTransform>
+    </circle>
+    
+    <circle cx="52" cy="-45" r="3" fill="#00d8ff" filter="url(#glowCyan)">
+      <animateTransform attributeName="transform" type="rotate" values="0 0 -45;360 0 -45" dur="8s" repeatCount="indefinite"></animateTransform>
+    </circle>
+    <circle cx="-52" cy="-45" r="2" fill="#a366f5">
+      <animateTransform attributeName="transform" type="rotate" values="180 0 -45;540 0 -45" dur="8s" repeatCount="indefinite"></animateTransform>
+    </circle>
+  </g>
+
+  
+  <rect x="295" y="32" width="450" height="236" rx="10" fill="#0f161f" stroke="#254d60" stroke-width="2"></rect>
+  <rect x="296" y="33" width="448" height="234" rx="9" fill="none" stroke="#3b6c82" stroke-width="0.5"></rect>
+
+  
+  <rect x="295" y="32" width="450" height="40" fill="url(#scanline)" clip-path="url(#rightPanelClip)" opacity="0.5">
+    <animateTransform attributeName="transform" type="translate" values="0,-40;0,276" dur="4s" begin="1s" repeatCount="indefinite"></animateTransform>
+  </rect>
+
+  
+  <g stroke="#00d8ff" stroke-width="1.5" fill="none" opacity="0.6">
+    <path d="M 303 40 L 295 40 L 295 48"></path>
+    <path d="M 737 40 L 745 40 L 745 48"></path>
+    <path d="M 303 260 L 295 260 L 295 252"></path>
+    <path d="M 737 260 L 745 260 L 745 252"></path>
+  </g>
+
+  <g transform="translate(295, 32)">
+
+    
+    <g fill="#466075" font-family="monospace" font-size="10" font-weight="bold">
+      <text x="15" y="25">1</text>
+      <text x="15" y="40">2</text>
+      <text x="15" y="55">3</text>
+      <text x="15" y="70">4</text>
+      <text x="15" y="85">5</text>
+      <text x="15" y="100">6</text>
+      <text x="15" y="180">7</text>
+      <text x="15" y="195">8</text>
+      <text x="15" y="210">9</text>
+      <text x="15" y="225">10</text>
+    </g>
+
+    
+    
+    <rect x="35" y="21" width="30" height="4" rx="2" fill="#00d8ff">
+      
+      
+    </rect>
+    <path d="M 70 21 L 75 21 L 75 25 L 70 25 Z" fill="#69859c">
+      
+    </path>
+
+    
+    <rect x="35" y="36" width="60" height="4" rx="2" fill="#00d8ff">
+      
+    </rect>
+    <rect x="100" y="36" width="10" height="4" rx="2" fill="#69859c">
+      
+    </rect>
+
+    
+    <rect x="35" y="51" width="40" height="4" rx="2" fill="#00d8ff">
+      
+    </rect>
+    <rect x="80" y="51" width="10" height="4" rx="2" fill="#00d8ff">
+      
+    </rect>
+    <circle cx="97" cy="53" r="2" fill="#69859c">
+      
+    </circle>
+    <rect x="105" y="51" width="80" height="4" rx="2" fill="#466075">
+      
+    </rect>
+    <circle cx="192" cy="53" r="2" fill="#69859c">
+      
+    </circle>
+
+    
+    <rect x="45" y="66" width="40" height="4" rx="2" fill="#00d8ff">
+      
+    </rect>
+    <circle cx="92" cy="68" r="2" fill="#00d8ff">
+      
+    </circle>
+    <rect x="100" y="66" width="35" height="4" rx="2" fill="#466075">
+      
+    </rect>
+    <circle cx="142" cy="68" r="2" fill="#69859c">
+      
+    </circle>
+
+    
+    <path d="M 35 81 L 40 81 L 40 85 L 35 85 Z" fill="#69859c">
+      
+    </path>
+
+    
+    <rect x="35" y="176" width="50" height="4" rx="2" fill="#9b6aff">
+      
+    </rect>
+    <path d="M 90 176 L 95 176 L 95 180 L 90 180 Z" fill="#69859c">
+      
+    </path>
+    <rect x="35" y="191" width="40" height="4" rx="2" fill="#9b6aff">
+      
+    </rect>
+    <circle cx="82" cy="193" r="2" fill="#69859c"></circle>
+    <rect x="95" y="191" width="60" height="4" rx="2" fill="#466075">
+      
+    </rect>
+    <circle cx="162" cy="193" r="2" fill="#69859c"></circle>
+    <rect x="25" y="206" width="20" height="4" rx="2" fill="#9b6aff">
+      
+    </rect>
+
+    
+    <rect x="35" y="221" width="0" height="4" rx="2" fill="#00d8ff" opacity="0.7">
+      
+    </rect>
+    
+    <rect x="35" y="221" width="3" height="4" fill="#ffffff" opacity="0">
+      
+      
+    </rect>
+
+    
+    <rect x="315" y="15" width="115" height="32" rx="6" fill="#0b242e" stroke="#007a8a" stroke-width="1">
+      
+    </rect>
+    
+    <circle cx="335" cy="31" r="12" fill="url(#activeGlow)">
+      
+      
+    </circle>
+    <rect x="330" y="26" width="10" height="10" rx="2" fill="#00ffff">
+      
+    </rect>
+    <text x="350" y="36" fill="#00ffff" font-family="'Segoe UI', Roboto, sans-serif" font-weight="bold" font-size="16" letter-spacing="1">
+      ACTIVE
+      
+    </text>
+
+    
+    
+    <text x="235" y="130" fill="#00d8ff" font-family="'Montserrat', 'Segoe UI', Arial, sans-serif" font-weight="bold" font-size="34" text-anchor="middle" letter-spacing="2" opacity="0.3" filter="url(#titleGlow)">BUTLER AI</text>
+    
+    <text x="235" y="130" fill="url(#titleShimmer)" font-family="'Montserrat', 'Segoe UI', Arial, sans-serif" font-weight="bold" font-size="34" text-anchor="middle" letter-spacing="2">BUTLER AI</text>
+
+    
+    <text x="235" y="170" fill="#7ed4e6" font-family="'Montserrat', 'Segoe UI', Arial, sans-serif" font-weight="bold" font-size="26" text-anchor="middle" letter-spacing="1.5">
+      OPERATING SYSTEM
+      
+    </text>
+
+    
+    <line x1="100" y1="178" x2="370" y2="178" stroke="#00d8ff" stroke-width="1" opacity="0.3">
+      
+      
+      
+    </line>
+  </g>
+
+  
+  
+  <text x="400" y="355" fill="#00d8ff" font-family="'Montserrat', 'Segoe UI', Arial, sans-serif" font-weight="bold" font-size="52" text-anchor="middle" letter-spacing="4" opacity="0.2" filter="url(#titleGlow)">BUTLER AI SYSTEMS</text>
+  
+  <text x="400" y="355" fill="url(#textGradient)" font-family="'Montserrat', 'Segoe UI', Arial, sans-serif" font-weight="bold" font-size="52" text-anchor="middle" letter-spacing="4" filter="url(#dropShadow)">
+    BUTLER AI SYSTEMS
+    
+  </text>
+
+  
+  
+  <circle cx="100" cy="320" r="2" fill="#00d8ff" opacity="0">
+    
+    
+    
+  </circle>
+  
+  <circle cx="700" cy="380" r="1.5" fill="#a366f5" opacity="0">
+    
+    
+    
+  </circle>
+  
+  <circle cx="400" cy="385" r="2" fill="#00d8ff" opacity="0">
+    
+    
+  </circle>
+  
+  <circle cx="550" cy="375" r="1.5" fill="#ffffff" opacity="0">
+    
+    
+    
+  </circle>
+  
+  <circle cx="230" cy="375" r="1.5" fill="#a366f5" opacity="0">
+    
+    
+  </circle>
+  
+  <circle cx="650" cy="370" r="1" fill="#00d8ff" opacity="0">
+    
+    
+  </circle>
+
+  
+  
+  <line x1="50" y1="290" x2="750" y2="290" stroke="#00d8ff" stroke-width="0.5" opacity="0.15"></line>
+  <rect x="50" y="288" width="20" height="3" rx="1" fill="#00d8ff" opacity="0.7">
+    
+    
+  </rect>
+  <rect x="400" y="288" width="12" height="3" rx="1" fill="#a366f5" opacity="0">
+    
+    
+  </rect>
+
+  
+  <rect x="288" y="32" width="3" height="15" rx="1" fill="#00d8ff" opacity="0">
+    
+    
+  </rect>
+
+  
+  
+  <g opacity="0.2" stroke="#00d8ff" stroke-width="0.8" fill="none">
+    <path d="M 20 380 L 50 380 L 50 360 L 80 360">
+      
+      
+    </path>
+    <circle cx="80" cy="360" r="2.5" fill="#00d8ff" opacity="0">
+      
+    </circle>
+  </g>
+  
+  <g opacity="0.2" stroke="#a366f5" stroke-width="0.8" fill="none">
+    <path d="M 780 380 L 750 380 L 750 360 L 720 360">
+      
+      
+    </path>
+    <circle cx="720" cy="360" r="2.5" fill="#a366f5" opacity="0">
+      
+    </circle>
+  </g>
+
+  
+  <rect x="300" y="388" width="200" height="3" rx="1.5" fill="#1a2030"></rect>
+  <rect x="300" y="388" width="0" height="3" rx="1.5" fill="#00d8ff" opacity="0.8">
+    
+    
+  </rect>
+  <text x="400" y="399" fill="#466075" font-family="monospace" font-size="7" text-anchor="middle" letter-spacing="2">
+    INITIALIZING SYSTEMS
+    
+  </text>
+
+</svg>
