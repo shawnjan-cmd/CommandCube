@@ -596,59 +596,71 @@ export default function RootLayout() {
   // to prevent the white/black flash before navigation fires
   const showHoldingScreen = needsOnboarding === null && !showSplash;
 
+  // ─── BULLETPROOF v5: ONBOARDING IS NOT A ROUTE ─────────────────────────
+  // Per user direction: WelcomeScreen is rendered as a plain React component,
+  // NOT as a Stack.Screen. This guarantees `onComplete` is a real prop on a
+  // real component and can never be undefined. setNeedsOnboarding(false)
+  // triggers a normal React re-render which mounts the Stack (tabs) for the
+  // first time. Zero router calls. Zero race conditions.
+
+  // 1) Still loading — show nothing; splash/holding screen covers the void.
+  if (needsOnboarding === null) {
+    return (
+      <GlobalErrorBoundary>
+        <CosmeticProvider>
+          <TabBarProvider>
+            {showSplash && !splashDone ? (
+              <NexusSplash onDone={() => { setShowSplash(false); setSplashDone(true); }} />
+            ) : (
+              <View style={s.holdingScreen}>
+                <View style={{ width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(255,42,31,0.30)', backgroundColor: 'rgba(255,42,31,0.06)', alignItems: 'center', justifyContent: 'center' }}>
+                  <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#FF2A1F', opacity: 0.6 }} />
+                </View>
+              </View>
+            )}
+            <StatusBar style="light" />
+          </TabBarProvider>
+        </CosmeticProvider>
+      </GlobalErrorBoundary>
+    );
+  }
+
+  // 2) Onboarding active — render WelcomeScreen as a plain component.
+  if (needsOnboarding === true) {
+    return (
+      <GlobalErrorBoundary>
+        <CosmeticProvider>
+          <TabBarProvider>
+            <StatusBar style="light" />
+            <WelcomeScreen
+              onComplete={() => {
+                // Persist and flip state — that's it. No router calls.
+                AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
+                setNeedsOnboarding(false);
+              }}
+            />
+          </TabBarProvider>
+        </CosmeticProvider>
+      </GlobalErrorBoundary>
+    );
+  }
+
+  // 3) needsOnboarding === false — render the real app.
   return (
     <GlobalErrorBoundary>
       <CosmeticProvider>
         <TabBarProvider>
-          {/* Splash: first launch on Android only when already onboarded */}
-          {showSplash && !splashDone ? (
-            <NexusSplash onDone={() => { setShowSplash(false); setSplashDone(true); }} />
-          ) : null}
-          {/* Dark holding screen prevents black flash while AsyncStorage reads */}
-          {showHoldingScreen ? (
-            <View style={s.holdingScreen}>
-              <View style={{ width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: 'rgba(255,42,31,0.30)', backgroundColor: 'rgba(255,42,31,0.06)', alignItems: 'center', justifyContent: 'center' }}>
-                <Animated.View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#FF2A1F', opacity: 0.6 }} />
-              </View>
-            </View>
-          ) : null}
           <StatusBar style="light" />
-          <View style={[s.container, showHoldingScreen && { opacity: 0 }]}>
-            {/* ─── SIMPLE CONDITIONAL RENDER (BULLETPROOF v3) ──────────────
-                We deliberately do NOT use Stack.Protected here anymore.
-                The SDK 54 Stack.Protected pattern was failing to re-evaluate
-                its guards on some devices, leaving users trapped on the
-                last onboarding screen even after they tapped LAUNCH.
-
-                Instead we render WelcomeScreen directly as a React component
-                when needsOnboarding === true, and pass `onComplete` as a
-                normal prop. The launch button just calls that prop. When
-                state flips to false, React unmounts WelcomeScreen and mounts
-                the Stack with (tabs) — no router races, no guard quirks. */}
-            {needsOnboarding === true ? (
-              <WelcomeScreen onComplete={handleOnboardingComplete} />
-            ) : needsOnboarding === false ? (
-              <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
-                <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
-                <Stack.Screen name="welcome"        options={{ headerShown: false, gestureEnabled: false }} />
-                <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-                <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-                <Stack.Screen name="tutorial"       options={{ headerShown: false }} />
-                <Stack.Screen name="main-menu"      options={{ headerShown: false }} />
-                <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
-                <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-                <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
-              </Stack>
-            ) : null}
-          </View>
-
-          {/* ─── LEGACY OVERLAY — disabled in favour of Stack.Protected ────────
-              The previous architecture rendered WelcomeScreen as a sibling
-              View overlay on top of the mounted tabs. That approach worked
-              but tabs were always mounted underneath, which could bleed
-              through on some Android OEM skins during the transition frame.
-              Stack.Protected (above) replaces this entirely — the tabs do
-              not mount at all until onboarding is complete. */}
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
+            <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
+            <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="tutorial"       options={{ headerShown: false }} />
+            <Stack.Screen name="main-menu"      options={{ headerShown: false }} />
+            <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
+            <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+          </Stack>
         </TabBarProvider>
       </CosmeticProvider>
     </GlobalErrorBoundary>

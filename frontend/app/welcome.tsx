@@ -1157,84 +1157,24 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
     }
   };
 
-  const attemptNav = (): boolean => {
-    if (navigatedRef.current) return true;
-    navigatedRef.current = true;
-    logger.log('[Screen10] LAUNCH pressed — flipping onboarding gate (conditional render v3)');
-
-    // ── Simple conditional render architecture (v3) ────────────────────────
-    // _layout.tsx now uses a plain conditional render:
-    //   needsOnboarding === true  → <WelcomeScreen onComplete={...} />
-    //   needsOnboarding === false → <Stack>...</Stack>
-    //
-    // So we just need to flip the state. The parent will unmount us and
-    // mount the tabs in the same render cycle. No router calls. No races.
-
-    // Channel 1: the canonical path — call onComplete prop from parent.
-    // This is the PRIMARY path now because the parent passes it directly.
-    if (typeof onComplete === 'function') {
-      try {
-        onComplete();
-        logger.log('[Screen10] ✓ onComplete() fired');
-      } catch (e) {
-        logger.warn('[Screen10] onComplete threw:', e);
-      }
-    } else {
-      logger.warn('[Screen10] onComplete prop is missing! Falling back to globals.');
-    }
-
-    // Channel 2: global setter — backup if onComplete wasn't passed.
-    try {
-      (global as any).__setNeedsOnboarding?.(false);
-      logger.log('[Screen10] ✓ __setNeedsOnboarding(false) fired');
-    } catch {}
-
-    // Channel 3: global completion flag (picked up by 600ms poller).
-    try { (global as any).__butler_onboarding_just_completed = true; } catch {}
-
-    // Channel 4: persist the gate flag in background (source of truth on next launch).
-    AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
-
-    return true;
-  };
-
-  const doLaunch = useCallback(async () => {
+  // ── BULLETPROOF v5: ONE PATH ONLY ───────────────────────────────────────
+  // onComplete is now a real prop from a real component (not a route).
+  // It is guaranteed to be defined. Call it. Nothing else.
+  const handleLaunch = useCallback(() => {
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
-    if (stuckTimerRef.current) { clearTimeout(stuckTimerRef.current); stuckTimerRef.current = null; }
     safeHaptics.heavy();
-    logger.log('[Screen10] launch sequence started');
-
-    // ── FLIP THE GATE FIRST (v3 BULLETPROOF) ─────────────────────────────────
-    // Synchronously flip the gate BEFORE any awaits or async work. This is
-    // critical: if persistAllKeys() hangs (corrupt iCloud sync, slow disk,
-    // low memory), the user is ALREADY in the app. Storage write completes
-    // in the background or fails harmlessly.
     safeSet('navigating');
-    attemptNav();
-
-    // Belt-and-suspenders: if the parent's conditional render hasn't
-    // unmounted us within 600ms, surface the emergency escape button.
-    emergencyRef.current = setTimeout(() => {
-      if (mountedRef.current) {
-        logger.warn('[Screen10] 600ms elapsed — exposing emergency escape button');
-        setShowEmergency(true);
-      }
-    }, 600);
-
-    // Persistence runs in the background — fire and forget.
-    persistAllKeys().catch(e => logger.warn('[Screen10] persistAllKeys threw:', e));
-
-    // Watchdog: at 2s, if still mounted, re-fire dismissal channels once.
-    stuckTimerRef.current = setTimeout(() => {
-      if (!mountedRef.current) return;
-      logger.warn('[Screen10] 2s watchdog — re-flipping state');
-      if (typeof onComplete === 'function') { try { onComplete(); } catch {} }
-      try { (global as any).__setNeedsOnboarding?.(false); } catch {}
-      AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
-    }, 2000);
+    logger.log('[Screen10] LAUNCH pressed — calling onComplete()');
+    if (onComplete) {
+      onComplete();
+    } else {
+      logger.error('[Screen10] onComplete prop is missing — this should never happen under the v5 architecture');
+    }
   }, [onComplete]);
+
+  const doLaunch = handleLaunch;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -1405,22 +1345,9 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               onPress={() => {
                 safeHaptics.heavy();
-                logger.warn('[Screen10] EMERGENCY ESCAPE pressed — fire-everything');
-                // Belt-and-suspenders: write the gate flag synchronously AND
-                // fire every dismissal channel in parallel. No awaits.
-                try { AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch {}
-                try { (global as any).__butler_onboarding_just_completed = true; } catch {}
-                try { (global as any).__setNeedsOnboarding?.(false); } catch {}
-                try { (global as any).__onboardingComplete?.(); } catch {}
-                if (typeof onComplete === 'function') { try { onComplete(); } catch {} }
-                try { router.replace('/(tabs)/nexushome' as any); } catch {}
-                // If somehow STILL stuck after 1s, hard-reload the JS bundle.
-                setTimeout(() => {
-                  try {
-                    const { DevSettings } = require('react-native');
-                    DevSettings?.reload?.();
-                  } catch {}
-                }, 1500);
+                logger.warn('[Screen10] EMERGENCY ESCAPE pressed');
+                // v5: call onComplete only. No router calls. No globals.
+                if (onComplete) onComplete();
               }}
               style={{ borderRadius: 10, borderWidth: 2, borderColor: '#FFB020', backgroundColor: '#FFB020', paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
             >

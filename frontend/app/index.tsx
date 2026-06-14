@@ -1,11 +1,17 @@
 /**
  * Bootstrap route — `/`
  *
- * Renders nothing; the root layout (`app/_layout.tsx`) reads onboarding
- * state from AsyncStorage and calls `router.replace('/welcome' | '/(tabs)/nexushome')`
- * exactly once. Keeping this file as an empty component avoids the
- * expo-router warning about a missing initial route.
+ * The root layout (`app/_layout.tsx`) handles onboarding gating BEFORE
+ * the router ever reaches this file. Once onboarding is complete and the
+ * Stack is rendered, the router lands on `/`, which matches this file.
+ *
+ * This file must NOT return null — that produces a black screen. Instead
+ * we use <Redirect> to send the user into the tab navigator. expo-router
+ * matches `/(tabs)` to `(tabs)/_layout.tsx` + `(tabs)/index.tsx`
+ * (which re-exports nexushome).
  */
+import { Redirect } from 'expo-router';
+
 export default function Index() {
-  return null;
+  return <Redirect href="/(tabs)/nexushome" />;
 }
