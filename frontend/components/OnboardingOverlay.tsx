@@ -635,9 +635,9 @@ function Screen3Consent({ onNext, onBack, consents, setConsents }: {
           <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
           <Text style={st.backBtnTxt}>BACK</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[st.primaryBtn, { flex: 1, opacity: allRequired ? 1 : 0.45 }]}
-          onPress={() => { if (!allRequired) return; safeHaptics.medium(); onNext(); }}
-          activeOpacity={allRequired ? 0.85 : 1}>
+        <TouchableOpacity style={[st.primaryBtn, { flex: 1 }]}
+          onPress={() => { safeHaptics.medium(); onNext(); }}
+          activeOpacity={0.85}>
           <MaterialIcons name="arrow-forward" size={20} color="#000" />
           <Text style={st.primaryBtnTxt}>I ACCEPT</Text>
         </TouchableOpacity>
@@ -684,8 +684,8 @@ function Screen4Pledge({ onNext, onBack }: { onNext: () => void; onBack: () => v
           <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
           <Text style={st.backBtnTxt}>BACK</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[st.primaryBtn, { flex: 1, opacity: pledged ? 1 : 0.45 }]}
-          onPress={() => { if (!pledged) return; safeHaptics.medium(); onNext(); }} activeOpacity={pledged ? 0.85 : 1}>
+        <TouchableOpacity style={[st.primaryBtn, { flex: 1 }]}
+          onPress={() => { safeHaptics.medium(); onNext(); }} activeOpacity={0.85}>
           <MaterialIcons name="arrow-forward" size={20} color="#000" />
           <Text style={st.primaryBtnTxt}>I PLEDGE</Text>
         </TouchableOpacity>
@@ -907,8 +907,8 @@ function Screen8ServerPrivacy({ onNext, onBack, serverAccepts, setServerAccepts 
           <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
           <Text style={st.backBtnTxt}>BACK</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[st.primaryBtn, { flex: 1, opacity: allAccepted ? 1 : 0.45 }]}
-          onPress={() => { if (!allAccepted) return; safeHaptics.medium(); onNext(); }} activeOpacity={allAccepted ? 0.85 : 1}>
+        <TouchableOpacity style={[st.primaryBtn, { flex: 1 }]}
+          onPress={() => { safeHaptics.medium(); onNext(); }} activeOpacity={0.85}>
           <MaterialIcons name="arrow-forward" size={20} color="#000" />
           <Text style={st.primaryBtnTxt}>CONTINUE</Text>
         </TouchableOpacity>

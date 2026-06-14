@@ -649,25 +649,28 @@ export default function RootLayout() {
               )
             ) : null}
 
-            {/* ── ONBOARDING OVERLAY (covers tabs while needsOnboarding=true) ──
-                Wrapped in its own ErrorBoundary so any render error inside the
-                overlay does NOT trap the user — the boundary calls onComplete
-                automatically to recover. */}
+            {/* ── ONBOARDING WINDOW (floating panel above home tab) ──
+                Renders as a CENTERED WINDOW with the home tab visible on
+                all sides — gives the user context that they're inside the
+                app, not in a separate flow. Has a 2px red border + neon
+                shadow so it stands out cleanly against the HUD backdrop. */}
             {needsOnboarding === true && (
-              <View style={[StyleSheet.absoluteFill, { backgroundColor: '#050505', zIndex: 9999, elevation: 9999 }]} pointerEvents="auto" accessibilityViewIsModal={true}>
-                <OnboardingErrorBoundary onRecover={() => setNeedsOnboarding(false)}>
-                  <OnboardingOverlay
-                    onComplete={() => {
-                      // Just flip the state. OnboardingOverlay's Screen 10 button
-                      // already persisted all 7 keys before calling this.
-                      setNeedsOnboarding(false);
-                      // Trigger the WOW first-boot cinematic — only if it hasn't played before.
-                      hasFirstBootPlayed().then((played) => {
-                        if (!played) setShowCinematic(true);
-                      });
-                    }}
-                  />
-                </OnboardingErrorBoundary>
+              <View style={s.onboardingScrim} pointerEvents="auto" accessibilityViewIsModal={true}>
+                {/* Tap-outside dimming layer (does NOT close — onboarding only
+                    exits via the LAUNCH button on Screen 10) */}
+                <View style={s.onboardingScrimDim} pointerEvents="none" />
+                <View style={s.onboardingWindow}>
+                  <OnboardingErrorBoundary onRecover={() => setNeedsOnboarding(false)}>
+                    <OnboardingOverlay
+                      onComplete={() => {
+                        setNeedsOnboarding(false);
+                        hasFirstBootPlayed().then((played) => {
+                          if (!played) setShowCinematic(true);
+                        });
+                      }}
+                    />
+                  </OnboardingErrorBoundary>
+                </View>
               </View>
             )}
 
@@ -690,5 +693,42 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 9998,
+  },
+  /* ─── ONBOARDING WINDOW ─────────────────────────────────────────────
+     A floating panel above the home tab. Home tab is visible:
+       • ~60px top  (status bar + a slice of header content)
+       • ~80px bottom (tab bar + a slice)
+       • ~16px left/right
+     The scrim dims the visible home-tab portions to ~60% opacity so
+     the user knows the panel is modal but they can still see they're
+     inside the live app.  */
+  onboardingScrim: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 9999,
+    elevation: 9999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 60,
+    paddingBottom: 80,
+  },
+  onboardingScrimDim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(2,4,6,0.62)',
+  },
+  onboardingWindow: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 520,
+    borderRadius: 22,
+    overflow: 'hidden',
+    backgroundColor: '#050505',
+    borderWidth: 2,
+    borderColor: 'rgba(255,42,31,0.55)',
+    shadowColor: '#FF2A1F',
+    shadowOpacity: 0.65,
+    shadowRadius: 28,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 24,
   },
 });
