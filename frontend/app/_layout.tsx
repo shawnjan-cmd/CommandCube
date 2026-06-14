@@ -382,22 +382,20 @@ const sp = StyleSheet.create({
 });
 
 // ─── MODULE-LEVEL ROUTER REF ─────────────────────────────────────────────────
-// Stable reference so __onboardingComplete always has the latest router.
-// No pathname, no usePathname, no route-level guards here.
+// Stable reference kept for backwards compatibility with any service that
+// might call `_routerRef.current.replace(...)` directly. Under the SDK 54+
+// Stack.Protected architecture this ref is no longer used for onboarding
+// dismissal — that path is now 100% driven by the `needsOnboarding` gate.
 const _routerRef: { current: ReturnType<typeof useRouter> | null } = { current: null };
 
+// Legacy global — kept as a no-op so any old code path that still calls it
+// (debug menu, deep links, third-party helpers) doesn't throw. Under
+// Stack.Protected, onboarding completion is driven by `__setNeedsOnboarding(false)`,
+// NOT by a router.replace to /(tabs).
 (global as any).__onboardingComplete = () => {
-  const r = _routerRef.current;
-  if (!r) {
-    console.warn('[_layout] __onboardingComplete called before router ref was set');
-    return;
-  }
-  try {
-    r.replace('/(tabs)' as any);
-  } catch (e) {
-    console.warn('[_layout] router.replace failed:', e);
-    try { r.navigate('/(tabs)' as any); } catch {}
-  }
+  // Forward to the canonical channel — flip the gate. Stack.Protected will
+  // mount the tabs automatically. NO router.replace here.
+  try { (global as any).__setNeedsOnboarding?.(false); } catch {}
 };
 
 // ─── ROOT LAYOUT ─────────────────────────────────────────────────────────────
@@ -457,10 +455,13 @@ export default function RootLayout() {
       try {
         await deviceIdentifier.getDeviceId().catch(() => {});
 
-        // Always land on the tabs. Onboarding is rendered as an overlay Modal
-        // on top of the tab navigator (see <Modal> below), so the navigator
-        // tree is always mounted and there's no replace-race possible.
-        router.replace('/(tabs)' as any);
+        // ── Stack.Protected handles navigation ────────────────────────────
+        // Under the SDK 54+ Stack.Protected architecture, the navigator
+        // automatically mounts the correct route based on the `needsOnboarding`
+        // gate. NO router.replace() needed during init — calling it here
+        // would target /(tabs) which is GUARDED OUT while needsOnboarding is
+        // still true, causing an unmatched-route warning or fighting with
+        // Stack.Protected's own guard re-evaluation when the gate flips.
         setAppReady(true);
 
         // Background services only run once the user has accepted onboarding.
@@ -484,7 +485,6 @@ export default function RootLayout() {
         }
       } catch (e) {
         console.warn('[_layout] initApp failed:', e);
-        try { router.replace('/(tabs)' as any); } catch {}
         setAppReady(true);
       }
     };
@@ -614,27 +614,23 @@ export default function RootLayout() {
           ) : null}
           <StatusBar style="light" />
           <View style={[s.container, showHoldingScreen && { opacity: 0 }]}>
-            {/* ─── ROUTING WITH Stack.Protected ────────────────────────────────
-                SDK 54+ pattern. `welcome` and `(tabs)` are guarded by
-                opposing booleans so EXACTLY ONE mounts at any time:
-                  • !needsOnboarding ? show tabs : show welcome
-                Tabs literally cannot bleed through the welcome screen
-                because they aren't rendered at all while needsOnboarding
-                is true. When WelcomeScreen flips `setNeedsOnboarding(false)`
-                via the global setter, Stack.Protected automatically
-                re-evaluates guards and navigates to (tabs).
+            {/* ─── SIMPLE CONDITIONAL RENDER (BULLETPROOF v3) ──────────────
+                We deliberately do NOT use Stack.Protected here anymore.
+                The SDK 54 Stack.Protected pattern was failing to re-evaluate
+                its guards on some devices, leaving users trapped on the
+                last onboarding screen even after they tapped LAUNCH.
 
-                Until needsOnboarding resolves from AsyncStorage we render
-                NEITHER — the holding-screen splash above covers the void. */}
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
-              {/* Onboarding-only route. Mounts ONLY while user hasn't completed onboarding. */}
-              <Stack.Protected guard={needsOnboarding === true}>
-                <Stack.Screen name="welcome" options={{ headerShown: false, gestureEnabled: false }} />
-              </Stack.Protected>
-
-              {/* Main app — tabs + all secondary routes. Mounts ONLY after onboarding done. */}
-              <Stack.Protected guard={needsOnboarding === false}>
+                Instead we render WelcomeScreen directly as a React component
+                when needsOnboarding === true, and pass `onComplete` as a
+                normal prop. The launch button just calls that prop. When
+                state flips to false, React unmounts WelcomeScreen and mounts
+                the Stack with (tabs) — no router races, no guard quirks. */}
+            {needsOnboarding === true ? (
+              <WelcomeScreen onComplete={handleOnboardingComplete} />
+            ) : needsOnboarding === false ? (
+              <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
                 <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
+                <Stack.Screen name="welcome"        options={{ headerShown: false, gestureEnabled: false }} />
                 <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
                 <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
                 <Stack.Screen name="tutorial"       options={{ headerShown: false }} />
@@ -642,8 +638,8 @@ export default function RootLayout() {
                 <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
                 <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
                 <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
-              </Stack.Protected>
-            </Stack>
+              </Stack>
+            ) : null}
           </View>
 
           {/* ─── LEGACY OVERLAY — disabled in favour of Stack.Protected ────────

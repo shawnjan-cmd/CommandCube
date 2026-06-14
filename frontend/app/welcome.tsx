@@ -1160,37 +1160,41 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
   const attemptNav = (): boolean => {
     if (navigatedRef.current) return true;
     navigatedRef.current = true;
-    logger.log('[Screen10] LAUNCH pressed — flipping onboarding guard');
+    logger.log('[Screen10] LAUNCH pressed — flipping onboarding gate (conditional render v3)');
 
-    // ── Stack.Protected architecture (SDK 54+) ──────────────────────────────
-    // We DO NOT call router.replace() / router.dismissTo() / __onboardingComplete()
-    // here anymore. Those legacy router calls would target /(tabs)/nexushome
-    // BEFORE Stack.Protected has mounted the (tabs) navigator, which could
-    // throw "unmatched route" warnings or flicker.
+    // ── Simple conditional render architecture (v3) ────────────────────────
+    // _layout.tsx now uses a plain conditional render:
+    //   needsOnboarding === true  → <WelcomeScreen onComplete={...} />
+    //   needsOnboarding === false → <Stack>...</Stack>
     //
-    // Instead we just flip the gate state. Stack.Protected re-evaluates its
-    // guards synchronously and atomically swaps welcome → (tabs). No race.
+    // So we just need to flip the state. The parent will unmount us and
+    // mount the tabs in the same render cycle. No router calls. No races.
 
-    // Channel 1: persist the gate flag (source of truth on next launch).
-    AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
-
-    // Channel 2: synchronous global flag — picked up by the _layout
-    // 600ms storage poller as a safety-net within ~600ms even if Channel 3
-    // somehow misses (e.g. global setter not registered yet on cold start).
-    try { (global as any).__butler_onboarding_just_completed = true; } catch {}
-
-    // Channel 3: the canonical path — flip the gate. Stack.Protected does
-    // the rest automatically.
-    try { (global as any).__setNeedsOnboarding?.(false); } catch {}
-
-    // Channel 4: legacy explicit callback (no-op under Stack.Protected, but
-    // kept for backwards compatibility with the standalone /welcome route
-    // when used outside the gated layout).
+    // Channel 1: the canonical path — call onComplete prop from parent.
+    // This is the PRIMARY path now because the parent passes it directly.
     if (typeof onComplete === 'function') {
-      try { onComplete(); } catch (e) {
+      try {
+        onComplete();
+        logger.log('[Screen10] ✓ onComplete() fired');
+      } catch (e) {
         logger.warn('[Screen10] onComplete threw:', e);
       }
+    } else {
+      logger.warn('[Screen10] onComplete prop is missing! Falling back to globals.');
     }
+
+    // Channel 2: global setter — backup if onComplete wasn't passed.
+    try {
+      (global as any).__setNeedsOnboarding?.(false);
+      logger.log('[Screen10] ✓ __setNeedsOnboarding(false) fired');
+    } catch {}
+
+    // Channel 3: global completion flag (picked up by 600ms poller).
+    try { (global as any).__butler_onboarding_just_completed = true; } catch {}
+
+    // Channel 4: persist the gate flag in background (source of truth on next launch).
+    AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
+
     return true;
   };
 
@@ -1200,40 +1204,37 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
     if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
     if (stuckTimerRef.current) { clearTimeout(stuckTimerRef.current); stuckTimerRef.current = null; }
     safeHaptics.heavy();
-    safeSet('saving');
     logger.log('[Screen10] launch sequence started');
 
-    // EMERGENCY ESCAPE: surface a "TAP TO ENTER APP" button after 5s if the
-    // overlay still hasn't dismissed.
-    emergencyRef.current = setTimeout(() => {
-      if (mountedRef.current) {
-        logger.warn('[Screen10] 5s elapsed — exposing emergency escape button');
-        setShowEmergency(true);
-      }
-    }, 5000);
-
-    try { await persistAllKeys(); } catch (e) { logger.warn('[Screen10] persistAllKeys threw:', e); }
+    // ── FLIP THE GATE FIRST (v3 BULLETPROOF) ─────────────────────────────────
+    // Synchronously flip the gate BEFORE any awaits or async work. This is
+    // critical: if persistAllKeys() hangs (corrupt iCloud sync, slow disk,
+    // low memory), the user is ALREADY in the app. Storage write completes
+    // in the background or fails harmlessly.
     safeSet('navigating');
-
-    // Fire ALL channels ONCE. We deliberately do NOT loop router.replace —
-    // the guide explicitly warns against it ("20 nav calls over 10 seconds
-    // causes chaos"). Instead we rely on the 600ms storage poller in
-    // _layout.tsx as the safety net: if the overlay somehow doesn't dismiss
-    // within 600ms, the poller catches it. Meanwhile the user-facing
-    // emergency button appears at 5s as the ultimate escape.
     attemptNav();
 
-    // A SINGLE, short watchdog at 2s — if we're still mounted (overlay didn't
-    // dismiss), fire a state-flip channel one more time WITHOUT touching the
-    // router. No nav spam, no chaos.
+    // Belt-and-suspenders: if the parent's conditional render hasn't
+    // unmounted us within 600ms, surface the emergency escape button.
+    emergencyRef.current = setTimeout(() => {
+      if (mountedRef.current) {
+        logger.warn('[Screen10] 600ms elapsed — exposing emergency escape button');
+        setShowEmergency(true);
+      }
+    }, 600);
+
+    // Persistence runs in the background — fire and forget.
+    persistAllKeys().catch(e => logger.warn('[Screen10] persistAllKeys threw:', e));
+
+    // Watchdog: at 2s, if still mounted, re-fire dismissal channels once.
     stuckTimerRef.current = setTimeout(() => {
       if (!mountedRef.current) return;
-      logger.warn('[Screen10] 2s elapsed without dismiss — re-flipping state once');
-      try { (global as any).__setNeedsOnboarding?.(false); } catch {}
+      logger.warn('[Screen10] 2s watchdog — re-flipping state');
       if (typeof onComplete === 'function') { try { onComplete(); } catch {} }
+      try { (global as any).__setNeedsOnboarding?.(false); } catch {}
       AsyncStorage.setItem(ONBOARDING_DONE_KEY, '1').catch(() => {});
     }, 2000);
-  }, [router, onComplete]);
+  }, [onComplete]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -1403,7 +1404,7 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete?
               activeOpacity={0.82}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               onPress={() => {
-                safeHaptics.warning();
+                safeHaptics.heavy();
                 logger.warn('[Screen10] EMERGENCY ESCAPE pressed — fire-everything');
                 // Belt-and-suspenders: write the gate flag synchronously AND
                 // fire every dismissal channel in parallel. No awaits.
