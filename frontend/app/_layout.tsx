@@ -1,23 +1,25 @@
 /**
- * Butler AI — Root Layout (CLEAN v8.0.0)
+ * Butler AI — Root Layout (CLEAN v8.1.0)
  *
  * ARCHITECTURE
  * ────────────
- * Onboarding is a regular TAB route: /(tabs)/onboarding
- *   • app/index.tsx reads the completion flag and redirects to
- *     /(tabs)/onboarding (first run) or /(tabs)/nexushome (returning user).
- *   • The tab bar inside (tabs)/_layout.tsx hides itself while the user
- *     is on the onboarding tab so they cannot skip ahead.
- *   • On the final onboarding screen the user taps LAUNCH, the AsyncStorage
- *     keys are persisted, and we router.replace() to /(tabs)/nexushome.
+ * First-launch onboarding renders INLINE inside `app/index.tsx`:
+ *   • app/index.tsx reads the completion flag.
+ *   • If unset → renders OnboardingOverlay directly inline (no redirect,
+ *     no (tabs) group involvement on first run — this sidesteps the EAS
+ *     production-build routing edge case where (tabs) children failed
+ *     to mount on cold start).
+ *   • If set → emits <Redirect href="/(tabs)/nexushome" /> which mounts
+ *     the tab navigator with nexushome focused (via initialRouteName).
+ *   • On LAUNCH tap from Screen 10 → flag persisted → setDecision('go_home')
+ *     re-renders <Redirect> → user lands on home tab.
  *
  * This root layout therefore does NOT contain any onboarding overlay,
- * polling, hardcoded globals, modal scrim, or duplicate gate logic. All
- * that machinery has been removed. The root layout's sole responsibility
- * is:
+ * polling, hardcoded globals, modal scrim, or duplicate gate logic. Its
+ * sole responsibilities are:
  *   1. Mount the Stack with valid routes only.
  *   2. Install global error guards.
- *   3. Start background services (auto-connect, error logger, etc.)
+ *   3. Bootstrap background services (auto-connect, error logger, etc.)
  *      once onboarding has been completed.
  */
 import { Stack } from 'expo-router';
