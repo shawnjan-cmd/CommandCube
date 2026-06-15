@@ -23,7 +23,6 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import * as SystemUI from 'expo-system-ui';
 import React, { Component, useEffect, useRef, ReactNode } from 'react';
 import { View, Text, StyleSheet, Platform, Animated, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -33,6 +32,13 @@ import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync } from '@/hooks/useAppSync';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 import { withTimeout } from '@/utils/withTimeout';
+
+// expo-system-ui — optional native module. Loaded lazily so a missing-link
+// scenario can NEVER crash the bundle parse. If unavailable, we silently
+// continue (the splash background and our root View bg both already use
+// the same dark-navy color, so there's no visual discontinuity).
+let SystemUI: any = null;
+try { SystemUI = require('expo-system-ui'); } catch { SystemUI = null; }
 
 // ── GLOBAL UNHANDLED PROMISE & ERROR GUARD ──────────────────────────────────
 (() => {
@@ -60,7 +66,11 @@ import { withTimeout } from '@/utils/withTimeout';
 // sees Butler-themed dark navy instead of pure black. This eliminates the
 // brief black flash that can occur between the splash hiding and the React
 // tree's first paint — a common false-positive "black screen" symptom.
-try { SystemUI.setBackgroundColorAsync('#050A12').catch(() => {}); } catch {}
+try {
+  if (SystemUI && typeof SystemUI.setBackgroundColorAsync === 'function') {
+    SystemUI.setBackgroundColorAsync('#050A12').catch(() => {});
+  }
+} catch {}
 
 // ── NATIVE SPLASH POLICY (IMPORTANT — black-screen prevention) ─────────────
 // We DO NOT call preventAutoHideAsync() because:
@@ -288,7 +298,22 @@ export default function RootLayout() {
         <TabBarProvider>
           <View style={s.container}>
             <StatusBar style="light" />
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050505' } }}>
+
+            {/* ── BACKGROUND BOOT LABEL ─────────────────────────────────────
+                Rendered BEHIND the Stack so it is ALWAYS visible the moment
+                React mounts — even before expo-router has resolved/rendered
+                the index route. This guarantees the user sees Butler AI
+                branding instead of a near-black `s.container` rectangle if
+                the Stack is slow to render its first screen. Once any Stack
+                screen mounts (typically <100ms), it covers this layer with
+                its own opaque content. */}
+            <View style={s.bootLabel} pointerEvents="none">
+              <Text style={s.bootBrand}>BUTLER AI</Text>
+              <View style={s.bootDivider} />
+              <Text style={s.bootStatus}>INITIALIZING…</Text>
+            </View>
+
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050A12' } }}>
               <Stack.Screen name="index"          options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
               <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
@@ -306,5 +331,15 @@ export default function RootLayout() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050505' },
+  container: { flex: 1, backgroundColor: '#050A12' },
+  bootLabel: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#050A12',
+    zIndex: 0,
+  },
+  bootBrand:    { fontSize: 22, fontWeight: '900', color: '#00FFC6', letterSpacing: 5, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
+  bootDivider:  { width: 80, height: 2, backgroundColor: '#00FFC6', opacity: 0.5, marginVertical: 14, borderRadius: 1 },
+  bootStatus:   { fontSize: 11, color: '#7FE5D6', letterSpacing: 3, fontWeight: '700', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 });
