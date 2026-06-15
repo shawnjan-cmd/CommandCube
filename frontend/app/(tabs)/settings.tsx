@@ -2156,7 +2156,7 @@ export default function SettingsScreen() {
                           haptics.success();
                           // Onboarding is a tab route — navigate directly.
                           try {
-                            router.push('/(tabs)/onboarding' as any);
+                            router.push('/' as any);
                           } catch {
                             Alert.alert('Reset Complete', 'Restart the app to view the onboarding flow.');
                           }
@@ -2181,7 +2181,7 @@ export default function SettingsScreen() {
                   '@butler_welcome_complete_v1',
                   '@butler_stable_state',
                 ]).finally(() => {
-                  router.push('/(tabs)/onboarding' as any);
+                  router.push('/' as any);
                 });
               }}
               activeOpacity={0.8}

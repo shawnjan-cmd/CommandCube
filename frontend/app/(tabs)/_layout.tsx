@@ -84,7 +84,7 @@ export default function TabLayout() {
       {/* Animated Terminator-HUD backdrop visible across all tabs */}
       <CyberneticBackdrop intensity={0.7} />
       <Tabs
-        initialRouteName="onboarding"
+        initialRouteName="nexushome"
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
         tabBar={(props) => {
           // Hide tab bar entirely while user is on the onboarding tab so
