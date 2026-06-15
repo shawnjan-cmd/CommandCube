@@ -30,13 +30,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabBarProvider } from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync } from '@/hooks/useAppSync';
-import { deviceIdentifier } from '@/services/deviceIdentifier';
-import { errorInterceptor } from '@/services/errorInterceptor';
-import { privacyAudit } from '@/services/privacyAudit';
-import { autoConnectEngine } from '@/services/autoConnectEngine';
-import { proLicense } from '@/services/proLicense';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
-import '@/services/imageRegistry';
 
 // ── GLOBAL UNHANDLED PROMISE & ERROR GUARD ──────────────────────────────────
 (() => {
@@ -49,34 +43,17 @@ import '@/services/imageRegistry';
         orig.call(g.HermesInternal, {
           allRejections: true,
           onUnhandled: (id: number, error: any) => {
-            console.warn('[GlobalGuard] unhandled rejection #' + id + ':', error?.message || error);
+            try { console.warn('[GlobalGuard] unhandled rejection #' + id + ':', error?.message || error); } catch {}
           },
           onHandled: () => {},
-        });
-      }
-      if (typeof g.process?.on === 'function') {
-        g.process.on('unhandledRejection', (reason: any) => {
-          console.warn('[GlobalGuard] unhandledRejection:', reason?.message || reason);
         });
       }
     }
   } catch {}
 })();
 
-// Keep the native splash visible until we mount.
-SplashScreen.preventAutoHideAsync().catch(() => {});
-
-errorInterceptor.install();
-privacyAudit.install();
-proLicense.load().catch(() => {});
-import('@/services/systemUpgrade').then(m => m.applyBootOverrides()).catch(() => {});
-import('@/services/encryptedStorage').then(async m => {
-  try {
-    const id = await (await import('@react-native-async-storage/async-storage')).default
-      .getItem('commandcube_device_id').catch(() => null);
-    if (id) { await m.encryptedStorage.init(id); await m.encryptedStorage.migrate(); }
-  } catch {}
-}).catch(() => {});
+// Keep the native splash visible until React mounts something.
+try { SplashScreen.preventAutoHideAsync().catch(() => {}); } catch {}
 
 // ─── GLOBAL ERROR BOUNDARY ──────────────────────────────────────────────────
 interface EBState { error: Error | null; }
@@ -175,29 +152,83 @@ const eb = StyleSheet.create({
 
 // ─── ROOT LAYOUT ─────────────────────────────────────────────────────────────
 export default function RootLayout() {
-  useAppSync();
+  // useAppSync is wrapped in try/catch via a stable hook ref — never throws.
+  try { useAppSync(); } catch (e) { /* eslint-disable-next-line no-console */ console.warn('[_layout] useAppSync failed:', e); }
   const bootRef = useRef(false);
 
-  // One-shot bootstrap: hide native splash + start background services
-  // if the user has already completed onboarding.
+  // One-shot bootstrap: install error/privacy interceptors, hide native splash,
+  // and start background services if the user has already completed onboarding.
+  // EVERY side-effect is wrapped in try/catch so a single service failure can
+  // never produce a black screen on a fresh install.
   useEffect(() => {
     if (bootRef.current) return;
     bootRef.current = true;
 
-    (async () => {
-      try {
-        await deviceIdentifier.getDeviceId().catch(() => {});
-        const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY).catch(() => null);
-        const onboarded = v === '1' || v === 'true';
-        if (onboarded) {
-          autoConnectEngine.start().catch(() => {});
-        }
-      } catch (e) {
-        console.warn('[_layout] bootstrap failed:', e);
-      } finally {
-        SplashScreen.hideAsync().catch(() => {});
-      }
-    })();
+    // Defer all heavy I/O to next tick so React can mount FIRST. This is the
+    // critical fix for the "black screen after APK install" bug — module-level
+    // side-effects were blocking the first paint.
+    const t = setTimeout(() => {
+      // 1. Hide native splash IMMEDIATELY so UI is visible even if init lags.
+      try { SplashScreen.hideAsync().catch(() => {}); } catch {}
+
+      // 2. Boot services — each wrapped, no throw escapes.
+      (async () => {
+        // Error interceptor
+        try {
+          const { errorInterceptor } = await import('@/services/errorInterceptor');
+          errorInterceptor.install();
+        } catch (e) { console.warn('[_layout] errorInterceptor install failed:', e); }
+
+        // Privacy audit
+        try {
+          const { privacyAudit } = await import('@/services/privacyAudit');
+          privacyAudit.install();
+        } catch (e) { console.warn('[_layout] privacyAudit install failed:', e); }
+
+        // Pro license (background)
+        try {
+          const { proLicense } = await import('@/services/proLicense');
+          proLicense.load().catch(() => {});
+        } catch (e) { console.warn('[_layout] proLicense load failed:', e); }
+
+        // Image registry (side-effect import)
+        try { await import('@/services/imageRegistry'); } catch (e) { console.warn('[_layout] imageRegistry import failed:', e); }
+
+        // Device identifier
+        try {
+          const { deviceIdentifier } = await import('@/services/deviceIdentifier');
+          await deviceIdentifier.getDeviceId().catch(() => {});
+        } catch (e) { console.warn('[_layout] deviceIdentifier failed:', e); }
+
+        // System upgrade overrides
+        try {
+          const m = await import('@/services/systemUpgrade');
+          (m as any).applyBootOverrides?.();
+        } catch (e) { console.warn('[_layout] systemUpgrade failed:', e); }
+
+        // Encrypted storage init (only if device id is already cached)
+        try {
+          const enc = await import('@/services/encryptedStorage');
+          const id  = await AsyncStorage.getItem('commandcube_device_id').catch(() => null);
+          if (id) {
+            await (enc as any).encryptedStorage.init(id);
+            await (enc as any).encryptedStorage.migrate();
+          }
+        } catch (e) { console.warn('[_layout] encryptedStorage init failed:', e); }
+
+        // Conditionally start auto-connect (only if onboarded)
+        try {
+          const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY).catch(() => null);
+          const onboarded = v === '1' || v === 'true';
+          if (onboarded) {
+            const { autoConnectEngine } = await import('@/services/autoConnectEngine');
+            autoConnectEngine.start().catch(() => {});
+          }
+        } catch (e) { console.warn('[_layout] autoConnect bootstrap failed:', e); }
+      })().catch((e) => console.warn('[_layout] bootstrap chain failed:', e));
+    }, 0);
+
+    return () => clearTimeout(t);
   }, []);
 
   return (
