@@ -29,6 +29,7 @@ const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = 
   builder:    mc('hammer-screwdriver'),
   skins:      mc('palette-swatch-outline'),
   settings:   mc('cog-box'),
+  onboarding: mc('school-outline'),
 };
 
 export default function TabLayout() {
@@ -87,14 +88,15 @@ export default function TabLayout() {
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
         tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
       >
-        <Tabs.Screen name="nexushome" options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
-        <Tabs.Screen name="scripts"   options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
-        <Tabs.Screen name="butler"    options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />
-        <Tabs.Screen name="knowledge" options={{ title: 'KNOWLEDGE',      tabBarLabel: 'KB'      }} />
-        <Tabs.Screen name="logs"      options={{ title: 'PC TELEMETRY',   tabBarLabel: 'PC'      }} />
-        <Tabs.Screen name="builder"   options={{ title: 'BUILDER',        tabBarLabel: 'BUILD'   }} />
-        <Tabs.Screen name="skins"     options={{ title: 'SKINS',          tabBarLabel: 'SKINS'   }} />
-        <Tabs.Screen name="settings"  options={{ title: 'CONFIG',         tabBarLabel: 'CONFIG'  }} />
+        <Tabs.Screen name="nexushome"  options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
+        <Tabs.Screen name="scripts"    options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
+        <Tabs.Screen name="butler"     options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />
+        <Tabs.Screen name="knowledge"  options={{ title: 'KNOWLEDGE',      tabBarLabel: 'KB'      }} />
+        <Tabs.Screen name="logs"       options={{ title: 'PC TELEMETRY',   tabBarLabel: 'PC'      }} />
+        <Tabs.Screen name="builder"    options={{ title: 'BUILDER',        tabBarLabel: 'BUILD'   }} />
+        <Tabs.Screen name="onboarding" options={{ title: 'TUTORIAL',       tabBarLabel: 'INTRO'   }} />
+        <Tabs.Screen name="skins"      options={{ title: 'SKINS',          tabBarLabel: 'SKINS'   }} />
+        <Tabs.Screen name="settings"   options={{ title: 'CONFIG',         tabBarLabel: 'CONFIG'  }} />
 
         {/* Hidden routes — accessible via navigation but not shown in the bar */}
         <Tabs.Screen name="terminal"  options={{ href: null, title: 'TERMINAL'    }} />

@@ -1,19 +1,16 @@
 /**
  * HomeGreetingBanner.tsx
  * ──────────────────────────────────────────────────────────────────
- * Slim, elegant greeting strip pinned just above the privacy / clock
- * widgets on the homepage. Time-aware copy ("GOOD MORNING", etc.) +
- * subtle accent line + a soft linear gradient backdrop.
+ * Centered, matrix-style greeting card. Time-aware copy + HUD corner
+ * brackets + accent dot.
  *
- * Quiet, classy, no animations — exists to give the page a confident
- * "command-deck" opening rather than diving straight into the badge.
+ * Zero animations — keeps the strip lightweight on low-end devices.
  */
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const MONO: any = Platform.OS === 'ios' ? 'Courier New' : 'monospace';
-const BODY: any = Platform.OS === 'ios' ? 'System' : 'sans-serif';
+const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
   accent:   '#FF2A1F',
@@ -32,7 +29,6 @@ function greetingFor(d: Date) {
 }
 
 interface Props {
-  /** Reserved for future use — kept for backwards compatibility but no longer rendered. */
   callsign?: string;
 }
 
@@ -41,7 +37,7 @@ export default React.memo(HomeGreetingBanner);
 function HomeGreetingBanner(_props: Props) {
   const [now, setNow] = useState(new Date());
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30_000);  // refresh greeting every 30s
+    const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
 
@@ -49,32 +45,30 @@ function HomeGreetingBanner(_props: Props) {
 
   return (
     <View style={s.wrap}>
-      <LinearGradient
-        colors={[C.accent + '14', C.accent + '03', 'transparent']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={StyleSheet.absoluteFill}
-      />
+      <View style={s.card}>
+        {/* HUD corner brackets (all 4) */}
+        <View style={[s.corner, { top: 0,    left: 0,    borderTopWidth: 1.5,    borderLeftWidth: 1.5,   borderColor: C.accent + 'AA' }]} />
+        <View style={[s.corner, { top: 0,    right: 0,   borderTopWidth: 1.5,    borderRightWidth: 1.5,  borderColor: C.accent + 'AA' }]} />
+        <View style={[s.corner, { bottom: 0, left: 0,    borderBottomWidth: 1.5, borderLeftWidth: 1.5,   borderColor: C.accent + 'AA' }]} />
+        <View style={[s.corner, { bottom: 0, right: 0,   borderBottomWidth: 1.5, borderRightWidth: 1.5,  borderColor: C.accent + 'AA' }]} />
 
-      {/* Left accent rail */}
-      <View style={s.rail} />
+        {/* Top accent strip */}
+        <View style={s.topBar} />
 
-      <View style={s.content}>
-        <Text style={s.greeting} numberOfLines={1}>
-          {greeting}
-          <Text style={s.dot}>  ·  </Text>
-          <Text style={s.callsign}>BUTLER AI ONLINE</Text>
-        </Text>
+        {/* Greeting row — centered */}
+        <View style={s.greetingRow}>
+          <MaterialCommunityIcons name="weather-night" size={11} color={C.accent} />
+          <Text style={s.greeting} numberOfLines={1}>
+            {greeting}
+          </Text>
+          <Text style={s.sep}> · </Text>
+          <Text style={s.callsign} numberOfLines={1}>BUTLER AI ONLINE</Text>
+        </View>
+
+        {/* Tagline — centered */}
         <Text style={s.tagline} numberOfLines={1}>
           LAN-ONLY  ·  ZERO TELEMETRY  ·  YOUR PC · YOUR RULES
         </Text>
-      </View>
-
-      {/* Right-side hint chevron block */}
-      <View style={s.rightBlock}>
-        <View style={[s.tick, { width: 8 }]} />
-        <View style={[s.tick, { width: 14 }]} />
-        <View style={[s.tick, { width: 5 }]} />
       </View>
     </View>
   );
@@ -85,49 +79,47 @@ const s = StyleSheet.create({
     marginHorizontal: 12,
     marginTop: 10,
     marginBottom: 4,
-    paddingVertical: 10,
+  },
+  card: {
+    paddingVertical: 12,
     paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.accent + '40',
+    backgroundColor: 'rgba(255,42,31,0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  corner: { position: 'absolute', width: 10, height: 10 },
+  topBar: {
+    position: 'absolute', top: 0, left: 0, right: 0,
+    height: 1.5,
+    backgroundColor: C.accent + '80',
+  },
+  greetingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: C.accent + '25',
-    overflow: 'hidden',
-    backgroundColor: '#070A0E',
+    justifyContent: 'center',
+    gap: 6,
   },
-  rail: {
-    width: 2.5, height: '70%',
-    backgroundColor: C.accent,
-    borderRadius: 2,
-    marginRight: 10,
-    ...(Platform.OS === 'ios' ? { shadowColor: C.accent, shadowOpacity: 0.9, shadowRadius: 4, shadowOffset: { width: 0, height: 0 } } : {}),
-  },
-  content: { flex: 1 },
   greeting: {
     fontSize: 13,
     fontWeight: '900',
     fontFamily: MONO,
     letterSpacing: 1.8,
     color: C.textBrt,
+    textAlign: 'center',
   },
-  dot:      { color: C.accent, fontFamily: MONO, fontWeight: '900' },
-  callsign: { color: C.accent, fontFamily: MONO, fontWeight: '900' },
+  sep:      { color: C.accent + 'AA', fontFamily: MONO, fontWeight: '900', fontSize: 13 },
+  callsign: { color: C.accent, fontFamily: MONO, fontWeight: '900', fontSize: 13, letterSpacing: 1.8 },
   tagline: {
-    marginTop: 2,
-    fontSize: 9.5,
+    marginTop: 5,
+    fontSize: 9,
     fontFamily: MONO,
     fontWeight: '700',
     letterSpacing: 1.2,
     color: C.textMid,
-  },
-  rightBlock: {
-    alignItems: 'flex-end',
-    gap: 2.5,
-    marginLeft: 10,
-  },
-  tick: {
-    height: 1.5,
-    borderRadius: 1,
-    backgroundColor: C.accent + '80',
+    textAlign: 'center',
   },
 });

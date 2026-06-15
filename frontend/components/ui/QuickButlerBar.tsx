@@ -22,7 +22,7 @@ import { haptics } from '@/services/haptics';
 
 export const BUTLER_PREFILL_KEY = '@butler_prefill_prompt';
 
-const BAR_H = 52;
+const BAR_H = 64;
 
 const RED      = '#FF2A1F';
 const RED_HI   = '#FF6A52';
@@ -102,6 +102,9 @@ export default function QuickButlerBar() {
           <View pointerEvents="none" style={styles.signalEdge} />
           <View pointerEvents="none" style={styles.rimLight} />
 
+          {/* Top matrix-style accent strip */}
+          <View pointerEvents="none" style={styles.topAccentBar} />
+
           {/* HUD corner brackets — match the matrix card aesthetic */}
           <View pointerEvents="none" style={[styles.hudCorner, { top: 0,    left: 4,    borderTopWidth: 1.5,    borderLeftWidth: 1.5 }]} />
           <View pointerEvents="none" style={[styles.hudCorner, { top: 0,    right: 0,   borderTopWidth: 1.5,    borderRightWidth: 1.5 }]} />
@@ -112,6 +115,8 @@ export default function QuickButlerBar() {
             {/* Robot badge + prompt chevron + blinking cursor */}
             <View style={styles.robotBadge}>
               <MaterialCommunityIcons name="robot-angry-outline" size={17} color={RED} />
+              {/* Pulse dot indicator on top-right of badge */}
+              <View pointerEvents="none" style={styles.armedDot} />
             </View>
             <View style={styles.promptBlock}>
               <Text style={styles.promptGlyph}>{'>'}</Text>
@@ -152,6 +157,11 @@ export default function QuickButlerBar() {
                 />
               </TouchableOpacity>
             </Animated.View>
+          </View>
+
+          {/* Bottom status line — matrix-style identifier */}
+          <View pointerEvents="none" style={styles.bottomStatusRow}>
+            <Text style={styles.bottomStatusTxt}>BUTLER · LOCAL LLM · LAN-ONLY</Text>
           </View>
         </View>
       </View>
@@ -222,12 +232,39 @@ const styles = StyleSheet.create({
     width: 9, height: 9,
     borderColor: RED_HI + 'CC',
   },
+  topAccentBar: {
+    position: 'absolute',
+    top: 0, left: 4, right: 4,
+    height: 2,
+    backgroundColor: RED + 'BB',
+    zIndex: 1,
+  },
+  armedDot: {
+    position: 'absolute',
+    top: -2, right: -2,
+    width: 6, height: 6, borderRadius: 3,
+    backgroundColor: RED_HI,
+    borderWidth: 1,
+    borderColor: DECK,
+  },
+  bottomStatusRow: {
+    position: 'absolute',
+    bottom: 2, left: 0, right: 0,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  bottomStatusTxt: {
+    fontFamily: MONO, fontSize: 7,
+    color: 'rgba(255,106,82,0.55)',
+    fontWeight: '700',
+    letterSpacing: 1.6,
+  },
   row: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 10,
     paddingRight: 7,
+    paddingBottom: 7,
     gap: 8,
   },
   robotBadge: {
@@ -236,6 +273,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,42,31,0.08)',
     borderWidth: 1,
     borderColor: 'rgba(255,42,31,0.45)',
+    position: 'relative',
   },
   promptBlock: {
     flexDirection: 'row',

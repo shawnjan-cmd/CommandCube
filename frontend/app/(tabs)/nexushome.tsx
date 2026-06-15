@@ -1334,23 +1334,25 @@ function CommandModulesGrid({ goToTab }: { goToTab: (t: string) => void }) {
     sub: string;
     color: string;
   };
+  // Hand-picked unique icons — none of the generic boxes/folders
   const pillars: Pillar[] = [
-    { tab: 'scripts',   icon: 'code-braces',          title: 'SCRIPTS',   sub: 'Python automation',  color: D.cyan },
-    { tab: 'butler',    icon: 'robot-outline',        title: 'BUTLER AI', sub: 'Local AI chat',      color: D.amber },
-    { tab: 'knowledge', icon: 'brain',                title: 'KNOWLEDGE', sub: 'Self-growing KB',    color: D.purple },
-    { tab: 'tools',     icon: 'toolbox-outline',      title: 'TOOLS',     sub: 'File · share · sys', color: D.green },
-    { tab: 'pc',        icon: 'desktop-classic',      title: 'PC',        sub: 'CPU · RAM · Disk',   color: D.blue },
-    { tab: 'builder',   icon: 'view-grid-plus-outline', title: 'BUILD',   sub: 'Drag-drop pipelines', color: D.orange },
+    { tab: 'scripts',   icon: 'language-python',        title: 'SCRIPTS',   sub: 'Python automation',     color: D.cyan },
+    { tab: 'butler',    icon: 'chip',                   title: 'BUTLER AI', sub: 'Local LLM chat',        color: D.amber },
+    { tab: 'knowledge', icon: 'head-snowflake-outline', title: 'KNOWLEDGE', sub: 'Self-growing KB',       color: D.purple },
+    { tab: 'tools',     icon: 'wrench-cog-outline',     title: 'TOOLS',     sub: 'File · share · sys',    color: D.green },
+    { tab: 'pc',        icon: 'monitor-dashboard',      title: 'PC',        sub: 'CPU · RAM · Disk',      color: D.blue },
+    { tab: 'builder',   icon: 'vector-square',          title: 'BUILD',     sub: 'Drag-drop pipelines',   color: D.orange },
   ];
 
   return (
     <View style={cmg.wrap}>
       <NexusCard accentColor={D.cyan} glowIntensity={0.16}>
-        {/* Header */}
+        {/* Header — centered */}
         <View style={cmg.header}>
-          <MaterialCommunityIcons name="grid" size={15} color={D.cyan} />
-          <Text style={cmg.headerTitle}>COMMAND MODULES</Text>
-          <View style={{ flex: 1 }} />
+          <View style={cmg.headerTitleRow}>
+            <MaterialCommunityIcons name="grid" size={15} color={D.cyan} />
+            <Text style={cmg.headerTitle}>COMMAND MODULES</Text>
+          </View>
           <View style={cmg.headerPill}>
             <Animated.View style={[cmg.headerPillDot, { opacity: dotOp }]} />
             <Text style={cmg.headerPillTxt}>6 / 6 ONLINE</Text>
@@ -1359,9 +1361,9 @@ function CommandModulesGrid({ goToTab }: { goToTab: (t: string) => void }) {
 
         <Text style={cmg.subhead}>Tap any module to open · all routes local</Text>
 
-        {/* 2 × 3 grid (3 rows of 2) */}
+        {/* 2 × 3 grid (3 rows of 2) — fully centered, huge icons */}
         <View style={cmg.grid}>
-          {pillars.map((p, i) => (
+          {pillars.map((p) => (
             <TouchableOpacity
               key={p.tab}
               activeOpacity={0.85}
@@ -1370,15 +1372,29 @@ function CommandModulesGrid({ goToTab }: { goToTab: (t: string) => void }) {
             >
               {/* HUD top accent strip */}
               <View style={[cmg.tileTopBar, { backgroundColor: p.color + 'AA' }]} />
-              {/* Tiny corner ticks */}
+              {/* Corner ticks — all 4, matrix style */}
               <View style={[cmg.tileCorner, { top: 0,    left: 0,    borderTopWidth: 1,    borderLeftWidth: 1,   borderColor: p.color + '90' }]} />
+              <View style={[cmg.tileCorner, { top: 0,    right: 0,   borderTopWidth: 1,    borderRightWidth: 1,  borderColor: p.color + '90' }]} />
+              <View style={[cmg.tileCorner, { bottom: 0, left: 0,    borderBottomWidth: 1, borderLeftWidth: 1,   borderColor: p.color + '90' }]} />
               <View style={[cmg.tileCorner, { bottom: 0, right: 0,   borderBottomWidth: 1, borderRightWidth: 1,  borderColor: p.color + '90' }]} />
 
-              <View style={[cmg.tileIconBox, { borderColor: p.color + '80', backgroundColor: p.color + '18' }]}>
-                <MaterialCommunityIcons name={p.icon} size={22} color={p.color} />
+              {/* HUGE centered icon — fills the box */}
+              <View style={cmg.tileIconBox}>
+                <MaterialCommunityIcons
+                  name={p.icon}
+                  size={72}
+                  color={p.color}
+                  style={Platform.OS === 'ios'
+                    ? { textShadowColor: p.color, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 18 } as any
+                    : undefined}
+                />
               </View>
+
+              {/* Centered title + sub */}
               <Text style={[cmg.tileTitle, { color: p.color }]} numberOfLines={1}>{p.title}</Text>
               <Text style={cmg.tileSub} numberOfLines={1}>{p.sub}</Text>
+
+              {/* Centered OPEN footer */}
               <View style={[cmg.tileGoRow, { borderTopColor: p.color + '24' }]}>
                 <Text style={[cmg.tileGoTxt, { color: p.color + 'BB' }]}>OPEN</Text>
                 <MaterialIcons name="chevron-right" size={11} color={p.color} />
@@ -1387,12 +1403,10 @@ function CommandModulesGrid({ goToTab }: { goToTab: (t: string) => void }) {
           ))}
         </View>
 
-        {/* Footer */}
+        {/* Footer — centered signature */}
         <View style={cmg.footer}>
           <MaterialCommunityIcons name="fingerprint" size={10} color={D.textMid} />
-          <Text style={cmg.footerTxt}>BUTLER-CORE · VISION SYS · v2.1</Text>
-          <View style={{ flex: 1 }} />
-          <Text style={cmg.footerStatus}>STATUS · ARMED</Text>
+          <Text style={cmg.footerTxt}>BUTLER-CORE · VISION SYS · v2.1 · STATUS · ARMED</Text>
         </View>
       </NexusCard>
     </View>
@@ -1401,8 +1415,9 @@ function CommandModulesGrid({ goToTab }: { goToTab: (t: string) => void }) {
 
 const cmg = StyleSheet.create({
   wrap:           { marginHorizontal: 12, marginTop: 10 },
-  header:         { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingTop: 14 },
-  headerTitle:    { fontFamily: MONO, fontSize: 12.5, fontWeight: '900', letterSpacing: 1.8, color: D.text },
+  header:         { alignItems: 'center', paddingHorizontal: 14, paddingTop: 14, gap: 6 },
+  headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headerTitle:    { fontFamily: MONO, fontSize: 12.5, fontWeight: '900', letterSpacing: 1.8, color: D.text, textAlign: 'center' },
   headerPill:     {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     borderWidth: 1, borderColor: D.cyan + '60', backgroundColor: D.cyan + '12',
@@ -1410,34 +1425,40 @@ const cmg = StyleSheet.create({
   },
   headerPillDot:  { width: 5, height: 5, borderRadius: 3, backgroundColor: D.cyan },
   headerPillTxt:  { fontFamily: MONO, fontSize: 8.5, fontWeight: '900', letterSpacing: 1.2, color: D.cyan },
-  subhead:        { fontFamily: MONO, fontSize: 9, color: D.textMid, letterSpacing: 1, paddingHorizontal: 14, paddingTop: 4 },
+  subhead:        { fontFamily: MONO, fontSize: 9, color: D.textMid, letterSpacing: 1, paddingHorizontal: 14, paddingTop: 6, textAlign: 'center' },
 
-  grid:           { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 10, gap: 8 },
+  grid:           { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 12, gap: 8, justifyContent: 'center' },
   tile:           {
     width: '48%',
-    borderWidth: 1, borderRadius: 10,
-    paddingHorizontal: 10, paddingTop: 12, paddingBottom: 8,
+    borderWidth: 1, borderRadius: 12,
+    paddingHorizontal: 8, paddingTop: 14, paddingBottom: 8,
     overflow: 'hidden', position: 'relative',
-    minHeight: 110,
+    alignItems: 'center', justifyContent: 'flex-start',
+    minHeight: 170,
   },
   tileTopBar:     { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
-  tileCorner:     { position: 'absolute', width: 9, height: 9 },
+  tileCorner:     { position: 'absolute', width: 10, height: 10 },
   tileIconBox:    {
-    width: 36, height: 36, borderRadius: 8, borderWidth: 1,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 8,
+    width: 96, height: 96, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 6,
   },
-  tileTitle:      { fontFamily: MONO, fontSize: 12, fontWeight: '900', letterSpacing: 1.4 },
-  tileSub:        { fontFamily: MONO, fontSize: 8.5, color: D.textMid, letterSpacing: 0.4, marginTop: 2 },
-  tileGoRow:      { flexDirection: 'row', alignItems: 'center', gap: 2, marginTop: 8, paddingTop: 6, borderTopWidth: StyleSheet.hairlineWidth },
-  tileGoTxt:      { flex: 1, fontFamily: MONO, fontSize: 8, fontWeight: '900', letterSpacing: 1.4 },
+  tileTitle:      { fontFamily: MONO, fontSize: 13, fontWeight: '900', letterSpacing: 1.5, textAlign: 'center', marginTop: 4 },
+  tileSub:        { fontFamily: MONO, fontSize: 8.5, color: D.textMid, letterSpacing: 0.4, marginTop: 3, textAlign: 'center' },
+  tileGoRow:      {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 2,
+    marginTop: 10, paddingTop: 6,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    alignSelf: 'stretch',
+  },
+  tileGoTxt:      { fontFamily: MONO, fontSize: 8, fontWeight: '900', letterSpacing: 1.4 },
 
   footer:         {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
     paddingHorizontal: 14, paddingVertical: 11, marginTop: 4,
     borderTopWidth: 1, borderTopColor: D.cyan + '20',
   },
-  footerTxt:      { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1 },
-  footerStatus:   { fontFamily: MONO, fontSize: 8, fontWeight: '900', color: D.cyan + 'BB', letterSpacing: 1.2 },
+  footerTxt:      { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1, textAlign: 'center' },
 });
 
 // ─── KB ARTICLES FEED ─────────────────────────────────────────────
