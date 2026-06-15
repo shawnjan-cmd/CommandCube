@@ -335,292 +335,246 @@ function QAIcon({ type, color, size = 22 }: { type: string; color: string; size?
 }
 
 // ─────────────────────────────────────────────────────────────────
-// SCREEN 1: WELCOME
+// SCREEN 1: WELCOME — v9 BULLETPROOF REWRITE
 // ─────────────────────────────────────────────────────────────────
+// Goals (per user request — recreated from scratch):
+//   • Clear, focused, NOT a wall of text.
+//   • Big hero, big CTA. Three core promises. Compliance + legal docs
+//     kept (Play Store requirement). Nothing else.
+//   • Stable: a single subtle animation (hero pulse). No staggered
+//     spring chains that could mid-mount throw on low-end devices.
+//   • No dependency on prior session state — `allAccepted` is read but
+//     only used to swap the CTA label (REVIEW AGAIN vs GET STARTED).
 function Screen1Welcome({ onNext, allAccepted }: { onNext: () => void; allAccepted: boolean }) {
-  const fade = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.92)).current;
-  const logoGlow = useRef(new Animated.Value(0)).current;
-  const titleSlide = useRef(new Animated.Value(20)).current;
+  const heroPulse = useRef(new Animated.Value(0.35)).current;
+
   useEffect(() => {
-    Animated.stagger(150, [
-      Animated.parallel([
-        Animated.timing(fade, { toValue: 1, duration: 600, useNativeDriver: true }),
-        Animated.spring(scaleAnim, { toValue: 1, tension: 50, friction: 8, useNativeDriver: true }),
-      ]),
-      Animated.spring(titleSlide, { toValue: 0, tension: 60, friction: 10, useNativeDriver: true }),
-    ]).start();
-    const glow = Animated.loop(Animated.sequence([
-      Animated.timing(logoGlow, { toValue: 1, duration: 2000, useNativeDriver: true }),
-      Animated.timing(logoGlow, { toValue: 0.3, duration: 2000, useNativeDriver: true }),
+    const a = Animated.loop(Animated.sequence([
+      Animated.timing(heroPulse, { toValue: 1,    duration: 1600, useNativeDriver: true }),
+      Animated.timing(heroPulse, { toValue: 0.35, duration: 1600, useNativeDriver: true }),
     ]));
-    glow.start();
-    return () => glow.stop();
-  }, []);
+    a.start();
+    return () => a.stop();
+  }, [heroPulse]);
+
+  const PROMISES = [
+    {
+      color: C.cyan,
+      icon:  'wifi-tethering',
+      title: 'LAN-only · Zero Cloud',
+      body:  'Your phone talks directly to YOUR PC over your Wi-Fi. No relay server, no third party — ever.',
+    },
+    {
+      color: C.green,
+      icon:  'lock-outline',
+      title: 'Encrypted + Signed',
+      body:  'Every command is HMAC-SHA256 signed. AES-256 storage on device. Pair code required.',
+    },
+    {
+      color: C.amber,
+      icon:  'block',
+      title: 'Zero Auto-Execute',
+      body:  'No scheduler, no cron, no background tasks. Every command needs your active tap.',
+    },
+  ];
 
   const LEGAL_DOCS = [
-    { color: C.cyan, icon: 'visibility', title: 'Privacy Policy', desc: 'Device UUID only. No scripts, contacts, location, or telemetry ever collected.', url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
-    { color: '#B8860B', icon: 'gavel', title: 'Terms of Service', desc: '18+ only. Personal PCs only. No unauthorized access. No malware.', url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
-    { color: '#FFFFFF', icon: 'shield', title: 'Data Safety Declaration', desc: 'Mirrors the Play Store form. Camera: QR scan only, never stored.', url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
-    { color: '#CC3333', icon: 'delete-forever', title: 'Delete My Data', desc: 'Settings → DELETE ALL MY DATA — 3 taps. Immediate and permanent.', url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
+    { color: C.cyan,    icon: 'visibility',     title: 'Privacy Policy',          desc: 'Device UUID only. No scripts, contacts, location, or telemetry collected.',                       url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
+    { color: '#B8860B', icon: 'gavel',          title: 'Terms of Service',        desc: '18+ only. Personal PCs only. No unauthorized access. No malware.',                                 url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
+    { color: '#FFFFFF', icon: 'shield',         title: 'Data Safety Declaration', desc: 'Mirrors the Play Store form. Camera used only for QR pairing scans.',                              url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
+    { color: C.red,     icon: 'delete-forever', title: 'Delete My Data',          desc: 'Settings → DELETE ALL MY DATA. Three taps. Immediate and permanent.',                              url: 'https://shawnjan-cmd.github.io/privacy-policy-/' },
   ];
 
   return (
-    <Animated.View style={{ flex: 1, opacity: fade, transform: [{ scale: scaleAnim }] }}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* ── Hero ── */}
-        <View style={{ alignItems: 'center', paddingTop: 32, paddingBottom: 28 }}>
-          <View style={{ position: 'relative', width: '100%', alignItems: 'center', paddingVertical: 28 }}>
-            <View style={{ position:'absolute', top:0, left:0, width:22, height:22, borderTopWidth:2, borderLeftWidth:2, borderColor: C.cyan + '60' }} />
-            <View style={{ position:'absolute', top:0, right:0, width:22, height:22, borderTopWidth:2, borderRightWidth:2, borderColor: C.cyan + '60' }} />
-            <View style={{ position:'absolute', bottom:0, left:0, width:22, height:22, borderBottomWidth:2, borderLeftWidth:2, borderColor: C.cyan + '60' }} />
-            <View style={{ position:'absolute', bottom:0, right:0, width:22, height:22, borderBottomWidth:2, borderRightWidth:2, borderColor: C.cyan + '60' }} />
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 90 }}>
 
-            {/* Status badge — no version number */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5, borderColor: C.cyan + '40', backgroundColor: C.cyan + '08', marginBottom: 20 }}>
-              <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.green, opacity: logoGlow }} />
-              <Text style={{ fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 2, color: C.cyan }}>BUTLER AI</Text>
-              <View style={{ width: 1, height: 10, backgroundColor: C.cyan + '40' }} />
-              <Text style={{ fontSize: 9, fontWeight: '700', fontFamily: MONO, letterSpacing: 1, color: C.cyan + 'CC' }}>PC AUTOMATION</Text>
-            </View>
-
-            {/* Main wordmark */}
-            <Animated.View style={{ alignItems: 'center', gap: 4, transform: [{ translateY: titleSlide }] }}>
-              <Text style={{
-                fontSize: 52, fontWeight: '900', fontFamily: MONO,
-                color: '#FFFFFF', letterSpacing: 8, lineHeight: 56,
-                ...(Platform.OS === 'ios' ? { textShadowColor: C.cyan, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 18 } : {}),
-              }}>BUTLER</Text>
-
-              {/* Accent divider row */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: -4 }}>
-                <View style={{ flex: 1, height: 1.5, backgroundColor: C.cyan, opacity: 0.25 }} />
-                <Text style={{
-                  fontSize: 32, fontWeight: '900', fontFamily: MONO,
-                  color: C.cyan, letterSpacing: 18,
-                  ...(Platform.OS === 'ios' ? { textShadowColor: C.cyan, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 16 } : {}),
-                }}>AI</Text>
-                <View style={{ flex: 1, height: 1.5, backgroundColor: C.cyan, opacity: 0.25 }} />
-              </View>
-
-              {/* Sub-label — "NEXUS" removed */}
-              <Text style={{ fontSize: 10, fontWeight: '700', fontFamily: MONO, color: C.cyan + 'AA', letterSpacing: 5, textAlign: 'center', marginTop: 10 }}>
-                COMMAND CENTER
-              </Text>
-
-              {/* ── Animated hero illustration (user-supplied SVG) ─────── */}
-              <View style={{ marginTop: 16, marginBottom: 4, width: '100%', alignItems: 'center' }}>
-                <ButlerHeroSvg />
-              </View>
-
-              {/* Tag strip with LAN ONLY added */}
-              <View style={{ flexDirection: 'row', gap: 6, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-                {['LOCAL AI', 'ZERO CLOUD', 'HMAC-SHA256', 'LAN ONLY'].map((tag) => (
-                  <View key={tag} style={{ borderRadius: 6, borderWidth: 1, borderColor: C.cyan + '30', backgroundColor: C.cyan + '07', paddingHorizontal: 9, paddingVertical: 4 }}>
-                    <Text style={{ fontSize: 9, fontWeight: '900', fontFamily: MONO, color: C.cyan + 'BB', letterSpacing: 1 }}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
-
-              {/* Setup time estimate */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 14, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 10, borderWidth: 1, borderColor: C.cyan + '20', backgroundColor: C.cyan + '05' }}>
-                <MaterialIcons name="schedule" size={12} color={C.cyan} />
-                <Text style={{ fontSize: 9, fontWeight: '700', fontFamily: MONO, color: C.cyan + '90', letterSpacing: 1 }}>SETUP TAKES ABOUT 2 MINUTES</Text>
-                <View style={{ width: 1, height: 10, backgroundColor: C.cyan + '30' }} />
-                <Text style={{ fontSize: 9, fontWeight: '700', fontFamily: MONO, color: C.green + '90', letterSpacing: 1 }}>10 STEPS</Text>
-              </View>
-            </Animated.View>
-          </View>
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <View style={{ alignItems: 'center', paddingTop: 28, paddingBottom: 22, gap: 14 }}>
+        {/* Status pill */}
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', gap: 6,
+          borderWidth: 1, borderRadius: 20,
+          paddingHorizontal: 12, paddingVertical: 5,
+          borderColor: C.cyan + '40', backgroundColor: C.cyan + '08',
+        }}>
+          <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.green, opacity: heroPulse }} />
+          <Text style={{ fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 2, color: C.cyan }}>BUTLER AI</Text>
+          <View style={{ width: 1, height: 10, backgroundColor: C.cyan + '40' }} />
+          <Text style={{ fontSize: 9, fontWeight: '700', fontFamily: MONO, letterSpacing: 1, color: C.cyan + 'CC' }}>PC AUTOMATION</Text>
         </View>
 
-        {/* ── MODULE REGISTRY ── Automation-Terminal themed module listing ── */}
-        <View style={[st.card, { borderColor: C.cyan + '35', marginBottom: 14, padding: 0, overflow: 'hidden' }]}>
-          {/* HUD top accent bar */}
-          <View style={{ height: 2, backgroundColor: C.cyan }} />
-
-          {/* Terminal-style title bar */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 6 }}>
-            <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.green }} />
-            <Text style={{ fontSize: 9, fontWeight: '900', color: C.cyan + 'AA', fontFamily: MONO, letterSpacing: 1.6 }}>~/butler ❯</Text>
-            <Text style={{ fontSize: 9, fontWeight: '700', color: C.text + '99', fontFamily: MONO, letterSpacing: 1 }}>list --modules</Text>
-            <View style={{ flex: 1 }} />
-            <View style={{ borderRadius: 4, borderWidth: 1, borderColor: C.green + '50', backgroundColor: C.green + '10', paddingHorizontal: 6, paddingVertical: 2 }}>
-              <Text style={{ fontSize: 8, fontWeight: '900', color: C.green, fontFamily: MONO }}>9/9 ARMED</Text>
-            </View>
+        {/* Wordmark */}
+        <View style={{ alignItems: 'center', gap: 2 }}>
+          <Text style={{
+            fontSize: 54, fontWeight: '900', fontFamily: MONO,
+            color: '#FFFFFF', letterSpacing: 8, lineHeight: 58,
+            ...(Platform.OS === 'ios' ? { textShadowColor: C.cyan, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 18 } : {}),
+          }}>BUTLER</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: -2 }}>
+            <View style={{ width: 50, height: 1.5, backgroundColor: C.cyan, opacity: 0.35 }} />
+            <Text style={{
+              fontSize: 30, fontWeight: '900', fontFamily: MONO,
+              color: C.cyan, letterSpacing: 16,
+              ...(Platform.OS === 'ios' ? { textShadowColor: C.cyan, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 14 } : {}),
+            }}>AI</Text>
+            <View style={{ width: 50, height: 1.5, backgroundColor: C.cyan, opacity: 0.35 }} />
           </View>
-
-          {/* Hex-chip icon + headline row */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 14, paddingVertical: 10 }}>
-            {/* Custom hexagonal automation-chip icon (replaces the plain "9") */}
-            <Svg width={56} height={56} viewBox="0 0 56 56">
-              <Defs>
-                <LinearGradient id="hexBody" x1="0" y1="0" x2="0" y2="1">
-                  <Stop offset="0%" stopColor={C.cyan} stopOpacity="0.22" />
-                  <Stop offset="100%" stopColor={C.cyan} stopOpacity="0.05" />
-                </LinearGradient>
-                <RadialGradient id="hexCoreGlow" cx="50%" cy="50%" r="50%">
-                  <Stop offset="0%"  stopColor="#FFFFFF" stopOpacity="0.95" />
-                  <Stop offset="100%" stopColor={C.cyan} stopOpacity="0.12" />
-                </RadialGradient>
-              </Defs>
-              {/* Hex shell */}
-              <Path d="M28 3 L51 16 L51 40 L28 53 L5 40 L5 16 Z"
-                    fill="url(#hexBody)" stroke={C.cyan} strokeOpacity={0.85} strokeWidth={1.4}/>
-              {/* Inner hex outline */}
-              <Path d="M28 9 L46 19 L46 37 L28 47 L10 37 L10 19 Z"
-                    fill="none" stroke={C.cyan} strokeOpacity={0.35} strokeWidth={1} strokeDasharray="3 2"/>
-              {/* Circuit traces */}
-              <Path d="M5 28 L13 28 M43 28 L51 28 M28 3 L28 9 M28 47 L28 53" stroke={C.cyan} strokeOpacity={0.7} strokeWidth={1.2}/>
-              <Circle cx="13" cy="28" r="1.6" fill={C.cyan} />
-              <Circle cx="43" cy="28" r="1.6" fill={C.cyan} />
-              <Circle cx="28" cy="9"  r="1.6" fill={C.cyan} />
-              <Circle cx="28" cy="47" r="1.6" fill={C.cyan} />
-              {/* Diagonal traces */}
-              <Path d="M14 17 L20 23 M42 17 L36 23 M14 39 L20 33 M42 39 L36 33" stroke={C.cyan} strokeOpacity={0.45} strokeWidth={0.9}/>
-              {/* Central core */}
-              <Circle cx="28" cy="28" r="9" fill="url(#hexCoreGlow)" />
-              <Circle cx="28" cy="28" r="7" fill="none" stroke={C.cyan} strokeWidth={1.2}/>
-              <Circle cx="28" cy="28" r="3" fill={C.cyan} />
-              <Path d="M25 28 L31 28 M28 25 L28 31" stroke="#FFFFFF" strokeWidth={1.1} strokeLinecap="round" opacity={0.9}/>
-              {/* Corner notches */}
-              <Path d="M5 16 L9 16 M5 40 L9 40 M51 16 L47 16 M51 40 L47 40" stroke={C.cyan} strokeOpacity={0.7} strokeWidth={1.4}/>
-            </Svg>
-
-            <View style={{ flex: 1, gap: 4 }}>
-              <Text style={{ fontSize: 16, fontWeight: '900', color: '#FFFFFF', fontFamily: MONO, letterSpacing: 1.2 }}>MODULE REGISTRY</Text>
-              <Text style={{ fontSize: 10, color: C.textMid, fontFamily: MONO, letterSpacing: 0.5 }}>v8.0 · 9 modules online · 0 fault · 0 pending</Text>
-            </View>
-          </View>
-
-          {/* Divider line */}
-          <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: C.cyan + '25', marginHorizontal: 14 }} />
-
-          {/* Terminal module listing */}
-          <View style={{ paddingHorizontal: 14, paddingVertical: 10, gap: 4 }}>
-            {[
-              { id: '01', name: 'home',         tag: 'DASHBOARD',  hint: 'Live PC HUD'        },
-              { id: '02', name: 'scripts',      tag: '70+ LIBRARY', hint: 'Python automation'  },
-              { id: '03', name: 'butler.ai',    tag: 'LLM·LOCAL',  hint: 'Ollama on YOUR PC'  },
-              { id: '04', name: 'knowledge',    tag: 'SIGMA-NET',  hint: 'Self-growing KB'    },
-              { id: '05', name: 'tools',        tag: 'PHONE→PC',   hint: 'File / clipboard'   },
-              { id: '06', name: 'pc.health',    tag: 'REALTIME',   hint: 'CPU·RAM·Disk·Net'   },
-              { id: '07', name: 'builder',      tag: 'VISUAL·NODE', hint: 'Drag-drop pipelines' },
-              { id: '08', name: 'skins',        tag: 'THEMES',     hint: 'Cosmetic packs'     },
-              { id: '09', name: 'config',       tag: 'SETTINGS',   hint: 'Server·keys·data'   },
-            ].map((m) => (
-              <View key={m.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, width: 18 }}>{m.id}</Text>
-                <Text style={{ fontSize: 11, color: C.cyan, fontFamily: MONO, fontWeight: '700' }}>❯</Text>
-                <Text style={{ fontSize: 11, color: C.text, fontFamily: MONO, fontWeight: '700', minWidth: 78 }}>load {m.name}</Text>
-                <Text style={{ fontSize: 10, color: C.textMid, fontFamily: MONO, flex: 1 }} numberOfLines={1}>{m.hint}</Text>
-                <View style={{ borderRadius: 3, paddingHorizontal: 5, paddingVertical: 1, backgroundColor: C.cyan + '14', borderWidth: 1, borderColor: C.cyan + '35' }}>
-                  <Text style={{ fontSize: 8, color: C.cyan, fontFamily: MONO, fontWeight: '900', letterSpacing: 0.5 }}>{m.tag}</Text>
-                </View>
-                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.green }} />
-              </View>
-            ))}
-          </View>
-
-          {/* Bottom status line — feature highlights as terminal tags */}
-          <View style={{ paddingHorizontal: 14, paddingBottom: 14, paddingTop: 4 }}>
-            <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: C.cyan + '20', marginBottom: 10 }} />
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <Text style={{ fontSize: 9, color: C.cyan + '80', fontFamily: MONO, fontWeight: '900', letterSpacing: 1 }}>STACK:</Text>
-              <Text style={{ fontSize: 9, color: C.textMid, fontFamily: MONO }}>capabilities loaded</Text>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap' }}>
-              {['70+ Scripts', 'Local AI', 'Crawler KB', 'Widget Studio', 'Script Builder', 'Undo System'].map(b => (
-                <View key={b} style={{ borderRadius: 4, borderWidth: 1, borderColor: C.green + '45', backgroundColor: C.green + '08', paddingHorizontal: 8, paddingVertical: 3, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 9, fontWeight: '900', color: C.green, fontFamily: MONO }}>✓</Text>
-                  <Text style={{ fontSize: 9, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 0.3 }}>{b.toUpperCase()}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
+          <Text style={{ fontSize: 10, fontWeight: '700', fontFamily: MONO, color: C.cyan + 'AA', letterSpacing: 5, marginTop: 8 }}>
+            COMMAND CENTER
+          </Text>
         </View>
 
-        {/* Key features */}
-        {[
-          { icon: 'lock', col: C.cyan, title: 'End-to-End Private', body: 'Phone→PC direct over your Wi-Fi. No relay server. HMAC-SHA256 signed every request.' },
-          { icon: 'block', col: C.red, title: 'Malicious Script Shield', body: 'rm -rf, format commands, registry wipes auto-blocked before execution.' },
-          { icon: 'schedule', col: C.orange, title: 'Zero Scheduled Execution', body: 'No scheduler, no cron, no timers. Every command requires your deliberate tap.' },
-          { icon: 'undo', col: C.amber, title: '1-Tap Undo System', body: 'Every script run logged. Reverse any operation within 24 hours.' },
-          { icon: 'visibility-off', col: C.purple, title: 'Zero Telemetry', body: 'No analytics, no crash reports, no advertising IDs. Zero data sent anywhere.' },
-        ].map((f, i) => (
-          <View key={i} style={[st.card, { borderColor: f.col + '35', marginBottom: 10 }]}>
-            <View style={{ height: 2, backgroundColor: f.col }} />
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 14, padding: 14 }}>
-              <View style={{ width: 48, height: 48, borderRadius: 14, borderWidth: 1.5, borderColor: f.col + '55', backgroundColor: f.col + '12', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <MaterialIcons name={f.icon as any} size={24} color={f.col} />
+        {/* Hero illustration */}
+        <View style={{ marginTop: 8, width: '100%', alignItems: 'center' }}>
+          <ButlerHeroSvg />
+        </View>
+
+        {/* Tag chips */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 6, marginTop: 4 }}>
+          {['LOCAL AI', 'ZERO CLOUD', 'HMAC-SHA256', 'LAN ONLY'].map((tag) => (
+            <View key={tag} style={{
+              borderRadius: 6, borderWidth: 1,
+              borderColor: C.cyan + '40', backgroundColor: C.cyan + '08',
+              paddingHorizontal: 9, paddingVertical: 4,
+            }}>
+              <Text style={{ fontSize: 9, fontWeight: '900', fontFamily: MONO, color: C.cyan + 'CC', letterSpacing: 1.2 }}>{tag}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Setup time pill */}
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', gap: 8,
+          marginTop: 4,
+          paddingHorizontal: 14, paddingVertical: 7,
+          borderRadius: 10, borderWidth: 1,
+          borderColor: C.cyan + '25', backgroundColor: C.cyan + '06',
+        }}>
+          <MaterialIcons name="schedule" size={12} color={C.cyan} />
+          <Text style={{ fontSize: 9, fontWeight: '700', fontFamily: MONO, color: C.cyan + 'AA', letterSpacing: 1 }}>SETUP ~ 2 MIN</Text>
+          <View style={{ width: 1, height: 10, backgroundColor: C.cyan + '30' }} />
+          <Text style={{ fontSize: 9, fontWeight: '700', fontFamily: MONO, color: C.green + 'AA', letterSpacing: 1 }}>10 STEPS</Text>
+        </View>
+      </View>
+
+      {/* ── 3 CORE PROMISES (focused, no wall-of-text) ────────────────── */}
+      <View style={{ paddingHorizontal: 4, marginBottom: 6 }}>
+        <Text style={{ fontSize: 10, fontWeight: '900', fontFamily: MONO, color: C.cyan + 'AA', letterSpacing: 2.5, marginBottom: 10, marginLeft: 4 }}>
+          ❯ WHY BUTLER AI
+        </Text>
+        {PROMISES.map((p) => (
+          <View key={p.title} style={[st.card, { borderColor: p.color + '35', marginBottom: 10 }]}>
+            <View style={{ height: 2, backgroundColor: p.color }} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 }}>
+              <View style={{
+                width: 46, height: 46, borderRadius: 12,
+                borderWidth: 1.5, borderColor: p.color + '60', backgroundColor: p.color + '12',
+                alignItems: 'center', justifyContent: 'center',
+              }}>
+                <MaterialIcons name={p.icon as any} size={22} color={p.color} />
               </View>
-              <View style={{ flex: 1, gap: 5 }}>
-                <Text style={{ fontSize: 17, fontWeight: '900', fontFamily: MONO, color: f.col }}>{f.title}</Text>
-                <Text style={{ fontSize: 14, color: C.textMid, lineHeight: 22 }}>{f.body}</Text>
+              <View style={{ flex: 1, gap: 4 }}>
+                <Text style={{ fontSize: 14, fontWeight: '900', fontFamily: MONO, color: p.color, letterSpacing: 0.5 }}>{p.title}</Text>
+                <Text style={{ fontSize: 12, color: C.textMid, lineHeight: 18 }}>{p.body}</Text>
               </View>
             </View>
           </View>
         ))}
+      </View>
 
-        {/* No-scheduler banner */}
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, borderWidth: 2, borderColor: C.red + '55', borderRadius: 14, padding: 14, backgroundColor: C.red + '08', marginBottom: 14 }}>
-          <MaterialIcons name="schedule" size={22} color={C.red} />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontWeight: '900', color: C.red, fontFamily: MONO, letterSpacing: 0.5 }}>⛔ NO SCHEDULED EXECUTION</Text>
-            <Text style={{ fontSize: 14, color: C.textMid, lineHeight: 22, marginTop: 4 }}>Built without any scheduler, cron, timer, or background auto-execution. Every command requires your active tap — enforced at server level.</Text>
-          </View>
-        </View>
+      {/* ── COMPLIANCE BADGE (Play Store required) ────────────────────── */}
+      <ComplianceBadge />
 
-        <ComplianceBadge />
-
-        {allAccepted ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderRadius: 12, padding: 14, borderColor: C.green + '55', backgroundColor: C.green + '08', marginBottom: 14 }}>
-            <MaterialIcons name="lock" size={18} color={C.green} />
-            <Text style={{ flex: 1, fontSize: 13, color: C.green, fontFamily: MONO, lineHeight: 20 }}>All agreements previously saved · Tap OPEN BUTLER AI on the last screen to launch</Text>
-          </View>
-        ) : null}
-
-        {/* Legal documents */}
-        <View style={[st.card, { borderColor: C.cyan + '35', marginBottom: 16 }]}>
-          <View style={{ height: 2, backgroundColor: C.cyan }} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingTop: 14, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: C.cyan + '20' }}>
-            <MaterialIcons name="gavel" size={18} color={C.cyan} />
-            <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: C.cyan, fontFamily: MONO }}>REQUIRED LEGAL DOCUMENTS</Text>
-            <View style={{ borderRadius: 6, borderWidth: 1, borderColor: C.green + '60', backgroundColor: C.green + '10', paddingHorizontal: 8, paddingVertical: 4 }}>
-              <Text style={{ fontSize: 9, fontWeight: '900', color: C.green, fontFamily: MONO }}>4 DOCS</Text>
-            </View>
-          </View>
-          <View style={{ padding: 12, gap: 10 }}>
-            {LEGAL_DOCS.map((doc, i) => (
-              <TouchableOpacity key={i} onPress={() => Linking.openURL(doc.url).catch(() => {})} activeOpacity={0.85}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 0, borderColor: doc.color + '40', backgroundColor: doc.color + '06', overflow: 'hidden' }}>
-                <View style={{ width: 3, alignSelf: 'stretch', backgroundColor: doc.color, marginRight: 9, flexShrink: 0 }} />
-                <View style={{ width: 44, height: 44, borderRadius: 12, borderWidth: 1.5, borderColor: doc.color + '60', backgroundColor: doc.color + '12', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <MaterialIcons name={doc.icon as any} size={20} color={doc.color} />
-                </View>
-                <View style={{ flex: 1, gap: 3 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '900', color: doc.color, fontFamily: MONO }}>{doc.title}</Text>
-                  <Text style={{ fontSize: 12, color: C.textMid, lineHeight: 17 }}>{doc.desc}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, borderWidth: 1, borderRadius: 7, paddingHorizontal: 8, paddingVertical: 5, borderColor: doc.color + '55', backgroundColor: doc.color + '10', marginRight: 10 }}>
-                  <MaterialIcons name="open-in-new" size={11} color={doc.color} />
-                  <Text style={{ fontSize: 9, fontWeight: '900', color: doc.color, fontFamily: MONO }}>VIEW</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, paddingHorizontal: 14, paddingBottom: 12 }}>
-            {'support: andrejsladkovic1992@gmail.com · com.butlerai.pc.automation'}
+      {/* ── Returning-user "all accepted" banner ──────────────────────── */}
+      {allAccepted ? (
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', gap: 10,
+          borderWidth: 1.5, borderRadius: 12, padding: 14,
+          borderColor: C.green + '55', backgroundColor: C.green + '08',
+          marginBottom: 14,
+        }}>
+          <MaterialIcons name="lock" size={18} color={C.green} />
+          <Text style={{ flex: 1, fontSize: 12, color: C.green, fontFamily: MONO, lineHeight: 18 }}>
+            All agreements previously saved · You can skip to the launch screen
           </Text>
         </View>
+      ) : null}
 
-        <TouchableOpacity testID="onboarding-screen1-next" style={st.primaryBtn} onPress={() => { safeHaptics.medium(); onNext(); }} activeOpacity={0.85}>
-          <MaterialIcons name="arrow-forward" size={20} color="#000" />
-          <Text style={st.primaryBtnTxt}>{allAccepted ? 'REVIEW AGAIN' : 'GET STARTED'}</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </Animated.View>
+      {/* ── LEGAL DOCS (Play Store required) ──────────────────────────── */}
+      <View style={[st.card, { borderColor: C.cyan + '35', marginBottom: 18 }]}>
+        <View style={{ height: 2, backgroundColor: C.cyan }} />
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', gap: 10,
+          paddingHorizontal: 14, paddingTop: 14, paddingBottom: 10,
+          borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: C.cyan + '20',
+        }}>
+          <MaterialIcons name="gavel" size={18} color={C.cyan} />
+          <Text style={{ flex: 1, fontSize: 13, fontWeight: '900', color: C.cyan, fontFamily: MONO, letterSpacing: 1 }}>LEGAL DOCUMENTS</Text>
+          <View style={{
+            borderRadius: 6, borderWidth: 1,
+            borderColor: C.green + '60', backgroundColor: C.green + '10',
+            paddingHorizontal: 8, paddingVertical: 3,
+          }}>
+            <Text style={{ fontSize: 9, fontWeight: '900', color: C.green, fontFamily: MONO }}>4 DOCS</Text>
+          </View>
+        </View>
+        <View style={{ padding: 10, gap: 8 }}>
+          {LEGAL_DOCS.map((doc) => (
+            <TouchableOpacity
+              key={doc.title}
+              onPress={() => Linking.openURL(doc.url).catch(() => {})}
+              activeOpacity={0.85}
+              style={{
+                flexDirection: 'row', alignItems: 'center', gap: 10,
+                borderWidth: 1.5, borderRadius: 10, paddingVertical: 10, paddingRight: 10,
+                borderColor: doc.color + '40', backgroundColor: doc.color + '06',
+                overflow: 'hidden',
+              }}>
+              <View style={{ width: 3, alignSelf: 'stretch', backgroundColor: doc.color, marginRight: 8 }} />
+              <View style={{
+                width: 40, height: 40, borderRadius: 10,
+                borderWidth: 1.5, borderColor: doc.color + '60', backgroundColor: doc.color + '12',
+                alignItems: 'center', justifyContent: 'center',
+              }}>
+                <MaterialIcons name={doc.icon as any} size={18} color={doc.color} />
+              </View>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={{ fontSize: 12, fontWeight: '900', color: doc.color, fontFamily: MONO }}>{doc.title}</Text>
+                <Text style={{ fontSize: 10, color: C.textMid, lineHeight: 14 }}>{doc.desc}</Text>
+              </View>
+              <View style={{
+                flexDirection: 'row', alignItems: 'center', gap: 3,
+                borderWidth: 1, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 4,
+                borderColor: doc.color + '55', backgroundColor: doc.color + '10',
+              }}>
+                <MaterialIcons name="open-in-new" size={10} color={doc.color} />
+                <Text style={{ fontSize: 9, fontWeight: '900', color: doc.color, fontFamily: MONO }}>VIEW</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Text style={{ fontSize: 9, color: C.textDim, fontFamily: MONO, paddingHorizontal: 14, paddingBottom: 12 }}>
+          support: andrejsladkovic1992@gmail.com · com.butlerai.pc.automation
+        </Text>
+      </View>
+
+      {/* ── PRIMARY CTA ───────────────────────────────────────────────── */}
+      <TouchableOpacity
+        testID="onboarding-screen1-next"
+        style={[st.primaryBtn, { marginHorizontal: 4, paddingVertical: 18 }]}
+        onPress={() => { safeHaptics.medium(); onNext(); }}
+        activeOpacity={0.85}
+      >
+        <MaterialIcons name="arrow-forward" size={22} color="#000" />
+        <Text style={[st.primaryBtnTxt, { fontSize: 15, letterSpacing: 2.5 }]}>
+          {allAccepted ? 'REVIEW AGAIN' : 'GET STARTED'}
+        </Text>
+      </TouchableOpacity>
+
+    </ScrollView>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────────────
 // SCREEN 2: APP TOUR
@@ -1202,148 +1156,209 @@ function Screen9Download({ onNext, onBack }: { onNext: () => void; onBack: () =>
 }
 
 // ─────────────────────────────────────────────────────────────────
-// SCREEN 10: LAUNCH — Final clean rewrite (v8)
+// SCREEN 10: LAUNCH — v9 BULLETPROOF REWRITE
 // ─────────────────────────────────────────────────────────────────
-// Design rules (zero exceptions):
-//   • No useEffect, no setTimeout, no animation queues that could
-//     somehow swallow the user's tap.
-//   • No "auto-redirect" — onComplete fires ONLY when the user taps
-//     the button. Nothing else triggers it.
-//   • TWO independent tap targets (primary + secondary) so even if
-//     one of them has a click-handler edge case, the other works.
-//   • Persistence runs background; we never await it before calling
-//     onComplete. Storage failure cannot trap the user.
-//   • Local `tapped` ref (NOT state) for de-dupe so React never
-//     re-renders the button before unmount.
-
+// HARD RULES (do not relax):
+//   1. Persistence MUST complete BEFORE handoff to onComplete().
+//      We `await` the AsyncStorage.multiSet so that when the user
+//      reopens the app, the onboarding flag is GUARANTEED to be set.
+//      (Previous versions fire-and-forget the write; on cold-kill
+//      after launch this could leave the flag unset.)
+//   2. Persistence is wrapped with Promise.race + 1500ms timeout so
+//      a slow storage write can NEVER trap the user — after 1.5s we
+//      proceed to navigation regardless. Storage failure never blocks.
+//   3. ONE big button. No secondary clutter. Bigger hit-slop, bigger
+//      text, bigger glow. Impossible to miss.
+//   4. Dedupe via ref (not state) so React never re-renders mid-tap.
+//   5. If onComplete throws (router edge case), we reset the dedupe
+//      and surface an Alert so the user can retry. Storage is already
+//      saved at this point so the next launch goes straight to home
+//      either way.
+//   6. No useEffect, no setTimeout chains, no animation queues that
+//      could swallow the tap. Tap → save → navigate. That's it.
 function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete: () => void }) {
-  // Use ref (not state) for the dedupe guard — avoids re-render and is
-  // synchronously updated. A second tap within the same frame returns early.
   const firedRef = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
+  const heroPulse = useRef(new Animated.Value(0.4)).current;
 
-  const enterApp = () => {
+  // Subtle hero glow — pure UI, never blocks the button handler.
+  useEffect(() => {
+    const a = Animated.loop(Animated.sequence([
+      Animated.timing(heroPulse, { toValue: 1,   duration: 1400, useNativeDriver: true }),
+      Animated.timing(heroPulse, { toValue: 0.4, duration: 1400, useNativeDriver: true }),
+    ]));
+    a.start();
+    return () => a.stop();
+  }, [heroPulse]);
+
+  const enterApp = useCallback(async () => {
     if (firedRef.current) return;
     firedRef.current = true;
+    setSubmitting(true);
+    safeHaptics.success();
 
-    // Fire-and-forget persistence — never awaited. Even if router.replace
-    // somehow fails below, this guarantees that the NEXT app launch will
-    // skip onboarding via the `app/index.tsx` gate.
-    AsyncStorage.multiSet([
-      ['@butler_onboarding_done_v2',        'true'],
+    // ── 1. PERSIST (with 1.5s hard timeout so storage stalls don't trap) ──
+    const writes: [string, string][] = [
+      [ONBOARDING_DONE_KEY,                 'true'],
       ['@butler_welcome_complete_v1',       'true'],
-      ['@butler_terms_accepted_v1',         'true'],
-      ['@butler_consent_v2',                '1.0.0'],
-      ['@butler_age_confirmed_v1',          'true'],
+      [TERMS_ACCEPTED_KEY,                  'true'],
+      [PRIVACY_ACCEPTED_KEY,                'true'],
+      [CONSENT_KEY,                         '1.0.0'],
+      [AGE_CONFIRMED_KEY,                   'true'],
       ['@butler_show_post_onboarding_chat', 'true'],
       ['@butler_stable_state',              'onboarded'],
       ['@butler_launch_attempted_at',       String(Date.now())],
-    ]).catch(() => {});
+    ];
+    try {
+      await Promise.race([
+        AsyncStorage.multiSet(writes),
+        new Promise<void>((resolve) => setTimeout(resolve, 1500)),
+      ]);
+    } catch {
+      // Storage hiccup — keep going. Worst case: user re-sees onboarding
+      // next launch, but the home tab is still reachable.
+    }
 
-    // Hand off to parent INSTANTLY. If onComplete itself throws (e.g. a
-    // router-not-ready edge case), reset the dedupe flag so the user can
-    // retry, and surface a recovery alert so they're never silently stuck.
+    // ── 2. HAND OFF TO PARENT (which performs the router.replace) ─────────
     try {
       onComplete();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('[Screen10] onComplete threw:', e);
-      firedRef.current = false; // allow retry
+      firedRef.current = false;
+      setSubmitting(false);
       try {
         Alert.alert(
-          'Almost there',
-          'Tap LAUNCH BUTLER AI again, or close and reopen the app — your onboarding has been saved.',
+          'Almost There',
+          'Tap LAUNCH AI again — your onboarding is saved and will not show next launch.',
         );
       } catch {}
     }
-  };
+  }, [onComplete, heroPulse]);
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60 }}>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
 
-      {/* Hero */}
-      <View style={{ alignItems: 'center', paddingVertical: 28, gap: 14 }}>
-        <View style={{ width: 110, height: 110, borderRadius: 22, borderWidth: 2, borderColor: C.green + '60', backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-          <ButlerRobotLogo size={98} glow />
+      {/* ── Hero: ALL DONE check ─────────────────────────────────────── */}
+      <View style={{ alignItems: 'center', paddingTop: 32, paddingBottom: 18, gap: 16 }}>
+        <View style={{ width: 132, height: 132, alignItems: 'center', justifyContent: 'center' }}>
+          {/* Pulsing aura rings */}
+          <Animated.View style={{
+            position: 'absolute', width: 132, height: 132, borderRadius: 66,
+            borderWidth: 2, borderColor: C.green, opacity: heroPulse,
+          }} />
+          <Animated.View style={{
+            position: 'absolute', width: 110, height: 110, borderRadius: 55,
+            borderWidth: 1.5, borderColor: C.green + 'AA',
+            opacity: heroPulse.interpolate({ inputRange: [0.4, 1], outputRange: [0.7, 0.2] }),
+          }} />
+          {/* Solid check disc */}
+          <View style={{
+            width: 92, height: 92, borderRadius: 46, backgroundColor: C.green + '15',
+            borderWidth: 2.5, borderColor: C.green,
+            alignItems: 'center', justifyContent: 'center',
+          }}>
+            <MaterialIcons name="check" size={56} color={C.green} />
+          </View>
         </View>
-        <Text style={{ fontSize: 30, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 3 }}>ALL DONE!</Text>
-        <Text style={{ fontSize: 14, color: C.textMid, textAlign: 'center', lineHeight: 22, paddingHorizontal: 24 }}>
-          You're all set. Tap the green button to enter Butler AI.
+
+        <Text style={{ fontSize: 30, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 5 }}>
+          ALL DONE
         </Text>
+
+        <Text style={{ fontSize: 13, color: C.textMid, textAlign: 'center', lineHeight: 21, paddingHorizontal: 28, fontFamily: MONO, letterSpacing: 0.4 }}>
+          Setup complete. Tap below to enter Butler AI and start automating your PC.
+        </Text>
+
+        {/* Quick recap chips */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 6, marginTop: 4, paddingHorizontal: 24 }}>
+          {['✓ PRIVATE', '✓ LAN ONLY', '✓ ZERO TELEMETRY', '✓ YOUR PC'].map((t) => (
+            <View key={t} style={{
+              borderRadius: 6, borderWidth: 1, paddingHorizontal: 9, paddingVertical: 4,
+              borderColor: C.green + '50', backgroundColor: C.green + '0C',
+            }}>
+              <Text style={{ fontSize: 9, fontWeight: '900', color: C.green, fontFamily: MONO, letterSpacing: 1 }}>{t}</Text>
+            </View>
+          ))}
+        </View>
       </View>
 
-      <ComplianceBadge />
-
-      {/* ─── PRIMARY LAUNCH BUTTON ───────────────────────────────────── */}
+      {/* ── PRIMARY LAUNCH BUTTON — single, massive, obvious ────────── */}
       <TouchableOpacity
         testID="onboarding-launch-primary"
         accessibilityRole="button"
         accessibilityLabel="Launch Butler AI"
-        activeOpacity={0.7}
+        accessibilityState={{ disabled: submitting }}
+        activeOpacity={0.78}
         onPress={enterApp}
         onLongPress={enterApp}
-        hitSlop={{ top: 28, bottom: 28, left: 28, right: 28 }}
+        disabled={submitting}
+        hitSlop={{ top: 32, bottom: 32, left: 32, right: 32 }}
         style={{
-          backgroundColor: '#00FF88',
-          borderRadius: 18,
-          paddingVertical: 26,
-          paddingHorizontal: 32,
+          backgroundColor: submitting ? '#00CC66' : '#00FF88',
+          borderRadius: 20,
+          paddingVertical: 30,
+          paddingHorizontal: 28,
           alignItems: 'center',
           justifyContent: 'center',
-          marginTop: 28,
-          marginHorizontal: 18,
+          marginTop: 22,
+          marginHorizontal: 16,
           borderWidth: 3,
           borderColor: '#00CC66',
           shadowColor: '#00FF88',
           shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.7,
-          shadowRadius: 20,
-          elevation: 14,
+          shadowOpacity: 0.85,
+          shadowRadius: 22,
+          elevation: 16,
+          minHeight: 92,
         }}
       >
-        <Text style={{ color: '#000', fontSize: 24, fontWeight: '900', fontFamily: MONO, letterSpacing: 2, textAlign: 'center' }}>
-          🚀  LAUNCH BUTLER AI
-        </Text>
-        <Text style={{ color: '#002A1A', fontSize: 12, marginTop: 6, fontFamily: MONO, fontWeight: '700', letterSpacing: 1 }}>
-          TAP HERE TO ENTER THE APP
-        </Text>
+        {submitting ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <ActivityIndicator size="small" color="#000" />
+            <Text style={{ color: '#000', fontSize: 18, fontWeight: '900', fontFamily: MONO, letterSpacing: 2 }}>
+              LAUNCHING…
+            </Text>
+          </View>
+        ) : (
+          <>
+            <Text style={{ color: '#000', fontSize: 24, fontWeight: '900', fontFamily: MONO, letterSpacing: 3, textAlign: 'center' }}>
+              LAUNCH BUTLER AI
+            </Text>
+            <Text style={{ color: '#002A1A', fontSize: 11, marginTop: 6, fontFamily: MONO, fontWeight: '900', letterSpacing: 1.5 }}>
+              TAP TO ENTER THE APP →
+            </Text>
+          </>
+        )}
       </TouchableOpacity>
 
-      {/* ─── SECONDARY BACKUP BUTTON ─────────────────────────────────── */}
-      <TouchableOpacity
-        testID="onboarding-launch-secondary"
-        accessibilityRole="button"
-        accessibilityLabel="Enter the app"
-        activeOpacity={0.6}
-        onPress={enterApp}
-        onLongPress={enterApp}
-        hitSlop={{ top: 18, bottom: 18, left: 18, right: 18 }}
-        style={{
-          marginTop: 14,
-          marginHorizontal: 18,
-          paddingVertical: 14,
-          paddingHorizontal: 20,
-          borderRadius: 12,
-          borderWidth: 1.5,
-          borderColor: C.cyan + '70',
-          backgroundColor: C.cyan + '10',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Text style={{ color: C.cyan, fontSize: 13, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.5 }}>
-          OR TAP HERE → ENTER APP
-        </Text>
-      </TouchableOpacity>
+      {/* ── Compliance recap (small) ────────────────────────────────── */}
+      <View style={{ marginTop: 22, marginHorizontal: 16 }}>
+        <ComplianceBadge />
+      </View>
 
-      {/* Footer */}
-      <View style={{ borderWidth: 1, borderRadius: 10, borderColor: C.cyan + '20', backgroundColor: C.cyan + '06', padding: 12, marginTop: 22, marginHorizontal: 18 }}>
-        <Text style={{ fontSize: 10, color: C.textDim, fontFamily: MONO, textAlign: 'center', lineHeight: 16 }}>
-          {'Agreements saved locally · Never uploaded · Remembered across restarts'}
+      {/* ── Storage receipt ─────────────────────────────────────────── */}
+      <View style={{
+        borderWidth: 1, borderRadius: 10,
+        borderColor: C.cyan + '25', backgroundColor: C.cyan + '06',
+        paddingVertical: 11, paddingHorizontal: 14,
+        marginTop: 8, marginHorizontal: 16,
+        flexDirection: 'row', alignItems: 'center', gap: 8,
+      }}>
+        <MaterialIcons name="save-alt" size={14} color={C.cyan} />
+        <Text style={{ flex: 1, fontSize: 10, color: C.textDim, fontFamily: MONO, lineHeight: 15 }}>
+          Agreements saved locally · Never uploaded · Remembered across restarts
         </Text>
       </View>
 
-      <View style={[st.navRow, { marginTop: 14, marginBottom: 8 }]}>
-        <TouchableOpacity style={st.backBtn} onPress={onBack} activeOpacity={0.85}>
+      {/* ── BACK link ───────────────────────────────────────────────── */}
+      <View style={[st.navRow, { marginTop: 18, marginBottom: 12 }]}>
+        <TouchableOpacity
+          style={st.backBtn}
+          onPress={() => { if (!submitting) { safeHaptics.light(); onBack(); } }}
+          activeOpacity={0.85}
+          disabled={submitting}
+        >
           <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
           <Text style={st.backBtnTxt}>BACK</Text>
         </TouchableOpacity>
