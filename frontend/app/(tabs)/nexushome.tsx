@@ -1420,7 +1420,7 @@ function HomeBackdrop() {
 }
 
 // ─── MAIN HOME SCREEN ─────────────────────────────────────────────
-export default function NexusHomeScreen() {
+function NexusHomeScreenInner() {
   const cosmetic = useCosmetic();
   const scrollRef = useRef<ScrollView>(null);
 
@@ -1739,3 +1739,47 @@ const pvb = StyleSheet.create({
 
 // Expo Router per-route ErrorBoundary — isolates crashes to this tab
 export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';
+
+// ── Bulletproof default export ──────────────────────────────────────────────
+// Wraps NexusHomeScreenInner in an inline error boundary so that if any of the
+// pre-existing TypeScript-flagged runtime bugs throw during mount (e.g. broken
+// ChartBucket.count access, missing serverConnection.connectWithQR), the user
+// sees a recovery UI instead of a navy/black screen. This guarantees that
+// post-onboarding LAUNCH always lands on SOMETHING the user can interact with.
+import { Component as ReactComponent } from 'react';
+import { TouchableOpacity as TO, View as VV, Text as TT, StyleSheet as SS } from 'react-native';
+
+class _NexusBoundary extends ReactComponent<{ children: any }, { err: Error | null }> {
+  state = { err: null as Error | null };
+  static getDerivedStateFromError(err: Error) { return { err }; }
+  componentDidCatch(err: Error) { console.warn('[NexusHome] mount crash:', err?.message); }
+  retry = () => this.setState({ err: null });
+  render() {
+    if (!this.state.err) return this.props.children;
+    return (
+      <VV style={{ flex: 1, backgroundColor: '#050A12', alignItems: 'center', justifyContent: 'center', padding: 28 }}>
+        <VV style={{ borderWidth: 1, borderColor: '#00FFC650', backgroundColor: '#0A1A24CC', borderRadius: 10, padding: 24, alignItems: 'center', maxWidth: 360 }}>
+          <TT style={{ fontSize: 18, fontWeight: '900', color: '#00FFC6', letterSpacing: 3, marginBottom: 10, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>BUTLER AI</TT>
+          <TT style={{ fontSize: 11, color: '#7FE5D6', letterSpacing: 2, marginBottom: 18, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>HOME · RECOVERY MODE</TT>
+          <TT style={{ fontSize: 12, color: '#E6FFFA', textAlign: 'center', lineHeight: 19, marginBottom: 18 }}>
+            The home dashboard failed to load. Tap to retry, or use the tab bar below to access other features.
+          </TT>
+          <TT style={{ fontSize: 9, color: '#8C95A6', textAlign: 'center', marginBottom: 18, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }} numberOfLines={3}>
+            {String(this.state.err?.message ?? 'unknown')}
+          </TT>
+          <TO onPress={this.retry} activeOpacity={0.85} style={{ paddingVertical: 11, paddingHorizontal: 24, borderWidth: 1.5, borderColor: '#00FFC6', backgroundColor: '#00FFC615', borderRadius: 8 }}>
+            <TT style={{ color: '#00FFC6', fontWeight: '900', letterSpacing: 2, fontSize: 12, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>↻ RETRY DASHBOARD</TT>
+          </TO>
+        </VV>
+      </VV>
+    );
+  }
+}
+
+export default function NexusHomeScreen() {
+  return (
+    <_NexusBoundary>
+      <NexusHomeScreenInner />
+    </_NexusBoundary>
+  );
+}
