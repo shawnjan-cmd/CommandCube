@@ -23,6 +23,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
 import React, { Component, useEffect, useRef, ReactNode } from 'react';
 import { View, Text, StyleSheet, Platform, Animated, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -52,6 +53,14 @@ import { withTimeout } from '@/utils/withTimeout';
     }
   } catch {}
 })();
+
+// ── ROOT WINDOW BACKGROUND ─────────────────────────────────────────────────
+// Sets the Android Activity / iOS UIView root-window background color so
+// any moment the React tree is being mounted/swapped/unmounted, the user
+// sees Butler-themed dark navy instead of pure black. This eliminates the
+// brief black flash that can occur between the splash hiding and the React
+// tree's first paint — a common false-positive "black screen" symptom.
+try { SystemUI.setBackgroundColorAsync('#050A12').catch(() => {}); } catch {}
 
 // ── NATIVE SPLASH POLICY (IMPORTANT — black-screen prevention) ─────────────
 // We DO NOT call preventAutoHideAsync() because:

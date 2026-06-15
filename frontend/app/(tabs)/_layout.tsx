@@ -41,6 +41,17 @@ export default function TabLayout() {
   // there is absolutely no way to bypass onboarding before completion.
   const onOnboarding = pathname?.includes('onboarding') ?? false;
 
+  // ── Boot-complete sentinel ─────────────────────────────────────────────
+  // The first time TabLayout mounts successfully, we stamp a diagnostic key
+  // proving the whole startup chain (_layout → index gate → (tabs) layout)
+  // is alive. Fire-and-forget — never blocks render, never throws.
+  React.useEffect(() => {
+    try {
+      const AS = require('@react-native-async-storage/async-storage').default;
+      AS?.setItem?.('@butler_boot_complete_at', String(Date.now())).catch(() => {});
+    } catch {}
+  }, []);
+
   // ── Themed centered header — applied to every tab except home ────────────
   // Uses our custom ThemedCenterHeader so titles are perfectly centered with
   // the homepage's gunmetal+endo-red treatment. Each Tab.Screen title is

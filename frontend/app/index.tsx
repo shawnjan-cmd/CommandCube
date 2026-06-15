@@ -70,6 +70,18 @@ export default function Index() {
           1500,
           'AsyncStorage onboarding flag'
         );
+
+        // 1a. Self-heal corrupted values. Any value that isn't a known
+        //     truthy ('true'/'1') or falsy ('false'/'0'/null/undefined/'')
+        //     marker is treated as corruption — we delete it and default
+        //     to onboarding. Defends against partial writes, encoding
+        //     glitches, or hostile manual AsyncStorage edits.
+        const VALID_VALUES: any[] = ['true', 'false', '1', '0', '', null, undefined];
+        if (!VALID_VALUES.includes(v as any)) {
+          console.warn('[Index] corrupted onboarding flag detected, clearing:', JSON.stringify(v));
+          AsyncStorage.removeItem(ONBOARDING_DONE_KEY).catch(() => {});
+          v = null;
+        }
         let done = v === 'true' || v === '1';
 
         // 2. Migrate legacy flags if canonical is unset
