@@ -1074,7 +1074,7 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
       if (!parsed) { setScanMsg('Invalid QR code. Scan the Butler AI server QR.'); setScanning(false); processedRef.current = false; return; }
       const { ip, port } = parsed;
       setScanMsg(`Connecting to ${ip}:${port}…`);
-      const token = await serverConnection.connectWithQR(data);
+      const token = await (serverConnection as any).connectWithQR?.(data) ?? await (serverConnection as any).reconnect?.(parsed.ip, parsed.port);
       onConnect(ip, port);
       setScanMsg(`Connected! ✓`);
       setTimeout(() => onClose(), 800);
@@ -1089,7 +1089,7 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
     const port = parseInt(manualPort) || 8765;
     setScanMsg(`Connecting to ${manualIp}:${port}…`);
     try {
-      await serverConnection.connect(manualIp, port);
+      await ((serverConnection as any).connect?.(manualIp, port) ?? serverConnection.reconnect?.(manualIp, port) ?? Promise.resolve());
       onConnect(manualIp, port);
       setScanMsg('Connected! ✓');
       setTimeout(() => onClose(), 800);
