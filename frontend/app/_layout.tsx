@@ -31,6 +31,7 @@ import { TabBarProvider } from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync } from '@/hooks/useAppSync';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
+import { withTimeout } from '@/utils/withTimeout';
 
 // ── GLOBAL UNHANDLED PROMISE & ERROR GUARD ──────────────────────────────────
 (() => {
@@ -54,6 +55,18 @@ import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 
 // Keep the native splash visible until React mounts something.
 try { SplashScreen.preventAutoHideAsync().catch(() => {}); } catch {}
+
+// ── HARD SPLASH FORCE-HIDE (last-resort black-screen guard) ────────────────
+// If for ANY reason the React tree never calls `SplashScreen.hideAsync()`
+// (corrupted bundle, hung native module, JSI bridge stall, etc.) we force
+// the splash off after 5 seconds anyway. This guarantees the user sees
+// SOMETHING — even if it's a half-rendered tree or our SYSTEM-FAULT
+// boundary — instead of staring at black indefinitely.
+try {
+  setTimeout(() => {
+    try { SplashScreen.hideAsync().catch(() => {}); } catch {}
+  }, 5000);
+} catch {}
 
 // ─── GLOBAL ERROR BOUNDARY ──────────────────────────────────────────────────
 interface EBState { error: Error | null; }
@@ -189,58 +202,64 @@ export default function RootLayout() {
       try { SplashScreen.hideAsync().catch(() => {}); } catch {}
       mark('splash_hidden');
 
-      // 2. Boot services — each wrapped, no throw escapes.
+      // 2. Boot services — each wrapped in try/catch AND withTimeout so a
+      //    single hung dynamic import can NEVER produce a black screen. The
+      //    timeout per stage is set deliberately tight (1.5-3s) because none
+      //    of these services are required for first paint; they all enhance
+      //    later interactions and can complete or fail in the background.
       (async () => {
-        // Error interceptor
+        // Error interceptor — composes with any existing global handler
         try {
-          const { errorInterceptor } = await import('@/services/errorInterceptor');
-          errorInterceptor.install();
+          const mod = await withTimeout(import('@/services/errorInterceptor'), 2500, 'errorInterceptor import');
+          (mod as any)?.errorInterceptor?.install?.();
         } catch (e) { console.warn('[_layout] errorInterceptor install failed:', e); }
 
         // Privacy audit
         try {
-          const { privacyAudit } = await import('@/services/privacyAudit');
-          privacyAudit.install();
+          const mod = await withTimeout(import('@/services/privacyAudit'), 2500, 'privacyAudit import');
+          (mod as any)?.privacyAudit?.install?.();
         } catch (e) { console.warn('[_layout] privacyAudit install failed:', e); }
 
-        // Pro license (background)
+        // Pro license — fully fire-and-forget (per guide §2.1 — app is FREE,
+        // this should never block UI)
         try {
-          const { proLicense } = await import('@/services/proLicense');
-          proLicense.load().catch(() => {});
+          const mod = await withTimeout(import('@/services/proLicense'), 1500, 'proLicense import');
+          (mod as any)?.proLicense?.load?.().catch(() => {});
         } catch (e) { console.warn('[_layout] proLicense load failed:', e); }
 
         // Image registry (side-effect import)
-        try { await import('@/services/imageRegistry'); } catch (e) { console.warn('[_layout] imageRegistry import failed:', e); }
+        try { await withTimeout(import('@/services/imageRegistry'), 2500, 'imageRegistry import'); }
+        catch (e) { console.warn('[_layout] imageRegistry import failed:', e); }
 
         // Device identifier
         try {
-          const { deviceIdentifier } = await import('@/services/deviceIdentifier');
-          await deviceIdentifier.getDeviceId().catch(() => {});
+          const mod = await withTimeout(import('@/services/deviceIdentifier'), 2500, 'deviceIdentifier import');
+          await withTimeout((mod as any)?.deviceIdentifier?.getDeviceId?.() ?? Promise.resolve(null), 2000, 'deviceIdentifier.getDeviceId');
         } catch (e) { console.warn('[_layout] deviceIdentifier failed:', e); }
 
-        // System upgrade overrides
+        // System upgrade overrides — idempotent via version check inside
         try {
-          const m = await import('@/services/systemUpgrade');
-          (m as any).applyBootOverrides?.();
+          const m = await withTimeout(import('@/services/systemUpgrade'), 2500, 'systemUpgrade import');
+          (m as any)?.applyBootOverrides?.();
         } catch (e) { console.warn('[_layout] systemUpgrade failed:', e); }
 
         // Encrypted storage init (only if device id is already cached)
         try {
-          const enc = await import('@/services/encryptedStorage');
-          const id  = await AsyncStorage.getItem('commandcube_device_id').catch(() => null);
-          if (id) {
-            await (enc as any).encryptedStorage.init(id);
-            await (enc as any).encryptedStorage.migrate();
+          const enc = await withTimeout(import('@/services/encryptedStorage'), 2500, 'encryptedStorage import');
+          const id  = await withTimeout(AsyncStorage.getItem('commandcube_device_id'), 1500, 'AsyncStorage getItem device id');
+          if (id && enc) {
+            await withTimeout((enc as any).encryptedStorage.init(id), 2000, 'encryptedStorage.init');
+            await withTimeout((enc as any).encryptedStorage.migrate(), 2000, 'encryptedStorage.migrate');
           }
         } catch (e) { console.warn('[_layout] encryptedStorage init failed:', e); }
 
         // Conditionally start auto-connect (only if onboarded)
         try {
-          const v = await AsyncStorage.getItem(ONBOARDING_DONE_KEY).catch(() => null);
+          const v = await withTimeout(AsyncStorage.getItem(ONBOARDING_DONE_KEY), 1500, 'AsyncStorage onboarding flag');
           const onboarded = v === '1' || v === 'true';
           if (onboarded) {
-            const { autoConnectEngine } = await import('@/services/autoConnectEngine');
-            autoConnectEngine.start().catch(() => {});
+            const mod = await withTimeout(import('@/services/autoConnectEngine'), 2500, 'autoConnectEngine import');
+            (mod as any)?.autoConnectEngine?.start?.().catch(() => {});
           }
         } catch (e) { console.warn('[_layout] autoConnect bootstrap failed:', e); }
 
