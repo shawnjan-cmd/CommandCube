@@ -1,27 +1,42 @@
+# ── Butler AI backend — minimum production requirements ──────────────────
+# Backend only ships /app/backend/server.py which uses FastAPI + Motor (MongoDB).
+# The Emergent build container installs with `pip install --no-cache-dir
+# --no-dependencies` so every transitive dep MUST be listed here explicitly.
+#
+# History: previous requirements.txt contained `jq>=1.6.0` (requires libjq-dev
+# system library + gcc to compile, which broke the slim Docker image), plus
+# 20+ unused packages (pandas, numpy, boto3, pytest, black, isort, flake8,
+# mypy, typer, etc.). All removed.
+
+# ── Web framework ────────────────────────────────────────────────────────
 fastapi==0.110.1
-uvicorn==0.25.0
-boto3>=1.34.129
-requests-oauthlib>=2.0.0
-cryptography>=42.0.8
-python-dotenv>=1.0.1
-pymongo==4.5.0
-pydantic>=2.6.4
-email-validator>=2.2.0
-pyjwt>=2.10.1
-bcrypt==4.1.3
-passlib>=1.7.4
-tzdata>=2024.2
+starlette==0.37.2
+uvicorn[standard]==0.25.0
+python-multipart==0.0.9
+
+# ── Data validation ──────────────────────────────────────────────────────
+pydantic==2.6.4
+pydantic-core==2.16.3
+annotated-types==0.6.0
+typing-extensions==4.12.2
+email-validator==2.2.0
+
+# ── MongoDB (async driver Motor + low-level PyMongo) ─────────────────────
 motor==3.3.1
-pytest>=8.0.0
-black>=24.1.1
-isort>=5.13.2
-flake8>=7.0.0
-mypy>=1.8.0
-python-jose>=3.3.0
-requests>=2.31.0
-pandas>=2.2.0
-numpy>=1.26.0
-python-multipart>=0.0.9
-jq>=1.6.0
-typer>=0.9.0
-emergentintegrations==0.2.0
+pymongo==4.5.0
+dnspython==2.6.1
+
+# ── Env loading ──────────────────────────────────────────────────────────
+python-dotenv==1.0.1
+
+# ── Uvicorn runtime helpers ──────────────────────────────────────────────
+anyio==4.4.0
+sniffio==1.3.1
+idna==3.7
+h11==0.14.0
+click==8.1.7
+httptools==0.6.1
+uvloop==0.19.0; sys_platform != 'win32'
+watchfiles==0.21.0
+websockets==12.0
+pyyaml==6.0.1
