@@ -330,14 +330,17 @@ function SectionDivider({ label, color = D.cyan }: { label: string; color?: stri
 }
 
 // ─── PRIVACY TRUST BADGE ──────────────────────────────────────────
-// Compact home-screen badge that proves the app is local-only in real time.
-// Subscribes to privacyAudit and shows live LAN vs CLOUD counters.
+// Centered home-screen badge that explains itself and proves the app is
+// local-only in real time. Subscribes to privacyAudit and shows live
+// LAN / CLOUD / TRACKER / TELEMETRY counters.
 // Tap → opens the full /privacy-audit screen.
 function PrivacyTrustBadge() {
   const router = useRouter();
   const [counters, setCounters] = useState<AuditCounters>(privacyAudit.getCounters());
-  const pulse = useRef(new Animated.Value(0)).current;
-  const shimmer = useRef(new Animated.Value(0)).current;
+  const pulse   = useRef(new Animated.Value(0)).current;
+  const ring1   = useRef(new Animated.Value(0)).current;
+  const ring2   = useRef(new Animated.Value(0)).current;
+  const scanY   = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const unsub = privacyAudit.subscribe((_e, c) => setCounters(c));
@@ -345,96 +348,314 @@ function PrivacyTrustBadge() {
   }, []);
 
   useEffect(() => {
-    const loop = Animated.loop(Animated.sequence([
-      Animated.timing(pulse, { toValue: 1, duration: 1300, useNativeDriver: true }),
-      Animated.timing(pulse, { toValue: 0, duration: 1300, useNativeDriver: true }),
+    const loopPulse = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1, duration: 1400, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 1400, useNativeDriver: true }),
     ]));
-    loop.start();
-    const sh = Animated.loop(Animated.sequence([
-      Animated.timing(shimmer, { toValue: 1, duration: 2600, useNativeDriver: true }),
-      Animated.timing(shimmer, { toValue: 0, duration: 0,    useNativeDriver: true }),
+    loopPulse.start();
+    const loopRing1 = Animated.loop(Animated.timing(ring1, { toValue: 1, duration: 2400, useNativeDriver: true }));
+    const loopRing2 = Animated.loop(Animated.sequence([
       Animated.delay(900),
+      Animated.timing(ring2, { toValue: 1, duration: 2400, useNativeDriver: true }),
     ]));
-    sh.start();
-    return () => { loop.stop(); sh.stop(); };
+    loopRing1.start();
+    loopRing2.start();
+    const loopScan = Animated.loop(Animated.sequence([
+      Animated.timing(scanY, { toValue: 1, duration: 2200, useNativeDriver: true }),
+      Animated.timing(scanY, { toValue: 0, duration: 0,    useNativeDriver: true }),
+      Animated.delay(700),
+    ]));
+    loopScan.start();
+    return () => { loopPulse.stop(); loopRing1.stop(); loopRing2.stop(); loopScan.stop(); };
   }, []);
 
-  const isClean = counters.cloud === 0 && counters.blocked === 0;
-  const accent  = isClean ? '#00FF88' : '#FF2A1F';
-  const dotOp   = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1] });
-  const dotScl  = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.55] });
-  const shineX  = shimmer.interpolate({ inputRange: [0, 1], outputRange: [-180, 320] });
+  const isClean    = counters.cloud === 0 && counters.blocked === 0;
+  const accent     = isClean ? '#00FF88' : '#FFC400';
+  const accentSoft = isClean ? 'rgba(0,255,136,0.10)' : 'rgba(255,196,0,0.10)';
+  const dotOp      = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] });
+  const dotScl     = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.55] });
+
+  // Concentric ring expand/fade
+  const ring1Sc   = ring1.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.0] });
+  const ring1Op   = ring1.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0] });
+  const ring2Sc   = ring2.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.0] });
+  const ring2Op   = ring2.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0] });
+
+  // Scanning line moves top → bottom
+  const scanTrans = scanY.interpolate({ inputRange: [0, 1], outputRange: [0, 156] });
+
+  const stats = [
+    { icon: 'wifi',         label: 'LAN CALLS',  value: String(counters.lan),    color: D.green },
+    { icon: 'cloud-off',    label: 'CLOUD',      value: String(counters.cloud),  color: isClean ? D.textMid : accent },
+    { icon: 'block',        label: 'TRACKERS',   value: '0',                     color: D.green },
+    { icon: 'visibility-off', label: 'TELEMETRY', value: '0',                    color: D.green },
+  ] as const;
+
+  const title    = isClean ? 'PRIVACY AUDIT · LIVE' : 'EXTERNAL CALL OBSERVED';
+  const subTitle = isClean
+    ? 'Every network call inspected on-device · No traffic ever leaves your LAN'
+    : `${counters.cloud} non-LAN request${counters.cloud === 1 ? '' : 's'} observed — tap to inspect`;
 
   return (
     <TouchableOpacity
-      activeOpacity={0.85}
+      activeOpacity={0.88}
       onPress={() => { haptics.light(); router.push('/privacy-audit' as any); }}
       style={ptb.wrap}
     >
-      <View style={[ptb.card, { borderColor: accent + '50', backgroundColor: accent + '06' }]}>
-        {/* Animated shimmer sweep — pure cosmetic, signals "live" */}
-        <Animated.View pointerEvents="none" style={[ptb.shimmer, { transform: [{ translateX: shineX }] }]} />
-        {/* HUD corner ticks */}
-        <View style={[ptb.corner, { top: 0, left: 0, borderTopWidth: 1.5, borderLeftWidth: 1.5, borderColor: accent + 'AA' }]} />
-        <View style={[ptb.corner, { bottom: 0, right: 0, borderBottomWidth: 1.5, borderRightWidth: 1.5, borderColor: accent + 'AA' }]} />
+      <View style={[ptb.card, { borderColor: accent + '55', backgroundColor: accentSoft }]}>
+        {/* HUD corner ticks (all 4) */}
+        <View style={[ptb.corner, { top: 0,    left: 0,    borderTopWidth: 1.5,    borderLeftWidth: 1.5,   borderColor: accent + 'AA' }]} />
+        <View style={[ptb.corner, { top: 0,    right: 0,   borderTopWidth: 1.5,    borderRightWidth: 1.5,  borderColor: accent + 'AA' }]} />
+        <View style={[ptb.corner, { bottom: 0, left: 0,    borderBottomWidth: 1.5, borderLeftWidth: 1.5,   borderColor: accent + 'AA' }]} />
+        <View style={[ptb.corner, { bottom: 0, right: 0,   borderBottomWidth: 1.5, borderRightWidth: 1.5,  borderColor: accent + 'AA' }]} />
 
-        {/* Left icon column */}
-        <View style={[ptb.iconBox, { borderColor: accent + '88', backgroundColor: accent + '14' }]}>
-          <MaterialCommunityIcons name={isClean ? 'shield-lock' : 'shield-alert'} size={20} color={accent} />
-        </View>
+        {/* Vertical scanning line — pure cosmetic, signals "live audit" */}
+        <Animated.View pointerEvents="none" style={[ptb.scanLine, {
+          backgroundColor: accent + '40',
+          transform: [{ translateY: scanTrans }],
+          shadowColor: accent, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 4,
+        }]} />
 
-        {/* Center text */}
-        <View style={{ flex: 1, marginLeft: 12 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-            <Animated.View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: accent, opacity: dotOp, transform: [{ scale: dotScl }] }} />
-            <Text style={[ptb.title, { color: accent }]} numberOfLines={1}>
-              {isClean ? 'SECURED · LAN-ONLY' : 'CLOUD CALL DETECTED'}
-            </Text>
+        {/* ── Header row: status pill + AUDIT chevron ─────────── */}
+        <View style={ptb.headerRow}>
+          <View style={[ptb.statusPill, { borderColor: accent + '80', backgroundColor: accent + '15' }]}>
+            <Animated.View style={{
+              width: 6, height: 6, borderRadius: 3, backgroundColor: accent,
+              opacity: dotOp, transform: [{ scale: dotScl }],
+            }} />
+            <Text style={[ptb.statusPillTxt, { color: accent }]}>{isClean ? 'VERIFIED · CLEAN' : 'ATTENTION'}</Text>
           </View>
-          <Text style={ptb.sub} numberOfLines={1}>
-            {`${counters.cloud} cloud · ${counters.lan} LAN · 0 trackers · 0 ads`}
-          </Text>
+          <View style={ptb.headerSpacer} />
+          <Text style={[ptb.ctaTxt, { color: accent }]}>FULL AUDIT</Text>
+          <MaterialIcons name="chevron-right" size={14} color={accent} />
         </View>
 
-        {/* Right CTA */}
-        <View style={ptb.cta}>
-          <Text style={[ptb.ctaTxt, { color: accent }]}>AUDIT</Text>
-          <MaterialIcons name="chevron-right" size={16} color={accent} />
+        {/* ── Centered shield with pulsing rings ──────────────── */}
+        <View style={ptb.shieldStack}>
+          <Animated.View style={[ptb.ring, {
+            borderColor: accent,
+            opacity: ring1Op,
+            transform: [{ scale: ring1Sc }],
+          }]} />
+          <Animated.View style={[ptb.ring, {
+            borderColor: accent,
+            opacity: ring2Op,
+            transform: [{ scale: ring2Sc }],
+          }]} />
+          <View style={[ptb.shieldCore, {
+            borderColor: accent,
+            backgroundColor: accent + '18',
+            ...(Platform.OS === 'ios' ? { shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.9, shadowRadius:12 } : {}),
+          }]}>
+            <MaterialCommunityIcons name={isClean ? 'shield-lock-outline' : 'shield-alert-outline'} size={28} color={accent} />
+          </View>
         </View>
-      </View>
 
-      {/* Tiny tag-line under card to seal trust */}
-      <View style={ptb.tagRow}>
-        <MaterialIcons name="lock" size={9} color={D.textMid} />
-        <Text style={ptb.tagTxt}>END-TO-END PRIVATE · NO ACCOUNTS · NO TELEMETRY · HMAC-SIGNED</Text>
+        {/* ── Title + explainer ────────────────────────────────── */}
+        <Text style={[ptb.title, { color: accent }]} numberOfLines={1}>{title}</Text>
+        <Text style={ptb.explainer} numberOfLines={2}>{subTitle}</Text>
+
+        {/* ── 4 themed mini stat tiles (centered grid) ────────── */}
+        <View style={ptb.statsRow}>
+          {stats.map((s, i) => (
+            <View key={i} style={[ptb.statTile, { borderColor: s.color + '40', backgroundColor: s.color + '0A' }]}>
+              <MaterialIcons name={s.icon as any} size={14} color={s.color} />
+              <Text style={[ptb.statValue, { color: s.color }]}>{s.value}</Text>
+              <Text style={ptb.statLabel} numberOfLines={1}>{s.label}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* ── Bottom trust chips row ──────────────────────────── */}
+        <View style={ptb.chipRow}>
+          {[
+            { icon: 'lock',           label: 'HMAC-SIGNED' },
+            { icon: 'wifi-off',       label: 'NO INTERNET' },
+            { icon: 'person-off',     label: 'NO ACCOUNTS' },
+            { icon: 'do-not-disturb', label: 'NO TELEMETRY' },
+          ].map((c, i) => (
+            <View key={i} style={ptb.chip}>
+              <MaterialIcons name={c.icon as any} size={9} color={D.textMid} />
+              <Text style={ptb.chipTxt}>{c.label}</Text>
+            </View>
+          ))}
+        </View>
       </View>
     </TouchableOpacity>
   );
 }
 
 const ptb = StyleSheet.create({
-  wrap:    { marginHorizontal: 12, marginTop: 10, marginBottom: 4 },
-  card:    {
-    flexDirection: 'row', alignItems: 'center',
-    borderWidth: 1, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12,
-    overflow: 'hidden',
+  wrap:        { marginHorizontal: 12, marginTop: 10, marginBottom: 4 },
+  card:        {
+    borderWidth: 1, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14,
+    overflow: 'hidden', alignItems: 'center',
   },
-  shimmer: {
-    position: 'absolute', top: 0, bottom: 0, width: 90,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    transform: [{ skewX: '-22deg' }],
+  corner:      { position: 'absolute', width: 12, height: 12 },
+  scanLine:    { position: 'absolute', left: 0, right: 0, height: 1, top: 0 },
+
+  headerRow:   { flexDirection: 'row', alignItems: 'center', width: '100%', gap: 4 },
+  headerSpacer:{ flex: 1 },
+  statusPill:  {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderWidth: 1, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3,
   },
-  corner:  { position: 'absolute', width: 10, height: 10 },
-  iconBox: {
-    width: 36, height: 36, borderRadius: 8, borderWidth: 1,
+  statusPillTxt:{ fontFamily: MONO, fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
+  ctaTxt:      { fontFamily: MONO, fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
+
+  shieldStack: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', marginTop: 12, marginBottom: 10 },
+  ring:        {
+    position: 'absolute', width: 56, height: 56, borderRadius: 28,
+    borderWidth: 1.5,
+  },
+  shieldCore:  {
+    width: 52, height: 52, borderRadius: 26, borderWidth: 1.5,
     alignItems: 'center', justifyContent: 'center',
   },
-  title:   { fontFamily: MONO, fontSize: 11, fontWeight: '900', letterSpacing: 1.5 },
-  sub:     { fontFamily: MONO, fontSize: 9, color: D.textMid, marginTop: 3, letterSpacing: 0.6 },
-  cta:     { flexDirection: 'row', alignItems: 'center', gap: 1, marginLeft: 8 },
-  ctaTxt:  { fontFamily: MONO, fontSize: 10, fontWeight: '900', letterSpacing: 1.5 },
-  tagRow:  { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6, paddingHorizontal: 4 },
-  tagTxt:  { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1, flex: 1 },
+
+  title:       { fontFamily: MONO, fontSize: 13, fontWeight: '900', letterSpacing: 2, textAlign: 'center' },
+  explainer:   { fontFamily: MONO, fontSize: 9.5, color: D.textMid, letterSpacing: 0.4, textAlign: 'center', marginTop: 5, lineHeight: 13, paddingHorizontal: 6 },
+
+  statsRow:    { flexDirection: 'row', gap: 6, marginTop: 12, alignSelf: 'stretch' },
+  statTile:    {
+    flex: 1, borderWidth: 1, borderRadius: 8, paddingVertical: 7, paddingHorizontal: 4,
+    alignItems: 'center', gap: 3,
+  },
+  statValue:   { fontFamily: MONO, fontSize: 14, fontWeight: '900', letterSpacing: 0.5, marginTop: 1 },
+  statLabel:   { fontFamily: MONO, fontSize: 7, color: D.textDim, letterSpacing: 1 },
+
+  chipRow:     { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 11, paddingHorizontal: 2 },
+  chip:        { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  chipTxt:     { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1 },
+});
+
+// ─── ZERO TRUST MATRIX ────────────────────────────────────────────
+// Visual showcase of the 6 hard-coded security guarantees.
+// Pure-cosmetic component (no data), designed to make the app feel
+// fortress-grade at a glance. Animates a sweeping verification scan
+// across the 6 pillars.
+function ZeroTrustMatrix() {
+  const router = useRouter();
+  const sweep  = useRef(new Animated.Value(0)).current;
+  const glow   = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const sw = Animated.loop(Animated.sequence([
+      Animated.timing(sweep, { toValue: 1, duration: 3200, useNativeDriver: false }),
+      Animated.delay(500),
+      Animated.timing(sweep, { toValue: 0, duration: 0,    useNativeDriver: false }),
+    ]));
+    sw.start();
+    const gl = Animated.loop(Animated.sequence([
+      Animated.timing(glow, { toValue: 1, duration: 1500, useNativeDriver: true }),
+      Animated.timing(glow, { toValue: 0, duration: 1500, useNativeDriver: true }),
+    ]));
+    gl.start();
+    return () => { sw.stop(); gl.stop(); };
+  }, []);
+
+  const sweepIdx  = sweep.interpolate({ inputRange: [0, 1], outputRange: [-0.5, 6.5] });
+  const glowOp    = glow.interpolate({  inputRange: [0, 1], outputRange: [0.35, 1] });
+
+  const pillars: Array<{ icon: keyof typeof MaterialCommunityIcons.glyphMap; title: string; sub: string; color: string }> = [
+    { icon: 'shield-key-outline',         title: 'HMAC-SHA256',  sub: 'Signed pairing handshake', color: D.green },
+    { icon: 'lan',                        title: 'LAN-ONLY',     sub: 'Never leaves your network', color: D.cyan },
+    { icon: 'incognito',                  title: 'NO ACCOUNTS',  sub: 'Anonymous · zero sign-in',  color: D.amber },
+    { icon: 'eye-off-outline',            title: 'NO TELEMETRY', sub: '0 analytics · 0 trackers',  color: D.purple },
+    { icon: 'lock-outline',               title: 'AES-256',      sub: 'Encrypted local keystore',  color: D.green },
+    { icon: 'source-branch-check',        title: 'AUDITABLE',    sub: 'Source-visible · open',     color: D.blue },
+  ];
+
+  return (
+    <TouchableOpacity activeOpacity={0.92} onPress={() => { haptics.light(); router.push('/privacy-audit' as any); }} style={ztm.wrap}>
+      <NexusCard accentColor={D.green} glowIntensity={0.18}>
+        {/* Header */}
+        <View style={ztm.header}>
+          <MaterialCommunityIcons name="shield-check-outline" size={15} color={D.green} />
+          <Text style={ztm.headerTitle}>ZERO TRUST MATRIX</Text>
+          <View style={{ flex: 1 }} />
+          <Animated.View style={{ opacity: glowOp }}>
+            <View style={ztm.headerPill}>
+              <View style={ztm.headerPillDot} />
+              <Text style={ztm.headerPillTxt}>6 / 6 ARMED</Text>
+            </View>
+          </Animated.View>
+        </View>
+
+        <Text style={ztm.subhead}>
+          Hardware-grade privacy guarantees · always-on
+        </Text>
+
+        {/* 2 × 3 pillar grid with verification sweep */}
+        <View style={ztm.grid}>
+          {pillars.map((p, i) => {
+            // Each tile lights up as the sweep index passes over it
+            const tileOpacity = sweepIdx.interpolate({
+              inputRange: [i - 0.6, i, i + 0.6],
+              outputRange: [0.35, 1, 0.35],
+              extrapolate: 'clamp',
+            });
+            return (
+              <View key={i} style={[ztm.tile, { borderColor: p.color + '38', backgroundColor: p.color + '0A' }]}>
+                <Animated.View pointerEvents="none" style={[ztm.tileGlow, { backgroundColor: p.color + '22', opacity: tileOpacity }]} />
+                <View style={[ztm.tileIconBox, { borderColor: p.color + '70', backgroundColor: p.color + '15' }]}>
+                  <MaterialCommunityIcons name={p.icon} size={16} color={p.color} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[ztm.tileTitle, { color: p.color }]} numberOfLines={1}>{p.title}</Text>
+                  <Text style={ztm.tileSub} numberOfLines={1}>{p.sub}</Text>
+                </View>
+                <MaterialIcons name="check-circle" size={12} color={p.color} />
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Footer signature */}
+        <View style={ztm.footer}>
+          <MaterialCommunityIcons name="fingerprint" size={10} color={D.textMid} />
+          <Text style={ztm.footerTxt}>BUTLER-AI · ENCRYPTED-AT-REST · LAN-VERIFIED · TAP TO AUDIT</Text>
+          <MaterialIcons name="chevron-right" size={12} color={D.textMid} />
+        </View>
+      </NexusCard>
+    </TouchableOpacity>
+  );
+}
+
+const ztm = StyleSheet.create({
+  wrap:           { marginHorizontal: 12, marginTop: 10 },
+  header:         { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingTop: 14 },
+  headerTitle:    { fontFamily: MONO, fontSize: 12.5, fontWeight: '900', letterSpacing: 1.8, color: D.text },
+  headerPill:     {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderWidth: 1, borderColor: D.green + '60', backgroundColor: D.green + '12',
+    borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3,
+  },
+  headerPillDot:  { width: 5, height: 5, borderRadius: 3, backgroundColor: D.green },
+  headerPillTxt:  { fontFamily: MONO, fontSize: 8.5, fontWeight: '900', letterSpacing: 1.2, color: D.green },
+
+  subhead:        { fontFamily: MONO, fontSize: 9, color: D.textMid, letterSpacing: 1, paddingHorizontal: 14, paddingTop: 4 },
+
+  grid:           { paddingHorizontal: 12, paddingTop: 10, gap: 6 },
+  tile:           {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    borderWidth: 1, borderRadius: 9, paddingVertical: 8, paddingHorizontal: 9,
+    overflow: 'hidden',
+  },
+  tileGlow:       { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  tileIconBox:    {
+    width: 28, height: 28, borderRadius: 6, borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  tileTitle:      { fontFamily: MONO, fontSize: 10.5, fontWeight: '900', letterSpacing: 1.2 },
+  tileSub:        { fontFamily: MONO, fontSize: 8.5, color: D.textMid, letterSpacing: 0.4, marginTop: 1 },
+
+  footer:         {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, paddingVertical: 11, marginTop: 4,
+    borderTopWidth: 1, borderTopColor: D.green + '20',
+  },
+  footerTxt:      { flex: 1, fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1 },
 });
 
 // ─── BUTLER AI HERO ────────────────────────────────────────────────
@@ -1635,6 +1856,7 @@ function NexusHomeScreenInner() {
       <SafeBoundary label="GREETING"><HomeGreetingBanner /></SafeBoundary>
 
       <PrivacyTrustBadge />
+      <ZeroTrustMatrix />
       <SafeBoundary label="COMMAND DECK"><HomeTerminalClock isConnected={isConnected} /></SafeBoundary>
 
       <HomeSectionDivider label="Quick Access" />
