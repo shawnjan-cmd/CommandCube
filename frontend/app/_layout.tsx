@@ -313,6 +313,13 @@ export default function RootLayout() {
               <Text style={s.bootStatus}>INITIALIZING…</Text>
             </View>
 
+            {/* Visible "v2.0.0" tag in bottom-right corner so you can instantly
+                confirm the app is the FRESH build and not a cached old APK.
+                Disappears as soon as a Stack screen mounts. */}
+            <View style={s.versionTag} pointerEvents="none">
+              <Text style={s.versionText}>BUILD v2.0.0 · vc100</Text>
+            </View>
+
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050A12' } }}>
               <Stack.Screen name="index"          options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
@@ -342,4 +349,6 @@ const s = StyleSheet.create({
   bootBrand:    { fontSize: 22, fontWeight: '900', color: '#00FFC6', letterSpacing: 5, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
   bootDivider:  { width: 80, height: 2, backgroundColor: '#00FFC6', opacity: 0.5, marginVertical: 14, borderRadius: 1 },
   bootStatus:   { fontSize: 11, color: '#7FE5D6', letterSpacing: 3, fontWeight: '700', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
+  versionTag:   { position: 'absolute', bottom: 24, right: 18, paddingVertical: 4, paddingHorizontal: 8, borderWidth: 1, borderColor: '#00FFC650', backgroundColor: '#00FFC610', borderRadius: 4 },
+  versionText:  { fontSize: 9, color: '#00FFC6', letterSpacing: 1.4, fontWeight: '700', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 });
