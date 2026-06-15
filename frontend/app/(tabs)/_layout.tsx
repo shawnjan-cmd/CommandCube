@@ -21,7 +21,6 @@ const mi = (name: MIName) => (color: string, size: number) =>
 // Map route name → icon renderer. Order doesn't matter; the Tabs definitions
 // below decide the on-screen ordering.
 const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = {
-  onboarding: mc('rocket-launch-outline'),
   nexushome:  mc('view-dashboard-variant'),
   scripts:    mc('code-braces-box'),
   butler:     mc('robot-happy'),
@@ -36,9 +35,9 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const { isConnected } = useServerConnection();
   const pathname = usePathname();
-  // True whenever the user is on the onboarding tab — drives hiding of the
-  // tab bar, the Ask-Butler composer and the floating connection badge so
-  // there is absolutely no way to bypass onboarding before completion.
+  // Legacy flag — kept for harmless backward-compat with other components.
+  // Onboarding is no longer a tab route (rendered inline by app/index.tsx),
+  // so this will normally be false in production.
   const onOnboarding = pathname?.includes('onboarding') ?? false;
 
   // ── Boot-complete sentinel ─────────────────────────────────────────────
@@ -86,15 +85,8 @@ export default function TabLayout() {
       <Tabs
         initialRouteName="nexushome"
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
-        tabBar={(props) => {
-          // Hide tab bar entirely while user is on the onboarding tab so
-          // they cannot switch to other tabs until they complete onboarding.
-          const focusedRoute = props.state.routes[props.state.index];
-          if (focusedRoute?.name === 'onboarding') return null;
-          return <FuturisticTabBar {...props} iconMap={ICONS} />;
-        }}
+        tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
       >
-        <Tabs.Screen name="onboarding" options={{ title: 'ONBOARDING', tabBarLabel: 'START', headerShown: false, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen name="nexushome" options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
         <Tabs.Screen name="scripts"   options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
         <Tabs.Screen name="butler"    options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />
