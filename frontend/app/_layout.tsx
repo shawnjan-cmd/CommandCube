@@ -53,15 +53,17 @@ import { withTimeout } from '@/utils/withTimeout';
   } catch {}
 })();
 
-// Keep the native splash visible until React mounts something.
-try { SplashScreen.preventAutoHideAsync().catch(() => {}); } catch {}
-
-// ── HARD SPLASH FORCE-HIDE (last-resort black-screen guard) ────────────────
-// If for ANY reason the React tree never calls `SplashScreen.hideAsync()`
-// (corrupted bundle, hung native module, JSI bridge stall, etc.) we force
-// the splash off after 5 seconds anyway. This guarantees the user sees
-// SOMETHING — even if it's a half-rendered tree or our SYSTEM-FAULT
-// boundary — instead of staring at black indefinitely.
+// ── NATIVE SPLASH POLICY (IMPORTANT — black-screen prevention) ─────────────
+// We DO NOT call preventAutoHideAsync() because:
+//   • Our splash background (#050202) is near-black. If anything stalls
+//     (slow AsyncStorage, hung native module, JSI bridge cold-start), the
+//     user sees a pure black screen with no indication the app is alive.
+//   • Letting the splash auto-hide guarantees that the moment JS is ready,
+//     the user sees the React tree — even if our first screen is just a
+//     loading indicator, it's clearly "alive" instead of black.
+//
+// We still keep a HARD 5-second hideAsync() force-call as a belt-and-suspenders
+// safety net for the rare devices where auto-hide doesn't kick in.
 try {
   setTimeout(() => {
     try { SplashScreen.hideAsync().catch(() => {}); } catch {}

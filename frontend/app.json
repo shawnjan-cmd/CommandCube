@@ -2,7 +2,7 @@
   "expo": {
     "name": "Butler AI: PC Automation",
     "slug": "butler-ai-pc-automation",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#050202"
+      "backgroundColor": "#050A12"
     },
     "assetBundlePatterns": [
       "assets/icon.png",
@@ -25,7 +25,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.butlerai.pc.automation",
-      "buildNumber": "4",
+      "buildNumber": "5",
       "infoPlist": {
         "NSCameraUsageDescription": "Butler AI uses the camera exclusively to scan QR codes displayed on your PC screen for instant pairing. No photos are taken, stored, or transmitted.",
         "NSLocalNetworkUsageDescription": "Butler AI connects to a Python server running on your own PC over your local WiFi network to execute scripts and monitor system performance. No data leaves your home network.",
@@ -38,7 +38,7 @@
         "backgroundColor": "#050202"
       },
       "package": "com.butlerai.pc.automation",
-      "versionCode": 4,
+      "versionCode": 5,
       "jsEngine": "hermes",
       "permissions": [
         "android.permission.INTERNET",
