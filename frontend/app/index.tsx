@@ -90,9 +90,10 @@ export default function Index() {
   }, []);
 
   // ── Onboarding completion handler ────────────────────────────────────────
-  // Persists every flag and THEN navigates to /(tabs)/nexushome. By this
-  // point onboarding has rendered fully so the (tabs) group will mount
-  // correctly when we redirect into it.
+  // Persists every flag and flips local state so this component re-renders
+  // and emits a <Redirect> on the NEXT render cycle. Using setDecision()
+  // instead of router.replace() is far more reliable in EAS production
+  // builds — same code path that already works for returning users.
   const handleComplete = () => {
     AsyncStorage.multiSet([
       ['@butler_onboarding_done_v2',        'true'],
@@ -105,10 +106,20 @@ export default function Index() {
       ['@butler_onboarding_exit_at',        String(Date.now())],
     ]).catch(() => {});
 
+    // Flip to 'go_home' → next render returns <Redirect href="/(tabs)/nexushome" />
+    // This uses the EXACT same path that returning users hit on every app
+    // launch (which we know works), so we're not introducing any new failure
+    // mode. The router.replace() fallbacks are kept as belt-and-suspenders.
+    setDecision('go_home');
+
+    // Also fire imperative navigation as a backup in case setDecision is
+    // slow to propagate. Wrapped in try/catch so a failure doesn't matter.
     const target = '/(tabs)/nexushome' as const;
-    try { router.replace(target as any); return; } catch {}
-    try { router.push(target as any); return; } catch {}
-    try { (router as any).navigate?.(target); } catch {}
+    try { router.replace(target as any); } catch {
+      try { router.push(target as any); } catch {
+        try { (router as any).navigate?.(target); } catch {}
+      }
+    }
   };
 
   // ── Render based on decision ─────────────────────────────────────────────
