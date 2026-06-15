@@ -35,7 +35,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#050202"
+        "backgroundColor": "#050A12"
       },
       "package": "com.butlerai.pc.automation",
       "versionCode": 100,
@@ -115,12 +115,12 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#030810",
+          "backgroundColor": "#050A12",
           "image": "./assets/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "dark": {
-            "backgroundColor": "#030810",
+            "backgroundColor": "#050A12",
             "image": "./assets/icon.png"
           }
         }

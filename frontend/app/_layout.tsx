@@ -23,7 +23,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { Component, useEffect, useRef, ReactNode } from 'react';
+import React, { Component, useCallback, useEffect, useRef, ReactNode } from 'react';
 import { View, Text, StyleSheet, Platform, Animated, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,13 +32,6 @@ import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync } from '@/hooks/useAppSync';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 import { withTimeout } from '@/utils/withTimeout';
-
-// expo-system-ui — optional native module. Loaded lazily so a missing-link
-// scenario can NEVER crash the bundle parse. If unavailable, we silently
-// continue (the splash background and our root View bg both already use
-// the same dark-navy color, so there's no visual discontinuity).
-let SystemUI: any = null;
-try { SystemUI = require('expo-system-ui'); } catch { SystemUI = null; }
 
 // ── GLOBAL UNHANDLED PROMISE & ERROR GUARD ──────────────────────────────────
 (() => {
@@ -66,28 +59,13 @@ try { SystemUI = require('expo-system-ui'); } catch { SystemUI = null; }
 // sees Butler-themed dark navy instead of pure black. This eliminates the
 // brief black flash that can occur between the splash hiding and the React
 // tree's first paint — a common false-positive "black screen" symptom.
-try {
-  if (SystemUI && typeof SystemUI.setBackgroundColorAsync === 'function') {
-    SystemUI.setBackgroundColorAsync('#050A12').catch(() => {});
-  }
-} catch {}
-
-// ── NATIVE SPLASH POLICY (IMPORTANT — black-screen prevention) ─────────────
-// We DO NOT call preventAutoHideAsync() because:
-//   • Our splash background (#050202) is near-black. If anything stalls
-//     (slow AsyncStorage, hung native module, JSI bridge cold-start), the
-//     user sees a pure black screen with no indication the app is alive.
-//   • Letting the splash auto-hide guarantees that the moment JS is ready,
-//     the user sees the React tree — even if our first screen is just a
-//     loading indicator, it's clearly "alive" instead of black.
-//
-// We still keep a HARD 5-second hideAsync() force-call as a belt-and-suspenders
-// safety net for the rare devices where auto-hide doesn't kick in.
-try {
-  setTimeout(() => {
-    try { SplashScreen.hideAsync().catch(() => {}); } catch {}
-  }, 5000);
-} catch {}
+// ── NATIVE SPLASH ──────────────────────────────────────────────────────────
+// Canonical Expo splash pattern: hold the splash up at module-load with
+// preventAutoHideAsync(), and hide it ONLY after the root View has actually
+// rendered (via its onLayout callback in RootLayout below). This eliminates
+// the black gap that occurred when the splash auto-hid before React was
+// ready to paint.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 // ─── GLOBAL ERROR BOUNDARY ──────────────────────────────────────────────────
 interface EBState { error: Error | null; }
@@ -191,9 +169,7 @@ export default function RootLayout() {
   const bootRef = useRef(false);
 
   // ── BOOT DIAGNOSTIC HELPER ────────────────────────────────────────────────
-  // Writes timestamped boot stage markers to AsyncStorage. If the user ever
-  // hits a black screen again, these will tell us EXACTLY how far boot got
-  // (visible via Settings → "Reset App Data" debug dump). Fire-and-forget,
+  // Writes timestamped boot stage markers to AsyncStorage. Fire-and-forget,
   // never awaited, never throws.
   const mark = (stage: string) => {
     try {
@@ -201,35 +177,31 @@ export default function RootLayout() {
     } catch {}
   };
 
-  // Stage 1: RootLayout function body executed (React has called us)
+  // Stage 1: RootLayout function body executed
   mark('layout_executed');
 
-  // One-shot bootstrap: install error/privacy interceptors, hide native splash,
-  // and start background services if the user has already completed onboarding.
-  // EVERY side-effect is wrapped in try/catch so a single service failure can
-  // never produce a black screen on a fresh install.
+  // Hide the native splash THE MOMENT the root View renders its first frame.
+  // This is the canonical Expo splash pattern: preventAutoHideAsync() holds
+  // the splash up at module load, then onLayout fires when React has actually
+  // painted, so the splash → React handoff happens with no visible gap.
+  const onRootLayout = useCallback(() => {
+    SplashScreen.hideAsync().catch(() => {});
+    mark('splash_hidden');
+  }, []);
+
+  // Bootstrap background services AFTER React mounts. None of these are
+  // required for first paint — they're all wrapped in try/catch + withTimeout
+  // so a single failure can't cascade.
   useEffect(() => {
     if (bootRef.current) return;
     bootRef.current = true;
 
-    // Stage 2: useEffect fired → React mount cycle is alive.
+    // Stage 2: useEffect fired
     mark('effect_fired');
 
-    // Defer all heavy I/O to next tick so React can mount FIRST. This is the
-    // critical fix for the "black screen after APK install" bug — module-level
-    // side-effects were blocking the first paint.
     const t = setTimeout(() => {
-      // 1. Hide native splash IMMEDIATELY so UI is visible even if init lags.
-      try { SplashScreen.hideAsync().catch(() => {}); } catch {}
-      mark('splash_hidden');
-
-      // 2. Boot services — each wrapped in try/catch AND withTimeout so a
-      //    single hung dynamic import can NEVER produce a black screen. The
-      //    timeout per stage is set deliberately tight (1.5-3s) because none
-      //    of these services are required for first paint; they all enhance
-      //    later interactions and can complete or fail in the background.
       (async () => {
-        // Error interceptor — composes with any existing global handler
+        // Error interceptor
         try {
           const mod = await withTimeout(import('@/services/errorInterceptor'), 2500, 'errorInterceptor import');
           (mod as any)?.errorInterceptor?.install?.();
@@ -241,8 +213,7 @@ export default function RootLayout() {
           (mod as any)?.privacyAudit?.install?.();
         } catch (e) { console.warn('[_layout] privacyAudit install failed:', e); }
 
-        // Pro license — fully fire-and-forget (per guide §2.1 — app is FREE,
-        // this should never block UI)
+        // Pro license — fully fire-and-forget
         try {
           const mod = await withTimeout(import('@/services/proLicense'), 1500, 'proLicense import');
           (mod as any)?.proLicense?.load?.().catch(() => {});
@@ -258,7 +229,7 @@ export default function RootLayout() {
           await withTimeout((mod as any)?.deviceIdentifier?.getDeviceId?.() ?? Promise.resolve(null), 2000, 'deviceIdentifier.getDeviceId');
         } catch (e) { console.warn('[_layout] deviceIdentifier failed:', e); }
 
-        // System upgrade overrides — idempotent via version check inside
+        // System upgrade overrides
         try {
           const m = await withTimeout(import('@/services/systemUpgrade'), 2500, 'systemUpgrade import');
           (m as any)?.applyBootOverrides?.();
@@ -296,30 +267,8 @@ export default function RootLayout() {
     <GlobalErrorBoundary>
       <CosmeticProvider>
         <TabBarProvider>
-          <View style={s.container}>
+          <View style={s.container} onLayout={onRootLayout}>
             <StatusBar style="light" />
-
-            {/* ── BACKGROUND BOOT LABEL ─────────────────────────────────────
-                Rendered BEHIND the Stack so it is ALWAYS visible the moment
-                React mounts — even before expo-router has resolved/rendered
-                the index route. This guarantees the user sees Butler AI
-                branding instead of a near-black `s.container` rectangle if
-                the Stack is slow to render its first screen. Once any Stack
-                screen mounts (typically <100ms), it covers this layer with
-                its own opaque content. */}
-            <View style={s.bootLabel} pointerEvents="none">
-              <Text style={s.bootBrand}>BUTLER AI</Text>
-              <View style={s.bootDivider} />
-              <Text style={s.bootStatus}>INITIALIZING…</Text>
-            </View>
-
-            {/* Visible "v2.0.0" tag in bottom-right corner so you can instantly
-                confirm the app is the FRESH build and not a cached old APK.
-                Disappears as soon as a Stack screen mounts. */}
-            <View style={s.versionTag} pointerEvents="none">
-              <Text style={s.versionText}>BUILD v2.0.0 · vc100</Text>
-            </View>
-
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050A12' } }}>
               <Stack.Screen name="index"          options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
@@ -339,16 +288,4 @@ export default function RootLayout() {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050A12' },
-  bootLabel: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#050A12',
-    zIndex: 0,
-  },
-  bootBrand:    { fontSize: 22, fontWeight: '900', color: '#00FFC6', letterSpacing: 5, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-  bootDivider:  { width: 80, height: 2, backgroundColor: '#00FFC6', opacity: 0.5, marginVertical: 14, borderRadius: 1 },
-  bootStatus:   { fontSize: 11, color: '#7FE5D6', letterSpacing: 3, fontWeight: '700', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-  versionTag:   { position: 'absolute', bottom: 24, right: 18, paddingVertical: 4, paddingHorizontal: 8, borderWidth: 1, borderColor: '#00FFC650', backgroundColor: '#00FFC610', borderRadius: 4 },
-  versionText:  { fontSize: 9, color: '#00FFC6', letterSpacing: 1.4, fontWeight: '700', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 });

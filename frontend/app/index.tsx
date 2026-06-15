@@ -6,22 +6,16 @@
  * (returning user). All routing happens BEFORE `(tabs)` mounts, so the
  * tab navigator mounts ONCE with the correct focused route.
  *
- * ── BLACK-SCREEN PREVENTION (critical) ─────────────────────────────────────
- * Earlier builds rendered an invisible black holder while waiting for
- * AsyncStorage to resolve. If AsyncStorage stalled (cold-start race, hung
- * native bridge), the user saw a true-black screen forever.
+ * The render-while-deciding holder is just a #050A12 View — the native
+ * splash (also #050A12) is still up on top of it via the canonical
+ * `preventAutoHideAsync` + `onLayout` → `hideAsync` pattern in
+ * app/_layout.tsx, so the user never sees this bare View.
  *
- * This version:
- *   • Renders a clearly visible "BUTLER AI / INITIALIZING…" boot panel
- *     with brand color + pulsing dot so the user knows the app IS alive
- *     even if the gate hasn't decided yet.
- *   • Wraps `AsyncStorage.getItem` in `withTimeout(1500ms)` so storage
- *     can never hang us.
- *   • A hard emergency fallback at 3000ms force-sets `target = onboarding`
- *     even if every other safeguard fails.
+ * Auto-migration: if the canonical key is unset but a legacy completion
+ * key is truthy, mirror it forward and skip onboarding.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
+import { View } from 'react-native';
 import { Redirect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ONBOARDING_DONE_KEY, WELCOME_COMPLETE_KEY } from '@/constants/onboardingKeys';
@@ -32,24 +26,9 @@ const LEGACY_DONE_KEYS = [
   '@nexus_first_launch_v1',    // pre-Butler era
 ];
 
-const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
-
 export default function Index() {
   const [target, setTarget] = useState<string | null>(null);
   const decidedRef = useRef(false);
-  const pulse = useRef(new Animated.Value(0)).current;
-
-  // Pulsing dot so the user can SEE the app is alive even while waiting.
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0, duration: 700, useNativeDriver: true }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [pulse]);
 
   useEffect(() => {
     // Emergency hard fallback — if for ANY reason we never decide a target
@@ -71,11 +50,7 @@ export default function Index() {
           'AsyncStorage onboarding flag'
         );
 
-        // 1a. Self-heal corrupted values. Any value that isn't a known
-        //     truthy ('true'/'1') or falsy ('false'/'0'/null/undefined/'')
-        //     marker is treated as corruption — we delete it and default
-        //     to onboarding. Defends against partial writes, encoding
-        //     glitches, or hostile manual AsyncStorage edits.
+        // 1a. Self-heal corrupted values
         const VALID_VALUES: any[] = ['true', 'false', '1', '0', '', null, undefined];
         if (!VALID_VALUES.includes(v as any)) {
           console.warn('[Index] corrupted onboarding flag detected, clearing:', JSON.stringify(v));
@@ -117,56 +92,11 @@ export default function Index() {
   }, []);
 
   if (target === null) {
-    // VISIBLE boot panel — proves the React tree is alive
-    return (
-      <View style={styles.root}>
-        <View style={styles.panel}>
-          <View style={styles.cornerTL} />
-          <View style={styles.cornerTR} />
-          <View style={styles.cornerBL} />
-          <View style={styles.cornerBR} />
-          <Text style={styles.brand}>BUTLER AI</Text>
-          <View style={styles.divider} />
-          <View style={styles.row}>
-            <Animated.View style={[styles.dot, { opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }]} />
-            <Text style={styles.status}>INITIALIZING…</Text>
-          </View>
-          <Text style={styles.hint}>v1.0.3 · LOCAL · ZERO CLOUD</Text>
-        </View>
-      </View>
-    );
+    // Bare holder. The native splash (preventAutoHideAsync'd until the root
+    // View's onLayout fires) is still showing on top of this — the user
+    // never sees this color.
+    return <View style={{ flex: 1, backgroundColor: '#050A12' }} />;
   }
 
   return <Redirect href={target as any} />;
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#050A12',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-  },
-  panel: {
-    width: '100%',
-    maxWidth: 360,
-    borderWidth: 1,
-    borderColor: '#00FFC650',
-    backgroundColor: '#0A1A24CC',
-    borderRadius: 10,
-    paddingVertical: 28,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-  },
-  cornerTL: { position: 'absolute', top: -2, left: -2, width: 14, height: 14, borderTopWidth: 2, borderLeftWidth: 2, borderColor: '#00FFC6' },
-  cornerTR: { position: 'absolute', top: -2, right: -2, width: 14, height: 14, borderTopWidth: 2, borderRightWidth: 2, borderColor: '#00FFC6' },
-  cornerBL: { position: 'absolute', bottom: -2, left: -2, width: 14, height: 14, borderBottomWidth: 2, borderLeftWidth: 2, borderColor: '#00FFC6' },
-  cornerBR: { position: 'absolute', bottom: -2, right: -2, width: 14, height: 14, borderBottomWidth: 2, borderRightWidth: 2, borderColor: '#00FFC6' },
-  brand: { fontSize: 22, fontWeight: '900', color: '#00FFC6', letterSpacing: 5, fontFamily: MONO },
-  divider: { width: 80, height: 2, backgroundColor: '#00FFC6', opacity: 0.5, marginVertical: 14 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  dot: { width: 9, height: 9, borderRadius: 5, backgroundColor: '#00FFC6' },
-  status: { fontSize: 12, color: '#E6FFFA', letterSpacing: 2, fontWeight: '700', fontFamily: MONO },
-  hint: { fontSize: 9, color: '#7FE5D6', letterSpacing: 1.4, marginTop: 16, fontFamily: MONO },
-});
