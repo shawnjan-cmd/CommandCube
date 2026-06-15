@@ -156,6 +156,20 @@ export default function RootLayout() {
   try { useAppSync(); } catch (e) { /* eslint-disable-next-line no-console */ console.warn('[_layout] useAppSync failed:', e); }
   const bootRef = useRef(false);
 
+  // ── BOOT DIAGNOSTIC HELPER ────────────────────────────────────────────────
+  // Writes timestamped boot stage markers to AsyncStorage. If the user ever
+  // hits a black screen again, these will tell us EXACTLY how far boot got
+  // (visible via Settings → "Reset App Data" debug dump). Fire-and-forget,
+  // never awaited, never throws.
+  const mark = (stage: string) => {
+    try {
+      AsyncStorage.setItem(`@butler_boot_${stage}`, String(Date.now())).catch(() => {});
+    } catch {}
+  };
+
+  // Stage 1: RootLayout function body executed (React has called us)
+  mark('layout_executed');
+
   // One-shot bootstrap: install error/privacy interceptors, hide native splash,
   // and start background services if the user has already completed onboarding.
   // EVERY side-effect is wrapped in try/catch so a single service failure can
@@ -164,12 +178,16 @@ export default function RootLayout() {
     if (bootRef.current) return;
     bootRef.current = true;
 
+    // Stage 2: useEffect fired → React mount cycle is alive.
+    mark('effect_fired');
+
     // Defer all heavy I/O to next tick so React can mount FIRST. This is the
     // critical fix for the "black screen after APK install" bug — module-level
     // side-effects were blocking the first paint.
     const t = setTimeout(() => {
       // 1. Hide native splash IMMEDIATELY so UI is visible even if init lags.
       try { SplashScreen.hideAsync().catch(() => {}); } catch {}
+      mark('splash_hidden');
 
       // 2. Boot services — each wrapped, no throw escapes.
       (async () => {
@@ -225,6 +243,9 @@ export default function RootLayout() {
             autoConnectEngine.start().catch(() => {});
           }
         } catch (e) { console.warn('[_layout] autoConnect bootstrap failed:', e); }
+
+        // Stage 3: All boot services attempted.
+        mark('services_done');
       })().catch((e) => console.warn('[_layout] bootstrap chain failed:', e));
     }, 0);
 
