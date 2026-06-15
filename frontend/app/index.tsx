@@ -1,71 +1,69 @@
 /**
  * Bootstrap route — `/`
  *
- * Reads the canonical onboarding-completion flag from AsyncStorage and
- * redirects to either the onboarding tab (first run) or the home tab
- * (returning user). All routing happens BEFORE `(tabs)` mounts, so the
- * tab navigator mounts ONCE with the correct focused route.
+ * NEW STRATEGY: For FIRST LAUNCH we render OnboardingOverlay INLINE here,
+ * bypassing the redirect → (tabs)/onboarding chain entirely. EAS production
+ * builds have shown the (tabs) group failing to mount the child onboarding
+ * route on cold start, so we sidestep the routing layer altogether.
  *
- * The render-while-deciding holder is just a #050A12 View — the native
- * splash (also #050A12) is still up on top of it via the canonical
- * `preventAutoHideAsync` + `onLayout` → `hideAsync` pattern in
- * app/_layout.tsx, so the user never sees this bare View.
+ * For RETURNING users (canonical flag = true) we redirect to nexushome —
+ * which has been proven to work since tabs mount fine after onboarding has
+ * completed at least once.
  *
  * Auto-migration: if the canonical key is unset but a legacy completion
  * key is truthy, mirror it forward and skip onboarding.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
-import { Redirect } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import { Redirect, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ONBOARDING_DONE_KEY, WELCOME_COMPLETE_KEY } from '@/constants/onboardingKeys';
 import { withTimeout } from '@/utils/withTimeout';
+import OnboardingOverlay from '@/components/OnboardingOverlay';
+import OnboardingErrorBoundary from '@/components/OnboardingErrorBoundary';
+
+type Decision = 'undecided' | 'show_onboarding' | 'go_home';
 
 const LEGACY_DONE_KEYS = [
-  WELCOME_COMPLETE_KEY,        // '@butler_welcome_complete_v1'
-  '@nexus_first_launch_v1',    // pre-Butler era
+  WELCOME_COMPLETE_KEY,
+  '@nexus_first_launch_v1',
 ];
 
 export default function Index() {
-  const [target, setTarget] = useState<string | null>(null);
+  const router = useRouter();
+  const [decision, setDecision] = useState<Decision>('undecided');
   const decidedRef = useRef(false);
 
   useEffect(() => {
-    // Emergency hard fallback — if for ANY reason we never decide a target
-    // within 3 seconds, force-redirect to onboarding so the user is never
-    // stuck on the boot screen indefinitely.
+    // 3s emergency fallback — if storage hangs, default to onboarding
     const emergency = setTimeout(() => {
       if (decidedRef.current) return;
       decidedRef.current = true;
-      console.warn('[Index] gate timed out after 3s — emergency redirect to onboarding');
-      setTarget('/(tabs)/onboarding');
+      console.warn('[Index] gate timed out after 3s — defaulting to onboarding');
+      setDecision('show_onboarding');
     }, 3000);
 
     (async () => {
       try {
-        // 1. Read canonical key (with timeout — cannot hang)
         let v = await withTimeout(
           AsyncStorage.getItem(ONBOARDING_DONE_KEY),
           1500,
-          'AsyncStorage onboarding flag'
+          'AsyncStorage onboarding flag',
         );
 
-        // 1a. Self-heal corrupted values
-        const VALID_VALUES: any[] = ['true', 'false', '1', '0', '', null, undefined];
-        if (!VALID_VALUES.includes(v as any)) {
-          console.warn('[Index] corrupted onboarding flag detected, clearing:', JSON.stringify(v));
+        const VALID: any[] = ['true', 'false', '1', '0', '', null, undefined];
+        if (!VALID.includes(v as any)) {
           AsyncStorage.removeItem(ONBOARDING_DONE_KEY).catch(() => {});
           v = null;
         }
         let done = v === 'true' || v === '1';
 
-        // 2. Migrate legacy flags if canonical is unset
         if (!done) {
           for (const lk of LEGACY_DONE_KEYS) {
             const lv = await withTimeout(
               AsyncStorage.getItem(lk),
               1000,
-              `AsyncStorage legacy ${lk}`
+              `legacy ${lk}`,
             );
             if (lv === 'true' || lv === '1') {
               done = true;
@@ -78,25 +76,60 @@ export default function Index() {
         if (decidedRef.current) return;
         decidedRef.current = true;
         clearTimeout(emergency);
-        setTarget(done ? '/(tabs)/nexushome' : '/(tabs)/onboarding');
+        setDecision(done ? 'go_home' : 'show_onboarding');
       } catch (e) {
         console.warn('[Index] gate read failed:', e);
         if (decidedRef.current) return;
         decidedRef.current = true;
         clearTimeout(emergency);
-        setTarget('/(tabs)/onboarding');
+        setDecision('show_onboarding');
       }
     })();
 
     return () => clearTimeout(emergency);
   }, []);
 
-  if (target === null) {
-    // Bare holder. The native splash (preventAutoHideAsync'd until the root
-    // View's onLayout fires) is still showing on top of this — the user
-    // never sees this color.
-    return <View style={{ flex: 1, backgroundColor: '#050A12' }} />;
+  // ── Onboarding completion handler ────────────────────────────────────────
+  // Persists every flag and THEN navigates to /(tabs)/nexushome. By this
+  // point onboarding has rendered fully so the (tabs) group will mount
+  // correctly when we redirect into it.
+  const handleComplete = () => {
+    AsyncStorage.multiSet([
+      ['@butler_onboarding_done_v2',        'true'],
+      ['@butler_welcome_complete_v1',       'true'],
+      ['@butler_terms_accepted_v1',         'true'],
+      ['@butler_consent_v2',                '1.0.0'],
+      ['@butler_age_confirmed_v1',          'true'],
+      ['@butler_show_post_onboarding_chat', 'true'],
+      ['@butler_stable_state',              'onboarded'],
+      ['@butler_onboarding_exit_at',        String(Date.now())],
+    ]).catch(() => {});
+
+    const target = '/(tabs)/nexushome' as const;
+    try { router.replace(target as any); return; } catch {}
+    try { router.push(target as any); return; } catch {}
+    try { (router as any).navigate?.(target); } catch {}
+  };
+
+  // ── Render based on decision ─────────────────────────────────────────────
+  if (decision === 'undecided') {
+    return <View style={styles.holder} />;
   }
 
-  return <Redirect href={target as any} />;
+  if (decision === 'go_home') {
+    return <Redirect href={'/(tabs)/nexushome' as any} />;
+  }
+
+  // First-launch path: render onboarding INLINE (no redirect, no tabs group)
+  return (
+    <View style={styles.holder}>
+      <OnboardingErrorBoundary onSkipToHome={handleComplete}>
+        <OnboardingOverlay onComplete={handleComplete} />
+      </OnboardingErrorBoundary>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  holder: { flex: 1, backgroundColor: '#050A12' },
+});
