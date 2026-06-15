@@ -9,7 +9,7 @@
  * renders OnboardingOverlay and hands off via router.replace when done.
  */
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OnboardingOverlay from '@/components/OnboardingOverlay';
@@ -18,10 +18,10 @@ export default function OnboardingTab() {
   const router = useRouter();
 
   const handleComplete = () => {
-    // Persist completion keys in background — never awaited so the user
-    // never has to wait on storage. We also stamp a diagnostic key with the
-    // timestamp so a returning agent / debug screen can verify the LAUNCH
-    // button was actually tapped (independent of routing success).
+    // Persist completion keys in background — never awaited. Even if
+    // every navigation path below fails, the next app launch will skip
+    // onboarding via the `app/index.tsx` gate (because the canonical
+    // `@butler_onboarding_done_v2` key is now 'true').
     AsyncStorage.multiSet([
       ['@butler_onboarding_done_v2',        'true'],
       ['@butler_welcome_complete_v1',       'true'],
@@ -33,23 +33,40 @@ export default function OnboardingTab() {
       ['@butler_onboarding_exit_at',        String(Date.now())],
     ]).catch(() => {});
 
-    // Multi-path navigation to be bulletproof against any single-method
-    // failure. router.replace is preferred (no back-button history) but
-    // we fall through to router.push, then router.navigate, in case the
-    // expo-router version on the user's device has a quirk.
+    // Multi-path navigation. We try every expo-router API in turn and
+    // surface a user-visible Alert ONLY if all three fail — because the
+    // onboarding flag is already persisted, the worst-case recovery is
+    // simply "close and reopen the app", not "you lost your progress".
     const target = '/(tabs)/nexushome' as const;
+    let navigated = false;
+
     try {
       console.log('[onboarding] LAUNCH → router.replace(' + target + ')');
       router.replace(target as any);
-      return;
+      navigated = true;
     } catch (e) {
       console.warn('[onboarding] replace failed, trying push:', e);
     }
-    try { router.push(target as any); return; } catch (e) {
-      console.warn('[onboarding] push failed, trying navigate:', e);
+
+    if (!navigated) {
+      try { router.push(target as any); navigated = true; }
+      catch (e) { console.warn('[onboarding] push failed, trying navigate:', e); }
     }
-    try { (router as any).navigate?.(target); } catch (e) {
-      console.error('[onboarding] ALL navigation paths failed:', e);
+
+    if (!navigated) {
+      try { (router as any).navigate?.(target); navigated = true; }
+      catch (e) { console.error('[onboarding] ALL navigation paths failed:', e); }
+    }
+
+    if (!navigated) {
+      // Final fallback — user-facing Alert. The onboarding flag is already
+      // saved so closing+reopening will land on home directly.
+      try {
+        Alert.alert(
+          'Setup complete',
+          "You're all set! Please close and reopen Butler AI — you'll land right on the home screen.",
+        );
+      } catch {}
     }
   };
 

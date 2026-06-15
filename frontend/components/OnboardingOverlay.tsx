@@ -6,7 +6,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated,
-  ActivityIndicator, Platform, Linking, Dimensions,
+  ActivityIndicator, Platform, Linking, Dimensions, Alert,
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Svg, { Circle, Path, Rect, G, Defs, RadialGradient, Stop, LinearGradient } from 'react-native-svg';
@@ -1225,7 +1225,9 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete:
     if (firedRef.current) return;
     firedRef.current = true;
 
-    // Fire-and-forget persistence — never awaited.
+    // Fire-and-forget persistence — never awaited. Even if router.replace
+    // somehow fails below, this guarantees that the NEXT app launch will
+    // skip onboarding via the `app/index.tsx` gate.
     AsyncStorage.multiSet([
       ['@butler_onboarding_done_v2',        'true'],
       ['@butler_welcome_complete_v1',       'true'],
@@ -1234,10 +1236,25 @@ function Screen10Ready({ onBack, onComplete }: { onBack: () => void; onComplete:
       ['@butler_age_confirmed_v1',          'true'],
       ['@butler_show_post_onboarding_chat', 'true'],
       ['@butler_stable_state',              'onboarded'],
+      ['@butler_launch_attempted_at',       String(Date.now())],
     ]).catch(() => {});
 
-    // Hand off to parent INSTANTLY.
-    onComplete();
+    // Hand off to parent INSTANTLY. If onComplete itself throws (e.g. a
+    // router-not-ready edge case), reset the dedupe flag so the user can
+    // retry, and surface a recovery alert so they're never silently stuck.
+    try {
+      onComplete();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('[Screen10] onComplete threw:', e);
+      firedRef.current = false; // allow retry
+      try {
+        Alert.alert(
+          'Almost there',
+          'Tap LAUNCH BUTLER AI again, or close and reopen the app — your onboarding has been saved.',
+        );
+      } catch {}
+    }
   };
 
   return (
