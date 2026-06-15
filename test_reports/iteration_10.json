@@ -1,0 +1,58 @@
+{
+  "summary": "PASS — Full onboarding → LAUNCH → nexushome flow verified end-to-end on mobile viewport 414x896. All 10 onboarding screens traversed successfully (Welcome → App Tour → Safety Consent → Safety Pledge → Legal Docs → Permissions → Q&A → Server Privacy → PC Setup → Launch). Screen 10 'ALL DONE!' + 'LAUNCH BUTLER AI' confirmed. Tapping LAUNCH (via testID `onboarding-launch-primary`) navigated from pathname `/` → `/nexushome` within ~2.5s. localStorage flag `@butler_onboarding_done_v2` was set to 'true', `@butler_boot_complete_at` was stamped (proving (tabs)/_layout mounted), and the home dashboard rendered with all 8 tab labels (HOME, SCRIPTS, AI, KB, PC, BUILD, SKINS, CONFIG) visible. No `_NexusBoundary` RECOVERY MODE was triggered. ZERO console errors during the LAUNCH transition.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "critical_test_evidence": {
+    "pre_launch_pathname": "/",
+    "post_launch_pathname": "/nexushome",
+    "post_launch_href": "http://localhost:3000/nexushome",
+    "post_launch_body_length": 2623,
+    "post_launch_body_excerpt_first_700": "BUTLER-CORE · VISION SYS v2.1 / SCAN: ACTIVE · SENTRY: ARMED · UPLINK: LAN-ONLY / BLR-01·STBY ... GOOD EVENING · BUTLER AI ONLINE / LAN-ONLY · ZERO TELEMETRY · YOUR PC · YOUR RULES / SECURED · LAN-ONLY / 0 cloud · 7 LAN · 0 trackers · 0 ads / AUDIT / COMMAND DECK · LIVE / LOCAL TIME / SESSION / OPS TODAY ... + tab bar HOME/SCRIPTS/AI/KB/PC/BUILD/SKINS/CONFIG",
+    "asyncstorage_onboarding_done_v2": "true",
+    "asyncstorage_boot_complete_at": "1781554306504",
+    "recovery_boundary_engaged": false,
+    "tabs_found_in_body": ["HOME", "SCRIPTS", "AI", "KB", "PC", "BUILD", "SKINS", "CONFIG"],
+    "console_errors_during_launch": [],
+    "console_warnings_during_launch": [
+      "[kbGrowthTracker] documentDirectory unavailable  // benign — expo-file-system/legacy has no documentDirectory on web; PC-data card just stays empty"
+    ],
+    "screen_transitions": {
+      "S1_welcome_button_GET_STARTED": "clicked OK (testID onboarding-screen1-next)",
+      "S2_app_tour_CONTINUE": "OK",
+      "S3_safety_consent_I_ACCEPT": "OK (4 required checkboxes set via label text click)",
+      "S4_safety_pledge_I_PLEDGE": "OK",
+      "S5_legal_docs_CONTINUE": "OK",
+      "S6_permissions_CONTINUE": "OK",
+      "S7_qa_CONTINUE": "OK",
+      "S8_server_privacy_CONTINUE": "OK",
+      "S9_pc_setup_CONTINUE": "OK",
+      "S10_launch_button": "ALL DONE! + LAUNCH BUTLER AI present, primary launch button tapped"
+    }
+  },
+  "test_report_links": [],
+  "action_items": [
+    "No fixes required. The bug is RESOLVED in the current code. The previous chain of fixes (deleted duplicate `(tabs)/index.tsx`, deleted orphan `(tabs)/onboarding.tsx`, set `initialRouteName=\"nexushome\"` in tabs layout, wrapped nexushome in inline _NexusBoundary, and the inline `Index → setDecision('go_home') → <Redirect href='/(tabs)/nexushome' />` + imperative `router.replace` belt-and-suspenders) all work as designed on the Expo web preview.",
+    "Real-device APK note for E1: Web verification confirms the JS-level flow is correct. If the navy screen still appears on EAS APK, that would now have to be a native-only issue (e.g. RN bundle missing a require, native module crash on TabLayout mount, or React Native screens initialization). Recommend adding a top-level RN ErrorBoundary in `app/_layout.tsx` that surfaces any caught render error to logcat for the next APK test — currently only `_NexusBoundary` inside nexushome catches errors. A higher boundary would also catch failures in `(tabs)/_layout.tsx` itself.",
+    "Minor: consider adding a `testID=\"onboarding-screen10-launch\"` alias on the primary LAUNCH button (currently `onboarding-launch-primary`) to match what `test_credentials.md` documents (line 29). Either update the doc or add the testID — they're inconsistent."
+  ],
+  "critical_code_review_comments": [
+    "app/index.tsx handleComplete is well-designed: both `setDecision('go_home') → <Redirect>` AND `router.replace(...)` fallbacks fire — confirmed working.",
+    "OnboardingOverlay Screen10Ready.enterApp uses a `firedRef` dedupe guard with try/catch around onComplete + Alert recovery — robust.",
+    "(tabs)/_layout.tsx stamps `@butler_boot_complete_at` on mount (line 47-52); this diagnostic value was observed in localStorage after launch, proving the tabs layout mounts successfully on web.",
+    "Tabs.initialRouteName='nexushome' is set, freezeOnBlur+lazy+animation:'none' optimizations active.",
+    "No deprecated packages observed in the files reviewed; expo-camera is used correctly (not expo-barcode-scanner). expo-file-system/legacy is imported in nexushome.tsx — this is the explicit legacy shim, intentional, not the deprecated `expo-file-system` default export.",
+    "Mild: nexushome.tsx is 1900+ lines — exceeds the 700-line guideline. Recommend splitting MechBay sub-components, NexusQRModal, and the card components into separate files for maintainability. Not blocking, not a bug."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100%"},
+  "seed_data_creation": "Cleared localStorage to force first-launch onboarding, then walked all 10 screens by interacting with the actual UI (no storage seeding shortcuts used — full real flow test).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "The LAUNCH → nexushome path works on Expo web preview. If the user reports a navy screen on EAS APK again, the issue is native-only and not reproducible on web. Browser automation cannot test the real APK; suggest E1 add a top-level RN ErrorBoundary in app/_layout.tsx to capture native render errors for the next device test.",
+  "rca_of_issue": "Bug REPRODUCTION: clear localStorage → reload → walk all 10 onboarding screens → tap LAUNCH BUTLER AI. PRIOR ROOT CAUSE (already fixed by previous agents): duplicate `(tabs)/index.tsx` route file shadowed the home route; orphan `(tabs)/onboarding.tsx` confused tabs layout; default initial route resolved to the wrong screen on first mount in production builds. CURRENT STATE: Index gate renders OnboardingOverlay inline → on LAUNCH tap, Screen10Ready.enterApp fires AsyncStorage.multiSet (fire-and-forget) + parent's handleComplete → setDecision('go_home') + router.replace('/(tabs)/nexushome'). On next render the gate emits <Redirect href='/(tabs)/nexushome' />, the (tabs) group mounts with initialRouteName='nexushome', and the home tab renders. Verified by pathname trail `/` → `/nexushome`, by `@butler_onboarding_done_v2='true'` in storage, by `@butler_boot_complete_at` being stamped (proving _layout.tsx useEffect ran), by all 8 tab labels appearing in the DOM, and by ZERO console errors during the transition."
+}
