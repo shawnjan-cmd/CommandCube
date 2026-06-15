@@ -1389,9 +1389,10 @@ export default function OnboardingOverlay({ onComplete }: { onComplete: () => vo
   }, [step, slideAnim]);
 
   // ── Android hardware back-button handler ────────────────────────────────
-  // Prevents the OS back button from breaking the overlay state. On screens
-  // 1–9 it goes back one screen. On screen 0 (Welcome) it returns true to
-  // block the back action entirely (so the app doesn't quit mid-onboarding).
+  // Onboarding is now a normal tab (not a gate), so we only intercept back
+  // when the user is mid-flow (step 1–9) to navigate to the previous screen.
+  // On Screen 0 (Welcome) we return `false` so the OS / tab navigator handles
+  // it naturally — letting the user leave the tab via the system back button.
   useEffect(() => {
     const { BackHandler, Platform } = require('react-native');
     if (Platform.OS !== 'android') return;
@@ -1406,7 +1407,7 @@ export default function OnboardingOverlay({ onComplete }: { onComplete: () => vo
         });
         return true; // consume
       }
-      return true; // on screen 0, block back so app doesn't quit
+      return false; // on Welcome — let the OS / tab navigator handle it
     };
     const sub = BackHandler.addEventListener('hardwareBackPress', onBack);
     return () => sub?.remove?.();

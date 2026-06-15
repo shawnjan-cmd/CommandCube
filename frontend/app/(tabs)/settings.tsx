@@ -2154,11 +2154,15 @@ export default function SettingsScreen() {
                           '@butler_stable_state',
                         ]).then(() => {
                           haptics.success();
-                          // Onboarding is a tab route — navigate directly.
+                          // Onboarding is a regular tab route now — navigate
+                          // straight to it. `/` would just redirect back to
+                          // /(tabs)/nexushome since we removed the gate.
                           try {
-                            router.push('/' as any);
+                            router.push('/(tabs)/onboarding' as any);
                           } catch {
-                            Alert.alert('Reset Complete', 'Restart the app to view the onboarding flow.');
+                            try { router.replace('/(tabs)/onboarding' as any); } catch {
+                              Alert.alert('Reset Complete', 'Tap the INTRO tab in the bottom bar to view the onboarding flow.');
+                            }
                           }
                         }).catch(() => {});
                       },
@@ -2175,13 +2179,18 @@ export default function SettingsScreen() {
               style={[g.actionBtn, { flex: 1, borderColor: N.green + '55', backgroundColor: N.green + '0A' }]}
               onPress={() => {
                 haptics.light();
-                // Clear gate keys then navigate to /onboarding route.
+                // Clear gate keys then navigate straight to the onboarding tab.
+                // We do NOT push '/' because the root index now redirects to
+                // /(tabs)/nexushome and would never show onboarding.
                 AsyncStorage.multiRemove([
                   '@butler_onboarding_done_v2',
                   '@butler_welcome_complete_v1',
                   '@butler_stable_state',
                 ]).finally(() => {
-                  router.push('/' as any);
+                  try { router.push('/(tabs)/onboarding' as any); }
+                  catch {
+                    try { router.replace('/(tabs)/onboarding' as any); } catch {}
+                  }
                 });
               }}
               activeOpacity={0.8}
