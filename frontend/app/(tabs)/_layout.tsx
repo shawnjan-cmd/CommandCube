@@ -98,7 +98,6 @@ export default function TabLayout() {
 
         {/* Hidden routes — accessible via navigation but not shown in the bar */}
         <Tabs.Screen name="terminal"  options={{ href: null, title: 'TERMINAL'    }} />
-        <Tabs.Screen name="index"     options={{ href: null, headerShown: false   }} />
         <Tabs.Screen name="fileshare" options={{ href: null, title: 'FILE SHARE'  }} />
         <Tabs.Screen name="support"   options={{ href: null, title: 'SUPPORT'     }} />
       </Tabs>
