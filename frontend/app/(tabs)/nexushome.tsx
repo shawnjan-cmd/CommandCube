@@ -133,7 +133,7 @@ function NeonBar({ value, color, height = 4, width }: { value: number; color: st
     Animated.timing(anim, { toValue: Math.min(1, Math.max(0, value / 100)), duration: 800, useNativeDriver: false }).start();
   }, [value]);
   return (
-    <View style={{ height, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: height / 2, overflow:'hidden', width: width || '100%' }}>
+    <View style={{ height, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: height / 2, overflow:'hidden', width: (width || '100%') as any }}>
       <Animated.View style={[
         { height:'100%', borderRadius: height / 2, backgroundColor: color },
         { width: anim.interpolate({ inputRange:[0,1], outputRange:['0%','100%'] }) as any },
@@ -628,7 +628,7 @@ function CrawlersGraphCard({ isConnected, kbFindings }: { isConnected: boolean; 
     }
   }, [isConnected]));
 
-  const points = buckets.length > 0 ? buckets.map(b => b.count) : [0,0,0,0,0,0,0];
+  const points = buckets.length > 0 ? buckets.map(b => b.delta) : [0,0,0,0,0,0,0];
   const maxPt = Math.max(...points, 1);
   const barW = ((SW - 64) - (points.length - 1) * 4) / points.length;
 
@@ -673,7 +673,7 @@ function CrawlersGraphCard({ isConnected, kbFindings }: { isConnected: boolean; 
                   isToday && Platform.OS==='ios' ? { shadowColor:D.teal, shadowOffset:{width:0,height:0}, shadowOpacity:1, shadowRadius:8 } : {},
                 ]} />
                 <Text style={{ fontSize:7, fontFamily:MONO, color:D.textDim }}>
-                  {buckets[i]?.date && !isNaN(new Date(buckets[i].date).getTime()) ? new Date(buckets[i].date).toLocaleDateString('en',{weekday:'narrow'}) : '--'}
+                  {buckets[i]?.ts && !isNaN(new Date(buckets[i].ts).getTime()) ? new Date(buckets[i].ts).toLocaleDateString('en',{weekday:'narrow'}) : '--'}
                 </Text>
               </View>
             );
@@ -745,7 +745,11 @@ function ScriptsGraphCard({ isConnected, goToTab }: { isConnected: boolean; goTo
     executionHistory.getAll().then(hist => {
       if (hist.length > 0) {
         const recent = hist.slice(-5).reverse();
-        setRecentScripts(recent.map(h => ({ name: h.scriptName || h.script || 'Script', ts: h.timestamp || Date.now()/1000, success: h.success !== false })));
+        setRecentScripts(recent.map(h => ({
+          name: h.scriptName || 'Script',
+          ts: h.timestamp ? (new Date(h.timestamp).getTime() / 1000) : (Date.now() / 1000),
+          success: h.success !== false,
+        })));
         const successes = hist.filter(h => h.success !== false).length;
         setSuccessRate(Math.round((successes / hist.length) * 100));
         setExecTotal(hist.length);
@@ -1011,8 +1015,8 @@ function RecentActivity({ goToTab }: { goToTab: (t:string)=>void }) {
             <TouchableOpacity key={i} onPress={() => goToTab('logs')} activeOpacity={0.8}
               style={{ flexDirection:'row', alignItems:'center', gap:10 }}>
               <MaterialIcons name={entry.success !== false ? 'check-circle' : 'error'} size={14} color={entry.success !== false ? D.green : D.red} />
-              <Text style={{ flex:1, fontSize:11, fontFamily:MONO, color:D.text }} numberOfLines={1}>{entry.scriptName || entry.script || 'Script'}</Text>
-              <Text style={{ fontSize:9, fontFamily:MONO, color:D.textDim }}>{formatAgo((entry.timestamp||Date.now())/1000)}</Text>
+              <Text style={{ flex:1, fontSize:11, fontFamily:MONO, color:D.text }} numberOfLines={1}>{entry.scriptName || 'Script'}</Text>
+              <Text style={{ fontSize:9, fontFamily:MONO, color:D.textDim }}>{formatAgo(entry.timestamp ? (new Date(entry.timestamp).getTime() / 1000) : (Date.now() / 1000))}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -1075,7 +1079,7 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
       const { ip, port } = parsed;
       setScanMsg(`Connecting to ${ip}:${port}…`);
       const token = await (serverConnection as any).connectWithQR?.(data) ?? await (serverConnection as any).reconnect?.(parsed.ip, parsed.port);
-      onConnect(ip, port);
+      onConnect(ip, parseInt(String(port), 10) || 8765);
       setScanMsg(`Connected! ✓`);
       setTimeout(() => onClose(), 800);
     } catch (e: any) {
@@ -1089,7 +1093,7 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
     const port = parseInt(manualPort) || 8765;
     setScanMsg(`Connecting to ${manualIp}:${port}…`);
     try {
-      await ((serverConnection as any).connect?.(manualIp, port) ?? serverConnection.reconnect?.(manualIp, port) ?? Promise.resolve());
+      await ((serverConnection as any).connect?.(manualIp, port) ?? (serverConnection as any).reconnect?.(manualIp, port) ?? Promise.resolve());
       onConnect(manualIp, port);
       setScanMsg('Connected! ✓');
       setTimeout(() => onClose(), 800);
@@ -1102,9 +1106,10 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
     setIsLANScanning(true); setLanProgress(null);
     try {
       const result = await quickScan((p) => setLanProgress(p));
-      if (result) {
-        setScanMsg(`Found server at ${result.ip}:${result.port}`);
-        setManualIp(result.ip); setManualPort(String(result.port));
+      const first = Array.isArray(result) && result.length > 0 ? result[0] : null;
+      if (first) {
+        setScanMsg(`Found server at ${first.ip}:${first.port}`);
+        setManualIp(first.ip); setManualPort(String(first.port));
         setShowManual(true);
       } else {
         setScanMsg('No Butler server found on local network');
@@ -1487,7 +1492,7 @@ function NexusHomeScreenInner() {
     const load = async () => {
       try {
         const token = serverConnection.getToken();
-        const h = token ? { Authorization:`Bearer ${token}` } : {};
+        const h: Record<string, string> = token ? { Authorization:`Bearer ${token}` } : {};
         const [metrRes, ollamaRes, kbRes] = await Promise.allSettled([
           fetch(`http://${sIp}:${sPort}/api/metrics`, { headers:h, signal:AbortSignal.timeout(4000) }),
           fetch(`http://${sIp}:${sPort}/api/ollama/status`, { headers:h, signal:AbortSignal.timeout(4000) }),
@@ -1646,7 +1651,7 @@ function NexusHomeScreenInner() {
         .filter(c => c.visible && c.id !== 'hero' && c.id !== 'quick_access')
         .sort((a, b) => a.order - b.order)
         .map(card => {
-          switch (card.id) {
+          switch (card.id as string) {
             case 'quick_send':
             case 'fileshare_clipboard':
               return <QuickSendCard key={card.id} isConnected={isConnected} />;
