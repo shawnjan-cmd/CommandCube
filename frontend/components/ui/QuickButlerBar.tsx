@@ -102,6 +102,12 @@ export default function QuickButlerBar() {
           <View pointerEvents="none" style={styles.signalEdge} />
           <View pointerEvents="none" style={styles.rimLight} />
 
+          {/* HUD corner brackets — match the matrix card aesthetic */}
+          <View pointerEvents="none" style={[styles.hudCorner, { top: 0,    left: 4,    borderTopWidth: 1.5,    borderLeftWidth: 1.5 }]} />
+          <View pointerEvents="none" style={[styles.hudCorner, { top: 0,    right: 0,   borderTopWidth: 1.5,    borderRightWidth: 1.5 }]} />
+          <View pointerEvents="none" style={[styles.hudCorner, { bottom: 0, left: 4,    borderBottomWidth: 1.5, borderLeftWidth: 1.5 }]} />
+          <View pointerEvents="none" style={[styles.hudCorner, { bottom: 0, right: 0,   borderBottomWidth: 1.5, borderRightWidth: 1.5 }]} />
+
           <View style={styles.row}>
             {/* Robot badge + prompt chevron + blinking cursor */}
             <View style={styles.robotBadge}>
@@ -210,6 +216,11 @@ const styles = StyleSheet.create({
     left: 4, right: 4, top: 0.5,
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.10)',
+  },
+  hudCorner: {
+    position: 'absolute',
+    width: 9, height: 9,
+    borderColor: RED_HI + 'CC',
   },
   row: {
     flex: 1,

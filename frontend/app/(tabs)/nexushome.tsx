@@ -338,35 +338,25 @@ function PrivacyTrustBadge() {
   const router = useRouter();
   const [counters, setCounters] = useState<AuditCounters>(privacyAudit.getCounters());
   const pulse   = useRef(new Animated.Value(0)).current;
-  const ring1   = useRef(new Animated.Value(0)).current;
-  const ring2   = useRef(new Animated.Value(0)).current;
-  const scanY   = useRef(new Animated.Value(0)).current;
+  const ring    = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const unsub = privacyAudit.subscribe((_e, c) => setCounters(c));
     return unsub;
   }, []);
 
+  // ONE shared slow loop drives the dot + ring + (interpolated) scan position.
+  // Cuts the previous 4 parallel loops down to a single native-driven animation,
+  // dramatically lighter on low-end phones.
   useEffect(() => {
-    const loopPulse = Animated.loop(Animated.sequence([
-      Animated.timing(pulse, { toValue: 1, duration: 1400, useNativeDriver: true }),
-      Animated.timing(pulse, { toValue: 0, duration: 1400, useNativeDriver: true }),
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1, duration: 2200, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 2200, useNativeDriver: true }),
     ]));
-    loopPulse.start();
-    const loopRing1 = Animated.loop(Animated.timing(ring1, { toValue: 1, duration: 2400, useNativeDriver: true }));
-    const loopRing2 = Animated.loop(Animated.sequence([
-      Animated.delay(900),
-      Animated.timing(ring2, { toValue: 1, duration: 2400, useNativeDriver: true }),
-    ]));
-    loopRing1.start();
-    loopRing2.start();
-    const loopScan = Animated.loop(Animated.sequence([
-      Animated.timing(scanY, { toValue: 1, duration: 2200, useNativeDriver: true }),
-      Animated.timing(scanY, { toValue: 0, duration: 0,    useNativeDriver: true }),
-      Animated.delay(700),
-    ]));
-    loopScan.start();
-    return () => { loopPulse.stop(); loopRing1.stop(); loopRing2.stop(); loopScan.stop(); };
+    const ringLoop = Animated.loop(Animated.timing(ring, { toValue: 1, duration: 2800, useNativeDriver: true }));
+    loop.start();
+    ringLoop.start();
+    return () => { loop.stop(); ringLoop.stop(); };
   }, []);
 
   const isClean    = counters.cloud === 0 && counters.blocked === 0;
@@ -376,13 +366,8 @@ function PrivacyTrustBadge() {
   const dotScl     = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.55] });
 
   // Concentric ring expand/fade
-  const ring1Sc   = ring1.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.0] });
-  const ring1Op   = ring1.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0] });
-  const ring2Sc   = ring2.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.0] });
-  const ring2Op   = ring2.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0] });
-
-  // Scanning line moves top → bottom
-  const scanTrans = scanY.interpolate({ inputRange: [0, 1], outputRange: [0, 156] });
+  const ringSc    = ring.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1.9] });
+  const ringOp    = ring.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0] });
 
   const stats = [
     { icon: 'wifi',         label: 'LAN CALLS',  value: String(counters.lan),    color: D.green },
@@ -409,13 +394,6 @@ function PrivacyTrustBadge() {
         <View style={[ptb.corner, { bottom: 0, left: 0,    borderBottomWidth: 1.5, borderLeftWidth: 1.5,   borderColor: accent + 'AA' }]} />
         <View style={[ptb.corner, { bottom: 0, right: 0,   borderBottomWidth: 1.5, borderRightWidth: 1.5,  borderColor: accent + 'AA' }]} />
 
-        {/* Vertical scanning line — pure cosmetic, signals "live audit" */}
-        <Animated.View pointerEvents="none" style={[ptb.scanLine, {
-          backgroundColor: accent + '40',
-          transform: [{ translateY: scanTrans }],
-          shadowColor: accent, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 4,
-        }]} />
-
         {/* ── Header row: status pill + AUDIT chevron ─────────── */}
         <View style={ptb.headerRow}>
           <View style={[ptb.statusPill, { borderColor: accent + '80', backgroundColor: accent + '15' }]}>
@@ -430,17 +408,12 @@ function PrivacyTrustBadge() {
           <MaterialIcons name="chevron-right" size={14} color={accent} />
         </View>
 
-        {/* ── Centered shield with pulsing rings ──────────────── */}
+        {/* ── Centered shield with single pulsing ring ──────── */}
         <View style={ptb.shieldStack}>
           <Animated.View style={[ptb.ring, {
             borderColor: accent,
-            opacity: ring1Op,
-            transform: [{ scale: ring1Sc }],
-          }]} />
-          <Animated.View style={[ptb.ring, {
-            borderColor: accent,
-            opacity: ring2Op,
-            transform: [{ scale: ring2Sc }],
+            opacity: ringOp,
+            transform: [{ scale: ringSc }],
           }]} />
           <View style={[ptb.shieldCore, {
             borderColor: accent,
@@ -536,25 +509,19 @@ const ptb = StyleSheet.create({
 // across the 6 pillars.
 function ZeroTrustMatrix() {
   const router = useRouter();
-  const sweep  = useRef(new Animated.Value(0)).current;
   const glow   = useRef(new Animated.Value(0)).current;
 
+  // Single native-driven loop — no per-tile sweep (was non-native driver +
+  // 6 simultaneous interpolations, expensive on low-end devices).
   useEffect(() => {
-    const sw = Animated.loop(Animated.sequence([
-      Animated.timing(sweep, { toValue: 1, duration: 3200, useNativeDriver: false }),
-      Animated.delay(500),
-      Animated.timing(sweep, { toValue: 0, duration: 0,    useNativeDriver: false }),
-    ]));
-    sw.start();
     const gl = Animated.loop(Animated.sequence([
-      Animated.timing(glow, { toValue: 1, duration: 1500, useNativeDriver: true }),
-      Animated.timing(glow, { toValue: 0, duration: 1500, useNativeDriver: true }),
+      Animated.timing(glow, { toValue: 1, duration: 1800, useNativeDriver: true }),
+      Animated.timing(glow, { toValue: 0, duration: 1800, useNativeDriver: true }),
     ]));
     gl.start();
-    return () => { sw.stop(); gl.stop(); };
+    return () => { gl.stop(); };
   }, []);
 
-  const sweepIdx  = sweep.interpolate({ inputRange: [0, 1], outputRange: [-0.5, 6.5] });
   const glowOp    = glow.interpolate({  inputRange: [0, 1], outputRange: [0.35, 1] });
 
   const pillars: Array<{ icon: keyof typeof MaterialCommunityIcons.glyphMap; title: string; sub: string; color: string }> = [
@@ -586,29 +553,20 @@ function ZeroTrustMatrix() {
           Hardware-grade privacy guarantees · always-on
         </Text>
 
-        {/* 2 × 3 pillar grid with verification sweep */}
+        {/* 2 × 3 pillar grid (now fully static, no sweep — much lighter) */}
         <View style={ztm.grid}>
-          {pillars.map((p, i) => {
-            // Each tile lights up as the sweep index passes over it
-            const tileOpacity = sweepIdx.interpolate({
-              inputRange: [i - 0.6, i, i + 0.6],
-              outputRange: [0.35, 1, 0.35],
-              extrapolate: 'clamp',
-            });
-            return (
-              <View key={i} style={[ztm.tile, { borderColor: p.color + '38', backgroundColor: p.color + '0A' }]}>
-                <Animated.View pointerEvents="none" style={[ztm.tileGlow, { backgroundColor: p.color + '22', opacity: tileOpacity }]} />
-                <View style={[ztm.tileIconBox, { borderColor: p.color + '70', backgroundColor: p.color + '15' }]}>
-                  <MaterialCommunityIcons name={p.icon} size={16} color={p.color} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[ztm.tileTitle, { color: p.color }]} numberOfLines={1}>{p.title}</Text>
-                  <Text style={ztm.tileSub} numberOfLines={1}>{p.sub}</Text>
-                </View>
-                <MaterialIcons name="check-circle" size={12} color={p.color} />
+          {pillars.map((p, i) => (
+            <View key={i} style={[ztm.tile, { borderColor: p.color + '38', backgroundColor: p.color + '0A' }]}>
+              <View style={[ztm.tileIconBox, { borderColor: p.color + '70', backgroundColor: p.color + '15' }]}>
+                <MaterialCommunityIcons name={p.icon} size={16} color={p.color} />
               </View>
-            );
-          })}
+              <View style={{ flex: 1 }}>
+                <Text style={[ztm.tileTitle, { color: p.color }]} numberOfLines={1}>{p.title}</Text>
+                <Text style={ztm.tileSub} numberOfLines={1}>{p.sub}</Text>
+              </View>
+              <MaterialIcons name="check-circle" size={12} color={p.color} />
+            </View>
+          ))}
         </View>
 
         {/* Footer signature */}
@@ -663,9 +621,192 @@ function ButlerAIHero(props: {
   isConnected: boolean; serverAddr: string; onScanQR: () => void;
   kbFindings: number; scriptCount: number;
 }) {
-  // Replaced with MECH BAY OS theme — see /components/home/MechBay.tsx
-  return <MechBayHero {...props} />;
+  return <NexusHero {...props} />;
 }
+
+// ─── NEXUS HERO — matrix-styled "BUTLER AI · COMMAND CORE" card ───
+// Single pulsing accent ring + breathing core dot. Pure transform/opacity
+// animations using the native driver so it stays 60 fps on low-end devices.
+function NexusHero({
+  isConnected, serverAddr, onScanQR, kbFindings, scriptCount,
+}: {
+  isConnected: boolean; serverAddr: string; onScanQR: () => void;
+  kbFindings: number; scriptCount: number;
+}) {
+  const breathe = useRef(new Animated.Value(0)).current;
+
+  // ONE shared slow breathing loop drives both ring + core dot — very cheap.
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(breathe, { toValue: 1, duration: 2400, useNativeDriver: true }),
+      Animated.timing(breathe, { toValue: 0, duration: 2400, useNativeDriver: true }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  const accent     = isConnected ? D.green : D.cyan;
+  const accentSoft = isConnected ? 'rgba(0,255,136,0.08)' : 'rgba(255,42,31,0.07)';
+  const statusTxt  = isConnected ? 'CORE ONLINE' : 'STANDBY';
+  const ctaTxt     = isConnected ? 'CORE LINKED · TAP TO REPAIR' : 'INITIATE PAIRING';
+
+  const kbDisplay     = kbFindings > 0
+    ? (kbFindings > 1_000_000 ? `${(kbFindings/1_000_000).toFixed(1)}M`
+       : kbFindings > 1000 ? `${(kbFindings/1000).toFixed(1)}K`
+       : String(kbFindings))
+    : '—';
+  const scriptDisplay = scriptCount > 0 ? String(scriptCount) : '—';
+
+  const ringScale = breathe.interpolate({ inputRange: [0, 1], outputRange: [1.0, 1.18] });
+  const ringOp    = breathe.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0.15] });
+  const dotOp     = breathe.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1] });
+  const dotScl    = breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.35] });
+
+  const stats = [
+    { icon: 'database',          label: 'VECTORS',  value: kbDisplay,     color: D.cyan },
+    { icon: 'code-tags',         label: 'SCRIPTS',  value: scriptDisplay, color: D.amber },
+    { icon: isConnected ? 'lan-connect' : 'lan-disconnect',
+                                 label: 'STATE',    value: isConnected ? 'LIVE' : 'IDLE',
+                                 color: isConnected ? D.green : D.amber },
+    { icon: 'wan',               label: 'LANE',     value: 'LOCAL',       color: D.green },
+  ] as const;
+
+  return (
+    <View style={nh.wrap}>
+      <View style={[nh.card, { borderColor: accent + '55', backgroundColor: accentSoft }]}>
+        {/* HUD corner ticks (all 4) */}
+        <View style={[nh.corner, { top: 0,    left: 0,    borderTopWidth: 1.5,    borderLeftWidth: 1.5,   borderColor: accent + 'AA' }]} />
+        <View style={[nh.corner, { top: 0,    right: 0,   borderTopWidth: 1.5,    borderRightWidth: 1.5,  borderColor: accent + 'AA' }]} />
+        <View style={[nh.corner, { bottom: 0, left: 0,    borderBottomWidth: 1.5, borderLeftWidth: 1.5,   borderColor: accent + 'AA' }]} />
+        <View style={[nh.corner, { bottom: 0, right: 0,   borderBottomWidth: 1.5, borderRightWidth: 1.5,  borderColor: accent + 'AA' }]} />
+
+        {/* ── Header row ──────────────────────────────────────── */}
+        <View style={nh.headerRow}>
+          <View style={[nh.statusPill, { borderColor: accent + '80', backgroundColor: accent + '15' }]}>
+            <Animated.View style={{
+              width: 6, height: 6, borderRadius: 3, backgroundColor: accent,
+              opacity: dotOp, transform: [{ scale: dotScl }],
+            }} />
+            <Text style={[nh.statusPillTxt, { color: accent }]}>{statusTxt}</Text>
+          </View>
+          <View style={{ flex: 1 }} />
+          <Text style={[nh.serial, { color: accent + 'AA' }]} numberOfLines={1}>
+            UNIT-01 · REV-A · {isConnected ? (serverAddr || 'PAIRED') : 'NO-LINK'}
+          </Text>
+        </View>
+
+        {/* ── Centered reactor with pulsing ring ─────────────── */}
+        <View style={nh.reactorStack}>
+          <Animated.View style={[nh.ring, {
+            borderColor: accent,
+            opacity: ringOp,
+            transform: [{ scale: ringScale }],
+          }]} />
+          <View style={[nh.reactorCore, {
+            borderColor: accent,
+            backgroundColor: accent + '18',
+            ...(Platform.OS === 'ios' ? { shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.9, shadowRadius:14 } : {}),
+          }]}>
+            <MaterialCommunityIcons name={isConnected ? 'hexagon-multiple' : 'hexagon-slice-6'} size={34} color={accent} />
+          </View>
+        </View>
+
+        {/* ── BUTLER AI title + tagline ──────────────────────── */}
+        <Text style={nh.title} numberOfLines={1} adjustsFontSizeToFit>
+          BUTLER<Text style={{ color: accent }}> AI</Text>
+        </Text>
+        <Text style={nh.tagline} numberOfLines={1}>LOCAL AI · PC AUTOMATION · COMMAND CORE</Text>
+
+        {/* ── 4 themed stat tiles ────────────────────────────── */}
+        <View style={nh.statsRow}>
+          {stats.map((s, i) => (
+            <View key={i} style={[nh.statTile, { borderColor: s.color + '40', backgroundColor: s.color + '0A' }]}>
+              <MaterialCommunityIcons name={s.icon as any} size={14} color={s.color} />
+              <Text style={[nh.statValue, { color: s.color }]} numberOfLines={1}>{s.value}</Text>
+              <Text style={nh.statLabel} numberOfLines={1}>{s.label}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* ── Primary CTA ────────────────────────────────────── */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => { haptics.medium(); onScanQR(); }}
+          style={[nh.cta, { borderColor: accent + 'AA', backgroundColor: accent + '14',
+            ...(Platform.OS === 'ios' ? { shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.65, shadowRadius:10 } : {}),
+          }]}
+        >
+          <MaterialCommunityIcons name={isConnected ? 'sync' : 'qrcode-scan'} size={15} color={accent} />
+          <Text style={[nh.ctaTxt, { color: accent }]} numberOfLines={1}>{ctaTxt}</Text>
+          <MaterialIcons name="chevron-right" size={16} color={accent} />
+        </TouchableOpacity>
+
+        {/* ── Footer trust chip row ──────────────────────────── */}
+        <View style={nh.chipRow}>
+          {[
+            { icon: 'shield-check', label: 'HMAC-SHA256' },
+            { icon: 'cloud-off',    label: 'ZERO CLOUD' },
+            { icon: 'wifi',         label: 'LAN-ONLY' },
+          ].map((c, i) => (
+            <View key={i} style={nh.chip}>
+              <MaterialCommunityIcons name={c.icon as any} size={9} color={D.textMid} />
+              <Text style={nh.chipTxt}>{c.label}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const nh = StyleSheet.create({
+  wrap:          { marginHorizontal: 12, marginTop: 10 },
+  card:          {
+    borderWidth: 1, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 14,
+    overflow: 'hidden', alignItems: 'center',
+  },
+  corner:        { position: 'absolute', width: 14, height: 14 },
+
+  headerRow:     { flexDirection: 'row', alignItems: 'center', width: '100%', gap: 6 },
+  statusPill:    {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderWidth: 1, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3,
+  },
+  statusPillTxt: { fontFamily: MONO, fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
+  serial:        { fontFamily: MONO, fontSize: 8.5, fontWeight: '700', letterSpacing: 1.1 },
+
+  reactorStack:  { width: 96, height: 96, alignItems: 'center', justifyContent: 'center', marginTop: 14, marginBottom: 8 },
+  ring:          {
+    position: 'absolute', width: 80, height: 80, borderRadius: 40,
+    borderWidth: 1.5,
+  },
+  reactorCore:   {
+    width: 68, height: 68, borderRadius: 34, borderWidth: 1.5,
+    alignItems: 'center', justifyContent: 'center',
+  },
+
+  title:         { fontFamily: MONO, fontSize: 38, fontWeight: '900', letterSpacing: 5, color: D.text, marginTop: 4, textAlign: 'center' },
+  tagline:       { fontFamily: MONO, fontSize: 9, color: D.textMid, letterSpacing: 1.5, textAlign: 'center', marginTop: 4 },
+
+  statsRow:      { flexDirection: 'row', gap: 6, marginTop: 14, alignSelf: 'stretch' },
+  statTile:      {
+    flex: 1, borderWidth: 1, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 4,
+    alignItems: 'center', gap: 3,
+  },
+  statValue:     { fontFamily: MONO, fontSize: 13, fontWeight: '900', letterSpacing: 0.5, marginTop: 1 },
+  statLabel:     { fontFamily: MONO, fontSize: 7, color: D.textDim, letterSpacing: 1 },
+
+  cta:           {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    borderWidth: 1.5, borderRadius: 10, paddingVertical: 12, paddingHorizontal: 14,
+    marginTop: 14, alignSelf: 'stretch',
+  },
+  ctaTxt:        { fontFamily: MONO, fontSize: 12, fontWeight: '900', letterSpacing: 2 },
+
+  chipRow:       { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10, marginTop: 11, paddingHorizontal: 2 },
+  chip:          { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  chipTxt:       { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1 },
+});
 
 // ─── CONNECTED PC CARD — upgraded with ring gauges + sparklines ───
 function ConnectedPCCard({ isConnected, serverAddr, metrics, ollamaOnline, cpuHistory, ramHistory, diskHistory, uptimeSeconds }: {
@@ -1166,9 +1307,138 @@ const spg = StyleSheet.create({
 
 // ─── QUICK ACCESS GRID ────────────────────────────────────────────
 function QuickAccessGrid({ goToTab }: { goToTab: (t: string) => void }) {
-  // Replaced with MECH BAY OS theme — see /components/home/MechBay.tsx
-  return <HexCommandRing goToTab={goToTab} />;
+  return <CommandModulesGrid goToTab={goToTab} />;
 }
+
+// ─── COMMAND MODULES GRID — matrix-styled 2×3 tappable pillar grid ──
+// Same visual language as ZeroTrustMatrix: HUD frame, "ARMED" pill,
+// themed icons, color-coded tile borders. Single subtle pulse only.
+function CommandModulesGrid({ goToTab }: { goToTab: (t: string) => void }) {
+  const pulse = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1, duration: 1800, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0, duration: 1800, useNativeDriver: true }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  const dotOp = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.45, 1] });
+
+  type Pillar = {
+    tab: string;
+    icon: keyof typeof MaterialCommunityIcons.glyphMap;
+    title: string;
+    sub: string;
+    color: string;
+  };
+  const pillars: Pillar[] = [
+    { tab: 'scripts',   icon: 'code-braces',          title: 'SCRIPTS',   sub: 'Python automation',  color: D.cyan },
+    { tab: 'butler',    icon: 'robot-outline',        title: 'BUTLER AI', sub: 'Local AI chat',      color: D.amber },
+    { tab: 'knowledge', icon: 'brain',                title: 'KNOWLEDGE', sub: 'Self-growing KB',    color: D.purple },
+    { tab: 'tools',     icon: 'toolbox-outline',      title: 'TOOLS',     sub: 'File · share · sys', color: D.green },
+    { tab: 'pc',        icon: 'desktop-classic',      title: 'PC',        sub: 'CPU · RAM · Disk',   color: D.blue },
+    { tab: 'builder',   icon: 'view-grid-plus-outline', title: 'BUILD',   sub: 'Drag-drop pipelines', color: D.orange },
+  ];
+
+  return (
+    <View style={cmg.wrap}>
+      <NexusCard accentColor={D.cyan} glowIntensity={0.16}>
+        {/* Header */}
+        <View style={cmg.header}>
+          <MaterialCommunityIcons name="grid" size={15} color={D.cyan} />
+          <Text style={cmg.headerTitle}>COMMAND MODULES</Text>
+          <View style={{ flex: 1 }} />
+          <View style={cmg.headerPill}>
+            <Animated.View style={[cmg.headerPillDot, { opacity: dotOp }]} />
+            <Text style={cmg.headerPillTxt}>6 / 6 ONLINE</Text>
+          </View>
+        </View>
+
+        <Text style={cmg.subhead}>Tap any module to open · all routes local</Text>
+
+        {/* 2 × 3 grid (3 rows of 2) */}
+        <View style={cmg.grid}>
+          {pillars.map((p, i) => (
+            <TouchableOpacity
+              key={p.tab}
+              activeOpacity={0.85}
+              onPress={() => { haptics.light(); goToTab(p.tab); }}
+              style={[cmg.tile, { borderColor: p.color + '40', backgroundColor: p.color + '0C' }]}
+            >
+              {/* HUD top accent strip */}
+              <View style={[cmg.tileTopBar, { backgroundColor: p.color + 'AA' }]} />
+              {/* Tiny corner ticks */}
+              <View style={[cmg.tileCorner, { top: 0,    left: 0,    borderTopWidth: 1,    borderLeftWidth: 1,   borderColor: p.color + '90' }]} />
+              <View style={[cmg.tileCorner, { bottom: 0, right: 0,   borderBottomWidth: 1, borderRightWidth: 1,  borderColor: p.color + '90' }]} />
+
+              <View style={[cmg.tileIconBox, { borderColor: p.color + '80', backgroundColor: p.color + '18' }]}>
+                <MaterialCommunityIcons name={p.icon} size={22} color={p.color} />
+              </View>
+              <Text style={[cmg.tileTitle, { color: p.color }]} numberOfLines={1}>{p.title}</Text>
+              <Text style={cmg.tileSub} numberOfLines={1}>{p.sub}</Text>
+              <View style={[cmg.tileGoRow, { borderTopColor: p.color + '24' }]}>
+                <Text style={[cmg.tileGoTxt, { color: p.color + 'BB' }]}>OPEN</Text>
+                <MaterialIcons name="chevron-right" size={11} color={p.color} />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Footer */}
+        <View style={cmg.footer}>
+          <MaterialCommunityIcons name="fingerprint" size={10} color={D.textMid} />
+          <Text style={cmg.footerTxt}>BUTLER-CORE · VISION SYS · v2.1</Text>
+          <View style={{ flex: 1 }} />
+          <Text style={cmg.footerStatus}>STATUS · ARMED</Text>
+        </View>
+      </NexusCard>
+    </View>
+  );
+}
+
+const cmg = StyleSheet.create({
+  wrap:           { marginHorizontal: 12, marginTop: 10 },
+  header:         { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingTop: 14 },
+  headerTitle:    { fontFamily: MONO, fontSize: 12.5, fontWeight: '900', letterSpacing: 1.8, color: D.text },
+  headerPill:     {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderWidth: 1, borderColor: D.cyan + '60', backgroundColor: D.cyan + '12',
+    borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3,
+  },
+  headerPillDot:  { width: 5, height: 5, borderRadius: 3, backgroundColor: D.cyan },
+  headerPillTxt:  { fontFamily: MONO, fontSize: 8.5, fontWeight: '900', letterSpacing: 1.2, color: D.cyan },
+  subhead:        { fontFamily: MONO, fontSize: 9, color: D.textMid, letterSpacing: 1, paddingHorizontal: 14, paddingTop: 4 },
+
+  grid:           { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 10, gap: 8 },
+  tile:           {
+    width: '48%',
+    borderWidth: 1, borderRadius: 10,
+    paddingHorizontal: 10, paddingTop: 12, paddingBottom: 8,
+    overflow: 'hidden', position: 'relative',
+    minHeight: 110,
+  },
+  tileTopBar:     { position: 'absolute', top: 0, left: 0, right: 0, height: 2 },
+  tileCorner:     { position: 'absolute', width: 9, height: 9 },
+  tileIconBox:    {
+    width: 36, height: 36, borderRadius: 8, borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 8,
+  },
+  tileTitle:      { fontFamily: MONO, fontSize: 12, fontWeight: '900', letterSpacing: 1.4 },
+  tileSub:        { fontFamily: MONO, fontSize: 8.5, color: D.textMid, letterSpacing: 0.4, marginTop: 2 },
+  tileGoRow:      { flexDirection: 'row', alignItems: 'center', gap: 2, marginTop: 8, paddingTop: 6, borderTopWidth: StyleSheet.hairlineWidth },
+  tileGoTxt:      { flex: 1, fontFamily: MONO, fontSize: 8, fontWeight: '900', letterSpacing: 1.4 },
+
+  footer:         {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, paddingVertical: 11, marginTop: 4,
+    borderTopWidth: 1, borderTopColor: D.cyan + '20',
+  },
+  footerTxt:      { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1 },
+  footerStatus:   { fontFamily: MONO, fontSize: 8, fontWeight: '900', color: D.cyan + 'BB', letterSpacing: 1.2 },
+});
 
 // ─── KB ARTICLES FEED ─────────────────────────────────────────────
 function KBArticlesFeed({ goToTab, isConnected }: { goToTab:(t:string)=>void; isConnected:boolean }) {
@@ -1855,12 +2125,12 @@ function NexusHomeScreenInner() {
       {/* Elegant greeting strip — time-aware, sets a confident tone */}
       <SafeBoundary label="GREETING"><HomeGreetingBanner /></SafeBoundary>
 
+      {/* Command modules — directly below the greeting, matrix-styled */}
+      <QuickAccessGrid goToTab={goToTab} />
+
       <PrivacyTrustBadge />
       <ZeroTrustMatrix />
       <SafeBoundary label="COMMAND DECK"><HomeTerminalClock isConnected={isConnected} /></SafeBoundary>
-
-      <HomeSectionDivider label="Quick Access" />
-      <QuickAccessGrid goToTab={goToTab} />
 
       <HomeSectionDivider label="Live Process Feed" />
       <SafeBoundary label="PROCESS FEED"><AutomationFeed isConnected={isConnected} /></SafeBoundary>
