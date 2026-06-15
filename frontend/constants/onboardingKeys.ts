@@ -3,6 +3,7 @@
  * Single source of truth — import from here to avoid circular deps.
  */
 export const ONBOARDING_DONE_KEY        = '@butler_onboarding_done_v2';
+export const WELCOME_COMPLETE_KEY       = '@butler_welcome_complete_v1';
 export const CONSENT_KEY                = '@butler_consent_v2';
 export const LAN_CONSENT_KEY            = '@butler_lan_consent_v1';
 export const TERMS_ACCEPTED_KEY         = '@butler_terms_accepted_v1';
