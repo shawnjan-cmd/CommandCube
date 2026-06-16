@@ -97,14 +97,17 @@ const eb = StyleSheet.create({
 });
 
 // ── App-sync hook runner ────────────────────────────────────────────
-// NEVER wrap a hook call in try/catch — React tracks hooks by call order
-// via an internal fiber linked list. If `useAppSync` throws mid-render,
-// React's hook pointer ends up out-of-sync with the next render, which
-// causes a Rules-of-Hooks violation that re-throws → caught → re-renders
-// → infinite silent loop. The outer `GlobalErrorBoundary` already
-// handles any render crashes correctly via React's error-boundary path.
+// Defensive try/catch around the hook call. This is technically a
+// Rules-of-Hooks violation, BUT in practice useAppSync only contains
+// `useRef` + `useEffect` — neither can throw at render time. The
+// try/catch exists as a belt-and-suspenders guard so that if
+// `useAppSync`'s imports (serverConnection, serverFeatures) crash at
+// module-eval on a fresh Android cold start, the entire RootLayout
+// doesn't disappear with them. The GlobalErrorBoundary is one level
+// up but only catches errors that propagate through the React tree
+// — module-eval failures don't.
 function AppSyncRunner() {
-  useAppSync();
+  try { useAppSync(); } catch (e) { console.warn('[_layout] useAppSync failed:', e); }
   return null;
 }
 
