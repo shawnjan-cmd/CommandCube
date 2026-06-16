@@ -20,6 +20,13 @@
 // ⚠ This import MUST be first — it monkey-patches Dimensions.get()
 //   so subsequent module-load reads can never see width=0/height=0.
 import '@/services/safeDimensionsShim';
+// ⚠ MUST be second — hooks the global JS error handler so that any
+//   uncaught error (including module-eval crashes in later imports
+//   and crashes during cold-start BEFORE React even mounts) gets
+//   written to AsyncStorage. On the next cold start we read it back
+//   and display it on-screen so the user never needs adb/logcat.
+import { installBootCrashLogger, readAndClearLastCrash, recordBoundaryCrash, markHomeReached } from '@/services/bootCrashLogger';
+installBootCrashLogger();
 import { Stack, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, useEffect, useLayoutEffect, useRef, ReactNode } from 'react';
@@ -57,6 +64,7 @@ class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState> {
   state: EBState = { error: null, resetCount: 0 };
   static getDerivedStateFromError(error: Error): any { return { error }; }
   componentDidCatch(error: Error) {
+    try { recordBoundaryCrash(error); } catch {}
     try { require('@/services/autoErrorLogger').autoErrorLogger.log('error', 'GlobalErrorBoundary', error.message); } catch {}
     console.error('[GlobalErrorBoundary] uncaught:', error?.message);
   }
@@ -172,6 +180,10 @@ async function bootstrapServices() {
 // ─── ROOT LAYOUT ─────────────────────────────────────────────────────────
 export default function RootLayout() {
   const bootRef = useRef(false);
+  // Holds any crash from the PREVIOUS cold-start session — displayed as a
+  // dismissible banner over the home screen so the user can see what
+  // crashed without ever needing adb/logcat.
+  const [prevCrash, setPrevCrash] = React.useState<null | { at: number; message: string; stack?: string }>(null);
 
   // ── HIDE SPLASH at the earliest possible moment after React commits
   // useLayoutEffect fires synchronously after DOM mutations and before
@@ -180,6 +192,22 @@ export default function RootLayout() {
   useLayoutEffect(() => {
     clearTimeout(_splashHardTimer);
     SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
+  // Read any crash stored by the previous boot. Fire-and-forget — if it
+  // throws, we just don't show the banner.
+  useEffect(() => {
+    readAndClearLastCrash().then(c => {
+      if (c && typeof c.message === 'string' && c.message) setPrevCrash(c as any);
+    }).catch(() => {});
+  }, []);
+
+  // If we've been alive for 3 seconds without a crash, we definitely
+  // reached the home screen (or close enough). Mark it so we don't
+  // keep showing a stale crash to a user whose problem is fixed.
+  useEffect(() => {
+    const t = setTimeout(() => { markHomeReached().catch(() => {}); }, 3000);
+    return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
@@ -211,6 +239,31 @@ export default function RootLayout() {
               <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
               <Stack.Screen name="+not-found"     options={{ headerShown: false }} />
             </Stack>
+            {/* Previous-boot crash banner — only shows if the LAST cold
+                start crashed before reaching home. Dismissible. Lets
+                the user see the actual error message without adb. */}
+            {prevCrash && (
+              <View pointerEvents="box-none" style={pcb.wrap}>
+                <View style={pcb.card}>
+                  <Text style={pcb.title}>PREVIOUS LAUNCH CRASHED</Text>
+                  <Text style={pcb.msg} numberOfLines={6}>
+                    {prevCrash.message || 'Unknown error'}
+                  </Text>
+                  {prevCrash.stack ? (
+                    <Text style={pcb.stack} numberOfLines={8}>
+                      {prevCrash.stack.split('\n').slice(0, 8).join('\n')}
+                    </Text>
+                  ) : null}
+                  <TouchableOpacity
+                    style={pcb.btn}
+                    onPress={() => setPrevCrash(null)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={pcb.btnTxt}>DISMISS</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         </TabBarProvider>
       </CosmeticProvider>
@@ -220,4 +273,16 @@ export default function RootLayout() {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000000' },
+});
+
+// Previous-boot crash banner — high-contrast red so it can't be missed.
+// Floats on top of the home screen and is dismissible.
+const pcb = StyleSheet.create({
+  wrap:  { position: 'absolute', top: 0, left: 0, right: 0, padding: 12, paddingTop: Platform.OS === 'ios' ? 48 : 24, zIndex: 9999 },
+  card:  { backgroundColor: '#1a0204', borderWidth: 1.5, borderColor: '#FF3131', borderRadius: 10, padding: 14 },
+  title: { fontSize: 12, fontWeight: '900', color: '#FF3131', letterSpacing: 2, marginBottom: 8, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
+  msg:   { fontSize: 13, color: '#FFCCCC', lineHeight: 18, marginBottom: 6 },
+  stack: { fontSize: 10, color: '#FFAAAA88', lineHeight: 14, marginBottom: 10, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
+  btn:   { alignSelf: 'flex-end', borderWidth: 1, borderColor: '#FF3131', borderRadius: 6, paddingHorizontal: 14, paddingVertical: 6 },
+  btnTxt:{ fontSize: 11, fontWeight: '900', color: '#FF3131', letterSpacing: 1.5, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 });
