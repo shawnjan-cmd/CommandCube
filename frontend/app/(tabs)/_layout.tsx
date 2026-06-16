@@ -53,6 +53,11 @@ export default function TabLayout() {
   // Onboarding is no longer a tab route (rendered inline by app/index.tsx),
   // so this will normally be false in production.
   const onOnboarding = pathname?.includes('onboarding') ?? false;
+  // Hide the floating Ask-Butler composer on the Butler tab itself —
+  // the tab already has a full-featured Command Console at the bottom,
+  // and overlaying QuickButlerBar on top of it produces a confusing
+  // double-input. Show it everywhere else.
+  const onButlerTab = pathname?.includes('butler') ?? false;
 
   // ── Boot-complete sentinel ─────────────────────────────────────────────
   // The first time TabLayout mounts successfully, we stamp a diagnostic key
@@ -148,8 +153,11 @@ export default function TabLayout() {
 
       {/* Persistent Ask-Butler composer floating above the tab bar.
           Hidden during onboarding so users can't bypass the flow by
-          sending a prompt that navigates to the AI tab. */}
-      {!onOnboarding && <QuickButlerBar />}
+          sending a prompt that navigates to the AI tab.
+          Also hidden on the Butler tab itself since that tab has a
+          full Command Console at the bottom and a stacked second
+          input would just confuse users. */}
+      {!onOnboarding && !onButlerTab && <QuickButlerBar />}
     </View>
   );
 }

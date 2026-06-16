@@ -25,6 +25,8 @@ import * as Clipboard from 'expo-clipboard';
 import { InlineWidgetSlot, WidgetLayer } from '@/components/ui/WidgetLayer';
 import { useCosmetic } from '@/contexts/CosmeticContext';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import { File as FsFile } from 'expo-file-system';
 
 import ButlerWelcomeHub from '@/components/ui/ButlerWelcomeHub';
 import { useChatHistory } from '@/hooks/useChatHistory';
@@ -110,6 +112,35 @@ interface ButlerTool {
   run: () => Promise<string>;
 }
 
+// ── Attachment types (clipboard / file / image quick-send) ─────────────────
+type AttachmentKind = 'clipboard' | 'file' | 'image';
+
+interface Attachment {
+  id: string;
+  kind: AttachmentKind;
+  name: string;       // file name or "Clipboard"
+  size: number;       // bytes
+  mime?: string;
+  content?: string;   // text content (UTF-8) — only for text-like files
+  preview?: string;   // base64 data-uri for images
+  truncated?: boolean;
+}
+
+const TEXT_MIME_RE = /^(text\/|application\/(json|xml|x-(yaml|toml|ini)|javascript|x-sh|x-python|x-csh|x-shellscript))/i;
+const TEXT_EXT_RE  = /\.(txt|md|markdown|json|jsonl|xml|csv|tsv|log|py|js|jsx|ts|tsx|sh|bash|zsh|fish|yml|yaml|toml|ini|cfg|conf|env|html|htm|css|scss|sql|rs|go|c|h|cpp|hpp|java|kt|swift|rb|php|lua|r|pl|ps1|bat|cmd|dockerfile|gitignore)$/i;
+const MAX_TEXT_BYTES = 12_000;   // per-attachment cap inside prompt
+const MAX_IMAGE_BYTES = 800_000; // ~600KB image limit
+function isLikelyText(name: string, mime?: string): boolean {
+  if (mime && TEXT_MIME_RE.test(mime)) return true;
+  return TEXT_EXT_RE.test(name);
+}
+function fmtBytes(b: number): string {
+  if (!b) return '0 B';
+  if (b < 1024) return `${b} B`;
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
+  return `${(b / 1024 / 1024).toFixed(2)} MB`;
+}
+
 const CONV_KEY = '@butler_conv_nexus_v1';
 const AI_DISCLOSURE_KEY = '@butler_ai_disclosure_v1';
 const USER_AVATAR_KEY = '@butler_user_avatar_v1';
@@ -184,8 +215,34 @@ function NexusChatHeader({ isConnected, onClear, accentColor, onBuildScript, onT
     a.start();
     return () => a.stop();
   }, []);
+
+  // Compact, persistent PID-style identifier (decorative — visual continuity with
+  // user's NEXUS HTML mockup; derives from process uptime so it's stable per session
+  // without exposing any real device data).
+  const pid = React.useMemo(() => {
+    const n = Math.abs(Math.floor((Date.now() / 1000) % 65535)).toString(16).padStart(4, '0').toUpperCase();
+    return `0x${n}`;
+  }, []);
+
   return (
     <View>
+      {/* ── NEXUS terminal-style status bar (NEW) ───────────────────── */}
+      <View style={[nch.statusBar, { borderColor: pr + '22', backgroundColor: '#000000' }]}>
+        {/* RGB stoplight dots — terminal-window vibe from nexus-v9 HTML */}
+        <View style={nch.stopRow}>
+          <View style={[nch.stopDot, { backgroundColor: '#FF4466' }]} />
+          <View style={[nch.stopDot, { backgroundColor: '#F59E0B' }]} />
+          <View style={[nch.stopDot, { backgroundColor: '#10B981' }]} />
+        </View>
+        <Text style={[nch.consoleTitle, { color: pr }]} numberOfLines={1}>
+          BUTLER AI <Text style={{ color: C.textDim }}>›</Text> <Text style={{ color: C.textMid }}>COMMAND CONSOLE</Text>
+        </Text>
+        <View style={nch.statusRight}>
+          <Animated.View style={[nch.liveDot, { backgroundColor: statusCol, opacity: pulse, shadowColor: statusCol }]} />
+          <Text style={[nch.pidTxt, { color: C.textDim }]} numberOfLines={1}>PID {pid}</Text>
+        </View>
+      </View>
+
       <View style={nch.wrap}>
         <View style={[nch.iconBox, { borderColor: pr + '50', backgroundColor: pr + '0C' }]}>
           <View style={nch.robotFace}>
@@ -221,8 +278,8 @@ function NexusChatHeader({ isConnected, onClear, accentColor, onBuildScript, onT
           style={[nch.toolBtn, { borderColor: pr + '35', backgroundColor: pr + '09' }]}
           activeOpacity={0.78}
         >
-          <MaterialIcons name="code" size={12} color={pr} />
-          <Text style={[nch.toolBtnTxt, { color: pr }]}>BUILD SCRIPT</Text>
+          <MaterialIcons name="auto-awesome" size={12} color={pr} />
+          <Text style={[nch.toolBtnTxt, { color: pr }]}>✦ BUILD SCRIPT</Text>
         </TouchableOpacity>
         <View style={nch.toolSep} />
         <TouchableOpacity
@@ -242,7 +299,7 @@ function NexusChatHeader({ isConnected, onClear, accentColor, onBuildScript, onT
           <MaterialIcons name="mic" size={12} color={C.amber} />
           <Text style={[nch.toolBtnTxt, { color: C.amber }]}>VOICE</Text>
         </TouchableOpacity>
-        {/* Model indicator badge */}
+        {/* Model indicator badge — terminal-style */}
         <View style={[nch.modelBadge, { borderColor: C.purple + '30', backgroundColor: C.purple + '08' }]}>
           <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: isConnected ? C.green : '#FF4466' }} />
           <Text style={[nch.modelTxt, { color: C.purple }]}>OLLAMA</Text>
@@ -267,6 +324,14 @@ const nch = StyleSheet.create({
   toolSep:   { width: 1, height: 18, backgroundColor: 'rgba(255,42,31,0.1)', marginHorizontal: 2 },
   modelBadge:{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 7, paddingVertical: 4, borderRadius: 6, borderWidth: 1, marginLeft: 'auto' as any },
   modelTxt:  { fontSize: 8, fontWeight: '700', fontFamily: MONO, letterSpacing: 0.5 },
+  // Terminal-window status bar at very top
+  statusBar:    { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 6, borderBottomWidth: 1 },
+  stopRow:      { flexDirection: 'row', gap: 5, alignItems: 'center' },
+  stopDot:      { width: 9, height: 9, borderRadius: 5 },
+  consoleTitle: { flex: 1, fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 1.6, textAlign: 'center' },
+  statusRight:  { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  liveDot:      { width: 7, height: 7, borderRadius: 4, ...(Platform.OS === 'ios' ? { shadowOpacity: 0.9, shadowRadius: 4, shadowOffset: { width: 0, height: 0 } } : {}) },
+  pidTxt:       { fontSize: 9, fontFamily: MONO, fontWeight: '700', letterSpacing: 0.7 },
 });
 
 const QUICK_CHIPS = [
@@ -707,7 +772,18 @@ function MessageBubble({ msg, onCopy, onReact, onSave, onSuggest, isLast, accent
           ? [mb.butlerBubble, { backgroundColor: C.surface, borderColor: pr + '22', borderLeftColor: pr }]
           : [mb.userBubble, { backgroundColor: sc + '18', borderColor: sc + '40' }],
       ]}>
-        {/* Role label */}
+        {/* NEXUS corner brackets — decorative HUD touch (matches HTML mockup) */}
+        {isButler ? (
+          <>
+            <View pointerEvents="none" style={[mb.cornerTL, { borderColor: pr + '70' }]} />
+            <View pointerEvents="none" style={[mb.cornerBR, { borderColor: pr + '50' }]} />
+          </>
+        ) : (
+          <>
+            <View pointerEvents="none" style={[mb.cornerTR, { borderColor: sc + '70' }]} />
+            <View pointerEvents="none" style={[mb.cornerBL, { borderColor: sc + '50' }]} />
+          </>
+        )}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
           {isButler ? (
             <>
@@ -808,6 +884,15 @@ const mb = StyleSheet.create({
   toolRow:     { marginHorizontal: 14, marginBottom: 10, borderWidth: 1, borderRadius: 12, padding: 12 },
   toolLabel:   { fontSize: 10, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
   toolResult:  { fontSize: 11, fontFamily: MONO, lineHeight: 17, marginTop: 4 },
+  // NEXUS HUD corner brackets — anchored to bubble corners
+  cornerTL:    { position: 'absolute', top: 5, left: 5, width: 10, height: 10,
+                 borderTopWidth: 1.5, borderLeftWidth: 1.5, borderTopLeftRadius: 3 },
+  cornerBR:    { position: 'absolute', bottom: 5, right: 5, width: 10, height: 10,
+                 borderBottomWidth: 1.5, borderRightWidth: 1.5, borderBottomRightRadius: 3 },
+  cornerTR:    { position: 'absolute', top: 5, right: 5, width: 10, height: 10,
+                 borderTopWidth: 1.5, borderRightWidth: 1.5, borderTopRightRadius: 3 },
+  cornerBL:    { position: 'absolute', bottom: 5, left: 5, width: 10, height: 10,
+                 borderBottomWidth: 1.5, borderLeftWidth: 1.5, borderBottomLeftRadius: 3 },
 });
 
 // ── Typing Indicator ────────────────────────────────────────────────────────
@@ -862,6 +947,8 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
 }) {
   const [inputText, setInputText] = useState('');
   const [focused, setFocused] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [pickingKind, setPickingKind] = useState<AttachmentKind | null>(null);
   const inputRef = useRef<TextInput>(null);
   const sendRef  = useRef(onSend);
   useEffect(() => { sendRef.current = onSend; }, [onSend]);
@@ -887,18 +974,182 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
     return () => { active = false; clearInterval(id); };
   }, []);
 
+  // ── Quick-action: paste clipboard directly into the composer ────────────
+  const pasteClipboard = useCallback(async () => {
+    try {
+      haptics.light();
+      const txt = await Clipboard.getStringAsync();
+      if (!txt || !txt.trim()) {
+        (global as any).__showConnectionToast?.('Clipboard is empty', '#FFC400');
+        return;
+      }
+      // For large clipboards, attach as a chip; for small text, inline.
+      if (txt.length > 600) {
+        setAttachments(prev => [...prev, {
+          id: `clip-${Date.now()}`,
+          kind: 'clipboard',
+          name: 'Clipboard',
+          size: txt.length,
+          mime: 'text/plain',
+          content: txt.slice(0, MAX_TEXT_BYTES),
+          truncated: txt.length > MAX_TEXT_BYTES,
+        }]);
+        (global as any).__showConnectionToast?.(`Clipboard attached (${fmtBytes(txt.length)})`, '#00FF88');
+      } else {
+        setInputText(prev => prev ? `${prev}\n${txt}` : txt);
+        (global as any).__showConnectionToast?.('Pasted from clipboard', '#00FF88');
+      }
+      setTimeout(() => inputRef.current?.focus(), 80);
+    } catch (e: any) {
+      (global as any).__showConnectionToast?.('Paste failed', '#FF3131');
+    }
+  }, []);
+
+  // ── Quick-action: attach a file (text-like preferred) ───────────────────
+  const attachFile = useCallback(async () => {
+    if (pickingKind) return;
+    try {
+      setPickingKind('file');
+      haptics.medium();
+      const res: any = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        multiple: false,
+        copyToCacheDirectory: true,
+      });
+      if (res?.canceled) return;
+      const asset = res?.assets?.[0];
+      if (!asset?.uri) {
+        (global as any).__showConnectionToast?.('No file selected', '#FFC400');
+        return;
+      }
+      const name: string = asset.name || 'file';
+      const size: number = asset.size || 0;
+      const mime: string = asset.mimeType || '';
+      const isText = isLikelyText(name, mime);
+      let content: string | undefined;
+      let truncated = false;
+      if (isText) {
+        try {
+          const file = new FsFile(asset.uri);
+          const raw = await file.text();
+          if (raw.length > MAX_TEXT_BYTES) { content = raw.slice(0, MAX_TEXT_BYTES); truncated = true; }
+          else content = raw;
+        } catch {
+          content = undefined;
+        }
+      }
+      setAttachments(prev => [...prev, {
+        id: `f-${Date.now()}`,
+        kind: 'file',
+        name,
+        size,
+        mime,
+        content,
+        truncated,
+      }]);
+      (global as any).__showConnectionToast?.(
+        `${name} attached (${fmtBytes(size)})${isText ? '' : ' · binary (metadata only)'}`,
+        '#00FF88',
+      );
+      setTimeout(() => inputRef.current?.focus(), 80);
+    } catch (e: any) {
+      (global as any).__showConnectionToast?.(`Attach failed: ${e?.message || 'unknown'}`, '#FF3131');
+    } finally {
+      setPickingKind(null);
+    }
+  }, [pickingKind]);
+
+  // ── Quick-action: attach an image ───────────────────────────────────────
+  const attachImage = useCallback(async () => {
+    if (pickingKind) return;
+    try {
+      setPickingKind('image');
+      haptics.medium();
+      // Soft-permission check — image picker handles internally on iOS/Android
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync().catch(() => null);
+      if (perm && perm.status !== 'granted') {
+        (global as any).__showConnectionToast?.('Photos permission denied', '#FFC400');
+        return;
+      }
+      const res: any = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.7,
+        base64: true,
+      });
+      if (res?.canceled) return;
+      const asset = res?.assets?.[0];
+      if (!asset?.uri) return;
+      const name: string = asset.fileName || `image-${Date.now()}.jpg`;
+      const sizeApprox = asset.base64 ? Math.floor((asset.base64.length * 3) / 4) : 0;
+      const preview = asset.base64 && sizeApprox <= MAX_IMAGE_BYTES
+        ? `data:${asset.mimeType || 'image/jpeg'};base64,${asset.base64.slice(0, 200_000)}`
+        : asset.uri;
+      setAttachments(prev => [...prev, {
+        id: `img-${Date.now()}`,
+        kind: 'image',
+        name,
+        size: sizeApprox,
+        mime: asset.mimeType || 'image/jpeg',
+        preview,
+        truncated: sizeApprox > MAX_IMAGE_BYTES,
+      }]);
+      (global as any).__showConnectionToast?.(`Image attached (${fmtBytes(sizeApprox)})`, '#00FF88');
+      setTimeout(() => inputRef.current?.focus(), 80);
+    } catch (e: any) {
+      (global as any).__showConnectionToast?.(`Image attach failed: ${e?.message || 'unknown'}`, '#FF3131');
+    } finally {
+      setPickingKind(null);
+    }
+  }, [pickingKind]);
+
+  const removeAttachment = useCallback((id: string) => {
+    haptics.light();
+    setAttachments(prev => prev.filter(a => a.id !== id));
+  }, []);
+
+  // ── Serialize attachments into the outgoing prompt ─────────────────────
+  const buildOutgoingText = useCallback((userText: string, atts: Attachment[]): string => {
+    if (!atts.length) return userText;
+    const blocks: string[] = [];
+    for (const a of atts) {
+      if (a.kind === 'image') {
+        blocks.push(`[ATTACHMENT image: ${a.name} (${fmtBytes(a.size)}) — base64 preview omitted from history; PC bridge can fetch on demand]`);
+      } else if (a.content) {
+        const ext = (a.name.split('.').pop() || '').toLowerCase();
+        const lang = ext === 'py' ? 'python'
+          : ['js','jsx'].includes(ext) ? 'javascript'
+          : ['ts','tsx'].includes(ext) ? 'typescript'
+          : ['json','jsonl'].includes(ext) ? 'json'
+          : ['sh','bash','zsh'].includes(ext) ? 'bash'
+          : ['md','markdown'].includes(ext) ? 'markdown'
+          : '';
+        const label = a.kind === 'clipboard' ? 'CLIPBOARD' : `FILE ${a.name}`;
+        const trunc = a.truncated ? ' (truncated to first 12KB)' : '';
+        blocks.push(`[ATTACHMENT ${label} · ${fmtBytes(a.size)}${trunc}]\n\`\`\`${lang}\n${a.content}\n\`\`\``);
+      } else {
+        blocks.push(`[ATTACHMENT file: ${a.name} (${fmtBytes(a.size)}, ${a.mime || 'binary'}) — content not previewed]`);
+      }
+    }
+    const head = userText.trim() || 'Please analyze the attachment(s) below.';
+    return `${head}\n\n${blocks.join('\n\n')}`;
+  }, []);
+
   const handleSend = useCallback(() => {
     const t = inputText.trim();
-    if (!t) return;
+    if (!t && !attachments.length) return;
     haptics.medium();
-    sendRef.current(t);
+    const outgoing = buildOutgoingText(t, attachments);
+    sendRef.current(outgoing);
     setInputText('');
-  }, [inputText]);
+    setAttachments([]);
+  }, [inputText, attachments, buildOutgoingText]);
 
   const pr = accentColor;
-  const canSend = !disabled && !!inputText.trim();
+  const canSend = !disabled && (!!inputText.trim() || attachments.length > 0);
   const statusCol = isConnected ? C.green : '#FF4466';
   const charCount = inputText.length;
+  const attCount = attachments.length;
 
   return (
     <View style={[ccb.outer, { backgroundColor: C.bgDeep, borderTopColor: pr + '40' }]}>
@@ -925,6 +1176,97 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
         <Text style={[ccb.charTxt, {
           color: charCount > 1700 ? '#FF4466' : charCount > 0 ? pr + 'AA' : C.textDim,
         }]}>{charCount}/2000</Text>
+      </View>
+
+      {/* ── Attachment chip preview row ──────────────────────────── */}
+      {attCount > 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 6, paddingHorizontal: 12, paddingBottom: 6 }}
+        >
+          {attachments.map(att => {
+            const kindCol = att.kind === 'image' ? C.purple
+              : att.kind === 'clipboard' ? C.green
+              : pr;
+            const kindIcon: any = att.kind === 'image' ? 'image'
+              : att.kind === 'clipboard' ? 'content-paste'
+              : 'insert-drive-file';
+            return (
+              <View
+                key={att.id}
+                style={[ccb.attChip, { borderColor: kindCol + '55', backgroundColor: kindCol + '10' }]}
+              >
+                {att.kind === 'image' && att.preview ? (
+                  <Image source={{ uri: att.preview }} style={ccb.attThumb} />
+                ) : (
+                  <MaterialIcons name={kindIcon} size={13} color={kindCol} />
+                )}
+                <View style={{ maxWidth: 130 }}>
+                  <Text style={[ccb.attName, { color: kindCol }]} numberOfLines={1}>
+                    {att.name}
+                  </Text>
+                  <Text style={[ccb.attMeta, { color: kindCol + '99' }]} numberOfLines={1}>
+                    {fmtBytes(att.size)}{att.truncated ? ' · trimmed' : ''}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => removeAttachment(att.id)}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  style={[ccb.attClose, { backgroundColor: kindCol + '22' }]}
+                  activeOpacity={0.7}
+                >
+                  <MaterialIcons name="close" size={11} color={kindCol} />
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </ScrollView>
+      ) : null}
+
+      {/* ── Attach toolbar (quick clipboard / file / image send) ────── */}
+      <View style={ccb.attachBar}>
+        <TouchableOpacity
+          onPress={pasteClipboard}
+          disabled={disabled}
+          style={[ccb.attachBtn, { borderColor: C.green + '40', backgroundColor: C.green + '0A', opacity: disabled ? 0.4 : 1 }]}
+          activeOpacity={0.75}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
+          <MaterialIcons name="content-paste" size={13} color={C.green} />
+          <Text style={[ccb.attachTxt, { color: C.green }]}>PASTE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={attachFile}
+          disabled={disabled || pickingKind !== null}
+          style={[ccb.attachBtn, { borderColor: pr + '40', backgroundColor: pr + '0A', opacity: (disabled || pickingKind !== null) ? 0.5 : 1 }]}
+          activeOpacity={0.75}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
+          {pickingKind === 'file'
+            ? <ActivityIndicator size="small" color={pr} />
+            : <MaterialIcons name="attach-file" size={13} color={pr} />}
+          <Text style={[ccb.attachTxt, { color: pr }]}>FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={attachImage}
+          disabled={disabled || pickingKind !== null}
+          style={[ccb.attachBtn, { borderColor: C.purple + '40', backgroundColor: C.purple + '0A', opacity: (disabled || pickingKind !== null) ? 0.5 : 1 }]}
+          activeOpacity={0.75}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
+          {pickingKind === 'image'
+            ? <ActivityIndicator size="small" color={C.purple} />
+            : <MaterialIcons name="image" size={13} color={C.purple} />}
+          <Text style={[ccb.attachTxt, { color: C.purple }]}>IMAGE</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }} />
+        {attCount > 0 ? (
+          <View style={[ccb.attCountChip, { borderColor: pr + '40', backgroundColor: pr + '14' }]}>
+            <MaterialIcons name="attach-file" size={10} color={pr} />
+            <Text style={[ccb.attCountTxt, { color: pr }]}>{attCount} attached</Text>
+          </View>
+        ) : null}
       </View>
 
       {/* Input row — beefier */}
@@ -1017,6 +1359,21 @@ const ccb = StyleSheet.create({
   sendBtnTxt:   { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
   frameBL:      { position: 'absolute', bottom: 6, left: 6, width: 12, height: 12, borderBottomWidth: 1.5, borderLeftWidth: 1.5 },
   frameBR:      { position: 'absolute', bottom: 6, right: 6, width: 12, height: 12, borderBottomWidth: 1.5, borderRightWidth: 1.5 },
+
+  // Attachment toolbar & chips
+  attachBar:    { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingBottom: 6 },
+  attachBtn:    { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 5,
+                  borderWidth: 1, borderRadius: 6 },
+  attachTxt:    { fontSize: 9, fontWeight: '900', fontFamily: MONO, letterSpacing: 0.9 },
+  attCountChip: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: 4,
+                  paddingHorizontal: 7, paddingVertical: 3 },
+  attCountTxt:  { fontSize: 8.5, fontWeight: '900', fontFamily: MONO, letterSpacing: 1 },
+  attChip:      { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 8,
+                  paddingLeft: 6, paddingRight: 4, paddingVertical: 4 },
+  attThumb:     { width: 26, height: 26, borderRadius: 4, backgroundColor: '#000' },
+  attName:      { fontSize: 11, fontFamily: MONO, fontWeight: '800', letterSpacing: 0.2 },
+  attMeta:      { fontSize: 8.5, fontFamily: MONO, fontWeight: '700', letterSpacing: 0.5 },
+  attClose:     { width: 18, height: 18, borderRadius: 4, alignItems: 'center', justifyContent: 'center' },
 });
 
 // ── Main Butler Screen ────────────────────────────────────────────────────────
