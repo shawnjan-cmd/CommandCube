@@ -39,7 +39,6 @@ import { ButlerWordmark } from '@/components/ui/ButlerWordmark';
 import { MechBayHero, HexCommandRing, MechPanel } from '@/components/home/MechBay';
 import HomeTerminalClock from '@/components/home/HomeTerminalClock';
 import HomeGreetingBanner from '@/components/home/HomeGreetingBanner';
-import ButlerAiTerminatorLogo from '@/components/ui/ButlerAiTerminatorLogo';
 import ButlerAITitle3D from '@/components/ui/ButlerAITitle3D';
 import HomeSectionDivider from '@/components/home/HomeSectionDivider';
 import AutomationFeed from '@/components/home/AutomationFeed';
