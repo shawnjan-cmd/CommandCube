@@ -178,10 +178,11 @@ export default function RootLayout() {
               <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
               <Stack.Screen name="+not-found"     options={{ headerShown: false }} />
             </Stack>
-            {/* Boot curtain — covers the brief gap between native-splash
-                dismissal and the first tab paint with a branded "BUTLER AI
-                INITIALIZING…" overlay. Auto-removes itself after 450 ms. */}
-            <BootCurtain holdMs={450} />
+            {/* Boot curtain — NEXUS-style branded initialization veil.
+                Covers the brief gap between native-splash dismissal and
+                the first tab paint with a polished hex-logo + circuit
+                + progress-bar overlay. Auto-removes itself after 700 ms. */}
+            <BootCurtain holdMs={700} />
           </View>
         </TabBarProvider>
       </CosmeticProvider>
