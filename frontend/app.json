@@ -2,7 +2,7 @@
   "expo": {
     "name": "Butler AI: PC Automation",
     "slug": "butler-ai-pc-automation",
-    "version": "2.1.16",
+    "version": "2.1.18",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -24,7 +24,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.butlerai.pc.automation",
-      "buildNumber": "108",
+      "buildNumber": "110",
       "infoPlist": {
         "NSCameraUsageDescription": "Butler AI uses the camera exclusively to scan QR codes displayed on your PC screen for instant pairing. No photos are taken, stored, or transmitted.",
         "NSLocalNetworkUsageDescription": "Butler AI connects to a Python server running on your own PC over your local WiFi network to execute scripts and monitor system performance. No data leaves your home network.",
@@ -37,7 +37,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.butlerai.pc.automation",
-      "versionCode": 126,
+      "versionCode": 128,
       "jsEngine": "hermes",
       "permissions": [
         "android.permission.INTERNET",
@@ -143,6 +143,6 @@
       "playStoreDeveloperWebsite": "https://shawnjan-cmd.github.io/",
       "appAccessInstructions": "Butler AI requires a paired PC server. TESTING WITHOUT A PC: tap 'Demo Mode' on the connection screen (if enabled) for simulated data. TESTING WITH LIVE SERVER: 1. Open app and tap CONTINUE through all 10 welcome screens (all consents must be ticked to proceed). 2. On Home screen, tap SCAN QR TO PAIR. 3. Tap MANUAL IP tab. 4. Enter the demo server IP supplied in Play Console reviewer notes. 5. Port: 8766. 6. Enter the 6-digit pairing PIN displayed in the PC terminal (also supplied in reviewer notes). 7. Tap CONNECT. Camera permission is QR-scan only; no photos stored or transmitted. Every script run requires a manual tap. Server- and client-side safety scanners reject destructive commands. Account deletion: Settings \u2192 Account & Data \u2192 Delete my account. Web deletion: shawnjan-cmd.github.io/privacy-policy-/#delete. LAN scan is shown before first use with explicit consent. Zero cloud, zero telemetry."
     },
-    "newArchEnabled": true
+    "newArchEnabled": false
   }
 }

@@ -86,7 +86,7 @@ export default function Index() {
           </View>
           <View style={styles.meta}>
             <Text style={styles.metaLabel}>ARCH</Text>
-            <Text style={styles.metaValue}>NEW</Text>
+            <Text style={styles.metaValue}>OLD</Text>
           </View>
         </View>
 

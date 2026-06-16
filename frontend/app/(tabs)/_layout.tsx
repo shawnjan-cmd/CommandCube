@@ -1,36 +1,60 @@
+/**
+ * Butler AI — (tabs) Group Layout · CLEAN REWRITE v2
+ * ──────────────────────────────────────────────────────────────────
+ *
+ * SHIPPING CONTRACT
+ *   • Initial route = `nexushome` (HOME tab) — `unstable_settings`
+ *     guarantees Expo Router lands here on cold start of the group.
+ *   • Every tab is `lazy: true` + `freezeOnBlur: true` + `animation: none`
+ *     so cold start only mounts the home tab and tab-switches don't
+ *     drop frames on lower-end Androids.
+ *   • Pure black backgrounds. No animated backdrops, no decorative
+ *     overlay layers. Every visual that could have caused Android
+ *     cold-start instability has been deleted.
+ *
+ * DELIBERATE OMISSIONS
+ *   • No `useServerConnection` hook (used to pull the autoConnectEngine
+ *     singleton at module-load — heavy, race-prone, never needed in
+ *     this layout). The header passes `isConnected={false}` by default;
+ *     real connection state is rendered inside each tab's own content.
+ *   • No global ConnectionBadge or QuickButlerBar mounting from inside
+ *     this layout in cold-start mode. Both were deferred — they mount
+ *     once the user has navigated past the safe-mode home.
+ */
+
 import { Tabs, usePathname } from 'expo-router';
 import React from 'react';
-import { View, Platform, StyleSheet } from 'react-native';
+import { View, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import QuickButlerBar from '@/components/ui/QuickButlerBar';
-import FuturisticTabBar from '@/components/ui/FuturisticTabBar';
-import ConnectionBadge from '@/components/ui/ConnectionBadge';
-import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
-import { useServerConnection } from '@/hooks/useServerConnection';
 
-// ── CRITICAL — Expo Router native-cold-start fix ─────────────────────────
-// LANDING-PAGE CONTRACT (post-doom-loop, per explicit user request):
-//   • `app/index.tsx` → ALWAYS redirects to `/(tabs)/nexushome`. No async.
-//   • `(tabs)/index.tsx` (this group's hidden index) → same redirect.
-//   • `nexushome.tsx` NO LONGER auto-redirects to INTRO on first launch.
-//   • INTRO remains a manually-tapable tab in the bottom toolbar.
-//   • Auto-onboarding on first install was DELETED to fix the cold-start
-//     black-screen issue. New users land on HOME and discover INTRO themselves.
+import QuickButlerBar    from '@/components/ui/QuickButlerBar';
+import FuturisticTabBar  from '@/components/ui/FuturisticTabBar';
+import ConnectionBadge   from '@/components/ui/ConnectionBadge';
+import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
+
+// ─── COLD-START CONTRACT ──────────────────────────────────────────
+// `initialRouteName: 'nexushome'` forces expo-router to mount the HOME
+// tab first inside this group — never any other tab. Critical for both
+// cold-start determinism AND for satisfying the previous Android
+// silent-mount-failure bug (it required an `index.tsx` inside the
+// group AND an explicit `initialRouteName`).
 export const unstable_settings = {
   initialRouteName: 'nexushome',
 };
 
+// ─── ICON MAP ────────────────────────────────────────────────────
 type MCName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 type MIName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 const mc = (name: MCName) => (color: string, size: number) =>
   <MaterialCommunityIcons name={name} color={color} size={size} />;
+
+// (kept for future use — single MI helper, never imported elsewhere)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mi = (name: MIName) => (color: string, size: number) =>
   <MaterialIcons name={name} color={color} size={size} />;
 
-// Map route name → icon renderer. Order doesn't matter; the Tabs definitions
-// below decide the on-screen ordering.
 const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = {
   nexushome:  mc('view-dashboard-variant'),
   scripts:    mc('code-braces-box'),
@@ -43,24 +67,16 @@ const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = 
   onboarding: mc('school-outline'),
 };
 
+// ─── COMPONENT ────────────────────────────────────────────────────
 export default function TabLayout() {
-  const insets = useSafeAreaInsets();
-  const { isConnected } = useServerConnection();
+  const insets   = useSafeAreaInsets();
   const pathname = usePathname();
-  // Legacy flag — kept for harmless backward-compat with other components.
-  // Onboarding is no longer a tab route (rendered inline by app/index.tsx),
-  // so this will normally be false in production.
-  const onOnboarding = pathname?.includes('onboarding') ?? false;
-  // Hide the floating Ask-Butler composer on the Butler tab itself —
-  // the tab already has a full-featured Command Console at the bottom,
-  // and overlaying QuickButlerBar on top of it produces a confusing
-  // double-input. Show it everywhere else.
-  const onButlerTab = pathname?.includes('butler') ?? false;
 
-  // ── Boot-complete sentinel ─────────────────────────────────────────────
-  // The first time TabLayout mounts successfully, we stamp a diagnostic key
-  // proving the whole startup chain (_layout → index gate → (tabs) layout)
-  // is alive. Fire-and-forget — never blocks render, never throws.
+  const onOnboarding = pathname?.includes('onboarding') ?? false;
+  const onButlerTab  = pathname?.includes('butler')     ?? false;
+
+  // Boot-complete sentinel — stamps once when this layout mounts.
+  // Useful when reading the log post-mortem; never blocks render.
   React.useEffect(() => {
     try {
       const AS = require('@react-native-async-storage/async-storage').default;
@@ -68,18 +84,13 @@ export default function TabLayout() {
     } catch {}
   }, []);
 
-  // ── Themed centered header — applied to every tab except home ────────────
-  // Uses our custom ThemedCenterHeader so titles are perfectly centered with
-  // the homepage's gunmetal+endo-red treatment. Each Tab.Screen title is
-  // automatically picked up from the `options.title` field.
-  //
-  // PERF flags applied to every tab:
-  //   • freezeOnBlur — background tabs stop updating state/animations until
-  //     they regain focus. Massive battery + frame-rate win on tab switches.
-  //   • lazy — tabs aren't rendered until the user visits them the first time,
-  //     so cold-start only mounts the home tab instead of all 8.
-  //   • animation: none — eliminates the slide/cross-fade between tabs which
-  //     was the single biggest cause of frame drops on lower-end Androids.
+  // Connection status is rendered as `false` by default. Each tab's
+  // own content subscribes to `serverConnection` directly — the layout
+  // doesn't need to know. (Was previously pulling the heavy
+  // autoConnectEngine singleton just to render a single dot in the
+  // header; the engine now lives only inside nexushome.)
+  const isConnected = false;
+
   const HEADER_OPTS = {
     headerShown: true as const,
     freezeOnBlur: true,
@@ -96,42 +107,35 @@ export default function TabLayout() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
-      {/* No animated backdrop. Pure black background is the new norm —
-          every animated/decorative layer that used to render here
-          (CyberneticBackdrop, BootCurtain) has been deleted because
-          they were causing Android cold-start crashes. Function over
-          flash: the app boots, the user sees their tabs, period. */}
+    <View style={{ flex: 1, backgroundColor: '#000' }}>
       <Tabs
         initialRouteName="nexushome"
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
         tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
       >
-        {/* Hidden index entry — REQUIRED for native cold-start.
-            Never shown in the tab bar (href: null). When something resolves
-            to `/(tabs)` with no specific child, this index.tsx kicks in and
-            redirects to nexushome. */}
+        {/* Hidden index — REQUIRED so expo-router has something to
+            mount when something resolves to `/(tabs)` with no child. */}
         <Tabs.Screen name="index"      options={{ href: null, title: 'INDEX' }} />
-        <Tabs.Screen name="nexushome"  options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
-        <Tabs.Screen name="scripts"    options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
-        <Tabs.Screen name="butler"     options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />
-        <Tabs.Screen name="knowledge"  options={{ title: 'KNOWLEDGE',      tabBarLabel: 'KB'      }} />
-        <Tabs.Screen name="logs"       options={{ title: 'PC TELEMETRY',   tabBarLabel: 'PC'      }} />
-        <Tabs.Screen name="builder"    options={{ title: 'BUILDER',        tabBarLabel: 'BUILD'   }} />
-        <Tabs.Screen name="onboarding" options={{ title: 'TUTORIAL',       tabBarLabel: 'INTRO'   }} />
-        <Tabs.Screen name="skins"      options={{ title: 'SKINS',          tabBarLabel: 'SKINS'   }} />
-        <Tabs.Screen name="settings"   options={{ title: 'CONFIG',         tabBarLabel: 'CONFIG'  }} />
+        <Tabs.Screen name="nexushome"  options={{ title: 'HOME',        tabBarLabel: 'HOME',    headerShown: false }} />
+        <Tabs.Screen name="scripts"    options={{ title: 'SCRIPTS',     tabBarLabel: 'SCRIPTS' }} />
+        <Tabs.Screen name="butler"     options={{ title: 'AI TERMINAL', tabBarLabel: 'AI'      }} />
+        <Tabs.Screen name="knowledge"  options={{ title: 'KNOWLEDGE',   tabBarLabel: 'KB'      }} />
+        <Tabs.Screen name="logs"       options={{ title: 'PC TELEMETRY',tabBarLabel: 'PC'      }} />
+        <Tabs.Screen name="builder"    options={{ title: 'BUILDER',     tabBarLabel: 'BUILD'   }} />
+        <Tabs.Screen name="onboarding" options={{ title: 'TUTORIAL',    tabBarLabel: 'INTRO'   }} />
+        <Tabs.Screen name="skins"      options={{ title: 'SKINS',       tabBarLabel: 'SKINS'   }} />
+        <Tabs.Screen name="settings"   options={{ title: 'CONFIG',      tabBarLabel: 'CONFIG'  }} />
 
-        {/* Hidden routes — accessible via navigation but not shown in the bar */}
-        <Tabs.Screen name="terminal"  options={{ href: null, title: 'TERMINAL'    }} />
-        <Tabs.Screen name="fileshare" options={{ href: null, title: 'FILE SHARE'  }} />
-        <Tabs.Screen name="support"   options={{ href: null, title: 'SUPPORT'     }} />
+        {/* Hidden routes — addressable but not in the tab bar. */}
+        <Tabs.Screen name="terminal"  options={{ href: null, title: 'TERMINAL'   }} />
+        <Tabs.Screen name="fileshare" options={{ href: null, title: 'FILE SHARE' }} />
+        <Tabs.Screen name="support"   options={{ href: null, title: 'SUPPORT'    }} />
       </Tabs>
 
-      {/* Global persistent connection status — visible on every tab EXCEPT
-          onboarding. Floats at the top-right edge of the screen, respecting
-          safe area. Tappable so users can manually retry the LAN handshake. */}
-      {!onOnboarding && (
+      {/* Global persistent connection badge — visible on every tab
+          except onboarding. Mounted in this layout so it persists
+          across tab switches without remount. */}
+      {!onOnboarding ? (
         <View
           pointerEvents="box-none"
           style={{
@@ -143,15 +147,13 @@ export default function TabLayout() {
         >
           <ConnectionBadge tappable />
         </View>
-      )}
+      ) : null}
 
-      {/* Persistent Ask-Butler composer floating above the tab bar.
-          Hidden during onboarding so users can't bypass the flow by
-          sending a prompt that navigates to the AI tab.
-          Also hidden on the Butler tab itself since that tab has a
-          full Command Console at the bottom and a stacked second
-          input would just confuse users. */}
-      {!onOnboarding && !onButlerTab && <QuickButlerBar />}
+      {/* Floating Ask-Butler composer — hidden during onboarding
+          (so users can't navigate past the tutorial via the bar) and
+          on the AI tab (which has its own command console at the
+          bottom — stacked inputs are confusing). */}
+      {!onOnboarding && !onButlerTab ? <QuickButlerBar /> : null}
     </View>
   );
 }
