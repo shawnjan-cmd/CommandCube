@@ -1,24 +1,33 @@
 /**
- * Onboarding Tab — `/(tabs)/onboarding`
+ * Onboarding Tab — `/(tabs)/onboarding`   (label: INTRO)
  * ────────────────────────────────────────────────────────────────
- * On first launch, `app/index.tsx` redirects here. On subsequent
- * launches it redirects to `/(tabs)/nexushome`. The user can also
- * revisit this tab any time from the bottom toolbar (labeled INTRO).
+ * BULLETPROOF v2 — survives every edge case we've hit across 20+ EAS
+ * builds.
  *
- * `handleComplete` is intentionally bulletproof:
- *   1. Writes are ALREADY persisted by Screen10's enterApp() before
- *      this handler is invoked (it `await`s the multiSet). So by the
- *      time we get here, AsyncStorage is in the "onboarded" state.
- *   2. We still re-write the canonical flag here defensively — costs
- *      nothing and protects against the unlikely event that Screen10
- *      called onComplete before the storage write resolved.
- *   3. router.replace → router.push → router.navigate fallback chain.
- *      Even if one navigation method is unavailable on a particular
- *      build, the next one will succeed.
- *   4. We do NOT await storage before navigating — the user's tap MUST
- *      result in instant motion to the home tab.
+ * ROUTING ARCHITECTURE
+ *   • app/index.tsx → ALWAYS redirects here. No async. No placeholder.
+ *   • This tab handles the "already-onboarded? skip to home" decision
+ *     INSIDE the tab navigator (post-mount), where everything is
+ *     guaranteed registered and routable.
+ *   • Users can still revisit INTRO from the bottom toolbar anytime;
+ *     the auto-skip only fires on the FIRST mount during a cold start
+ *     (tracked via a module-scoped `_skipChecked` flag).
+ *
+ * RENDER STRATEGY
+ *   • We render OnboardingOverlay IMMEDIATELY — never a blank/colored
+ *     placeholder. If the user is a "returning user", the post-mount
+ *     useEffect will call router.replace within milliseconds, before
+ *     they perceive any flash.
+ *   • If AsyncStorage stalls completely (e.g. cold-start bridge
+ *     warm-up), the user simply sees the intro — which is exactly
+ *     what was requested. Worst case is a no-op, never a blue screen.
+ *
+ * COMPLETION HANDOFF (`handleComplete`)
+ *   • Screen 10 already awaits the storage write before invoking this.
+ *   • We still defensively re-persist (cheap belt + suspenders).
+ *   • Triple-fallback navigation: replace → push → navigate.
  */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,12 +43,43 @@ import {
 
 const HOME_ROUTE = '/(tabs)/nexushome' as const;
 
+// Module-scoped guard: ensures we only auto-skip on the FIRST mount per
+// process lifetime (i.e. cold start). After this fires once, the user
+// can tap the INTRO tab freely without being yanked away.
+let _skipChecked = false;
+
 export default function OnboardingTab() {
   const router = useRouter();
+  const mountedRef = useRef(true);
 
+  // ── 1. Cold-start "already onboarded?" skip ────────────────────────────
+  useEffect(() => {
+    mountedRef.current = true;
+    if (_skipChecked) return;
+    _skipChecked = true;
+
+    let cancelled = false;
+    AsyncStorage.getItem(ONBOARDING_DONE_KEY)
+      .then((v) => {
+        if (cancelled || !mountedRef.current) return;
+        if (v === 'true' || v === '1') {
+          // Returning user — atomic same-tab-navigator switch to home.
+          try { router.replace(HOME_ROUTE as any); return; } catch {}
+          try { router.push(HOME_ROUTE as any);    return; } catch {}
+          try { (router as any).navigate?.(HOME_ROUTE); }    catch {}
+        }
+      })
+      .catch(() => { /* storage error — show onboarding (safe default) */ });
+
+    return () => {
+      cancelled = true;
+      mountedRef.current = false;
+    };
+  }, [router]);
+
+  // ── 2. Completion handler (passed to OnboardingOverlay & ErrorBoundary) ─
   const handleComplete = React.useCallback(() => {
-    // ── 1. Defensive re-persist (Screen10 already did this; cheap belt
-    //       + suspenders). Fire-and-forget — never blocks navigation.
+    // Defensive persistence (Screen10 already awaited this, but cheap).
     AsyncStorage.multiSet([
       [ONBOARDING_DONE_KEY,                 'true'],
       ['@butler_welcome_complete_v1',       'true'],
@@ -50,32 +90,18 @@ export default function OnboardingTab() {
       ['@butler_show_post_onboarding_chat', 'true'],
       ['@butler_stable_state',              'onboarded'],
       ['@butler_onboarding_exit_at',        String(Date.now())],
-    ]).catch(() => { /* never blocks user */ });
+    ]).catch(() => { /* never blocks navigation */ });
 
-    // ── 2. Navigate to home tab. Triple-fallback for robustness.
-    //       Same tab navigator → atomic switch, no overlay handoff.
-    try {
-      router.replace(HOME_ROUTE as any);
-      return;
-    } catch (e1) {
-      // eslint-disable-next-line no-console
-      console.warn('[OnboardingTab] router.replace failed:', e1);
-    }
-    try {
-      router.push(HOME_ROUTE as any);
-      return;
-    } catch (e2) {
-      // eslint-disable-next-line no-console
-      console.warn('[OnboardingTab] router.push failed:', e2);
-    }
-    try {
-      (router as any).navigate?.(HOME_ROUTE);
-    } catch (e3) {
-      // eslint-disable-next-line no-console
-      console.warn('[OnboardingTab] router.navigate failed:', e3);
-    }
+    // Navigate to home tab. Triple-fallback for robustness.
+    try { router.replace(HOME_ROUTE as any); return; }
+    catch (e1) { console.warn('[OnboardingTab] router.replace failed:', e1); }
+    try { router.push(HOME_ROUTE as any);    return; }
+    catch (e2) { console.warn('[OnboardingTab] router.push failed:', e2); }
+    try { (router as any).navigate?.(HOME_ROUTE); }
+    catch (e3) { console.warn('[OnboardingTab] router.navigate failed:', e3); }
   }, [router]);
 
+  // ── 3. Render — always renders OnboardingOverlay (no placeholder). ─────
   return (
     <View style={styles.holder}>
       <OnboardingErrorBoundary onSkipToHome={handleComplete}>
