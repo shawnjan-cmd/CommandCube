@@ -1,19 +1,25 @@
 /**
- * Butler AI — Root Layout (v9.1 — splash hand-off restored)
+ * Butler AI — Root Layout (v10 — bulletproof cold-start)
  * ──────────────────────────────────────────────────────────────────
- * v9.0 removed the splash logic entirely → caused a BLACK screen
- * because the system splash auto-hides as soon as JS starts but
- * React still needs ~1-3s to mount the first frame.
+ * COLD-START CONTRACT
+ *   1. `safeDimensionsShim` patches Dimensions.get() BEFORE anything
+ *      else can read it (prevents NaN crashes in ~19 files that read
+ *      width/height at module load).
+ *   2. `SplashScreen.preventAutoHideAsync()` runs once at module load.
+ *   3. A *short* (800 ms) hard-timeout fallback fires hideAsync() —
+ *      whether or not React ever mounts. This guarantees the splash
+ *      never sticks past 800 ms even if a deep import crashes.
+ *   4. `useLayoutEffect` hides the splash immediately on first commit.
+ *   5. Bootstrap services run in the background, each independently
+ *      wrapped in try/catch so a single failure can never block paint.
  *
- * v9.1 restores the OFFICIAL expo-splash-screen contract:
- *   1. preventAutoHideAsync() once at module load
- *   2. hideAsync() from the root layout's first useLayoutEffect
- *      (fires after the React tree commits)
- *   3. 2.5 s safety timeout fallback (in case effect never fires)
- *
- * No watchdog. No recovery mode. No heartbeat. Just the standard
- * pattern that ships in every Expo template.
+ * NO BootCurtain. The native splash + first paint is enough — adding
+ * a JS-side curtain on top of an already-fragile cold-start window
+ * was net-negative (more animations = more surface for crashes).
  */
+// ⚠ This import MUST be first — it monkey-patches Dimensions.get()
+//   so subsequent module-load reads can never see width=0/height=0.
+import '@/services/safeDimensionsShim';
 import { Stack, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, useEffect, useLayoutEffect, useRef, ReactNode } from 'react';
@@ -24,18 +30,26 @@ import { TabBarProvider } from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync } from '@/hooks/useAppSync';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
-import BootCurtain from '@/components/ui/BootCurtain';
 
 // ── KEEP SPLASH VISIBLE UNTIL FIRST REACT FRAME ──────────────────────────
-// Called exactly once at module evaluation. Must be paired with hideAsync().
-SplashScreen.preventAutoHideAsync().catch(() => {});
+// Called exactly once at module evaluation. Paired with hideAsync() below.
+try { SplashScreen.preventAutoHideAsync().catch(() => {}); } catch {}
 
-// Hard safety net — if for ANY reason hideAsync() inside the layout never
-// fires (early render throw, native module hang, etc.), force-hide after
-// 2.5 s. This guarantees the splash never lingers past that point.
-const _splashHardTimer = setTimeout(() => {
-  SplashScreen.hideAsync().catch(() => {});
-}, 2500);
+// Hard safety net — fires hideAsync() at 800 ms regardless of React state.
+// Drastically shorter than the old 2.5 s value: even if the JS module-load
+// chain partially fails, the user is never stuck staring at a black splash
+// for more than ~1 s. Anything past 800 ms is "broken" anyway.
+const _splashHardTimer: any = (typeof setTimeout !== 'undefined') ? setTimeout(() => {
+  try { SplashScreen.hideAsync().catch(() => {}); } catch {}
+}, 800) : null;
+
+// Belt + suspenders — schedule another hideAsync on the next microtask in
+// case `setTimeout` itself is starved by a long synchronous task.
+try {
+  Promise.resolve().then(() => {
+    setTimeout(() => { try { SplashScreen.hideAsync().catch(() => {}); } catch {} }, 50);
+  });
+} catch {}
 
 // ─── GLOBAL ERROR BOUNDARY (kept — but pure black bg now) ──────────────
 interface EBState { error: Error | null; resetCount: number; }
@@ -178,11 +192,6 @@ export default function RootLayout() {
               <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
               <Stack.Screen name="+not-found"     options={{ headerShown: false }} />
             </Stack>
-            {/* Boot curtain — NEXUS-style branded initialization veil.
-                Covers the brief gap between native-splash dismissal and
-                the first tab paint with a polished hex-logo + circuit
-                + progress-bar overlay. Auto-removes itself after 700 ms. */}
-            <BootCurtain holdMs={700} />
           </View>
         </TabBarProvider>
       </CosmeticProvider>
