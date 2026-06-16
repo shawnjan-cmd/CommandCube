@@ -41,6 +41,8 @@ import HomeTerminalClock from '@/components/home/HomeTerminalClock';
 import HomeGreetingBanner from '@/components/home/HomeGreetingBanner';
 import ButlerAITitle3D from '@/components/ui/ButlerAITitle3D';
 import HomeSectionDivider from '@/components/home/HomeSectionDivider';
+import NexusTopStatusBar from '@/components/home/NexusTopStatusBar';
+import Constants from 'expo-constants';
 import AutomationFeed from '@/components/home/AutomationFeed';
 import SafeBoundary from '@/components/ui/SafeBoundary';
 import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
@@ -2182,7 +2184,17 @@ function NexusHomeScreenInner() {
       <WidgetLayer pageId="home" />
       <InlineWidgetSlot pageId="home" position="inline-top" />
 
+      {/* ── NEXUS v5 top status bar ─────────────────────────── */}
+      <NexusTopStatusBar
+        isConnected={isConnected}
+        serverAddr={serverAddr}
+        version={(Constants.expoConfig as any)?.version || '2.1.15'}
+        onPair={() => setShowQR(true)}
+        onLock={() => goToTab('settings')}
+      />
+
       {/* Hero → COMMAND MODULES → combined setup hub */}
+      <HomeSectionDivider label="Mission Control" badge={isConnected ? 'LIVE' : 'STANDBY'} />
       <ButlerAIHero
         isConnected={isConnected} serverAddr={serverAddr}
         onScanQR={() => setShowQR(true)}
@@ -2192,16 +2204,20 @@ function NexusHomeScreenInner() {
       <SafeBoundary label="GREETING"><HomeGreetingBanner /></SafeBoundary>
 
       {/* Command modules — directly below the greeting, matrix-styled */}
+      <HomeSectionDivider label="Command Modules" badge="6 / 6" />
       <QuickAccessGrid goToTab={goToTab} />
 
+      <HomeSectionDivider label="Security Matrix" badge="LOCAL" />
       <PrivacyTrustBadge />
       <ZeroTrustMatrix />
+
+      <HomeSectionDivider label="Command Deck" badge={isConnected ? 'ONLINE' : 'OFFLINE'} />
       <SafeBoundary label="COMMAND DECK"><HomeTerminalClock isConnected={isConnected} /></SafeBoundary>
 
-      <HomeSectionDivider label="Live Process Feed" />
+      <HomeSectionDivider label="Live Process Feed" badge={isConnected ? 'STREAMING' : 'IDLE'} />
       <SafeBoundary label="PROCESS FEED"><AutomationFeed isConnected={isConnected} /></SafeBoundary>
 
-      <HomeSectionDivider label="PC Server Setup" />
+      <HomeSectionDivider label="PC Server Setup" badge={isConnected ? 'PAIRED' : 'PAIR NOW'} />
       <ServerSetupHub onScanQR={() => setShowQR(true)} isConnected={isConnected} />
 
       {/* Config-driven card renderer (hero & quick_access pinned above) */}
