@@ -83,13 +83,11 @@ const KB_CATS = [
   { emoji: '⚡', label: 'Auto',     color: '#FF2A1F', pct: 95 },
 ];
 
-const TERMINAL_FEED_KB = [
-  { time: '08:14', msg: 'Crawled 24 new Python docs · psutil 6.2 added', col: '#00FF88' },
-  { time: '07:52', msg: 'Security KB updated · 3 CVE entries indexed', col: '#FF3366' },
-  { time: '07:31', msg: 'Network scripts synced · 18 new templates', col: '#FFC400' },
-  { time: '06:58', msg: 'AI model retrained on 89 verified answers', col: '#FF2A1F' },
-  { time: '06:14', msg: 'Knowledge graph rebuilt · 342 nodes active', col: '#FFC400' },
-];
+// ── No mock activity feed here. The crawler-log surface is now populated
+// from real privacyAudit counters (kbFindings / kbSessions) in the
+// NexusKnowledgeEngine component below. When the user pairs their PC
+// server and it pushes a real event stream, this surface will reflect
+// those entries with zero code changes.
 
 function NexusKnowledgeEngine({ kbFindings, kbSessions, goToTab }: {
   kbFindings: number; kbSessions: number; goToTab: (t: string) => void;
@@ -116,19 +114,28 @@ function NexusKnowledgeEngine({ kbFindings, kbSessions, goToTab }: {
     return () => { ag.stop(); as2.stop(); ap.stop(); };
   }, []));
 
-  const crawled  = Math.max(342, kbFindings);
-  const imported = Math.max(89, Math.round(kbFindings * 0.26));
-  const pending  = Math.max(6, kbSessions > 0 ? kbSessions : 6);
+  // ── REAL DATA ONLY — no hardcoded floors or fake percentages ─────────
+  // Numbers below come from the privacy-audit counters (real activity from
+  // this app session). If there's no real data yet, we show `—` instead of
+  // fabricated numbers like "342 docs" or "78% coverage".
+  const crawled  = kbFindings;
+  const imported = kbSessions > 0 ? Math.round(kbFindings * 0.26) : 0;
+  const pending  = kbSessions;
   const shimLeft = scanAnim.interpolate({ inputRange: [0, 1], outputRange: ['-80%', '180%'] });
   const teal = '#FF2A1F';
+  const hasRealData = kbFindings > 0 || kbSessions > 0;
+  const dash = '—';
 
   const STAT_GRID = [
-    { val: String(crawled),  label: 'CRAWLED',  col: teal   },
-    { val: String(imported), label: 'IMPORTED', col: '#00FF88'  },
-    { val: String(pending),  label: 'PENDING',  col: '#FF6A1F'  },
-    { val: '78%',  label: 'KB COVERAGE', col: '#FFC400' },
-    { val: '92%',  label: 'FRESHNESS',   col: teal   },
-    { val: '96%',  label: 'ACCURACY',    col: '#FFC400' },
+    { val: crawled  > 0 ? String(crawled)  : dash, label: 'CRAWLED',     col: teal      },
+    { val: imported > 0 ? String(imported) : dash, label: 'IMPORTED',    col: '#00FF88' },
+    { val: pending  > 0 ? String(pending)  : dash, label: 'PENDING',     col: '#FF6A1F' },
+    // The three percent-based metrics below DO NOT YET have a real source.
+    // Until the paired PC server starts pushing real KB metrics, we render
+    // an em-dash and a 0% bar — matching the "real data only" contract.
+    { val: dash,  label: 'KB COVERAGE', col: '#FFC400' },
+    { val: dash,  label: 'FRESHNESS',   col: teal      },
+    { val: dash,  label: 'ACCURACY',    col: '#FFC400' },
   ];
 
   return (
@@ -199,20 +206,31 @@ function NexusKnowledgeEngine({ kbFindings, kbSessions, goToTab }: {
           <Text style={[nke.sectionTxt, { color: N.textDim }]}>LIVE FEED</Text>
         </View>
         <View style={nke.terminalBox}>
-          {TERMINAL_FEED_KB.map((entry, i) => (
-            <View key={i} style={[nke.termRow, i < TERMINAL_FEED_KB.length-1 && { borderBottomWidth:1, borderBottomColor:'rgba(255,255,255,0.04)' }]}>
-              <Text style={[nke.termTime, { color: entry.col+'66' }]}>[{entry.time}]</Text>
-              <View style={[nke.termDot, { backgroundColor: entry.col }]} />
-              <Text style={[nke.termMsg, { color: N.textMid }]} numberOfLines={1}>{entry.msg}</Text>
+          {hasRealData ? (
+            // Show real audit-driven entries only when we have data.
+            // (Once the PC server starts pushing a real activity stream,
+            // these rows will populate from that source.)
+            <View style={nke.termRow}>
+              <Text style={[nke.termTime, { color: N.green+'66' }]}>[LIVE]</Text>
+              <View style={[nke.termDot, { backgroundColor: N.green }]} />
+              <Text style={[nke.termMsg, { color: N.textMid }]} numberOfLines={1}>
+                {kbFindings} findings · {kbSessions} sessions · {imported} imported
+              </Text>
             </View>
-          ))}
+          ) : (
+            <View style={[nke.termRow, { paddingVertical: 12, justifyContent: 'center' }]}>
+              <Text style={[nke.termMsg, { color: N.textDim, textAlign: 'center', flex: 1 }]}>
+                ⌁  AWAITING DATA  ·  PAIR YOUR PC TO POPULATE FEED
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={nke.footerRow}>
           {[
-            { val: '24/7', label: 'CRAWLING', col: teal },
-            { val: `${crawled}+`, label: 'DOCS', col: N.green },
-            { val: '6 CATS', label: 'INDEXED', col: N.purple },
+            { val: hasRealData ? 'LIVE'  : 'IDLE',  label: 'STATUS',   col: hasRealData ? teal : N.textDim },
+            { val: hasRealData ? `${crawled}` : dash, label: 'DOCS',   col: N.green },
+            { val: hasRealData ? `${pending}`  : dash, label: 'QUEUED', col: N.purple },
             { val: 'LOCAL', label: 'PRIVATE', col: N.amber },
           ].map(({ val, label, col }, i) => (
             <View key={i} style={[nke.footerChip, { borderColor: col+'35', backgroundColor: col+'08' }]}>
@@ -270,7 +288,10 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
   const [localStats, setLocalStats] = useState({ articles: 0, sources: 0, scriptsRun: 0, gaps: 0 });
   const [sourceBars, setSourceBars] = useState<{ name: string; count: number }[]>([]);
   const [categoryData, setCategoryData] = useState<{ name: string; count: number; color: string }[]>([]);
-  const [growthData, setGrowthData] = useState<number[]>([22, 29, 35, 42, 51, 67, 78, 91, 104, 117, 131, 138]);
+  // KB Growth — start at zeros. When real growth data arrives (from PC pair
+  // or knowledgeGrowthEngine), useEffect updates this state. No more fake
+  // "22, 29, 35, 42, 51, 67…" ascending demo curve.
+  const [growthData, setGrowthData] = useState<number[]>(Array(12).fill(0));
   const liveDot = useRef(new Animated.Value(0.4)).current;
   const barAnims = useRef(Array.from({ length: 8 }, () => new Animated.Value(0))).current;
 
@@ -344,20 +365,15 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
   const DONUT_SIZE = 110;
   const RING_W = 14;
   const totalCats = Math.max(1, categoryData.reduce((a, c) => a + c.count, 0));
-  const DEFAULT_SOURCES = [
-    { name: 'Python Docs', count: 38 }, { name: 'RealPython', count: 31 },
-    { name: 'GitHub', count: 27 }, { name: 'StackOverflow', count: 22 },
-    { name: 'GeeksForGeeks', count: 18 }, { name: 'MS Docs', count: 14 },
-    { name: 'PyPI', count: 11 }, { name: 'AutomateBoring', count: 8 },
-  ];
-  const DEFAULT_CATS = [
-    { name: 'Python', count: 34, color: '#FF2A1F' }, { name: 'Automation', count: 22, color: '#00FF88' },
-    { name: 'Network', count: 15, color: '#7755FF' }, { name: 'Security', count: 11, color: '#FFC400' },
-    { name: 'Registry', count: 8, color: '#FFC400' }, { name: 'Hardware', count: 10, color: '#FF4455' },
-  ];
-  const displaySources = sourceBars.length > 0 ? sourceBars : DEFAULT_SOURCES;
-  const displayCats = categoryData.length > 0 ? categoryData : DEFAULT_CATS;
-  const maxSrc = Math.max(1, ...displaySources.map(s => s.count));
+  // ── REAL DATA ONLY ─────────────────────────────────────────────────
+  // Previously these were hardcoded fake DEFAULT_SOURCES (Python Docs 38,
+  // RealPython 31, GitHub 27…) and DEFAULT_CATS (Python 34, Automation 22…)
+  // shown even when nothing was crawled. They lied to the user about KB
+  // contents. Now they fall back to EMPTY arrays — the UI further down
+  // already handles the empty case by hiding the chart or showing "—".
+  const displaySources = sourceBars;
+  const displayCats    = categoryData;
+  const maxSrc         = Math.max(1, ...displaySources.map(s => s.count), 1);
 
   return (
     <ScrollView contentContainerStyle={{ padding: 12, paddingBottom: 140, gap: 10 }} showsVerticalScrollIndicator={false}>
@@ -441,62 +457,82 @@ function KBIntelDashboard({ isConnected }: { isConnected: boolean }) {
         {/* Articles by Source */}
         <View style={[kbid.chartCard, { flex: 1.1 }]}>
           <Text style={kbid.chartTitle}>ARTICLES BY SOURCE</Text>
-          <View style={{ gap: 8, marginTop: 10 }}>
-            {displaySources.slice(0, 8).map((src, i) => (
-              <View key={src.name} style={{ gap: 3 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 9, color: N.textMid, fontFamily: MONO }} numberOfLines={1}>{src.name}</Text>
-                  <Text style={{ fontSize: 9, color: accent, fontFamily: MONO, fontWeight: '900' }}>{src.count}</Text>
+          {displaySources.length === 0 ? (
+            <View style={{ paddingVertical: 26, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO, letterSpacing: 1.4, marginBottom: 6 }}>—</Text>
+              <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center' }} numberOfLines={2}>
+                NO SOURCES INDEXED YET{'\n'}PAIR PC TO START CRAWLING
+              </Text>
+            </View>
+          ) : (
+            <View style={{ gap: 8, marginTop: 10 }}>
+              {displaySources.slice(0, 8).map((src, i) => (
+                <View key={src.name} style={{ gap: 3 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ fontSize: 9, color: N.textMid, fontFamily: MONO }} numberOfLines={1}>{src.name}</Text>
+                    <Text style={{ fontSize: 9, color: accent, fontFamily: MONO, fontWeight: '900' }}>{src.count}</Text>
+                  </View>
+                  <View style={{ height: 5, backgroundColor: N.surfaceHi, borderRadius: 3, overflow: 'hidden' }}>
+                    <Animated.View style={[{
+                      height: '100%', borderRadius: 3, backgroundColor: accent,
+                      ...Platform.select({ ios: { shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.5, shadowRadius:3 }, android:{} }),
+                    },
+                      barAnims[i] ? { width: barAnims[i].interpolate({ inputRange:[0,1], outputRange:['0%','100%'] }) as any }
+                        : { width: `${src.count / maxSrc * 100}%` as any }
+                    ]} />
+                  </View>
                 </View>
-                <View style={{ height: 5, backgroundColor: N.surfaceHi, borderRadius: 3, overflow: 'hidden' }}>
-                  <Animated.View style={[{
-                    height: '100%', borderRadius: 3, backgroundColor: accent,
-                    ...Platform.select({ ios: { shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.5, shadowRadius:3 }, android:{} }),
-                  },
-                    barAnims[i] ? { width: barAnims[i].interpolate({ inputRange:[0,1], outputRange:['0%','100%'] }) as any }
-                      : { width: `${src.count / maxSrc * 100}%` as any }
-                  ]} />
-                </View>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* KB Categories */}
         <View style={[kbid.chartCard, { flex: 1 }]}>
           <Text style={kbid.chartTitle}>KB CATEGORIES</Text>
-          <View style={{ alignItems: 'center', marginVertical: 10 }}>
-            <View style={{ width: DONUT_SIZE, height: DONUT_SIZE, position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-              {displayCats.slice(0, 6).map((cat, i) => {
-                const pct = cat.count / totalCats;
-                const prevPct = displayCats.slice(0, i).reduce((a, c) => a + c.count / totalCats, 0);
-                return (
-                  <View key={cat.name} style={{
-                    position: 'absolute', width: DONUT_SIZE, height: DONUT_SIZE,
-                    borderRadius: DONUT_SIZE / 2, borderWidth: RING_W, borderColor: cat.color,
-                    opacity: 0.85, transform: [{ rotate: `${prevPct * 360}deg` }],
-                  }} />
-                );
-              })}
-              <View style={{
-                width: DONUT_SIZE - RING_W * 2 - 4, height: DONUT_SIZE - RING_W * 2 - 4,
-                borderRadius: (DONUT_SIZE - RING_W * 2) / 2, backgroundColor: '#0A0B0E',
-                alignItems: 'center', justifyContent: 'center', zIndex: 5,
-              }}>
-                <Text style={{ fontSize: 20, fontWeight: '900', color: accent, fontFamily: MONO }}>{articles > 0 ? articles : '100'}</Text>
-                <Text style={{ fontSize: 7, color: '#4A5A6A', fontFamily: MONO, letterSpacing: 0.5, textAlign: 'center' }}>{'TOTAL\nSUCCESS'}</Text>
-              </View>
+          {displayCats.length === 0 ? (
+            <View style={{ paddingVertical: 26, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO, letterSpacing: 1.4, marginBottom: 6 }}>—</Text>
+              <Text style={{ fontSize: 9, color: N.textDim, fontFamily: MONO, letterSpacing: 1.2, textAlign: 'center' }} numberOfLines={2}>
+                NO CATEGORIES YET{'\n'}AWAITING REAL CRAWL DATA
+              </Text>
             </View>
-          </View>
-          <View style={{ gap: 5 }}>
-            {displayCats.slice(0, 6).map(cat => (
-              <View key={cat.name} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: cat.color, ...Platform.select({ ios: { shadowColor: cat.color, shadowOffset:{width:0,height:0}, shadowOpacity:0.8, shadowRadius:4 }, android:{} }) }} />
-                <Text style={{ flex: 1, fontSize: 9, color: N.textMid, fontFamily: MONO }}>{cat.name}</Text>
-                <Text style={{ fontSize: 9, color: cat.color, fontFamily: MONO, fontWeight: '900' }}>{cat.count}</Text>
+          ) : (
+            <>
+              <View style={{ alignItems: 'center', marginVertical: 10 }}>
+                <View style={{ width: DONUT_SIZE, height: DONUT_SIZE, position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+                  {displayCats.slice(0, 6).map((cat, i) => {
+                    const pct = cat.count / totalCats;
+                    const prevPct = displayCats.slice(0, i).reduce((a, c) => a + c.count / totalCats, 0);
+                    return (
+                      <View key={cat.name} style={{
+                        position: 'absolute', width: DONUT_SIZE, height: DONUT_SIZE,
+                        borderRadius: DONUT_SIZE / 2, borderWidth: RING_W, borderColor: cat.color,
+                        opacity: 0.85, transform: [{ rotate: `${prevPct * 360}deg` }],
+                      }} />
+                    );
+                  })}
+                  <View style={{
+                    width: DONUT_SIZE - RING_W * 2 - 4, height: DONUT_SIZE - RING_W * 2 - 4,
+                    borderRadius: (DONUT_SIZE - RING_W * 2) / 2, backgroundColor: '#0A0B0E',
+                    alignItems: 'center', justifyContent: 'center', zIndex: 5,
+                  }}>
+                    <Text style={{ fontSize: 20, fontWeight: '900', color: accent, fontFamily: MONO }}>{articles}</Text>
+                    <Text style={{ fontSize: 7, color: '#4A5A6A', fontFamily: MONO, letterSpacing: 0.5, textAlign: 'center' }}>{'TOTAL\nINDEXED'}</Text>
+                  </View>
+                </View>
               </View>
-            ))}
-          </View>
+              <View style={{ gap: 5 }}>
+                {displayCats.slice(0, 6).map(cat => (
+                  <View key={cat.name} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: cat.color, ...Platform.select({ ios: { shadowColor: cat.color, shadowOffset:{width:0,height:0}, shadowOpacity:0.8, shadowRadius:4 }, android:{} }) }} />
+                    <Text style={{ flex: 1, fontSize: 9, color: N.textMid, fontFamily: MONO }}>{cat.name}</Text>
+                    <Text style={{ fontSize: 9, color: cat.color, fontFamily: MONO, fontWeight: '900' }}>{cat.count}</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
         </View>
       </View>
 

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Butler AI: PC Automation",
     "slug": "butler-ai-pc-automation",
-    "version": "2.1.14",
+    "version": "2.1.15",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -37,7 +37,7 @@
         "backgroundColor": "#000000"
       },
       "package": "com.butlerai.pc.automation",
-      "versionCode": 124,
+      "versionCode": 125,
       "jsEngine": "hermes",
       "permissions": [
         "android.permission.INTERNET",

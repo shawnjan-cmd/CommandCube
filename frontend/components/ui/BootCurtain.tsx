@@ -131,7 +131,7 @@ export default function BootCurtain({ holdMs = 700 }: { holdMs?: number }) {
       {/* ── Sub-tagline ───────────────────────────────────────── */}
       <View style={styles.subRow}>
         <Text style={styles.subBracket}>[</Text>
-        <Text style={styles.subText}>ULTIMATE COMMAND CENTER  ·  v2.1.14</Text>
+        <Text style={styles.subText}>ULTIMATE COMMAND CENTER  ·  v2.1.15</Text>
         <Text style={styles.subBracket}>]</Text>
       </View>
 

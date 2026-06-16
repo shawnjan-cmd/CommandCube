@@ -1,0 +1,42 @@
+{
+  "summary": "PASS — Butler AI v2.1.15 fake-data purge verified end-to-end. Backend: 5/5 pytest cases passed (GET /api/health, GET /, GET /api/status, POST /api/status, GET /api/). Frontend on mobile viewport 414x896 (Expo web preview): (1) First-time user with cleared localStorage → final pathname = /onboarding, INTRO tab content rendered, BUTLER AI 3D wordmark visible. (2) Returning user with @butler_onboarding_done_v2='true' + @butler_welcome_complete_v1='true' → pathname = /nexushome, BUTLER AI wordmark + 'LOCAL AI · PC AUTOMATION · COMMAND CORE' subtitle visible. (3) KB tab: ALL FOUR KPIs (KB ARTICLES, SOURCES CRAWLED, SCRIPTS RUN, TOPIC GAPS) show 0 — no 1.2K, 8.4K, or 342 anywhere. ARTICLES BY SOURCE shows 'NO SOURCES INDEXED YET / PAIR PC TO START CRAWLING' empty state; KB CATEGORIES shows 'NO CATEGORIES YET / AWAITING REAL CRAWL DATA' empty state. KB GROWTH 24H chart line renders FLAT at the zero baseline (verified in screenshot). NO fake source names ('Python Docs', 'RealPython', 'GeeksForGeeks') and NO fake percentages (78%, 92%, 96%) appear anywhere in the KB tab DOM text. (4) All remaining tabs navigate without errors: /scripts, /ai, /pc, /build, /skins, /settings reached cleanly. /onboarding direct navigation by returning user correctly redirected back to /nexushome via the existing onboarded-guard (expected belt-and-suspenders behavior documented in iteration 11). (5) Zero console errors during the entire run; zero log messages containing 'splash', 'watchdog', 'recovery', 'crash', 'fatal', or 'navy'. No blue or black recovery screen ever appeared.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": []
+  },
+  "critical_test_evidence": {
+    "kb_tab_kpis": { "KB_ARTICLES": "0", "SOURCES_CRAWLED": "0", "SCRIPTS_RUN": "0", "TOPIC_GAPS": "0" },
+    "kb_tab_empty_states": { "ARTICLES_BY_SOURCE": "NO SOURCES INDEXED YET", "KB_CATEGORIES": "NO CATEGORIES YET", "KB_GROWTH_chart": "flat-at-zero line, axis labels 00-20 visible" },
+    "kb_tab_fake_data_purge": { "Python Docs": "absent", "RealPython": "absent", "GeeksForGeeks": "absent", "'342'": "absent", "'1.2K'": "absent", "'8.4K'": "absent", "'78%'": "absent", "'92%'": "absent", "'96%'": "absent" },
+    "first_time_user_pathname": "/onboarding",
+    "returning_user_pathname": "/nexushome",
+    "tabs_reached": ["/scripts","/ai","/pc","/build","/skins","/settings"],
+    "console_errors": 0,
+    "splash_watchdog_recovery_logs": 0,
+    "backend": { "GET /api/health": "200 {status:ok}", "GET /api/status": "200 []", "POST /api/status": "200 (echoes payload, persists best-effort)", "GET /api/": "200 {message:Hello World}" }
+  },
+  "test_report_links": ["/app/backend/tests/test_health_status.py", "/app/test_reports/pytest/results.xml"],
+  "action_items": [
+    "MINOR (dead code): NexusKnowledgeEngine function in /app/frontend/app/(tabs)/knowledge.tsx (lines 92-245) is defined but never rendered anywhere in the codebase (grep confirms zero JSX call sites). It still references the legacy hardcoded KB_CATS array (lines 77-84) with stale percentages 92/76/84/68/78/95. Recommend deleting both NexusKnowledgeEngine and KB_CATS in a future cleanup to keep the 'real data only' contract enforced statically and prevent accidental re-mounting from spreading fake numbers again. Not a regression — these symbols never reach the rendered DOM in v2.1.15.",
+    "MINOR (file size guideline): /app/frontend/app/(tabs)/knowledge.tsx is ~3100 lines, well over the 700-line recommendation. Worth splitting the KBIntelDashboard, KBProcessDiagram, KBNeuralViz, FindingsGrowthChart, SigmaNetViz components into separate files in a future refactor. Functional, not blocking.",
+    "INFO: When testing INTRO tab via direct /onboarding URL with returning-user flags set, the route's internal 'already onboarded? go home' guard redirects to /nexushome. This is the intended belt-and-suspenders guard documented in iteration 11. Tapping the INTRO tab in the bottom bar will exhibit the same behavior for returning users — confirm with E1 whether that's the desired UX or whether the manual tap should bypass the guard."
+  ],
+  "critical_code_review_comments": [
+    "knowledge.tsx KBIntelDashboard correctly derives source/category arrays from AsyncStorage-backed `articles` count, then .filter(s => s.count > 0) drops every entry when articles=0 — so displaySources/displayCats are empty arrays and the JSX falls through to the EMPTY STATE blocks with em-dash + 'NO SOURCES INDEXED' / 'NO CATEGORIES YET'. Clean implementation of the 'real data only' contract.",
+    "growthData state initializes to Array(12).fill(0) and only mutates when articles > 5 (line 340). With articles=0, the growth chart line renders flat at the baseline (verified visually). No ascending demo curve regression.",
+    "NexusHUD.tsx primitives (HudHeader, StatCard, AgentCard, EmptyState) are pure prop-driven and contain ZERO internal mock data. StatCard exposes an `empty` boolean that swaps the value to '—' and locks the color bar to 0% — exactly the empty-state contract requested. Good reusable foundation.",
+    "Backend server.py is defensive: Mongo client init is wrapped in try/except (won't crash on bad URL), endpoints fall back to in-memory responses when db is None, and ObjectId is correctly excluded from /api/status via projection {'_id':0}.",
+    "No deprecated Expo packages spotted (no expo-av, no expo-barcode-scanner, no expo-background-fetch) in the inspected boot/knowledge files.",
+    "App boot path is the same clean v2.1.11 layout — pure-black GlobalErrorBoundary, no preventAutoHideAsync/hideAsync, no watchdog, /onboarding redirect fired from nexushome.tsx via 250ms post-mount router.navigate guarded by a module-scoped __butler_onboarding_check_done flag."
+  ],
+  "updated_files": ["/app/backend/tests/test_health_status.py (new)", "/app/test_reports/pytest/results.xml (junit output)"],
+  "success_rate": { "backend": "100% (5/5 endpoints)", "frontend": "100% (first-time + returning + KB purge + 6/6 other tabs + zero console errors)" },
+  "seed_data_creation": "TEST 1 cleared localStorage to simulate first-time user. TEST 2 set @butler_onboarding_done_v2='true' and @butler_welcome_complete_v1='true' for returning user. TEST 3 created TEST_butler_v2_1_15 status check via POST /api/status (cleanup not needed — endpoint best-effort persists to MongoDB and project uses ephemeral test database).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "v2.1.15 'real data only' contract is verified on the KB tab via Expo web preview. The legacy NexusKnowledgeEngine + KB_CATS in knowledge.tsx are dead code (no render sites); they don't affect the user but should be removed in a follow-up to prevent future re-mounting. Backend tests live at /app/backend/tests/test_health_status.py — reuse and extend for future iterations. EXPO_PUBLIC_BACKEND_URL=https://startup-fixer.preview.emergentagent.com is the public preview URL used for all testing.",
+  "rca_of_issue": "Not a bug fix — this iteration validates the v2.1.15 fake-data purge against /app/frontend/app/(tabs)/knowledge.tsx (DEFAULT_SOURCES / DEFAULT_CATS / fake percentages / fake growth curve removed) and the new shared primitives in /app/frontend/components/ui/NexusHUD.tsx. KB tab now renders 0s + em-dashes + empty-state blocks, confirmed by direct DOM scrape and screenshots."
+}
