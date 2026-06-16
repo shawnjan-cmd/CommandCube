@@ -41,6 +41,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ALL_ONBOARDING_WRITE_KEYS } from '@/constants/onboardingKeys';
 
 // ── PALETTE ──────────────────────────────────────────────────────────
 const C = {
@@ -207,16 +208,10 @@ async function persistOnboardingComplete(): Promise<void> {
   // Hard-cap the wait at 1.5 s so a hanging AsyncStorage CANNOT
   // block the user from reaching the home screen. In practice the
   // write completes in <50 ms — the timeout is a safety net only.
+  // Keys + values come from the single source of truth in
+  // `constants/onboardingKeys.ts`.
   try {
-    const write = AsyncStorage.multiSet([
-      [ONBOARDING_DONE_KEY,           'true'],
-      [WELCOME_COMPLETE_KEY,          'true'],
-      [TERMS_ACCEPTED_KEY,            'true'],
-      [PRIVACY_ACCEPTED_KEY,          'true'],
-      [CONSENT_KEY,                   '1.0.0'],
-      [AGE_CONFIRMED_KEY,             'true'],
-      ['@butler_stable_state',        'onboarded'],
-    ]);
+    const write = AsyncStorage.multiSet(ALL_ONBOARDING_WRITE_KEYS);
     const cap = new Promise<void>(res => setTimeout(res, 1500));
     await Promise.race([write, cap]);
   } catch {}

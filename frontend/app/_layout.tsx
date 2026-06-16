@@ -37,10 +37,14 @@ import {
   markHomeReached,
 } from '@/services/bootCrashLogger';
 installBootCrashLogger();
+// ⚠ MUST be third — splash hide controller. Calling `preventAuto()`
+//   at module-eval keeps the native splash up until React mounts.
+import { preventAuto, armAllHideStrategies } from '@/services/splashController';
+preventAuto();
 
 import React, { Component, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
-import { Stack, SplashScreen } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -49,9 +53,6 @@ import { TabBarProvider }  from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync }      from '@/hooks/useAppSync';
 import { ONBOARDING_DONE_KEY, WELCOME_COMPLETE_KEY } from '@/constants/onboardingKeys';
-
-// Keep splash visible until first React frame.
-try { SplashScreen.preventAutoHideAsync().catch(() => {}); } catch {}
 
 // ═══════════════════════════════════════════════════════════════════
 // ERROR BOUNDARY
@@ -143,9 +144,11 @@ export default function RootLayout() {
   const bootRef = useRef(false);
   const [prevCrash, setPrevCrash] = useState<null | { message: string; stack?: string }>(null);
 
-  // Hide splash on first commit.
+  // Hide splash with FIVE layered strategies — at least one will
+  // always fire (immediate, RAF, hard-cap 1.5 s).
   useLayoutEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
+    const cleanup = armAllHideStrategies({ hardCapMs: 1500 });
+    return cleanup;
   }, []);
 
   // Read any crash from the previous session (fire-and-forget).
