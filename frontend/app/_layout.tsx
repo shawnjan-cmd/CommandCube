@@ -30,6 +30,7 @@ import React, { Component, ReactNode, useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
@@ -136,34 +137,36 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <BootErrorBoundary>
-      <SafeProvider name="cosmetic">
-        <CosmeticProvider>
-          <SafeProvider name="tabbar">
-            <TabBarProvider>
-              <AppSyncRunner />
-              <View style={s.container}>
-                <StatusBar style="light" />
-                <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
-                  <Stack.Screen name="index"          options={{ headerShown: false }} />
-                  <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
-                  <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-                  <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-                  <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
-                  <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
-                  <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
-                  <Stack.Screen name="+not-found"     options={{ headerShown: false }} />
-                </Stack>
+    <SafeAreaProvider>
+      <BootErrorBoundary>
+        <SafeProvider name="cosmetic">
+          <CosmeticProvider>
+            <SafeProvider name="tabbar">
+              <TabBarProvider>
+                <AppSyncRunner />
+                <View style={s.container}>
+                  <StatusBar style="light" />
+                  <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000' } }}>
+                    <Stack.Screen name="index"          options={{ headerShown: false }} />
+                    <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
+                    <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+                    <Stack.Screen name="terms"          options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+                    <Stack.Screen name="category/[id]"  options={{ headerShown: false }} />
+                    <Stack.Screen name="data-safety"    options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
+                    <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
+                    <Stack.Screen name="+not-found"     options={{ headerShown: false }} />
+                  </Stack>
 
-                {/* Previous-launch crash banner — only ever shows if the last
-                    cold start crashed. Dismissible. Auto-clears after 3 s alive. */}
-                <PreviousCrashBanner />
-              </View>
-            </TabBarProvider>
-          </SafeProvider>
-        </CosmeticProvider>
-      </SafeProvider>
-    </BootErrorBoundary>
+                  {/* Previous-launch crash banner — only ever shows if the last
+                      cold start crashed. Dismissible. Auto-clears after 3 s alive. */}
+                  <PreviousCrashBanner />
+                </View>
+              </TabBarProvider>
+            </SafeProvider>
+          </CosmeticProvider>
+        </SafeProvider>
+      </BootErrorBoundary>
+    </SafeAreaProvider>
   );
 }
 
