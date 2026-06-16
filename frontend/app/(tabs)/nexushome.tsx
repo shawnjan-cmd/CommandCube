@@ -5,13 +5,15 @@
  * PC health score ring, live uptime ticker, all real data only.
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Component as ReactComponent } from 'react';
 import { useCosmetic } from '@/contexts/CosmeticContext';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import {
 
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Platform, ActivityIndicator, Animated, Dimensions, TextInput, Alert, Modal,
+  Linking, Share,
+  TouchableOpacity as TO, View as VV, Text as TT,
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import SectionTitle3D from '@/components/ui/SectionTitle3D';
@@ -21,7 +23,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // ⚠ DO NOT add `expo-camera` imports here. They get lazy-loaded via the
 // `QRCameraScanner` component (see imports below). Top-level expo-camera
 // imports cause Android cold-start black screens on New Architecture.
-import { Linking, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { haptics } from '@/services/haptics';
 import { Image as ExpoImage } from 'expo-image';
@@ -50,7 +51,6 @@ import Constants from 'expo-constants';
 import AutomationFeed from '@/components/home/AutomationFeed';
 import SafeBoundary from '@/components/ui/SafeBoundary';
 import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
-import { useRouter } from 'expo-router';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
@@ -2395,8 +2395,8 @@ export { ErrorBoundary } from '@/components/ui/TabErrorBoundary';
 // ChartBucket.count access, missing serverConnection.connectWithQR), the user
 // sees a recovery UI instead of a navy/black screen. This guarantees that
 // post-onboarding LAUNCH always lands on SOMETHING the user can interact with.
-import { Component as ReactComponent } from 'react';
-import { TouchableOpacity as TO, View as VV, Text as TT, StyleSheet as SS } from 'react-native';
+// (ReactComponent / TO / VV / TT aliases are imported at the top of the file
+// to comply with Metro/Babel strict-mode `import/first` rule.)
 
 class _NexusBoundary extends ReactComponent<{ children: any }, { err: Error | null }> {
   state = { err: null as Error | null };
