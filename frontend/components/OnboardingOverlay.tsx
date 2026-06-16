@@ -680,11 +680,16 @@ function Screen3Consent({ onNext, onBack, consents, setConsents }: {
           <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
           <Text style={st.backBtnTxt}>BACK</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[st.primaryBtn, { flex: 1 }]}
-          onPress={() => { safeHaptics.medium(); onNext(); }}
+        {/* Disabled until ALL required checkboxes (age, tos, privacy, lan) are ticked.
+            Prevents users skipping mandatory Play Store consent gates. */}
+        <TouchableOpacity
+          style={[st.primaryBtn, { flex: 1, opacity: allRequired ? 1 : 0.35 }]}
+          onPress={() => { if (!allRequired) return; safeHaptics.medium(); onNext(); }}
+          disabled={!allRequired}
+          accessibilityState={{ disabled: !allRequired }}
           activeOpacity={0.85}>
           <MaterialIcons name="arrow-forward" size={20} color="#000" />
-          <Text style={st.primaryBtnTxt}>I ACCEPT</Text>
+          <Text style={st.primaryBtnTxt}>{allRequired ? 'I ACCEPT' : 'TICK 4 REQUIRED ITEMS'}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -729,10 +734,16 @@ function Screen4Pledge({ onNext, onBack }: { onNext: () => void; onBack: () => v
           <MaterialIcons name="arrow-back" size={18} color={C.cyan} />
           <Text style={st.backBtnTxt}>BACK</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[st.primaryBtn, { flex: 1 }]}
-          onPress={() => { safeHaptics.medium(); onNext(); }} activeOpacity={0.85}>
+        {/* Disabled until the user explicitly ticks the pledge — prevents
+            silent advancement past the mandatory safety pledge. */}
+        <TouchableOpacity
+          style={[st.primaryBtn, { flex: 1, opacity: pledged ? 1 : 0.35 }]}
+          onPress={() => { if (!pledged) return; safeHaptics.medium(); onNext(); }}
+          disabled={!pledged}
+          accessibilityState={{ disabled: !pledged }}
+          activeOpacity={0.85}>
           <MaterialIcons name="arrow-forward" size={20} color="#000" />
-          <Text style={st.primaryBtnTxt}>I PLEDGE</Text>
+          <Text style={st.primaryBtnTxt}>{pledged ? 'I PLEDGE' : 'TICK THE PLEDGE ABOVE'}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

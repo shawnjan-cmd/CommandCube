@@ -94,6 +94,8 @@ export default function OnboardingTab() {
   // ── 2. Completion handler (passed to OnboardingOverlay & ErrorBoundary) ─
   const handleComplete = React.useCallback(() => {
     // Defensive persistence (Screen10 already awaited this, but cheap).
+    // Writes BOTH keys (v2 AND v1) so users updating from older builds
+    // are correctly recognised as onboarded on next launch.
     AsyncStorage.multiSet([
       [ONBOARDING_DONE_KEY,                 'true'],
       ['@butler_welcome_complete_v1',       'true'],
@@ -106,13 +108,18 @@ export default function OnboardingTab() {
       ['@butler_onboarding_exit_at',        String(Date.now())],
     ]).catch(() => { /* never blocks navigation */ });
 
-    // Navigate to home tab. Triple-fallback for robustness.
-    try { router.replace(HOME_ROUTE as any); return; }
-    catch (e1) { console.warn('[OnboardingTab] router.replace failed:', e1); }
-    try { router.push(HOME_ROUTE as any);    return; }
-    catch (e2) { console.warn('[OnboardingTab] router.push failed:', e2); }
-    try { (router as any).navigate?.(HOME_ROUTE); }
-    catch (e3) { console.warn('[OnboardingTab] router.navigate failed:', e3); }
+    // 100 ms deferral before navigation — gives the router enough time to
+    // be fully ready (per the v2.1.2 critical-fixes spec). Without this,
+    // some Android builds hit "Attempted to navigate before mounting the
+    // Root Layout component" and the user gets stuck on Screen 10.
+    setTimeout(() => {
+      try { router.replace(HOME_ROUTE as any); return; }
+      catch (e1) { console.warn('[OnboardingTab] router.replace failed:', e1); }
+      try { router.push(HOME_ROUTE as any);    return; }
+      catch (e2) { console.warn('[OnboardingTab] router.push failed:', e2); }
+      try { (router as any).navigate?.(HOME_ROUTE); }
+      catch (e3) { console.warn('[OnboardingTab] router.navigate failed:', e3); }
+    }, 100);
   }, [router]);
 
   // ── 3. Render — always renders OnboardingOverlay (no placeholder). ─────
