@@ -69,6 +69,18 @@ import { withTimeout } from '@/utils/withTimeout';
 // ready to paint.
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
+// ── HARD-TIMEOUT SPLASH FALLBACK (FIX FOR 20+ BLUE-SCREEN BUILDS) ──────────
+// If ANYTHING prevents the root View's onLayout from firing — a render
+// error caught by GlobalErrorBoundary (whose error screen has no onLayout),
+// a navigation race, a native module timing issue, etc. — the splash would
+// otherwise stay on screen forever, looking exactly like a "blue screen
+// of death". This unconditional 3-second timeout guarantees the splash is
+// hidden no matter what. The View's onLayout still fires earlier in the
+// happy path; this is purely a safety net.
+setTimeout(() => {
+  SplashScreen.hideAsync().catch(() => {});
+}, 3000);
+
 // ─── GLOBAL ERROR BOUNDARY ──────────────────────────────────────────────────
 interface EBState { error: Error | null; }
 class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState & { resetCount: number; reloadConfirm: boolean }> {
@@ -76,6 +88,12 @@ class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState & {
   static getDerivedStateFromError(error: Error): any { return { error }; }
   componentDidCatch(error: Error) {
     try { require('@/services/autoErrorLogger').autoErrorLogger.log('error', 'GlobalErrorBoundary', error.message); } catch {}
+    // CRITICAL: If we caught an error during cold start, the root View's
+    // onLayout will never fire — which means the splash never hides and
+    // the user sees the splash background forever (the infamous "blue
+    // screen"). Force-hide the splash here so the SYSTEM FAULT screen
+    // becomes visible instead.
+    try { SplashScreen.hideAsync().catch(() => {}); } catch {}
     console.error('[GlobalErrorBoundary] uncaught:', error?.message);
   }
   private handleReinit = () => {
