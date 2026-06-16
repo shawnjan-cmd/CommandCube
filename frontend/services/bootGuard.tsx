@@ -18,7 +18,7 @@
  */
 
 import React, { Component, ReactNode } from 'react';
-import { Dimensions, Platform, View, Text, StyleSheet, TouchableOpacity, useColorScheme } from 'react-native';
+import { Dimensions, Platform, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -207,6 +207,3 @@ const bannerStyles = StyleSheet.create({
   btn:   { alignSelf: 'flex-end', borderWidth: 1, borderColor: '#ef4444', borderRadius: 6, paddingHorizontal: 14, paddingVertical: 6 },
   btnTxt:{ fontSize: 11, fontWeight: '900', color: '#ef4444', letterSpacing: 1.5, fontFamily: MONO },
 });
-
-// Suppress unused-import warning for useColorScheme (may be wanted by callers)
-void useColorScheme;
