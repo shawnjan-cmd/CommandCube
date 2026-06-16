@@ -1998,7 +1998,7 @@ function NexusHomeScreenInner() {
         // First-time user — push to INTRO tab AFTER first paint
         setTimeout(() => {
           if (cancelled) return;
-          try { onboardingNavRouter.push('/(tabs)/onboarding' as any); }
+          try { onboardingNavRouter.navigate('/(tabs)/onboarding' as any); }
           catch (e) { console.warn('[NexusHome] onboarding nav failed:', e); }
         }, 250); // small delay = lets home paint visibly first
       } catch {
