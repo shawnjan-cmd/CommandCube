@@ -99,8 +99,11 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000000' }}>
-      {/* CyberneticBackdrop DELETED — was a suspected cold-start crash cause.
-          The app gets a clean solid-black background under the tabs instead. */}
+      {/* No animated backdrop. Pure black background is the new norm —
+          every animated/decorative layer that used to render here
+          (CyberneticBackdrop, BootCurtain) has been deleted because
+          they were causing Android cold-start crashes. Function over
+          flash: the app boots, the user sees their tabs, period. */}
       <Tabs
         initialRouteName="nexushome"
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
