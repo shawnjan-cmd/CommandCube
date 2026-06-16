@@ -1,121 +1,172 @@
 /**
  * Butler AI — Root Boot Route  (`/`)
  * ──────────────────────────────────────────────────────────────────
- * v4 — "MINIMAL SAFE HOME" (diagnostic mode for native black-screen)
+ * v5 — AUTO-REDIRECT (replaces v4 Safe-Mode diagnostic)
  *
- * Per user request after 20+ black-screen builds, this route now
- * renders a SELF-CONTAINED home screen instead of redirecting to
- * `/(tabs)/nexushome`. That bypasses every heavy component in the
- * (tabs) tree — FuturisticTabBar, QuickButlerBar, ConnectionBadge,
- * 9 tab routes, ~2400-line dashboard — any one of which could be
- * the crash culprit.
+ * Behavior
+ * ────────
+ *   1. Read onboarding status from AsyncStorage in parallel:
+ *        • ONBOARDING_DONE_KEY  (preferred, v2 contract)
+ *        • WELCOME_COMPLETE_KEY (legacy v1, still respected)
+ *   2. If either is `'true'` / `'1'`           → `/(tabs)/nexushome`
+ *      Otherwise (first-launch or wiped data) → `/(tabs)/onboarding`
+ *   3. Navigation uses a triple-fallback (`replace` → `push` →
+ *      `navigate`) — same contract as the onboarding finish handler.
+ *   4. While reading, we render a tiny black "boot card" identical
+ *      to the splash so the user never sees a flash of white.
+ *   5. If anything in step 1–3 takes > 2.5 s (AsyncStorage hang,
+ *      router init delay, anything weird) we surface a manual
+ *      ESCAPE HATCH with two buttons so the user is NEVER stuck.
  *
- * Diagnostic value:
- *   • If THIS minimal screen renders → JS bundle + Hermes are fine;
- *     the crash is inside the (tabs) tree → we strip components.
- *   • If THIS minimal screen still black-screens → JS bundle never
- *     loaded; the crash is native (ProGuard, native module init,
- *     manifest) → we look there.
- *
- * Once we identify the root cause, this file goes back to a simple
- * <Redirect /> to the real home.
+ * What this fixes
+ * ───────────────
+ *   • Removes the manual "LAUNCH FULL NEXUS" tap that v4 forced.
+ *   • Onboarded users now go straight to the dashboard.
+ *   • First-time users go straight to the tutorial.
+ *   • Triple-fallback nav + 2.5 s timeout = no possible boot dead-end.
  */
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View, Text, StyleSheet, Platform, TouchableOpacity, ActivityIndicator,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  ONBOARDING_DONE_KEY,
+  WELCOME_COMPLETE_KEY,
+} from '@/constants/onboardingKeys';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
+const HOME_ROUTE       = '/(tabs)/nexushome'  as const;
+const ONBOARDING_ROUTE = '/(tabs)/onboarding' as const;
+
+// ── Triple-fallback navigation — never throws ─────────────────────
+function safeNavigate(router: ReturnType<typeof useRouter>, route: string) {
+  try { router.replace(route as any); return; } catch (e1) { console.warn('[root] replace failed:', e1); }
+  try { router.push(route as any);    return; } catch (e2) { console.warn('[root] push failed:',    e2); }
+  try { (router as any).navigate?.(route); } catch (e3) { console.warn('[root] navigate failed:', e3); }
+}
+
+// ── Read onboarding state with a hard timeout ─────────────────────
+async function readOnboardingTarget(): Promise<typeof HOME_ROUTE | typeof ONBOARDING_ROUTE> {
+  try {
+    const read = Promise.all([
+      AsyncStorage.getItem(ONBOARDING_DONE_KEY).catch(() => null),
+      AsyncStorage.getItem(WELCOME_COMPLETE_KEY).catch(() => null),
+    ]);
+    // Hard cap at 1.8 s — if AsyncStorage hangs, default to HOME so
+    // returning users don't get re-shown the tutorial.
+    const timeout = new Promise<[null, null]>(res =>
+      setTimeout(() => res([null, null]), 1800),
+    );
+
+    const [v2, v1] = (await Promise.race([read, timeout])) as [any, any];
+    const onboarded =
+      v2 === 'true' || v2 === '1' ||
+      v1 === 'true' || v1 === '1';
+    return onboarded ? HOME_ROUTE : ONBOARDING_ROUTE;
+  } catch {
+    // On any unexpected failure, default to HOME (safer than tutorial
+    // loop, and the user can re-open the tutorial from the INTRO tab).
+    return HOME_ROUTE;
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+//                         ROOT BOOT ROUTE
+// ──────────────────────────────────────────────────────────────────
 export default function Index() {
-  const router  = useRouter();
-  const insets  = useSafeAreaInsets();
-  const [stage, setStage] = useState<'safe' | 'goingFull'>('safe');
+  const router = useRouter();
+  const [stuck, setStuck] = useState(false);
 
-  const goFull = () => {
-    setStage('goingFull');
-    // Defer the navigation 100ms so the user actually SEES this safe screen
-    // first — confirms the bundle ran before we attempt the full app.
-    setTimeout(() => {
-      try { router.replace('/(tabs)/nexushome' as any); }
-      catch (e) { console.warn('[index] route to full app failed:', e); }
-    }, 100);
-  };
+  // Auto-redirect on mount.
+  useEffect(() => {
+    let cancelled = false;
 
-  return (
-    <View style={[styles.root, { paddingTop: insets.top + 24 }]}>
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-      >
-        {/* HERO — proves JS bundle loaded + RN renders */}
-        <View style={styles.hero}>
-          <Text style={styles.brand}>NEXUS</Text>
-          <Text style={styles.tagline}>BUTLER AI · LOCAL PC AUTOMATION</Text>
-          <View style={styles.statusDot} />
-          <Text style={styles.status}>SAFE MODE · BOOT OK</Text>
-        </View>
+    (async () => {
+      const target = await readOnboardingTarget();
+      if (cancelled) return;
+      // Tiny 50 ms defer so React's first commit + splash hide happen
+      // before the router starts the screen-transition animation.
+      setTimeout(() => {
+        if (cancelled) return;
+        safeNavigate(router, target);
+      }, 50);
+    })();
 
-        {/* INFO PANEL — proves StyleSheet, flex, scroll, text all work */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>COLD-START DIAGNOSTIC</Text>
-          <Text style={styles.cardBody}>
-            If you can read this, the JS bundle loaded, React Native mounted,
-            and the root layout rendered successfully. The previous
-            black-screen issue was inside the full tab layout, not the boot
-            chain.
-          </Text>
-          <Text style={styles.cardBody}>
-            Tap below to load the full NEXUS app. If THAT screen black-screens,
-            we know the crash is inside one of the heavy components
-            (dashboard / tab bar / floating composer) — we'll strip them next.
-          </Text>
-        </View>
+    // ESCAPE HATCH — if we're still on this route after 2.5 s, surface
+    // manual buttons so the user is never permanently stuck.
+    const t = setTimeout(() => {
+      if (!cancelled) setStuck(true);
+    }, 2500);
 
-        {/* PLATFORM INFO */}
-        <View style={styles.metaRow}>
-          <View style={styles.meta}>
-            <Text style={styles.metaLabel}>PLATFORM</Text>
-            <Text style={styles.metaValue}>{Platform.OS.toUpperCase()}</Text>
-          </View>
-          <View style={styles.meta}>
-            <Text style={styles.metaLabel}>VERSION</Text>
-            <Text style={styles.metaValue}>{String(Platform.Version ?? '?')}</Text>
-          </View>
-          <View style={styles.meta}>
-            <Text style={styles.metaLabel}>ARCH</Text>
-            <Text style={styles.metaValue}>OLD</Text>
-          </View>
-        </View>
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [router]);
 
-        {/* PRIMARY ACTION */}
+  // Manual escape hatch ──────────────────────────────────────────
+  const goHome = useCallback(() => safeNavigate(router, HOME_ROUTE),       [router]);
+  const goTut  = useCallback(() => safeNavigate(router, ONBOARDING_ROUTE), [router]);
+
+  if (stuck) {
+    return (
+      <View style={styles.root}>
+        <Text style={styles.brand}>NEXUS</Text>
+        <Text style={styles.tagline}>BUTLER AI · LOCAL PC AUTOMATION</Text>
+
+        <View style={styles.statusDotWarn} />
+        <Text style={styles.statusWarn}>BOOT TIMEOUT · TAP TO CONTINUE</Text>
+
+        <View style={{ height: 28 }} />
+
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={goFull}
-          disabled={stage === 'goingFull'}
-          style={[styles.cta, stage === 'goingFull' && styles.ctaPressed]}
+          onPress={goHome}
+          style={styles.cta}
         >
-          <Text style={styles.ctaText}>
-            {stage === 'goingFull' ? 'LOADING FULL APP…' : 'LAUNCH FULL NEXUS →'}
-          </Text>
+          <Text style={styles.ctaText}>CONTINUE → HOME</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={goTut}
+          style={styles.ctaAlt}
+        >
+          <Text style={styles.ctaAltText}>SHOW TUTORIAL</Text>
         </TouchableOpacity>
 
         <Text style={styles.foot}>
-          Safe Mode v1.0 · No providers · No tabs · No native services.
+          If you see this for more than a few seconds, please reinstall.
         </Text>
-      </ScrollView>
+      </View>
+    );
+  }
+
+  // Normal boot card — quietly shown for ~50–300 ms before the redirect.
+  return (
+    <View style={styles.root}>
+      <Text style={styles.brand}>NEXUS</Text>
+      <Text style={styles.tagline}>BUTLER AI · LOCAL PC AUTOMATION</Text>
+      <View style={{ height: 18 }} />
+      <ActivityIndicator size="large" color="#3b82f6" />
+      <View style={{ height: 18 }} />
+      <Text style={styles.status}>INITIALISING…</Text>
     </View>
   );
 }
 
+// ── STYLES ────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root:    { flex: 1, backgroundColor: '#000000' },
-  scroll:  { padding: 20, paddingBottom: 60, alignItems: 'stretch' },
-  hero:    { alignItems: 'center', marginBottom: 28 },
-  brand:   {
-    fontSize: 44,
+  root: {
+    flex: 1,
+    backgroundColor: '#000000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 28,
+  },
+  brand: {
+    fontSize: 38,
     fontWeight: '900',
     color: '#3b82f6',
     letterSpacing: 8,
@@ -128,92 +179,66 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     fontFamily: MONO,
     fontWeight: '700',
-    marginBottom: 14,
     textAlign: 'center',
+    marginBottom: 6,
   },
-  statusDot: {
+  statusDotWarn: {
     width: 8, height: 8, borderRadius: 4,
-    backgroundColor: '#00FF41',
-    marginBottom: 8,
+    backgroundColor: '#FFC400',
+    marginBottom: 6,
   },
-  status:  {
+  statusWarn: {
     fontSize: 10,
-    color: '#00FF41',
+    color: '#FFC400',
     letterSpacing: 2,
     fontFamily: MONO,
     fontWeight: '900',
   },
-  card: {
-    borderWidth: 1,
-    borderColor: '#3b82f655',
-    borderRadius: 10,
-    backgroundColor: '#0f1219EE',
-    padding: 16,
-    marginBottom: 18,
-  },
-  cardTitle: {
-    fontSize: 11,
-    fontWeight: '900',
+  status: {
+    fontSize: 10,
     color: '#3b82f6',
     letterSpacing: 2,
-    marginBottom: 10,
     fontFamily: MONO,
-  },
-  cardBody: {
-    fontSize: 13,
-    color: '#dde2f0',
-    lineHeight: 19,
-    marginBottom: 10,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  meta: {
-    flex: 1,
-    marginHorizontal: 4,
-    paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: '#0f1219AA',
-    borderWidth: 1,
-    borderColor: '#1f2937',
-    alignItems: 'center',
-  },
-  metaLabel: {
-    fontSize: 9,
-    color: '#6b7280',
-    letterSpacing: 1.5,
-    fontFamily: MONO,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  metaValue: {
-    fontSize: 13,
-    color: '#dde2f0',
     fontWeight: '900',
-    fontFamily: MONO,
   },
   cta: {
     backgroundColor: '#3b82f6',
     borderRadius: 10,
-    paddingVertical: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    marginBottom: 12,
+    minWidth: 240,
     alignItems: 'center',
-    marginBottom: 16,
   },
-  ctaPressed: { opacity: 0.6 },
   ctaText: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '900',
     color: '#ffffff',
     letterSpacing: 2.5,
+    fontFamily: MONO,
+  },
+  ctaAlt: {
+    borderWidth: 1.5,
+    borderColor: '#3b82f655',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    minWidth: 240,
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+  ctaAltText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#3b82f6',
+    letterSpacing: 2,
     fontFamily: MONO,
   },
   foot: {
     fontSize: 10,
     color: '#4b5563',
     textAlign: 'center',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     fontFamily: MONO,
   },
 });

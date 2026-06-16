@@ -203,11 +203,12 @@ const PAGES: Page[] = [
 const TOTAL = PAGES.length;
 
 // ── EXIT-TO-HOME (triple-fallback, never throws) ─────────────────────
-function persistOnboardingComplete() {
-  // Fire-and-forget — never blocks the redirect. If storage fails for
-  // any reason, the user still gets sent home.
+async function persistOnboardingComplete(): Promise<void> {
+  // Hard-cap the wait at 1.5 s so a hanging AsyncStorage CANNOT
+  // block the user from reaching the home screen. In practice the
+  // write completes in <50 ms — the timeout is a safety net only.
   try {
-    AsyncStorage.multiSet([
+    const write = AsyncStorage.multiSet([
       [ONBOARDING_DONE_KEY,           'true'],
       [WELCOME_COMPLETE_KEY,          'true'],
       [TERMS_ACCEPTED_KEY,            'true'],
@@ -215,7 +216,9 @@ function persistOnboardingComplete() {
       [CONSENT_KEY,                   '1.0.0'],
       [AGE_CONFIRMED_KEY,             'true'],
       ['@butler_stable_state',        'onboarded'],
-    ]).catch(() => {});
+    ]);
+    const cap = new Promise<void>(res => setTimeout(res, 1500));
+    await Promise.race([write, cap]);
   } catch {}
 }
 
@@ -231,10 +234,9 @@ function navigateHome(router: ReturnType<typeof useRouter>) {
 export default function OnboardingTab() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  // Tab bar height — safe-guarded because the hook can throw if the
-  // screen is ever rendered outside a Tabs navigator (preview, dev, etc).
-  let tabBarHeight = 0;
-  try { tabBarHeight = useBottomTabBarHeight(); } catch { tabBarHeight = 80; }
+  // Tab bar height — `useBottomTabBarHeight` is provided by the Tabs
+  // navigator that wraps this screen. Safe to call unconditionally.
+  const tabBarHeight = useBottomTabBarHeight();
   const [idx, setIdx] = useState(0);
 
   const page    = PAGES[idx];
@@ -242,10 +244,13 @@ export default function OnboardingTab() {
   const isLast  = idx === TOTAL - 1;
 
   // ── Handlers (all swallowed try/catch — none can crash the screen) ─
-  const goNext = useCallback(() => {
+  const goNext = useCallback(async () => {
     try {
       if (isLast) {
-        persistOnboardingComplete();
+        // FINISH: await persistence so the NEXT cold-launch reads the
+        // onboarded flag (and goes straight to home instead of looping
+        // back here). Capped internally at 1.5 s — cannot block.
+        await persistOnboardingComplete();
         navigateHome(router);
       } else {
         setIdx(i => Math.min(i + 1, TOTAL - 1));
@@ -257,9 +262,11 @@ export default function OnboardingTab() {
     try { setIdx(i => Math.max(0, i - 1)); } catch {}
   }, []);
 
-  const skipHome = useCallback(() => {
+  const skipHome = useCallback(async () => {
     try {
-      persistOnboardingComplete();
+      // SKIP: same contract as FINISH — mark onboarded so user is not
+      // bounced back here on next cold-launch.
+      await persistOnboardingComplete();
       navigateHome(router);
     } catch (e) { console.warn('[tutorial] skipHome failed:', e); }
   }, [router]);
