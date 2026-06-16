@@ -32,8 +32,8 @@ export default function ConnectionBadge({ tappable = false, style }: Props) {
   useEffect(() => {
     if (!connected) { pulse.setValue(0.6); return; }
     const loop = Animated.loop(Animated.sequence([
-      Animated.timing(pulse, { toValue: 1,   duration: 1200, useNativeDriver: false }),
-      Animated.timing(pulse, { toValue: 0.5, duration: 1200, useNativeDriver: false }),
+      Animated.timing(pulse, { toValue: 1,   duration: 1200, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 0.5, duration: 1200, useNativeDriver: true }),
     ]));
     loop.start();
     return () => { loop.stop(); };

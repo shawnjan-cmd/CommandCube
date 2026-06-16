@@ -27,7 +27,7 @@ import NexusQuickChips, { BUTLER_DEFAULT_CHIPS } from '@/components/butler/Nexus
 import { useCosmetic } from '@/contexts/CosmeticContext';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-import { File as FsFile } from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 import ButlerWelcomeHub from '@/components/ui/ButlerWelcomeHub';
 import { useChatHistory } from '@/hooks/useChatHistory';
@@ -51,7 +51,12 @@ function isAuthDisabled(): boolean {
   try { return (serverConnection as any).isAuthDisabled?.() === true; } catch { return false; }
 }
 
-const { width: SW } = Dimensions.get('window');
+const { width: _SW_RAW } = Dimensions.get('window');
+// Cold-start safe: native bridge can momentarily report width=0 before
+// the JS thread is fully ready (foldables, slow Android boot, Jest).
+// Without a fallback, SVG/animation math downstream returns NaN, which
+// renders blank SVGs and crashes Animated.interpolate output ranges.
+const SW = _SW_RAW > 0 ? _SW_RAW : 414;
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const BODY_FONT: any = Platform.OS === 'ios' ? 'System' : 'sans-serif';
 
@@ -1034,8 +1039,13 @@ function CommandConsoleBarThemed({ onSend, isConnected, disabled, accentColor }:
       let truncated = false;
       if (isText) {
         try {
-          const file = new FsFile(asset.uri);
-          const raw = await file.text();
+          // Legacy API: reads `file://` URIs directly. The new
+          // `File` class constructor expects a raw path string and
+          // silently mishandles `file://` URIs on Android, which
+          // previously caused the attachment to fail (no error).
+          const raw = await FileSystem.readAsStringAsync(asset.uri, {
+            encoding: FileSystem.EncodingType.UTF8,
+          });
           if (raw.length > MAX_TEXT_BYTES) { content = raw.slice(0, MAX_TEXT_BYTES); truncated = true; }
           else content = raw;
         } catch {

@@ -11,7 +11,7 @@ const COMPACT_MODE_KEY   = '@butler_tab_compact_mode';
 const OMEGA_SEEN_KEY     = '@omega_log_seen_v1';   // persists dismissed state
 const OMEGA_PENDING_KEY  = '@omega_log_pending_v1'; // set when new analysis arrives
 
-export type TabName = 'index' | 'library' | 'butler' | 'scripts' | 'settings' | 'advanced' | 'todo' | 'terminal';
+export type TabName = 'index' | 'library' | 'butler' | 'scripts' | 'settings' | 'advanced' | 'terminal';
 
 export interface TabBadge {
   count?: number;
@@ -74,7 +74,6 @@ export function TabBarProvider({ children }: { children: ReactNode }) {
     scripts: null,
     settings: null,
     advanced: null,
-    todo: { count: 12, status: 'warning', priority: 'high' },
     terminal: null,
   });
   const [contextualActions, setContextualActions] = useState<ContextualAction[]>([]);
@@ -136,7 +135,6 @@ export function TabBarProvider({ children }: { children: ReactNode }) {
     scripts: false,
     settings: false,
     advanced: false,
-    todo: false,
     terminal: false,
   });
 
