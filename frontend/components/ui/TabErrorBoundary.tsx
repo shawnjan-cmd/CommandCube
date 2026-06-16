@@ -118,7 +118,7 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => Pro
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000509',
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,

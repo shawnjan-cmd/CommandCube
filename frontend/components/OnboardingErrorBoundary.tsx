@@ -108,7 +108,7 @@ export default class OnboardingErrorBoundary extends Component<Props, State> {
 }
 
 const st = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#050A12', alignItems: 'center', justifyContent: 'center', padding: 28 },
+  root: { flex: 1, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center', padding: 28 },
   panel: { width: '100%', maxWidth: 380, borderWidth: 1, borderColor: '#FFB02055', backgroundColor: '#1A130688', borderRadius: 10, padding: 24, alignItems: 'center' },
   cornerTL: { position: 'absolute', top: -2, left: -2, width: 14, height: 14, borderTopWidth: 2, borderLeftWidth: 2, borderColor: '#FFB020' },
   cornerTR: { position: 'absolute', top: -2, right: -2, width: 14, height: 14, borderTopWidth: 2, borderRightWidth: 2, borderColor: '#FFB020' },

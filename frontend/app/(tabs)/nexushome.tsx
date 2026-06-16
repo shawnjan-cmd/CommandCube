@@ -46,6 +46,7 @@ import AutomationFeed from '@/components/home/AutomationFeed';
 import SafeBoundary from '@/components/ui/SafeBoundary';
 import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
 import { useRouter } from 'expo-router';
+import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 const { width: SW } = Dimensions.get('window');
@@ -1972,6 +1973,41 @@ function NexusHomeScreenInner() {
     uiConfig.load().then(c => setUiCfg(c)).catch(() => {});
   }, []);
 
+  // ── FIRST-LAUNCH ONBOARDING REDIRECT (post-mount, blue-screen safe) ─────
+  // Home renders FIRST so there's no possibility of a blue/blank screen on
+  // cold start. AFTER the React tree has painted, we ask AsyncStorage if the
+  // user has completed onboarding. If not, we navigate to the INTRO tab so
+  // they get the proper tutorial experience.
+  // Wrapped in a module-scoped guard so it only fires ONCE per process —
+  // users can revisit INTRO manually without being yanked away.
+  const onboardingNavRouter = useRouter();
+  useEffect(() => {
+    if ((global as any).__butler_onboarding_check_done) return;
+    (global as any).__butler_onboarding_check_done = true;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const [v2, v1] = await Promise.all([
+          AsyncStorage.getItem(ONBOARDING_DONE_KEY),
+          AsyncStorage.getItem('@butler_welcome_complete_v1'),
+        ]);
+        if (cancelled) return;
+        const isDone = v2 === 'true' || v2 === '1' || v1 === 'true' || v1 === '1';
+        if (isDone) return; // returning user — stay on home
+        // First-time user — push to INTRO tab AFTER first paint
+        setTimeout(() => {
+          if (cancelled) return;
+          try { onboardingNavRouter.push('/(tabs)/onboarding' as any); }
+          catch (e) { console.warn('[NexusHome] onboarding nav failed:', e); }
+        }, 250); // small delay = lets home paint visibly first
+      } catch {
+        // storage error — safe default: do nothing, user stays on home
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [onboardingNavRouter]);
+
   // Connection state
   useFocusEffect(useCallback(() => {
     try {
@@ -2280,18 +2316,18 @@ class _NexusBoundary extends ReactComponent<{ children: any }, { err: Error | nu
   render() {
     if (!this.state.err) return this.props.children;
     return (
-      <VV style={{ flex: 1, backgroundColor: '#050A12', alignItems: 'center', justifyContent: 'center', padding: 28 }}>
-        <VV style={{ borderWidth: 1, borderColor: '#00FFC650', backgroundColor: '#0A1A24CC', borderRadius: 10, padding: 24, alignItems: 'center', maxWidth: 360 }}>
-          <TT style={{ fontSize: 18, fontWeight: '900', color: '#00FFC6', letterSpacing: 3, marginBottom: 10, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>BUTLER AI</TT>
-          <TT style={{ fontSize: 11, color: '#7FE5D6', letterSpacing: 2, marginBottom: 18, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>HOME · RECOVERY MODE</TT>
-          <TT style={{ fontSize: 12, color: '#E6FFFA', textAlign: 'center', lineHeight: 19, marginBottom: 18 }}>
+      <VV style={{ flex: 1, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center', padding: 28 }}>
+        <VV style={{ borderWidth: 1, borderColor: '#FF2A1F55', backgroundColor: '#1A0000CC', borderRadius: 10, padding: 24, alignItems: 'center', maxWidth: 360 }}>
+          <TT style={{ fontSize: 18, fontWeight: '900', color: '#FF2A1F', letterSpacing: 3, marginBottom: 10, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>BUTLER AI</TT>
+          <TT style={{ fontSize: 11, color: '#FF6644', letterSpacing: 2, marginBottom: 18, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>HOME · RECOVERY MODE</TT>
+          <TT style={{ fontSize: 12, color: '#FFE0DC', textAlign: 'center', lineHeight: 19, marginBottom: 18 }}>
             The home dashboard failed to load. Tap to retry, or use the tab bar below to access other features.
           </TT>
           <TT style={{ fontSize: 9, color: '#8C95A6', textAlign: 'center', marginBottom: 18, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }} numberOfLines={3}>
             {String(this.state.err?.message ?? 'unknown')}
           </TT>
-          <TO onPress={this.retry} activeOpacity={0.85} style={{ paddingVertical: 11, paddingHorizontal: 24, borderWidth: 1.5, borderColor: '#00FFC6', backgroundColor: '#00FFC615', borderRadius: 8 }}>
-            <TT style={{ color: '#00FFC6', fontWeight: '900', letterSpacing: 2, fontSize: 12, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>↻ RETRY DASHBOARD</TT>
+          <TO onPress={this.retry} activeOpacity={0.85} style={{ paddingVertical: 11, paddingHorizontal: 24, borderWidth: 1.5, borderColor: '#FF2A1F', backgroundColor: '#FF2A1F15', borderRadius: 8 }}>
+            <TT style={{ color: '#FF2A1F', fontWeight: '900', letterSpacing: 2, fontSize: 12, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>↻ RETRY DASHBOARD</TT>
           </TO>
         </VV>
       </VV>

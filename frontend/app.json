@@ -19,8 +19,7 @@
       "assets/favicon.png",
       "assets/fonts/**/*",
       "assets/images/authenticate-device-bg.jpg",
-      "assets/images/butler-robot-tux.jpg",
-      "assets/svg/**/*"
+      "assets/images/butler-robot-tux.jpg"
     ],
     "ios": {
       "supportsTablet": false,
