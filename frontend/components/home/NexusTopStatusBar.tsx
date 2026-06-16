@@ -44,7 +44,7 @@ interface Props {
   isConnected: boolean;
   /** "192.168.1.42:1817" or empty when disconnected. */
   serverAddr?: string;
-  /** App version, e.g. "2.1.15". */
+  /** App version, e.g. "2.1.26". */
   version: string;
   /** Triggered when the user taps the right-side PAIR CTA. */
   onPair: () => void;

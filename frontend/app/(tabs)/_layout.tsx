@@ -35,6 +35,7 @@ import ConnectionBadge   from '@/components/ui/ConnectionBadge';
 import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
 import WelcomeBackOverlay from '@/components/ui/WelcomeBackOverlay';
 import { useUserSession } from '@/hooks/useUserSession';
+import { APP_VERSION_LABEL } from '@/constants/appVersion';
 
 // ─── COLD-START CONTRACT ──────────────────────────────────────────
 // `initialRouteName: 'nexushome'` forces expo-router to mount the HOME
@@ -110,7 +111,7 @@ export default function TabLayout() {
         title={String(options?.title ?? '').replace(/^>\s*/, '')}
         isConnected={isConnected}
         showStatusPills
-        version="v1.0"
+        version={APP_VERSION_LABEL}
       />
     ),
   };

@@ -48,6 +48,7 @@ import ButlerAITitle3D from '@/components/ui/ButlerAITitle3D';
 import HomeSectionDivider from '@/components/home/HomeSectionDivider';
 import NexusTopStatusBar from '@/components/home/NexusTopStatusBar';
 import Constants from 'expo-constants';
+import { APP_VERSION } from '@/constants/appVersion';
 import AutomationFeed from '@/components/home/AutomationFeed';
 import SafeBoundary from '@/components/ui/SafeBoundary';
 import { privacyAudit, AuditCounters } from '@/services/privacyAudit';
@@ -2258,7 +2259,7 @@ function NexusHomeScreenInner() {
       <NexusTopStatusBar
         isConnected={isConnected}
         serverAddr={serverAddr}
-        version={(Constants.expoConfig as any)?.version || '2.1.15'}
+        version={APP_VERSION}
         onPair={() => setShowQR(true)}
         onLock={() => goToTab('settings')}
       />
