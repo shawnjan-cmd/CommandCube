@@ -7,7 +7,6 @@ import QuickButlerBar from '@/components/ui/QuickButlerBar';
 import FuturisticTabBar from '@/components/ui/FuturisticTabBar';
 import ConnectionBadge from '@/components/ui/ConnectionBadge';
 import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
-import CyberneticBackdrop from '@/components/backgrounds/CyberneticBackdrop';
 import { useServerConnection } from '@/hooks/useServerConnection';
 
 // ── CRITICAL — Expo Router native-cold-start fix ─────────────────────────
@@ -100,15 +99,8 @@ export default function TabLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#000000' }}>
-      {/* Animated Terminator-HUD backdrop visible across non-onboarding tabs.
-          Skipped on the onboarding tab because (a) onboarding has its own
-          HUDGridBG, and (b) CyberneticBackdrop uses Dimensions.get('window')
-          at module load — if the cold-start bridge returns 0 for window
-          width/height, its Animated.interpolate outputRange produces NaN
-          which crashes the render → splash stays up → "blue screen". Guard
-          here ensures onboarding (the very first screen on first launch)
-          never hits that code path during the most fragile boot moment. */}
-      {!onOnboarding && <CyberneticBackdrop intensity={0.7} />}
+      {/* CyberneticBackdrop DELETED — was a suspected cold-start crash cause.
+          The app gets a clean solid-black background under the tabs instead. */}
       <Tabs
         initialRouteName="nexushome"
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}

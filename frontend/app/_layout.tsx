@@ -171,8 +171,13 @@ export default function RootLayout() {
   useEffect(() => {
     if (bootRef.current) return;
     bootRef.current = true;
-    // Defer bootstrap to next microtask — never blocks first paint.
-    Promise.resolve().then(() => { bootstrapServices().catch(() => {}); });
+    // Defer bootstrap by 1500ms past mount — gives the native bridge,
+    // Hermes, and the first paint plenty of time to settle before we
+    // touch AppState listeners, intervals, fetch, or AsyncStorage in
+    // any heavy way. Was previously microtask-deferred which still
+    // raced with the first paint on slower Android devices.
+    const t = setTimeout(() => { bootstrapServices().catch(() => {}); }, 1500);
+    return () => clearTimeout(t);
   }, []);
 
   return (
