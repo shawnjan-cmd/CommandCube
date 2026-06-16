@@ -14,7 +14,12 @@
       "backgroundColor": "#000000"
     },
     "assetBundlePatterns": [
-      "assets/**/*"
+      "assets/icon.png",
+      "assets/adaptive-icon.png",
+      "assets/favicon.png",
+      "assets/fonts/**/*",
+      "assets/images/authenticate-device-bg.jpg",
+      "assets/images/butler-robot-tux.jpg"
     ],
     "ios": {
       "supportsTablet": false,
@@ -34,7 +39,6 @@
       "package": "com.butlerai.pc.automation",
       "versionCode": 125,
       "jsEngine": "hermes",
-      "allowBackup": false,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
