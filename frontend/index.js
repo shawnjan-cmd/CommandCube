@@ -87,20 +87,14 @@ if (typeof global.TextEncoder === 'undefined') {
 require('react-native-url-polyfill/auto');
 
 // ── 0c. SPLASH SCREEN UNIVERSAL FALLBACK (FIX FOR 20+ BLUE-SCREEN BUILDS) ───
-// This MUST run before any potentially-failing require. If expo-router/entry
-// fails (recovery screen path), or if `_layout.tsx` never loads, the splash
-// would otherwise stay on screen forever and look like a blue screen of
-// death. This unconditional 4-second timeout guarantees the splash is hidden
-// no matter what happens downstream. Done at the entry-point level so it
-// fires even when the entire React tree fails to mount.
-try {
-  const _Splash = require('expo-splash-screen');
-  // Hold the splash up while we try to boot, then force-hide after 4s.
-  try { _Splash.preventAutoHideAsync().catch(() => {}); } catch (_) {}
-  setTimeout(() => {
-    try { _Splash.hideAsync().catch(() => {}); } catch (_) {}
-  }, 4000);
-} catch (_) { /* expo-splash-screen not available — nothing to do */ }
+// IMPORTANT — DO NOT call `preventAutoHideAsync()` here.
+// `_layout.tsx` already calls it ONCE at its module-load. expo-splash-screen
+// v31 + SDK 54 + New Arch keeps an internal reference counter on these calls;
+// calling preventAutoHide twice means hideAsync() must be called TWICE to
+// fully dismiss, which races and on some devices leaves the splash visible
+// forever ("blue screen"). The Recovery component below still calls
+// hideAsync() defensively for the expo-router/entry failure path — that's
+// a separate concern from the prevent counter.
 
 // ── 0d. BOOT WATCHDOG — AUTO-RECOVERY IF THE APP FAILS TO LOAD ──────────────
 // Self-healing boot loop:

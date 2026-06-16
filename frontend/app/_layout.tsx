@@ -183,9 +183,20 @@ const eb = StyleSheet.create({
 });
 
 // ─── ROOT LAYOUT ─────────────────────────────────────────────────────────────
+// `useAppSync` is now run from a child component instead of called directly
+// inside the function body. Calling hooks inside try/catch violates the Rules
+// of Hooks and can silently corrupt React's hook order — that breaks renders
+// in ways the error boundary can't catch.
+function AppSyncRunner() {
+  try { useAppSync(); }
+  catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('[_layout] useAppSync failed:', e);
+  }
+  return null;
+}
+
 export default function RootLayout() {
-  // useAppSync is wrapped in try/catch via a stable hook ref — never throws.
-  try { useAppSync(); } catch (e) { /* eslint-disable-next-line no-console */ console.warn('[_layout] useAppSync failed:', e); }
   const bootRef = useRef(false);
 
   // ── BOOT DIAGNOSTIC HELPER ────────────────────────────────────────────────
@@ -326,9 +337,13 @@ export default function RootLayout() {
     <GlobalErrorBoundary>
       <CosmeticProvider>
         <TabBarProvider>
+          {/* Non-rendering child that safely runs useAppSync inside the
+              React tree (NOT in try/catch in the parent's body, which would
+              violate Rules of Hooks and corrupt hook order silently). */}
+          <AppSyncRunner />
           <View style={s.container} onLayout={onRootLayout}>
             <StatusBar style="light" />
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#050A12' } }}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#000000' } }}>
               <Stack.Screen name="index"          options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)"         options={{ headerShown: false }} />
               <Stack.Screen name="privacy-policy" options={{ headerShown: false, presentation: 'modal', animation: 'slide_from_bottom' }} />
@@ -346,5 +361,5 @@ export default function RootLayout() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050A12' },
+  container: { flex: 1, backgroundColor: '#000000' },
 });

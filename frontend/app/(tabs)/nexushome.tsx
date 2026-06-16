@@ -40,6 +40,7 @@ import { MechBayHero, HexCommandRing, MechPanel } from '@/components/home/MechBa
 import HomeTerminalClock from '@/components/home/HomeTerminalClock';
 import HomeGreetingBanner from '@/components/home/HomeGreetingBanner';
 import ButlerAiTerminatorLogo from '@/components/ui/ButlerAiTerminatorLogo';
+import ButlerAITitle3D from '@/components/ui/ButlerAITitle3D';
 import HomeSectionDivider from '@/components/home/HomeSectionDivider';
 import AutomationFeed from '@/components/home/AutomationFeed';
 import SafeBoundary from '@/components/ui/SafeBoundary';
@@ -712,11 +713,14 @@ function NexusHero({
           </View>
         </View>
 
-        {/* ── BUTLER AI logo (SVG terminator-themed) ──────────── */}
-        <View style={{ alignItems: 'center', marginTop: -2, marginBottom: 4 }}>
-          <ButlerAiTerminatorLogo width={300} />
+        {/* ── BUTLER AI 3D wordmark ───────────────────────────── */}
+        <View style={{ alignItems: 'center', marginTop: 4, marginBottom: 6, alignSelf: 'stretch' }}>
+          <ButlerAITitle3D
+            width={Math.min(SW - 56, 360)}
+            accent={accent}
+            subtitle="LOCAL AI · PC AUTOMATION · COMMAND CORE"
+          />
         </View>
-        <Text style={nh.tagline} numberOfLines={1}>LOCAL AI · PC AUTOMATION · COMMAND CORE</Text>
 
         {/* ── 4 themed stat tiles ────────────────────────────── */}
         <View style={nh.statsRow}>

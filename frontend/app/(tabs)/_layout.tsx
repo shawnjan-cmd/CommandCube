@@ -93,9 +93,16 @@ export default function TabLayout() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#040608' }}>
-      {/* Animated Terminator-HUD backdrop visible across all tabs */}
-      <CyberneticBackdrop intensity={0.7} />
+    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+      {/* Animated Terminator-HUD backdrop visible across non-onboarding tabs.
+          Skipped on the onboarding tab because (a) onboarding has its own
+          HUDGridBG, and (b) CyberneticBackdrop uses Dimensions.get('window')
+          at module load — if the cold-start bridge returns 0 for window
+          width/height, its Animated.interpolate outputRange produces NaN
+          which crashes the render → splash stays up → "blue screen". Guard
+          here ensures onboarding (the very first screen on first launch)
+          never hits that code path during the most fragile boot moment. */}
+      {!onOnboarding && <CyberneticBackdrop intensity={0.7} />}
       <Tabs
         initialRouteName="nexushome"
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}

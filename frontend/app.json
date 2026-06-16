@@ -2,7 +2,7 @@
   "expo": {
     "name": "Butler AI: PC Automation",
     "slug": "butler-ai-pc-automation",
-    "version": "2.1.8",
+    "version": "2.1.9",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#050A12"
+      "backgroundColor": "#000000"
     },
     "assetBundlePatterns": [
       "assets/icon.png",
@@ -35,10 +35,10 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#050A12"
+        "backgroundColor": "#000000"
       },
       "package": "com.butlerai.pc.automation",
-      "versionCode": 118,
+      "versionCode": 119,
       "jsEngine": "hermes",
       "permissions": [
         "android.permission.INTERNET",
@@ -115,12 +115,12 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#050A12",
+          "backgroundColor": "#000000",
           "image": "./assets/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "dark": {
-            "backgroundColor": "#050A12",
+            "backgroundColor": "#000000",
             "image": "./assets/icon.png"
           }
         }
