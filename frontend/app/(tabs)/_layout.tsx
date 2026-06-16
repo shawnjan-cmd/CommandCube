@@ -14,11 +14,12 @@ import { useServerConnection } from '@/hooks/useServerConnection';
 // The hidden `index.tsx` route below MUST exist for expo-router on native
 // Android to properly mount the (tabs) group on cold start. Without that
 // file the navigator never mounts → splash never hides → blue screen.
-// We DON'T set initialRouteName to 'index' though — that would hijack
-// URL-driven routing. Instead the default tab is `nexushome` (returning
-// users) and `app/index.tsx` explicitly redirects to `/(tabs)/onboarding`
-// for first launches (where the onboarding tab itself decides whether to
-// skip to home for already-onboarded users).
+//
+// LANDING-PAGE CONTRACT (post-doom-loop, per explicit user request):
+//   • `app/index.tsx` → ALWAYS redirects to `/(tabs)/nexushome`. No async.
+//   • `(tabs)/index.tsx` (this group's hidden index) → same redirect.
+//   • `nexushome.tsx` NO LONGER auto-redirects to INTRO on first launch.
+//   • INTRO remains a manually-tapable tab in the bottom toolbar.
 export const unstable_settings = {
   initialRouteName: 'nexushome',
 };

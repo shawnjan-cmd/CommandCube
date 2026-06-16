@@ -2078,40 +2078,32 @@ function NexusHomeScreenInner() {
     uiConfig.load().then(c => setUiCfg(c)).catch(() => {});
   }, []);
 
-  // ── FIRST-LAUNCH ONBOARDING REDIRECT (post-mount, blue-screen safe) ─────
-  // Home renders FIRST so there's no possibility of a blue/blank screen on
-  // cold start. AFTER the React tree has painted, we ask AsyncStorage if the
-  // user has completed onboarding. If not, we navigate to the INTRO tab so
-  // they get the proper tutorial experience.
-  // Wrapped in a module-scoped guard so it only fires ONCE per process —
-  // users can revisit INTRO manually without being yanked away.
-  const onboardingNavRouter = useRouter();
+  // ── HOME IS ALWAYS THE LANDING PAGE (per user request, post-doom-loop) ──
+  // We previously auto-redirected first-launch users to the INTRO tab.
+  // After 20+ user reports of "I get stuck on the tutorial / I just want
+  // home", that auto-redirect is REMOVED. INTRO remains a manually-tapable
+  // tab in the bottom toolbar — first-time users can reach it whenever they
+  // want, but the app boots straight to this dashboard, every time.
+  //
+  // We DO defensively stamp the onboarding-complete flag once on first
+  // launch, so:
+  //   • the INTRO tab itself never tries to "skip to home" mid-render
+  //     (that would feel jumpy if the user manually tapped INTRO)
+  //   • any other guard elsewhere in the app treats the user as ready.
   useEffect(() => {
-    if ((global as any).__butler_onboarding_check_done) return;
-    (global as any).__butler_onboarding_check_done = true;
-
-    let cancelled = false;
     (async () => {
       try {
-        const [v2, v1] = await Promise.all([
-          AsyncStorage.getItem(ONBOARDING_DONE_KEY),
-          AsyncStorage.getItem('@butler_welcome_complete_v1'),
-        ]);
-        if (cancelled) return;
-        const isDone = v2 === 'true' || v2 === '1' || v1 === 'true' || v1 === '1';
-        if (isDone) return; // returning user — stay on home
-        // First-time user — push to INTRO tab AFTER first paint
-        setTimeout(() => {
-          if (cancelled) return;
-          try { onboardingNavRouter.navigate('/(tabs)/onboarding' as any); }
-          catch (e) { console.warn('[NexusHome] onboarding nav failed:', e); }
-        }, 250); // small delay = lets home paint visibly first
-      } catch {
-        // storage error — safe default: do nothing, user stays on home
-      }
+        const v2 = await AsyncStorage.getItem(ONBOARDING_DONE_KEY);
+        const v1 = await AsyncStorage.getItem('@butler_welcome_complete_v1');
+        if (v2 !== 'true' && v2 !== '1' && v1 !== 'true' && v1 !== '1') {
+          await AsyncStorage.multiSet([
+            [ONBOARDING_DONE_KEY,           'true'],
+            ['@butler_welcome_complete_v1', 'true'],
+          ]).catch(() => {});
+        }
+      } catch { /* storage hiccup — safe to ignore, home still renders */ }
     })();
-    return () => { cancelled = true; };
-  }, [onboardingNavRouter]);
+  }, []);
 
   // Connection state
   useFocusEffect(useCallback(() => {
