@@ -31,47 +31,20 @@ import {
   View, Text, StyleSheet, Platform, TouchableOpacity, ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  ONBOARDING_DONE_KEY,
-  WELCOME_COMPLETE_KEY,
-} from '@/constants/onboardingKeys';
+  getBootTarget,
+  HOME_ROUTE,
+  ONBOARDING_ROUTE,
+  type BootTarget,
+} from '@/services/userSession';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
-
-const HOME_ROUTE       = '/(tabs)/nexushome'  as const;
-const ONBOARDING_ROUTE = '/(tabs)/onboarding' as const;
 
 // ── Triple-fallback navigation — never throws ─────────────────────
 function safeNavigate(router: ReturnType<typeof useRouter>, route: string) {
   try { router.replace(route as any); return; } catch (e1) { console.warn('[root] replace failed:', e1); }
   try { router.push(route as any);    return; } catch (e2) { console.warn('[root] push failed:',    e2); }
   try { (router as any).navigate?.(route); } catch (e3) { console.warn('[root] navigate failed:', e3); }
-}
-
-// ── Read onboarding state with a hard timeout ─────────────────────
-async function readOnboardingTarget(): Promise<typeof HOME_ROUTE | typeof ONBOARDING_ROUTE> {
-  try {
-    const read = Promise.all([
-      AsyncStorage.getItem(ONBOARDING_DONE_KEY).catch(() => null),
-      AsyncStorage.getItem(WELCOME_COMPLETE_KEY).catch(() => null),
-    ]);
-    // Hard cap at 1.8 s — if AsyncStorage hangs, default to HOME so
-    // returning users don't get re-shown the tutorial.
-    const timeout = new Promise<[null, null]>(res =>
-      setTimeout(() => res([null, null]), 1800),
-    );
-
-    const [v2, v1] = (await Promise.race([read, timeout])) as [any, any];
-    const onboarded =
-      v2 === 'true' || v2 === '1' ||
-      v1 === 'true' || v1 === '1';
-    return onboarded ? HOME_ROUTE : ONBOARDING_ROUTE;
-  } catch {
-    // On any unexpected failure, default to HOME (safer than tutorial
-    // loop, and the user can re-open the tutorial from the INTRO tab).
-    return HOME_ROUTE;
-  }
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -86,7 +59,7 @@ export default function Index() {
     let cancelled = false;
 
     (async () => {
-      const target = await readOnboardingTarget();
+      const target: BootTarget = await getBootTarget();
       if (cancelled) return;
       // Tiny 50 ms defer so React's first commit + splash hide happen
       // before the router starts the screen-transition animation.

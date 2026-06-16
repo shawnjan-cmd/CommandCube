@@ -40,8 +40,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ALL_ONBOARDING_WRITE_KEYS } from '@/constants/onboardingKeys';
+import { markUserOnboarded } from '@/services/userSession';
 
 // ── PALETTE ──────────────────────────────────────────────────────────
 const C = {
@@ -204,18 +203,10 @@ const PAGES: Page[] = [
 const TOTAL = PAGES.length;
 
 // ── EXIT-TO-HOME (triple-fallback, never throws) ─────────────────────
-async function persistOnboardingComplete(): Promise<void> {
-  // Hard-cap the wait at 1.5 s so a hanging AsyncStorage CANNOT
-  // block the user from reaching the home screen. In practice the
-  // write completes in <50 ms — the timeout is a safety net only.
-  // Keys + values come from the single source of truth in
-  // `constants/onboardingKeys.ts`.
-  try {
-    const write = AsyncStorage.multiSet(ALL_ONBOARDING_WRITE_KEYS);
-    const cap = new Promise<void>(res => setTimeout(res, 1500));
-    await Promise.race([write, cap]);
-  } catch {}
-}
+// Persistence delegated to the centralised `userSession` service so
+// the SAME contract is used by the FINISH button, the SKIP button,
+// the Settings → Delete-All-Data feature, and the boot-time redirect.
+const persistOnboardingComplete = markUserOnboarded;
 
 function navigateHome(router: ReturnType<typeof useRouter>) {
   try { router.replace(HOME_ROUTE as any);  return; } catch (e1) { console.warn('[tutorial] replace failed:', e1); }
