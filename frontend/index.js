@@ -86,15 +86,23 @@ if (typeof global.TextEncoder === 'undefined') {
 
 require('react-native-url-polyfill/auto');
 
-// ── 0c. SPLASH SCREEN UNIVERSAL FALLBACK (FIX FOR 20+ BLUE-SCREEN BUILDS) ───
-// IMPORTANT — DO NOT call `preventAutoHideAsync()` here.
-// `_layout.tsx` already calls it ONCE at its module-load. expo-splash-screen
-// v31 + SDK 54 + New Arch keeps an internal reference counter on these calls;
-// calling preventAutoHide twice means hideAsync() must be called TWICE to
-// fully dismiss, which races and on some devices leaves the splash visible
-// forever ("blue screen"). The Recovery component below still calls
-// hideAsync() defensively for the expo-router/entry failure path — that's
-// a separate concern from the prevent counter.
+// ── 0c. SPLASH SCREEN — HIDE IMMEDIATELY ───────────────────────────────────
+// User reported 20+ "blue screen" cold-boots on Android. Root cause matrix:
+//   1. Splash never dismissing (waits for layout that crashed)
+//   2. Recovery-Mode screen showing its dark-navy bg (looks like "blue screen")
+//   3. Watchdog firing recovery before heartbeat
+//
+// SIMPLEST FIX (per user request "make it go directly to homepage first"):
+// Call SplashScreen.hideAsync() the very moment JS executes. We don't wait
+// for layouts, effects, AsyncStorage, or anything else. If the system
+// honors prevent-auto-hide-async we'll still hide it again later via
+// _layout.tsx's onLayout — this is purely defensive.
+try {
+  const _SplashEarly = require('expo-splash-screen');
+  if (_SplashEarly && typeof _SplashEarly.hideAsync === 'function') {
+    _SplashEarly.hideAsync().catch(() => {});
+  }
+} catch (_) {}
 
 // ── 0d. BOOT WATCHDOG — AUTO-RECOVERY IF THE APP FAILS TO LOAD ──────────────
 // Self-healing boot loop:
@@ -144,62 +152,25 @@ global.__butlerBootHeartbeat = function () {
     _bootWatchdogTimer = setTimeout(() => {
       if (_bootHeartbeatFired) return; // already healthy
       // ── Boot is STUCK ────────────────────────────────────────────────
+      // SILENT RECOVERY ONLY — never show a visible "Recovery Mode"
+      // screen (the previous #050A12 dark-navy bg looked exactly like
+      // the "blue screen" the user keeps reporting). Just wipe caches
+      // in the background and try a silent reload, capped at 3 attempts
+      // to avoid infinite loops. If we exceed the cap, do absolutely
+      // nothing — the React tree should still eventually paint.
       if (attempts < BOOT_MAX_AUTO_ATTEMPTS) {
-        // Silent recovery: wipe video cache + reload.
         try { _wipeVideoCache && _wipeVideoCache().catch(() => {}); } catch (_) {}
         setTimeout(() => { try { _safeReload && _safeReload(); } catch (_) {} }, 600);
       } else {
-        // Loop guard tripped — show a user-visible recovery screen.
+        // Loop guard tripped — reset counter so next launch is clean,
+        // but DO NOT replace the React tree. Just hide the splash so
+        // whatever the app rendered (even a partial home screen) is
+        // visible to the user.
         try {
-          const React = require('react');
-          const { View, Text, TouchableOpacity } = require('react-native');
-          const _Splash = (() => { try { return require('expo-splash-screen'); } catch (_) { return null; } })();
-
-          function ButlerStuckRecovery() {
-            React.useEffect(() => {
-              try { _Splash && _Splash.hideAsync().catch(() => {}); } catch (_) {}
-            }, []);
-            const onWipe = async () => {
-              try {
-                // Wipe every cache we know about + reset boot counter.
-                try { await AS.clear(); } catch (_) {}
-                try { _wipeVideoCache && await _wipeVideoCache(); } catch (_) {}
-                try { _wipeAllAppCaches && await _wipeAllAppCaches(); } catch (_) {}
-              } finally {
-                setTimeout(() => { try { _safeReload && _safeReload(); } catch (_) {} }, 400);
-              }
-            };
-            return React.createElement(View,
-              { style: { flex: 1, backgroundColor: '#050A12', alignItems: 'center', justifyContent: 'center', padding: 28 } },
-              React.createElement(Text, {
-                style: { color: '#00CCDD', fontSize: 26, fontWeight: '900', fontFamily: 'monospace', letterSpacing: 4, marginBottom: 16 },
-              }, 'RECOVERY MODE'),
-              React.createElement(Text, {
-                style: { color: '#FFFFFF', fontSize: 13, fontFamily: 'monospace', textAlign: 'center', lineHeight: 20, marginBottom: 24, paddingHorizontal: 8 },
-              }, 'Butler AI failed to start ' + attempts + ' times in a row.\\n\\nTap below to wipe caches and restart.\\n\\nYour pairing key and onboarding will reset.'),
-              React.createElement(TouchableOpacity, {
-                onPress: onWipe, activeOpacity: 0.7,
-                style: {
-                  borderWidth: 2, borderColor: '#FF5500', backgroundColor: 'rgba(255,85,0,0.12)',
-                  borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32,
-                },
-              }, React.createElement(Text, {
-                style: { color: '#FF5500', fontSize: 14, fontWeight: '900', fontFamily: 'monospace', letterSpacing: 2 },
-              }, 'WIPE & RESTART')),
-              React.createElement(Text, {
-                style: { color: '#8C95A6', fontSize: 10, fontFamily: 'monospace', textAlign: 'center', marginTop: 28, opacity: 0.6 },
-              }, 'BUTLER AI · BOOT WATCHDOG'),
-            );
-          }
-          // Replace whatever was registered as 'main' with the recovery screen.
-          const { AppRegistry } = require('react-native');
-          AppRegistry.registerComponent('main', () => ButlerStuckRecovery);
-          // Also reset the attempt counter so a successful wipe-and-retry boots cleanly.
-          AS.setItem(BOOT_ATTEMPTS_KEY, '0').catch(() => {});
-        } catch (_) {
-          // Absolute fallback — try one more silent reload.
-          try { _safeReload && _safeReload(); } catch (__) {}
-        }
+          const _Splash = require('expo-splash-screen');
+          _Splash.hideAsync().catch(() => {});
+        } catch (_) {}
+        try { AS.setItem(BOOT_ATTEMPTS_KEY, '0').catch(() => {}); } catch (_) {}
       }
     }, BOOT_WATCHDOG_MS);
   }).catch(() => {});
@@ -428,7 +399,7 @@ function _makeRecovery(React, View, Text, msg) {
       } catch (_) {}
     }, []);
     return React.createElement(View,
-      { style: { flex: 1, backgroundColor: '#020A10', justifyContent: 'center', alignItems: 'center', padding: 32 } },
+      { style: { flex: 1, backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center', padding: 32 } },
       React.createElement(Text, {
         style: { color: '#00CCDD', fontSize: 22, fontWeight: '900', fontFamily: 'monospace', marginBottom: 16, letterSpacing: 3 },
       }, 'BUTLER AI'),

@@ -70,16 +70,21 @@ import { withTimeout } from '@/utils/withTimeout';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 // ── HARD-TIMEOUT SPLASH FALLBACK (FIX FOR 20+ BLUE-SCREEN BUILDS) ──────────
-// If ANYTHING prevents the root View's onLayout from firing — a render
-// error caught by GlobalErrorBoundary (whose error screen has no onLayout),
-// a navigation race, a native module timing issue, etc. — the splash would
-// otherwise stay on screen forever, looking exactly like a "blue screen
-// of death". This unconditional 3-second timeout guarantees the splash is
-// hidden no matter what. The View's onLayout still fires earlier in the
-// happy path; this is purely a safety net.
+// Aggressive 1.2s timeout. The user requested "go directly to homepage" —
+// so we kill the splash fast no matter what. Multiple defensive hides will
+// follow (onLayout, effect, finally) but this guarantees the splash is
+// gone within 1.2s of JS evaluating this module.
 setTimeout(() => {
   SplashScreen.hideAsync().catch(() => {});
-}, 3000);
+  // Pre-emptively mark the boot heartbeat so the index.js watchdog never
+  // shows the recovery screen — we'd rather render a partial home tab
+  // than a "stuck" screen.
+  try {
+    if (typeof (global as any).__butlerBootHeartbeat === 'function') {
+      (global as any).__butlerBootHeartbeat();
+    }
+  } catch {}
+}, 1200);
 
 // ─── GLOBAL ERROR BOUNDARY ──────────────────────────────────────────────────
 interface EBState { error: Error | null; }

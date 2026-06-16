@@ -133,5 +133,5 @@ export default function OnboardingTab() {
 }
 
 const styles = StyleSheet.create({
-  holder: { flex: 1, backgroundColor: '#050A12' },
+  holder: { flex: 1, backgroundColor: '#000000' },
 });
