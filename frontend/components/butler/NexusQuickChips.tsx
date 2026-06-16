@@ -16,7 +16,14 @@ import {
   View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+// LAZY Haptics — see CyberButton for full rationale. Avoid module-load
+// crashes on Android New Architecture cold start.
+let _haptics: any = null;
+function getHaptics() {
+  if (!_haptics) { try { _haptics = require('expo-haptics'); } catch { _haptics = {}; } }
+  return _haptics;
+}
+const Haptics = new Proxy({}, { get: (_t, prop) => (getHaptics() as any)?.[prop] }) as any;
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier New' : 'monospace';
 

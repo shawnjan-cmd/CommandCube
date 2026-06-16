@@ -20,14 +20,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+// ⚠ DO NOT add `expo-camera` imports here. They get lazy-loaded via the
+// `QRCameraScanner` component (see imports below). Top-level expo-camera
+// imports cause Android cold-start black screens on New Architecture.
 import { Linking, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { haptics } from '@/services/haptics';
 import { Image as ExpoImage } from 'expo-image';
 import { kbGrowthTracker, ChartBucket } from '@/services/kbGrowthTracker';
 import { serverConnection } from '@/services/serverConnection';
-import { autoConnectEngine, EngineEvent } from '@/services/autoConnectEngine';
+// `autoConnectEngine` is LAZY-LOADED inside useEffect (see useEffect block
+// in NexusHomeScreenInner). Importing the singleton at module-load racy
+// with the New Architecture native bridge on cold start.
+import type { EngineEvent } from '@/services/autoConnectEngine';
 import { executionHistory, HistoryEntry } from '@/services/executionHistory';
 import { quickScan, ScanProgress } from '@/services/lanScanner';
 import { parseQRConnection } from '@/services/qrParser';
@@ -1649,31 +1654,13 @@ function isValidIP(ip: string): boolean {
   return /^(\d{1,3}\.){3}\d{1,3}$/.test(ip) && ip.split('.').every(n => parseInt(n) <= 255);
 }
 
-function CameraPermissionRationaleDialog({ visible, onAllow, onDeny }: { visible:boolean; onAllow:()=>void; onDeny:()=>void }) {
-  if (!visible) return null;
-  return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.85)', alignItems:'center', justifyContent:'center', padding:24 }}>
-        <View style={{ backgroundColor:D.surfaceHi, borderRadius:18, borderWidth:1.5, borderColor:D.cyan+'40', padding:22, width:'100%', maxWidth:360 }}>
-          <Text style={{ fontSize:16, fontWeight:'900', fontFamily:MONO, color:D.text, marginBottom:10 }}>CAMERA REQUIRED</Text>
-          <Text style={{ fontSize:12, fontFamily:MONO, color:D.textMid, lineHeight:18, marginBottom:18 }}>
-            Butler AI needs camera access to scan the QR code displayed on your PC server. This is only used for pairing — not for any monitoring.
-          </Text>
-          <TouchableOpacity onPress={onAllow} style={{ backgroundColor:D.cyan, borderRadius:10, paddingVertical:12, alignItems:'center', marginBottom:8 }}>
-            <Text style={{ fontSize:13, fontWeight:'900', fontFamily:MONO, color:D.bg }}>ALLOW CAMERA</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onDeny} style={{ borderWidth:1, borderColor:D.textDim+'40', borderRadius:10, paddingVertical:10, alignItems:'center' }}>
-            <Text style={{ fontSize:12, fontFamily:MONO, color:D.textDim }}>Not now</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-}
+// LAZY-LOAD the QR camera scanner — its module evaluates `expo-camera`
+// imports, which crash Android cold-start on New Architecture if loaded
+// at app startup. By lazy-loading, the native camera module only
+// initialises when the user actually opens the pairing modal.
+const LazyQRCameraScanner = React.lazy(() => import('@/components/qr/QRCameraScanner'));
 
 function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClose:()=>void; onConnect:(ip:string,port:number)=>void }) {
-  const [permission, requestPermission] = useCameraPermissions();
-  const [showRationale, setShowRationale] = useState(false);
   const [manualIp, setManualIp] = useState('');
   const [manualPort, setManualPort] = useState('8765');
   const [scanning, setScanning] = useState(false);
@@ -1687,7 +1674,7 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
     if (visible) { processedRef.current = false; setScanMsg(''); setShowManual(false); }
   }, [visible]);
 
-  const handleBarCodeScanned = useCallback(async ({ data }: { data: string }) => {
+  const handleBarCodeScanned = useCallback(async (data: string) => {
     if (processedRef.current || scanning) return;
     processedRef.current = true;
     setScanning(true);
@@ -1742,11 +1729,6 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <CameraPermissionRationaleDialog
-        visible={showRationale}
-        onAllow={async () => { setShowRationale(false); await requestPermission(); }}
-        onDeny={() => setShowRationale(false)}
-      />
       <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.92)' }}>
         <View style={{ flexDirection:'row', alignItems:'center', paddingHorizontal:16, paddingTop:52, paddingBottom:16, gap:10 }}>
           <TouchableOpacity onPress={onClose} style={{ width:36, height:36, borderRadius:10, backgroundColor:D.surface, alignItems:'center', justifyContent:'center', borderWidth:1, borderColor:D.border }}>
@@ -1755,31 +1737,23 @@ function NexusQRModal({ visible, onClose, onConnect }: { visible:boolean; onClos
           <Text style={{ fontSize:16, fontWeight:'900', fontFamily:MONO, color:D.text, letterSpacing:2 }}>PAIR PC</Text>
         </View>
 
-        {permission?.granted ? (
-          <View style={{ flex:1, overflow:'hidden' }}>
-            <CameraView style={{ flex:1 }} facing="back" onBarcodeScanned={handleBarCodeScanned} barcodeScannerSettings={{ barcodeTypes:['qr'] }}>
-              <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        {/* Lazy-mounted scanner — only loads expo-camera when the modal
+            actually opens, AFTER the native bridge is fully alive. */}
+        <React.Suspense fallback={<View style={{ flex:1, backgroundColor:'#000' }} />}>
+          <LazyQRCameraScanner onScanned={handleBarCodeScanned} hudColor={D.cyan}>
+            <View style={StyleSheet.absoluteFill} pointerEvents="none">
+              <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.45)' }} />
+              <View style={{ flexDirection:'row', height:240 }}>
                 <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.45)' }} />
-                <View style={{ flexDirection:'row', height:240 }}>
-                  <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.45)' }} />
-                  <View style={{ width:240 }}>
-                    <HudCorners color={D.cyan} size={24} thickness={2.5} />
-                  </View>
-                  <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.45)' }} />
+                <View style={{ width:240 }}>
+                  <HudCorners color={D.cyan} size={24} thickness={2.5} />
                 </View>
                 <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.45)' }} />
               </View>
-            </CameraView>
-          </View>
-        ) : (
-          <View style={{ flex:1, alignItems:'center', justifyContent:'center', padding:32, gap:16 }}>
-            <MaterialIcons name="camera-alt" size={48} color={D.textDim} />
-            <Text style={{ fontSize:14, fontFamily:MONO, color:D.textMid, textAlign:'center', lineHeight:20 }}>Camera permission needed to scan QR code</Text>
-            <TouchableOpacity onPress={() => setShowRationale(true)} style={{ backgroundColor:D.cyan, borderRadius:10, paddingHorizontal:24, paddingVertical:12 }}>
-              <Text style={{ fontSize:13, fontWeight:'900', fontFamily:MONO, color:D.bg }}>ENABLE CAMERA</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.45)' }} />
+            </View>
+          </LazyQRCameraScanner>
+        </React.Suspense>
 
         <View style={{ padding:16, gap:10, backgroundColor:D.bg }}>
           {scanMsg ? (
@@ -2119,20 +2093,27 @@ function NexusHomeScreenInner() {
 
   useFocusEffect(useCallback(() => {
     let eng: (() => void) | undefined;
-    try {
-      if (autoConnectEngine && typeof autoConnectEngine.on === 'function') {
-        eng = autoConnectEngine.on((ev: EngineEvent) => {
-          if (ev.status === 'connected') {
-            setIsConnected(true);
-            try { setServerAddr(`${ev.ip}:${ev.port}`); } catch {}
-          }
-          if (ev.status === 'idle' || ev.status === 'scanning' || ev.status === 'reconnecting') {
-            setIsConnected(false);
-          }
-        });
-      }
-    } catch {}
-    return () => { try { eng?.(); } catch {} };
+    let cancelled = false;
+    // LAZY import — never touch the singleton at module-load. By the time
+    // this useFocusEffect fires, the native bridge is fully alive.
+    import('@/services/autoConnectEngine').then((mod) => {
+      if (cancelled) return;
+      try {
+        const engine = (mod as any)?.autoConnectEngine;
+        if (engine && typeof engine.on === 'function') {
+          eng = engine.on((ev: EngineEvent) => {
+            if (ev.status === 'connected') {
+              setIsConnected(true);
+              try { setServerAddr(`${ev.ip}:${ev.port}`); } catch {}
+            }
+            if (ev.status === 'idle' || ev.status === 'scanning' || ev.status === 'reconnecting') {
+              setIsConnected(false);
+            }
+          });
+        }
+      } catch {}
+    }).catch(() => {});
+    return () => { cancelled = true; try { eng?.(); } catch {} };
   }, []));
 
   // Metrics polling — builds sparkline history

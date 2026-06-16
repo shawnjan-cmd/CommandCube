@@ -105,8 +105,15 @@ class AutoConnectEngine {
     await networkMonitor.load().catch(() => {});
     networkMonitor.engineStart();
 
-    // Watch app state — resume = try reconnect immediately
-    this._appStateSub = AppState.addEventListener('change', this._onAppState);
+    // Watch app state — resume = try reconnect immediately.
+    // CRITICAL: defer by one tick so the native bridge is fully alive
+    // before attaching the AppState listener. On New Architecture +
+    // Hermes cold start, attaching native listeners synchronously can
+    // race with bridge init and crash the app.
+    setTimeout(() => {
+      try { this._appStateSub = AppState.addEventListener('change', this._onAppState); }
+      catch (e) { console.warn('[autoConnectEngine] AppState listener attach failed:', e); }
+    }, 0);
 
     // Try to connect (or scan if first time)
     await this._initialConnect();

@@ -20,7 +20,15 @@ import {
   TextStyle,
   StyleProp,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+// LAZY Haptics — load native module only on first user-tap, never at
+// module evaluation time. Prevents Android cold-start race conditions
+// where the native bridge isn't ready when this module is parsed.
+let _haptics: any = null;
+function getHaptics() {
+  if (!_haptics) { try { _haptics = require('expo-haptics'); } catch { _haptics = {}; } }
+  return _haptics;
+}
+const Haptics = new Proxy({}, { get: (_t, prop) => (getHaptics() as any)?.[prop] }) as any;
 import Animated, {
   useAnimatedStyle,
   useSharedValue,

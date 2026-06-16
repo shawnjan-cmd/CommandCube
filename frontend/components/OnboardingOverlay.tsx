@@ -13,7 +13,10 @@ import Svg, { Circle, Path, Rect, G, Defs, RadialGradient, Stop, LinearGradient 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { haptics } from '@/services/haptics';
 import { logger } from '@/utils/logger';
-import ButlerHeroSvg from '@/components/ui/ButlerHeroSvg';
+// ButlerHeroSvg was a heavy WebView/SvgXml-based illustration. PERMANENTLY
+// REMOVED — it was on the critical-render path of the very first onboarding
+// screen and contributed to Android cold-start instability. Replaced with
+// a tiny static placeholder rendered inline below.
 
 
 // ── Persistent keys ──────────────────────────────────────────────
@@ -424,9 +427,36 @@ function Screen1Welcome({ onNext, allAccepted }: { onNext: () => void; allAccept
           </Text>
         </View>
 
-        {/* Hero illustration */}
+        {/* Hero badge — lightweight inline replacement for the old
+            ButlerHeroSvg. Pure native primitives, zero crash risk. */}
         <View style={{ marginTop: 8, width: '100%', alignItems: 'center' }}>
-          <ButlerHeroSvg />
+          <View style={{
+            width: '88%',
+            maxWidth: 460,
+            paddingVertical: 22,
+            borderRadius: 14,
+            borderWidth: 1.5,
+            borderColor: 'rgba(0,216,255,0.35)',
+            backgroundColor: 'rgba(7,16,28,0.85)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <Text style={{
+              fontSize: 26,
+              fontWeight: '900',
+              letterSpacing: 4,
+              color: '#E6F1FF',
+              fontFamily: MONO,
+            }}>BUTLER <Text style={{ color: '#FF2A1F' }}>AI</Text></Text>
+            <Text style={{
+              fontSize: 10,
+              fontWeight: '800',
+              letterSpacing: 2,
+              color: '#7ED4E6',
+              marginTop: 6,
+              fontFamily: MONO,
+            }}>COMMAND CENTER · OPERATING SYSTEM</Text>
+          </View>
         </View>
 
         {/* Tag chips */}
