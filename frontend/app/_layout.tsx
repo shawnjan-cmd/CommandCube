@@ -1,23 +1,22 @@
 /**
- * Butler AI — Root Layout (v9.0 — Nuclear Cleanup)
+ * Butler AI — Root Layout (v9.1 — splash hand-off restored)
  * ──────────────────────────────────────────────────────────────────
- * AFTER 20+ blue-screen reports we REMOVED every defensive splash hack:
- *   • NO preventAutoHideAsync / hideAsync — splash auto-dismisses when JS
- *     starts. No race conditions, no timers, no "stuck splash" bugs.
- *   • NO 8-second watchdog, no Recovery Mode UI, no heartbeat marker.
- *   • NO complex withTimeout bootstrap chain — just a single fire-and-
- *     forget effect that initializes background services lazily.
+ * v9.0 removed the splash logic entirely → caused a BLACK screen
+ * because the system splash auto-hides as soon as JS starts but
+ * React still needs ~1-3s to mount the first frame.
  *
- * The contract is: render fast, fail open, never block.
- *   1. Root layout function body executes.
- *   2. <Stack> mounts immediately (no async gate before paint).
- *   3. Bootstrap effect kicks off side-imports AFTER the first paint.
- *   4. If anything blows up in step 3 it stays inside its own try/catch
- *      and never affects what the user sees.
+ * v9.1 restores the OFFICIAL expo-splash-screen contract:
+ *   1. preventAutoHideAsync() once at module load
+ *   2. hideAsync() from the root layout's first useLayoutEffect
+ *      (fires after the React tree commits)
+ *   3. 2.5 s safety timeout fallback (in case effect never fires)
+ *
+ * No watchdog. No recovery mode. No heartbeat. Just the standard
+ * pattern that ships in every Expo template.
  */
-import { Stack } from 'expo-router';
+import { Stack, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { Component, useEffect, useRef, ReactNode } from 'react';
+import React, { Component, useEffect, useLayoutEffect, useRef, ReactNode } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,6 +24,18 @@ import { TabBarProvider } from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync } from '@/hooks/useAppSync';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
+import BootCurtain from '@/components/ui/BootCurtain';
+
+// ── KEEP SPLASH VISIBLE UNTIL FIRST REACT FRAME ──────────────────────────
+// Called exactly once at module evaluation. Must be paired with hideAsync().
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// Hard safety net — if for ANY reason hideAsync() inside the layout never
+// fires (early render throw, native module hang, etc.), force-hide after
+// 2.5 s. This guarantees the splash never lingers past that point.
+const _splashHardTimer = setTimeout(() => {
+  SplashScreen.hideAsync().catch(() => {});
+}, 2500);
 
 // ─── GLOBAL ERROR BOUNDARY (kept — but pure black bg now) ──────────────
 interface EBState { error: Error | null; resetCount: number; }
@@ -134,6 +145,15 @@ async function bootstrapServices() {
 export default function RootLayout() {
   const bootRef = useRef(false);
 
+  // ── HIDE SPLASH at the earliest possible moment after React commits
+  // useLayoutEffect fires synchronously after DOM mutations and before
+  // the browser/native paints — perfect timing for splash hand-off.
+  // We also clear the hard-timeout so it doesn't double-fire.
+  useLayoutEffect(() => {
+    clearTimeout(_splashHardTimer);
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
   useEffect(() => {
     if (bootRef.current) return;
     bootRef.current = true;
@@ -158,6 +178,10 @@ export default function RootLayout() {
               <Stack.Screen name="privacy-audit"  options={{ headerShown: false, animation: 'slide_from_right' }} />
               <Stack.Screen name="+not-found"     options={{ headerShown: false }} />
             </Stack>
+            {/* Boot curtain — covers the brief gap between native-splash
+                dismissal and the first tab paint with a branded "BUTLER AI
+                INITIALIZING…" overlay. Auto-removes itself after 450 ms. */}
+            <BootCurtain holdMs={450} />
           </View>
         </TabBarProvider>
       </CosmeticProvider>
