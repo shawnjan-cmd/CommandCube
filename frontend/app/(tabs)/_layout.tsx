@@ -27,6 +27,7 @@ import React from 'react';
 import { View, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import QuickButlerBar    from '@/components/ui/QuickButlerBar';
 import FuturisticTabBar  from '@/components/ui/FuturisticTabBar';
@@ -89,10 +90,7 @@ export default function TabLayout() {
   // Boot-complete sentinel — stamps once when this layout mounts.
   // Useful when reading the log post-mortem; never blocks render.
   React.useEffect(() => {
-    try {
-      const AS = require('@react-native-async-storage/async-storage').default;
-      AS?.setItem?.('@butler_boot_complete_at', String(Date.now())).catch(() => {});
-    } catch {}
+    AsyncStorage.setItem('@butler_boot_complete_at', String(Date.now())).catch(() => {});
   }, []);
 
   // Connection status is rendered as `false` by default. Each tab's
