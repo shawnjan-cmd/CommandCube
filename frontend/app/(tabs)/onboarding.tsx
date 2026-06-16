@@ -38,6 +38,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -230,6 +231,10 @@ function navigateHome(router: ReturnType<typeof useRouter>) {
 export default function OnboardingTab() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
+  // Tab bar height — safe-guarded because the hook can throw if the
+  // screen is ever rendered outside a Tabs navigator (preview, dev, etc).
+  let tabBarHeight = 0;
+  try { tabBarHeight = useBottomTabBarHeight(); } catch { tabBarHeight = 80; }
   const [idx, setIdx] = useState(0);
 
   const page    = PAGES[idx];
@@ -338,8 +343,8 @@ export default function OnboardingTab() {
         <View style={{ height: 24 }} />
       </ScrollView>
 
-      {/* BOTTOM NAV — always visible */}
-      <View style={[styles.bottomNav, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+      {/* BOTTOM NAV — always visible · sits above the floating tab bar */}
+      <View style={[styles.bottomNav, { paddingBottom: Math.max(insets.bottom, 12) + 12, marginBottom: tabBarHeight }]}>
         {!isFirst ? (
           <TouchableOpacity
             onPress={goBack}
