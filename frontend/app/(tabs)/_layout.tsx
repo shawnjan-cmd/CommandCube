@@ -10,15 +10,13 @@ import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
 import { useServerConnection } from '@/hooks/useServerConnection';
 
 // ── CRITICAL — Expo Router native-cold-start fix ─────────────────────────
-// The hidden `index.tsx` route below MUST exist for expo-router on native
-// Android to properly mount the (tabs) group on cold start. Without that
-// file the navigator never mounts → splash never hides → blue screen.
-//
 // LANDING-PAGE CONTRACT (post-doom-loop, per explicit user request):
 //   • `app/index.tsx` → ALWAYS redirects to `/(tabs)/nexushome`. No async.
 //   • `(tabs)/index.tsx` (this group's hidden index) → same redirect.
 //   • `nexushome.tsx` NO LONGER auto-redirects to INTRO on first launch.
 //   • INTRO remains a manually-tapable tab in the bottom toolbar.
+//   • Auto-onboarding on first install was DELETED to fix the cold-start
+//     black-screen issue. New users land on HOME and discover INTRO themselves.
 export const unstable_settings = {
   initialRouteName: 'nexushome',
 };

@@ -29,7 +29,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabBarProvider } from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync } from '@/hooks/useAppSync';
-import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
+import { ONBOARDING_DONE_KEY, WELCOME_COMPLETE_KEY } from '@/constants/onboardingKeys';
 
 // ── KEEP SPLASH VISIBLE UNTIL FIRST REACT FRAME ──────────────────────────
 // Called exactly once at module evaluation. Paired with hideAsync() below.
@@ -134,9 +134,14 @@ async function bootstrapServices() {
   } catch (e) { console.warn('[bootstrap] systemUpgrade:', e); }
 
   try {
-    const enc = await import('@/services/encryptedStorage');
-    const id  = await AsyncStorage.getItem('commandcube_device_id');
+    // Use the deviceIdentifier service so legacy `@commandcube_device_id`
+    // keys get migrated to the new key. Direct AsyncStorage read here
+    // would miss the migration path entirely and leave encryptedStorage
+    // uninitialised on devices that upgraded from old builds.
+    const idMod = await import('@/services/deviceIdentifier');
+    const id    = await (idMod as any)?.deviceIdentifier?.getDeviceId?.().catch(() => null);
     if (id) {
+      const enc = await import('@/services/encryptedStorage');
       await (enc as any).encryptedStorage.init(id);
       await (enc as any).encryptedStorage.migrate();
     }
@@ -145,7 +150,7 @@ async function bootstrapServices() {
   try {
     const [v2, v1] = await Promise.all([
       AsyncStorage.getItem(ONBOARDING_DONE_KEY),
-      AsyncStorage.getItem('@butler_welcome_complete_v1'),
+      AsyncStorage.getItem(WELCOME_COMPLETE_KEY),
     ]);
     const onboarded = v2 === '1' || v2 === 'true' || v1 === '1' || v1 === 'true';
     if (onboarded) {

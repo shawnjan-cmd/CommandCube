@@ -19,9 +19,10 @@
  *   • When something resolves to `/(tabs)` with no specific child,
  *     this index emits a `<Redirect>` to `nexushome` (the home
  *     dashboard) — a synchronous, atomic redirect.
- *   • App cold-start still flows: `/` → `/(tabs)/onboarding`
- *     (handled by `app/index.tsx`); this file only catches
- *     fallback cases where a child isn't specified.
+ *   • App cold-start flows: `/` → `/(tabs)/nexushome` (handled by
+ *     `app/index.tsx`); this file only catches fallback cases where
+ *     a child isn't specified. Onboarding is NOT in the auto-flow —
+ *     it's a manually-tapable INTRO tab in the toolbar.
  */
 import React from 'react';
 import { Redirect } from 'expo-router';
