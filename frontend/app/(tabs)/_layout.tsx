@@ -32,6 +32,8 @@ import QuickButlerBar    from '@/components/ui/QuickButlerBar';
 import FuturisticTabBar  from '@/components/ui/FuturisticTabBar';
 import ConnectionBadge   from '@/components/ui/ConnectionBadge';
 import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
+import WelcomeBackOverlay from '@/components/ui/WelcomeBackOverlay';
+import { useUserSession } from '@/hooks/useUserSession';
 
 // ─── COLD-START CONTRACT ──────────────────────────────────────────
 // `initialRouteName: 'nexushome'` forces expo-router to mount the HOME
@@ -71,9 +73,18 @@ const ICONS: Record<string, (color: string, size: number) => React.ReactNode> = 
 export default function TabLayout() {
   const insets   = useSafeAreaInsets();
   const pathname = usePathname();
+  const session  = useUserSession();
 
   const onOnboarding = pathname?.includes('onboarding') ?? false;
   const onButlerTab  = pathname?.includes('butler')     ?? false;
+  const onHome       = pathname?.includes('nexushome')  ?? false;
+
+  // Show the WelcomeBackOverlay ONCE per app launch, only on the home
+  // tab, only after we know whether the user is new or returning, and
+  // never during the tutorial. Resets across cold-starts.
+  const [overlayShown, setOverlayShown] = React.useState(false);
+  const shouldShowOverlay =
+    !overlayShown && session.hydrated && onHome && !onOnboarding;
 
   // Boot-complete sentinel — stamps once when this layout mounts.
   // Useful when reading the log post-mortem; never blocks render.
@@ -154,6 +165,18 @@ export default function TabLayout() {
           on the AI tab (which has its own command console at the
           bottom — stacked inputs are confusing). */}
       {!onOnboarding && !onButlerTab ? <QuickButlerBar /> : null}
+
+      {/* Welcome-back / first-run greeting overlay — mounted ONCE per
+          app launch when the user lands on the home tab. Lightweight
+          (zero-dependency), auto-dismisses, never re-renders unless
+          the user navigates away and back. */}
+      {shouldShowOverlay ? (
+        <WelcomeBackOverlay
+          isReturning={session.isReturning}
+          holdMs={1100}
+          onDismiss={() => setOverlayShown(true)}
+        />
+      ) : null}
     </View>
   );
 }

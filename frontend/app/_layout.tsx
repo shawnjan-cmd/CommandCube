@@ -41,6 +41,13 @@ installBootCrashLogger();
 //   at module-eval keeps the native splash up until React mounts.
 import { preventAuto, armAllHideStrategies } from '@/services/splashController';
 preventAuto();
+// ⚠ MUST be fourth — kick off the AsyncStorage read for "is this a
+//   new or returning user?" as early as possible. This runs IN
+//   PARALLEL with the splash hide and React mount, so by the time
+//   `app/index.tsx` calls `getBootTarget()`, the answer is almost
+//   always already cached → the redirect is instant, no flash.
+import { hydrateUserSession } from '@/services/userSession';
+hydrateUserSession().catch(() => {});
 
 import React, { Component, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
