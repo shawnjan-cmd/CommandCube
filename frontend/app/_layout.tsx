@@ -207,6 +207,14 @@ export default function RootLayout() {
   const onRootLayout = useCallback(() => {
     SplashScreen.hideAsync().catch(() => {});
     mark('splash_hidden');
+    // Signal the boot watchdog (defined in /index.js) that the React tree
+    // has successfully mounted and painted. This resets the boot-attempts
+    // counter to 0 and cancels the 8s auto-reload timer.
+    try {
+      if (typeof (global as any).__butlerBootHeartbeat === 'function') {
+        (global as any).__butlerBootHeartbeat();
+      }
+    } catch {}
   }, []);
 
   // Bootstrap background services AFTER React mounts. None of these are

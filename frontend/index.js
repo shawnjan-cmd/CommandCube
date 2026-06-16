@@ -102,6 +102,138 @@ try {
   }, 4000);
 } catch (_) { /* expo-splash-screen not available — nothing to do */ }
 
+// ── 0d. BOOT WATCHDOG — AUTO-RECOVERY IF THE APP FAILS TO LOAD ──────────────
+// Self-healing boot loop:
+//   1. Bump `@butler_boot_attempts` AsyncStorage counter on every cold start.
+//   2. Start an 8-second watchdog timer.
+//   3. If the root layout signals "alive" before 8s → reset counter to 0,
+//      cancel the watchdog. App is healthy.
+//   4. If 8s elapses without the heartbeat → boot is stuck. If attempts < 3,
+//      wipe video cache + reload silently. If attempts >= 3, register a
+//      visible "RECOVERY MODE" screen with a "WIPE & RETRY" button so the
+//      user can never get trapped in a reload loop.
+//   5. The heartbeat is fired by `_layout.tsx`'s onRootLayout AND on a
+//      timer once useAppSync mounts — multiple sources for redundancy.
+const BOOT_WATCHDOG_MS         = 8000;
+const BOOT_MAX_AUTO_ATTEMPTS   = 3;
+const BOOT_ATTEMPTS_KEY        = '@butler_boot_attempts';
+const BOOT_LAST_SUCCESS_KEY    = '@butler_boot_last_success_at';
+
+let _bootHeartbeatFired = false;
+let _bootWatchdogTimer  = null;
+
+// Public API on global — `_layout.tsx` calls this when the root View paints.
+global.__butlerBootHeartbeat = function () {
+  if (_bootHeartbeatFired) return;
+  _bootHeartbeatFired = true;
+  if (_bootWatchdogTimer) { clearTimeout(_bootWatchdogTimer); _bootWatchdogTimer = null; }
+  try {
+    const AS = require('@react-native-async-storage/async-storage').default;
+    AS.multiSet([
+      [BOOT_ATTEMPTS_KEY,     '0'],
+      [BOOT_LAST_SUCCESS_KEY, String(Date.now())],
+    ]).catch(() => {});
+  } catch (_) {}
+};
+
+// Start the watchdog right now. Use require() so we don't block on import.
+(function _startBootWatchdog() {
+  let AS;
+  try { AS = require('@react-native-async-storage/async-storage').default; }
+  catch (_) { return; /* without AsyncStorage we can't track attempts */ }
+
+  // Read current attempt count, then increment for this boot.
+  AS.getItem(BOOT_ATTEMPTS_KEY).then((v) => {
+    const attempts = (parseInt(v || '0', 10) || 0) + 1;
+    AS.setItem(BOOT_ATTEMPTS_KEY, String(attempts)).catch(() => {});
+
+    _bootWatchdogTimer = setTimeout(() => {
+      if (_bootHeartbeatFired) return; // already healthy
+      // ── Boot is STUCK ────────────────────────────────────────────────
+      if (attempts < BOOT_MAX_AUTO_ATTEMPTS) {
+        // Silent recovery: wipe video cache + reload.
+        try { _wipeVideoCache && _wipeVideoCache().catch(() => {}); } catch (_) {}
+        setTimeout(() => { try { _safeReload && _safeReload(); } catch (_) {} }, 600);
+      } else {
+        // Loop guard tripped — show a user-visible recovery screen.
+        try {
+          const React = require('react');
+          const { View, Text, TouchableOpacity } = require('react-native');
+          const _Splash = (() => { try { return require('expo-splash-screen'); } catch (_) { return null; } })();
+
+          function ButlerStuckRecovery() {
+            React.useEffect(() => {
+              try { _Splash && _Splash.hideAsync().catch(() => {}); } catch (_) {}
+            }, []);
+            const onWipe = async () => {
+              try {
+                // Wipe every cache we know about + reset boot counter.
+                try { await AS.clear(); } catch (_) {}
+                try { _wipeVideoCache && await _wipeVideoCache(); } catch (_) {}
+                try { _wipeAllAppCaches && await _wipeAllAppCaches(); } catch (_) {}
+              } finally {
+                setTimeout(() => { try { _safeReload && _safeReload(); } catch (_) {} }, 400);
+              }
+            };
+            return React.createElement(View,
+              { style: { flex: 1, backgroundColor: '#050A12', alignItems: 'center', justifyContent: 'center', padding: 28 } },
+              React.createElement(Text, {
+                style: { color: '#00CCDD', fontSize: 26, fontWeight: '900', fontFamily: 'monospace', letterSpacing: 4, marginBottom: 16 },
+              }, 'RECOVERY MODE'),
+              React.createElement(Text, {
+                style: { color: '#FFFFFF', fontSize: 13, fontFamily: 'monospace', textAlign: 'center', lineHeight: 20, marginBottom: 24, paddingHorizontal: 8 },
+              }, 'Butler AI failed to start ' + attempts + ' times in a row.\\n\\nTap below to wipe caches and restart.\\n\\nYour pairing key and onboarding will reset.'),
+              React.createElement(TouchableOpacity, {
+                onPress: onWipe, activeOpacity: 0.7,
+                style: {
+                  borderWidth: 2, borderColor: '#FF5500', backgroundColor: 'rgba(255,85,0,0.12)',
+                  borderRadius: 14, paddingVertical: 16, paddingHorizontal: 32,
+                },
+              }, React.createElement(Text, {
+                style: { color: '#FF5500', fontSize: 14, fontWeight: '900', fontFamily: 'monospace', letterSpacing: 2 },
+              }, 'WIPE & RESTART')),
+              React.createElement(Text, {
+                style: { color: '#8C95A6', fontSize: 10, fontFamily: 'monospace', textAlign: 'center', marginTop: 28, opacity: 0.6 },
+              }, 'BUTLER AI · BOOT WATCHDOG'),
+            );
+          }
+          // Replace whatever was registered as 'main' with the recovery screen.
+          const { AppRegistry } = require('react-native');
+          AppRegistry.registerComponent('main', () => ButlerStuckRecovery);
+          // Also reset the attempt counter so a successful wipe-and-retry boots cleanly.
+          AS.setItem(BOOT_ATTEMPTS_KEY, '0').catch(() => {});
+        } catch (_) {
+          // Absolute fallback — try one more silent reload.
+          try { _safeReload && _safeReload(); } catch (__) {}
+        }
+      }
+    }, BOOT_WATCHDOG_MS);
+  }).catch(() => {});
+})();
+
+// Optional: wipe additional app caches (file system caches, etc.). Defined
+// here as a hoisted function so the watchdog above can reference it. It is
+// a best-effort no-op if anything is missing.
+async function _wipeAllAppCaches() {
+  try {
+    const FS = require('expo-file-system');
+    const FileSystem = FS.default || FS;
+    const cacheRoot = FileSystem.cacheDirectory;
+    if (!cacheRoot) return;
+    const info = await FileSystem.getInfoAsync(cacheRoot).catch(() => null);
+    if (info?.exists) {
+      // Just empty the cache directory, don't delete it.
+      try {
+        const entries = await FileSystem.readDirectoryAsync(cacheRoot);
+        for (const name of entries) {
+          try { await FileSystem.deleteAsync(cacheRoot + name, { idempotent: true }); }
+          catch (_) {}
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+}
+
 // ── 0b. Crash signature ───────────────────────────────────────────────────────
 const CRASH_SIGS = [
   'SimpleCache', 'ExpoVideoCache', 'VideoCache', 'VideoManager', 'VideoModule',
