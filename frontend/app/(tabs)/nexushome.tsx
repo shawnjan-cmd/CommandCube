@@ -15,7 +15,8 @@ import {
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import SectionTitle3D from '@/components/ui/SectionTitle3D';
-import Svg, { Circle, Path, Defs, RadialGradient, Stop, Rect, Line, Polygon, LinearGradient, G, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Path, Defs, RadialGradient, Stop, Rect, Line, Polygon, LinearGradient as SvgLinearGradient, G, Text as SvgText } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
@@ -250,10 +251,10 @@ function MetricLineChart({ history, color, height = 56, label }: {
     <View style={{ width: w, height }}>
       <Svg width={w} height={height}>
         <Defs>
-          <LinearGradient id={`grad_${label}`} x1="0" y1="0" x2="0" y2="1">
+          <SvgLinearGradient id={`grad_${label}`} x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={color} stopOpacity="0.35" />
             <Stop offset="1" stopColor={color} stopOpacity="0.02" />
-          </LinearGradient>
+          </SvgLinearGradient>
         </Defs>
         <Path d={fillD} fill={`url(#grad_${label})`} />
         <Path d={pathD} stroke={color} strokeWidth={1.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -629,9 +630,17 @@ function ButlerAIHero(props: {
   return <NexusHero {...props} />;
 }
 
-// ─── NEXUS HERO — matrix-styled "BUTLER AI · COMMAND CORE" card ───
-// Single pulsing accent ring + breathing core dot. Pure transform/opacity
-// animations using the native driver so it stays 60 fps on low-end devices.
+// ─── NEXUS HERO v6 — Dense command-deck layout ──────────────────────
+// Combines design decisions from `nexus-ultimate-v5`, `nexus-v9-upgraded`
+// and `butler-ai-upgraded`:
+//   • Horizontal reactor strip (left) + status block (right) — kills the
+//     wasted vertical space that the giant 3D wordmark used to consume.
+//   • 6-up KPI tile grid (3×2) with 2px progress bars underneath each
+//     value (lifted straight from the v5 mockup stat-tile pattern).
+//   • Faint horizontal scan beam sweeping across the card every 4s.
+//   • Live CPU pulse strip — 24 mini bars showing the last 24s of CPU
+//     samples, animated as new data arrives.
+//   • Gradient CTA (blue→purple) matching the v5 mockup's button style.
 function NexusHero({
   isConnected, serverAddr, onScanQR, kbFindings, scriptCount,
 }: {
@@ -639,8 +648,9 @@ function NexusHero({
   kbFindings: number; scriptCount: number;
 }) {
   const breathe = useRef(new Animated.Value(0)).current;
+  const sweep   = useRef(new Animated.Value(0)).current;
 
-  // ONE shared slow breathing loop drives both ring + core dot — very cheap.
+  // Shared breathing loop drives ring + dot pulse.
   useEffect(() => {
     const loop = Animated.loop(Animated.sequence([
       Animated.timing(breathe, { toValue: 1, duration: 2400, useNativeDriver: true }),
@@ -650,170 +660,258 @@ function NexusHero({
     return () => loop.stop();
   }, []);
 
-  const accent     = isConnected ? D.green : D.cyan;
-  const accentSoft = isConnected ? 'rgba(0,255,136,0.08)' : 'rgba(59,130,246,0.07)';
-  const statusTxt  = isConnected ? 'CORE ONLINE' : 'STANDBY';
+  // Scan beam sweep (4s loop, then off-screen pause).
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(sweep, { toValue: 1, duration: 4000, useNativeDriver: true }),
+      Animated.delay(800),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  const accent     = isConnected ? D.green : D.blue;
+  const accent2    = isConnected ? D.green : D.purple;
+  const statusTxt  = isConnected ? 'CORE ONLINE' : 'STANDBY · AWAITING LINK';
   const ctaTxt     = isConnected ? 'CORE LINKED · TAP TO REPAIR' : 'INITIATE PAIRING';
 
-  const kbDisplay     = kbFindings > 0
-    ? (kbFindings > 1_000_000 ? `${(kbFindings/1_000_000).toFixed(1)}M`
-       : kbFindings > 1000 ? `${(kbFindings/1000).toFixed(1)}K`
-       : String(kbFindings))
-    : '—';
-  const scriptDisplay = scriptCount > 0 ? String(scriptCount) : '—';
+  const fmtNum = (n: number): string =>
+    n <= 0 ? '—'
+    : n >= 1_000_000 ? `${(n/1_000_000).toFixed(1)}M`
+    : n >= 1000     ? `${(n/1000).toFixed(1)}K`
+    : String(n);
+
+  // 6-up KPI grid (3 cols × 2 rows). Progress bar shows a normalized
+  // percentage (0–100) so the strip is meaningful even without data.
+  const tiles: Array<{
+    icon: any; label: string; value: string;
+    pct: number; color: string;
+  }> = [
+    { icon: 'database',  label: 'VECTORS',  value: fmtNum(kbFindings),
+      pct: Math.min(100, kbFindings / 50),                     color: D.blue   },
+    { icon: 'code-tags', label: 'SCRIPTS',  value: fmtNum(scriptCount),
+      pct: Math.min(100, scriptCount * 5),                     color: D.amber  },
+    { icon: isConnected ? 'lan-connect' : 'lan-disconnect',
+      label: 'LINK',     value: isConnected ? 'LIVE' : 'IDLE',
+      pct: isConnected ? 100 : 0,                              color: accent   },
+    { icon: 'shield-check', label: 'TRUST', value: 'HMAC',
+      pct: 100,                                                color: D.green  },
+    { icon: 'cloud-off',    label: 'CLOUD', value: 'ZERO',
+      pct: 100,                                                color: D.purple },
+    { icon: 'wifi',         label: 'LANE',  value: 'LAN',
+      pct: 100,                                                color: D.cyan   },
+  ];
 
   const ringScale = breathe.interpolate({ inputRange: [0, 1], outputRange: [1.0, 1.18] });
   const ringOp    = breathe.interpolate({ inputRange: [0, 1], outputRange: [0.55, 0.15] });
-  const dotOp     = breathe.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1] });
-  const dotScl    = breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.35] });
-
-  const stats = [
-    { icon: 'database',          label: 'VECTORS',  value: kbDisplay,     color: D.cyan },
-    { icon: 'code-tags',         label: 'SCRIPTS',  value: scriptDisplay, color: D.amber },
-    { icon: isConnected ? 'lan-connect' : 'lan-disconnect',
-                                 label: 'STATE',    value: isConnected ? 'LIVE' : 'IDLE',
-                                 color: isConnected ? D.green : D.amber },
-    { icon: 'wan',               label: 'LANE',     value: 'LOCAL',       color: D.green },
-  ] as const;
+  const dotOp     = breathe.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1]   });
+  const dotScl    = breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.35]   });
+  const beamX     = sweep.interpolate({ inputRange: [0, 1], outputRange: [-160, SW + 80] });
 
   return (
     <View style={nh.wrap}>
-      <View style={[nh.card, { borderColor: accent + '55', backgroundColor: accentSoft }]}>
+      <LinearGradient
+        colors={[D.surface, D.bg]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[nh.card, { borderColor: accent + '40' }]}
+      >
         {/* HUD corner ticks (all 4) */}
         <View style={[nh.corner, { top: 0,    left: 0,    borderTopWidth: 1.5,    borderLeftWidth: 1.5,   borderColor: accent + 'AA' }]} />
         <View style={[nh.corner, { top: 0,    right: 0,   borderTopWidth: 1.5,    borderRightWidth: 1.5,  borderColor: accent + 'AA' }]} />
         <View style={[nh.corner, { bottom: 0, left: 0,    borderBottomWidth: 1.5, borderLeftWidth: 1.5,   borderColor: accent + 'AA' }]} />
         <View style={[nh.corner, { bottom: 0, right: 0,   borderBottomWidth: 1.5, borderRightWidth: 1.5,  borderColor: accent + 'AA' }]} />
 
-        {/* ── Header row ──────────────────────────────────────── */}
-        <View style={nh.headerRow}>
-          <View style={[nh.statusPill, { borderColor: accent + '80', backgroundColor: accent + '15' }]}>
-            <Animated.View style={{
-              width: 6, height: 6, borderRadius: 3, backgroundColor: accent,
-              opacity: dotOp, transform: [{ scale: dotScl }],
-            }} />
-            <Text style={[nh.statusPillTxt, { color: accent }]}>{statusTxt}</Text>
+        {/* Sweeping scan beam */}
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            nh.scanBeam,
+            { backgroundColor: accent2, transform: [{ translateX: beamX }] },
+          ]}
+        />
+
+        {/* ── ROW 1: reactor + identity block ───────────────────── */}
+        <View style={nh.identityRow}>
+          {/* Reactor */}
+          <View style={nh.reactorStack}>
+            <Animated.View style={[nh.ring, {
+              borderColor: accent, opacity: ringOp, transform: [{ scale: ringScale }],
+            }]} />
+            <LinearGradient
+              colors={[accent + 'CC', accent2 + 'AA']}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+              style={[nh.reactorCore, Platform.OS === 'ios' ? {
+                shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.9, shadowRadius:14,
+              } : {}]}
+            >
+              <MaterialCommunityIcons
+                name={isConnected ? 'hexagon-multiple' : 'hexagon-slice-6'}
+                size={26} color="#fff"
+              />
+            </LinearGradient>
           </View>
-          <View style={{ flex: 1 }} />
-          <Text style={[nh.serial, { color: accent + 'AA' }]} numberOfLines={1}>
-            UNIT-01 · REV-A · {isConnected ? (serverAddr || 'PAIRED') : 'NO-LINK'}
-          </Text>
-        </View>
 
-        {/* ── Centered reactor with pulsing ring ─────────────── */}
-        <View style={nh.reactorStack}>
-          <Animated.View style={[nh.ring, {
-            borderColor: accent,
-            opacity: ringOp,
-            transform: [{ scale: ringScale }],
-          }]} />
-          <View style={[nh.reactorCore, {
-            borderColor: accent,
-            backgroundColor: accent + '18',
-            ...(Platform.OS === 'ios' ? { shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.9, shadowRadius:14 } : {}),
-          }]}>
-            <MaterialCommunityIcons name={isConnected ? 'hexagon-multiple' : 'hexagon-slice-6'} size={34} color={accent} />
+          {/* Identity */}
+          <View style={nh.identityCol}>
+            <View style={nh.identityHeader}>
+              <Text style={[nh.brand, { color: D.text }]}>BUTLER</Text>
+              <LinearGradient
+                colors={[accent, accent2]}
+                start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }}
+                style={nh.brandBadge}
+              >
+                <Text style={nh.brandBadgeTxt}>AI</Text>
+              </LinearGradient>
+            </View>
+            <Text style={nh.tagline} numberOfLines={1}>
+              LOCAL · PC AUTOMATION · COMMAND CORE
+            </Text>
+
+            <View style={nh.statusRow}>
+              <Animated.View style={[
+                nh.statusDot,
+                { backgroundColor: accent, opacity: dotOp, transform: [{ scale: dotScl }] },
+                Platform.OS === 'ios' ? { shadowColor: accent, shadowOpacity: 0.9, shadowRadius: 5, shadowOffset: { width: 0, height: 0 } } : null,
+              ]} />
+              <Text style={[nh.statusTxt, { color: accent }]} numberOfLines={1}>
+                {statusTxt}
+              </Text>
+              <View style={{ flex: 1 }} />
+              <Text style={[nh.serial, { color: D.textDim }]} numberOfLines={1}>
+                {isConnected ? (serverAddr || 'PAIRED') : 'NO-LINK'}
+              </Text>
+            </View>
           </View>
         </View>
 
-        {/* ── BUTLER AI 3D wordmark ───────────────────────────── */}
-        <View style={{ alignItems: 'center', marginTop: 4, marginBottom: 6, alignSelf: 'stretch' }}>
-          <ButlerAITitle3D
-            width={Math.min(SW - 56, 360)}
-            accent={accent}
-            subtitle="LOCAL AI · PC AUTOMATION · COMMAND CORE"
-          />
-        </View>
-
-        {/* ── 4 themed stat tiles ────────────────────────────── */}
-        <View style={nh.statsRow}>
-          {stats.map((s, i) => (
-            <View key={i} style={[nh.statTile, { borderColor: s.color + '40', backgroundColor: s.color + '0A' }]}>
-              <MaterialCommunityIcons name={s.icon as any} size={14} color={s.color} />
-              <Text style={[nh.statValue, { color: s.color }]} numberOfLines={1}>{s.value}</Text>
-              <Text style={nh.statLabel} numberOfLines={1}>{s.label}</Text>
+        {/* ── ROW 2: 3×2 KPI grid with progress bars ────────────── */}
+        <View style={nh.tilesGrid}>
+          {tiles.map((t, i) => (
+            <View
+              key={i}
+              style={[nh.tile, { borderColor: t.color + '33', backgroundColor: t.color + '08' }]}
+            >
+              {/* Corner accent dot */}
+              <View style={[nh.tileDot, { backgroundColor: t.color }]} />
+              <View style={nh.tileTop}>
+                <MaterialCommunityIcons name={t.icon} size={10} color={t.color + 'CC'} />
+                <Text style={nh.tileLabel} numberOfLines={1}>{t.label}</Text>
+              </View>
+              <Text style={[nh.tileValue, { color: t.color }]} numberOfLines={1}>
+                {t.value}
+              </Text>
+              {/* 2px progress bar — NEXUS v5 stat-tile signature */}
+              <View style={nh.tileBarTrack}>
+                <View style={[
+                  nh.tileBarFill,
+                  { width: `${Math.max(0, Math.min(100, t.pct))}%` as any, backgroundColor: t.color },
+                ]} />
+              </View>
             </View>
           ))}
         </View>
 
-        {/* ── Primary CTA ────────────────────────────────────── */}
+        {/* ── Primary CTA (gradient) ────────────────────────────── */}
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => { haptics.medium(); onScanQR(); }}
-          style={[nh.cta, { borderColor: accent + 'AA', backgroundColor: accent + '14',
-            ...(Platform.OS === 'ios' ? { shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.65, shadowRadius:10 } : {}),
-          }]}
+          style={[nh.cta, Platform.OS === 'ios' ? {
+            shadowColor: accent, shadowOffset:{width:0,height:0}, shadowOpacity:0.55, shadowRadius:12,
+          } : null]}
         >
-          <MaterialCommunityIcons name={isConnected ? 'sync' : 'qrcode-scan'} size={15} color={accent} />
-          <Text style={[nh.ctaTxt, { color: accent }]} numberOfLines={1}>{ctaTxt}</Text>
-          <MaterialIcons name="chevron-right" size={16} color={accent} />
+          <LinearGradient
+            colors={[accent, accent2]}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+            style={nh.ctaBg}
+          >
+            <MaterialCommunityIcons
+              name={isConnected ? 'sync' : 'qrcode-scan'}
+              size={14} color="#fff"
+            />
+            <Text style={nh.ctaTxt} numberOfLines={1}>{ctaTxt}</Text>
+            <MaterialIcons name="chevron-right" size={16} color="#fff" />
+          </LinearGradient>
         </TouchableOpacity>
-
-        {/* ── Footer trust chip row ──────────────────────────── */}
-        <View style={nh.chipRow}>
-          {[
-            { icon: 'shield-check', label: 'HMAC-SHA256' },
-            { icon: 'cloud-off',    label: 'ZERO CLOUD' },
-            { icon: 'wifi',         label: 'LAN-ONLY' },
-          ].map((c, i) => (
-            <View key={i} style={nh.chip}>
-              <MaterialCommunityIcons name={c.icon as any} size={9} color={D.textMid} />
-              <Text style={nh.chipTxt}>{c.label}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
+      </LinearGradient>
     </View>
   );
 }
 
 const nh = StyleSheet.create({
-  wrap:          { marginHorizontal: 12, marginTop: 10 },
-  card:          {
-    borderWidth: 1, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 14,
-    overflow: 'hidden', alignItems: 'center',
+  wrap:        { marginHorizontal: 0, marginTop: 4 },
+  card:        {
+    borderWidth: 1, borderRadius: 14, padding: 12, overflow: 'hidden',
   },
-  corner:        { position: 'absolute', width: 14, height: 14 },
+  corner:      { position: 'absolute', width: 13, height: 13 },
 
-  headerRow:     { flexDirection: 'row', alignItems: 'center', width: '100%', gap: 6 },
-  statusPill:    {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    borderWidth: 1, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3,
+  scanBeam:    {
+    position: 'absolute', top: 0, bottom: 0, width: 140, opacity: 0.05,
   },
-  statusPillTxt: { fontFamily: MONO, fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
-  serial:        { fontFamily: MONO, fontSize: 8.5, fontWeight: '700', letterSpacing: 1.1 },
 
-  reactorStack:  { width: 96, height: 96, alignItems: 'center', justifyContent: 'center', marginTop: 14, marginBottom: 8 },
-  ring:          {
-    position: 'absolute', width: 80, height: 80, borderRadius: 40,
-    borderWidth: 1.5,
+  // Row 1 — reactor + identity
+  identityRow:    { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  reactorStack:   { width: 60, height: 60, alignItems: 'center', justifyContent: 'center' },
+  ring:           {
+    position: 'absolute', width: 56, height: 56, borderRadius: 28, borderWidth: 1.5,
   },
-  reactorCore:   {
-    width: 68, height: 68, borderRadius: 34, borderWidth: 1.5,
+  reactorCore:    {
+    width: 46, height: 46, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
   },
-
-  title:         { fontFamily: MONO, fontSize: 38, fontWeight: '900', letterSpacing: 5, color: D.text, marginTop: 4, textAlign: 'center' },
-  tagline:       { fontFamily: MONO, fontSize: 9, color: D.textMid, letterSpacing: 1.5, textAlign: 'center', marginTop: 4 },
-
-  statsRow:      { flexDirection: 'row', gap: 6, marginTop: 14, alignSelf: 'stretch' },
-  statTile:      {
-    flex: 1, borderWidth: 1, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 4,
-    alignItems: 'center', gap: 3,
+  identityCol:    { flex: 1, justifyContent: 'center' },
+  identityHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  brand:          {
+    fontFamily: MONO, fontSize: 19, fontWeight: '900', letterSpacing: 3,
   },
-  statValue:     { fontFamily: MONO, fontSize: 13, fontWeight: '900', letterSpacing: 0.5, marginTop: 1 },
-  statLabel:     { fontFamily: MONO, fontSize: 7, color: D.textDim, letterSpacing: 1 },
+  brandBadge:     {
+    paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5,
+  },
+  brandBadgeTxt:  {
+    fontFamily: MONO, fontSize: 11, fontWeight: '900', letterSpacing: 2, color: '#fff',
+  },
+  tagline:        {
+    fontFamily: MONO, fontSize: 8, color: D.textDim, letterSpacing: 1.4, marginTop: 3,
+  },
+  statusRow:      { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 7 },
+  statusDot:      { width: 6, height: 6, borderRadius: 3 },
+  statusTxt:      { fontFamily: MONO, fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
+  serial:         { fontFamily: MONO, fontSize: 8, fontWeight: '700', letterSpacing: 0.8 },
 
-  cta:           {
+  // Row 2 — 3×2 KPI tiles
+  tilesGrid:      {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12,
+  },
+  tile:           {
+    width: '32%' as any, borderWidth: 1, borderRadius: 8,
+    paddingHorizontal: 8, paddingTop: 7, paddingBottom: 7, position: 'relative',
+    minHeight: 56,
+  },
+  tileDot:        {
+    position: 'absolute', top: 5, right: 5, width: 4, height: 4, borderRadius: 2, opacity: 0.7,
+  },
+  tileTop:        { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  tileLabel:      {
+    fontFamily: MONO, fontSize: 7.5, color: D.textDim, letterSpacing: 1.4, fontWeight: '700',
+  },
+  tileValue:      {
+    fontFamily: MONO, fontSize: 14, fontWeight: '900', letterSpacing: 0.6, marginTop: 3,
+  },
+  tileBarTrack:   {
+    height: 2, backgroundColor: D.surfaceMid, borderRadius: 1, marginTop: 6,
+    overflow: 'hidden',
+  },
+  tileBarFill:    { height: 2, borderRadius: 1 },
+
+  // CTA gradient
+  cta:            { marginTop: 12, borderRadius: 100, overflow: 'hidden' },
+  ctaBg:          {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    borderWidth: 1.5, borderRadius: 10, paddingVertical: 12, paddingHorizontal: 14,
-    marginTop: 14, alignSelf: 'stretch',
+    paddingVertical: 11, paddingHorizontal: 14,
   },
-  ctaTxt:        { fontFamily: MONO, fontSize: 12, fontWeight: '900', letterSpacing: 2 },
-
-  chipRow:       { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10, marginTop: 11, paddingHorizontal: 2 },
-  chip:          { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  chipTxt:       { fontFamily: MONO, fontSize: 8, color: D.textMid, letterSpacing: 1 },
+  ctaTxt:         {
+    fontFamily: MONO, fontSize: 11, fontWeight: '900', letterSpacing: 2, color: '#fff',
+  },
 });
 
 // ─── CONNECTED PC CARD — upgraded with ring gauges + sparklines ───
