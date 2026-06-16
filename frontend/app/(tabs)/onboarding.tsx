@@ -53,23 +53,37 @@ export default function OnboardingTab() {
   const mountedRef = useRef(true);
 
   // ── 1. Cold-start "already onboarded?" skip ────────────────────────────
+  // CRITICAL ROUTER-READY GUARD: we wrap the navigation in setTimeout(0)
+  // so the redirect runs on the NEXT tick — after the Root Layout has
+  // finished mounting. Otherwise expo-router throws "Attempted to navigate
+  // before mounting the Root Layout component" and the user is stranded.
   useEffect(() => {
     mountedRef.current = true;
     if (_skipChecked) return;
     _skipChecked = true;
 
     let cancelled = false;
-    AsyncStorage.getItem(ONBOARDING_DONE_KEY)
-      .then((v) => {
+    (async () => {
+      try {
+        // Dual-key check — handles users updated from older builds that
+        // wrote v1 but not v2, and vice versa. Either flag = onboarded.
+        const [v2, v1] = await Promise.all([
+          AsyncStorage.getItem(ONBOARDING_DONE_KEY),
+          AsyncStorage.getItem('@butler_welcome_complete_v1'),
+        ]);
         if (cancelled || !mountedRef.current) return;
-        if (v === 'true' || v === '1') {
-          // Returning user — atomic same-tab-navigator switch to home.
+        const isDone = v2 === 'true' || v2 === '1' || v1 === 'true' || v1 === '1';
+        if (!isDone) return;
+
+        // Defer navigation by one tick so the router is fully mounted.
+        setTimeout(() => {
+          if (cancelled || !mountedRef.current) return;
           try { router.replace(HOME_ROUTE as any); return; } catch {}
           try { router.push(HOME_ROUTE as any);    return; } catch {}
           try { (router as any).navigate?.(HOME_ROUTE); }    catch {}
-        }
-      })
-      .catch(() => { /* storage error — show onboarding (safe default) */ });
+        }, 0);
+      } catch { /* storage error — safe default = show onboarding */ }
+    })();
 
     return () => {
       cancelled = true;

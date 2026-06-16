@@ -10,6 +10,19 @@ import ThemedCenterHeader from '@/components/ui/ThemedCenterHeader';
 import CyberneticBackdrop from '@/components/backgrounds/CyberneticBackdrop';
 import { useServerConnection } from '@/hooks/useServerConnection';
 
+// ── CRITICAL — Expo Router native-cold-start fix ─────────────────────────
+// The hidden `index.tsx` route below MUST exist for expo-router on native
+// Android to properly mount the (tabs) group on cold start. Without that
+// file the navigator never mounts → splash never hides → blue screen.
+// We DON'T set initialRouteName to 'index' though — that would hijack
+// URL-driven routing. Instead the default tab is `nexushome` (returning
+// users) and `app/index.tsx` explicitly redirects to `/(tabs)/onboarding`
+// for first launches (where the onboarding tab itself decides whether to
+// skip to home for already-onboarded users).
+export const unstable_settings = {
+  initialRouteName: 'nexushome',
+};
+
 type MCName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 type MIName = React.ComponentProps<typeof MaterialIcons>['name'];
 
@@ -88,6 +101,11 @@ export default function TabLayout() {
         screenOptions={{ ...HEADER_OPTS, sceneStyle: { backgroundColor: 'transparent' } }}
         tabBar={(props) => <FuturisticTabBar {...props} iconMap={ICONS} />}
       >
+        {/* Hidden index entry — REQUIRED for native cold-start.
+            Never shown in the tab bar (href: null). When something resolves
+            to `/(tabs)` with no specific child, this index.tsx kicks in and
+            redirects to nexushome. */}
+        <Tabs.Screen name="index"      options={{ href: null, title: 'INDEX' }} />
         <Tabs.Screen name="nexushome"  options={{ title: 'HOME',           tabBarLabel: 'HOME',    headerShown: false }} />
         <Tabs.Screen name="scripts"    options={{ title: 'SCRIPTS',        tabBarLabel: 'SCRIPTS' }} />
         <Tabs.Screen name="butler"     options={{ title: 'AI TERMINAL',    tabBarLabel: 'AI'      }} />
