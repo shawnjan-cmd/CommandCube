@@ -86,6 +86,22 @@ if (typeof global.TextEncoder === 'undefined') {
 
 require('react-native-url-polyfill/auto');
 
+// ── 0c. SPLASH SCREEN UNIVERSAL FALLBACK (FIX FOR 20+ BLUE-SCREEN BUILDS) ───
+// This MUST run before any potentially-failing require. If expo-router/entry
+// fails (recovery screen path), or if `_layout.tsx` never loads, the splash
+// would otherwise stay on screen forever and look like a blue screen of
+// death. This unconditional 4-second timeout guarantees the splash is hidden
+// no matter what happens downstream. Done at the entry-point level so it
+// fires even when the entire React tree fails to mount.
+try {
+  const _Splash = require('expo-splash-screen');
+  // Hold the splash up while we try to boot, then force-hide after 4s.
+  try { _Splash.preventAutoHideAsync().catch(() => {}); } catch (_) {}
+  setTimeout(() => {
+    try { _Splash.hideAsync().catch(() => {}); } catch (_) {}
+  }, 4000);
+} catch (_) { /* expo-splash-screen not available — nothing to do */ }
+
 // ── 0b. Crash signature ───────────────────────────────────────────────────────
 const CRASH_SIGS = [
   'SimpleCache', 'ExpoVideoCache', 'VideoCache', 'VideoManager', 'VideoModule',
@@ -276,6 +292,15 @@ if (Platform.OS === 'android') {
 // ── 3. Recovery screen factory (no external deps) ─────────────────────────────
 function _makeRecovery(React, View, Text, msg) {
   return function ButlerRecovery() {
+    // Hide the splash THE MOMENT the recovery screen renders. Without this,
+    // the splash stays on top of the recovery screen and the user sees the
+    // splash background forever ("blue screen") instead of this fallback.
+    React.useEffect(() => {
+      try {
+        const _Splash = require('expo-splash-screen');
+        _Splash.hideAsync().catch(() => {});
+      } catch (_) {}
+    }, []);
     return React.createElement(View,
       { style: { flex: 1, backgroundColor: '#020A10', justifyContent: 'center', alignItems: 'center', padding: 32 } },
       React.createElement(Text, {
