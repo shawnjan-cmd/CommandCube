@@ -1,109 +1,54 @@
 /**
- * Butler AI — Root Layout · CLEAN REWRITE v11
+ * Butler AI — Root Layout · CLEAN REWRITE v12
  * ──────────────────────────────────────────────────────────────────
  *
- * COLD-START CONTRACT
- *   1. `safeDimensionsShim` (auto-installs on import) patches
- *      Dimensions.get() so module-load reads can never see 0.
- *   2. `bootCrashLogger.installBootCrashLogger()` hooks the global
- *      JS error handler so any cold-start crash is persisted to
- *      AsyncStorage and surfaced as a red banner on the NEXT launch.
- *   3. `SplashScreen.preventAutoHideAsync()` keeps the splash up
- *      until React's first commit. `useLayoutEffect` hides it
- *      synchronously after first paint.
- *   4. Background `bootstrapServices()` is deferred 1500ms after
- *      mount and each step is independently try-wrapped.
+ * COLD-START CONTRACT  ─── now a single import line.
  *
- * DELIBERATE OMISSIONS
- *   • No try/catch around `useAppSync()` — that's a Rules-of-Hooks
- *     violation. The hook only does `useRef + useEffect` and can't
- *     throw at render. If it ever does, the error boundary catches.
- *   • No 800ms hard-timeout splash kill, no microtask splash kill —
- *     the layout layer fires hideAsync synchronously on first commit;
- *     additional kills were redundant guards causing log noise.
- *   • No ad-hoc fallback render trees — one `GlobalErrorBoundary`
- *     handles every render crash, period.
+ *   `bootGuard.installBootGuard()` does ALL of the below in one call:
+ *     1. Patches `Dimensions.get()` so module-load reads can never see 0.
+ *     2. Hooks the global JS error handler so any cold-start crash is
+ *        persisted to AsyncStorage and surfaced as a banner on the
+ *        next launch.
+ *     3. Calls `SplashScreen.preventAutoHideAsync()` so the native
+ *        splash stays up until React mounts.
+ *
+ *   `useSplashHide()` hides the splash on first commit, with a hard
+ *   1.5 s cap for safety.
+ *
+ *   `<BootErrorBoundary>` wraps the tree and renders a recoverable
+ *   fault screen if any render throws.
+ *
+ *   `<PreviousCrashBanner />` reads any persisted previous-launch
+ *   crash and shows a dismissible banner. Auto-clears after 3 s alive.
+ *
+ * That is the entire boot path. No other files needed.
  */
 
-// ⚠ MUST be first — patches Dimensions.get() before any other module
-//   can call it.
-import '@/services/safeDimensionsShim';
-// ⚠ MUST be second — hooks the global JS error handler. Module-eval
-//   errors in any later import will be persisted and shown next launch.
-import {
-  installBootCrashLogger,
-  readAndClearLastCrash,
-  recordBoundaryCrash,
-  markHomeReached,
-} from '@/services/bootCrashLogger';
-installBootCrashLogger();
-// ⚠ MUST be third — splash hide controller. Calling `preventAuto()`
-//   at module-eval keeps the native splash up until React mounts.
-import { preventAuto, armAllHideStrategies } from '@/services/splashController';
-preventAuto();
-// ⚠ MUST be fourth — kick off the AsyncStorage read for "is this a
-//   new or returning user?" as early as possible. This runs IN
-//   PARALLEL with the splash hide and React mount, so by the time
-//   `app/index.tsx` calls `getBootTarget()`, the answer is almost
-//   always already cached → the redirect is instant, no flash.
+// ⚠ MUST be the very first import — installs Dimensions shim and
+//   crash capture before any other module can evaluate.
+import { installBootGuard } from '@/services/bootGuard';
+installBootGuard();
+
+// Kick off the AsyncStorage "are you a new user?" read in parallel
+// with React mount so `app/index.tsx` redirects without flash.
 import { hydrateUserSession } from '@/services/userSession';
 hydrateUserSession().catch(() => {});
 
-import React, { Component, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import {
+  BootErrorBoundary,
+  PreviousCrashBanner,
+  useSplashHide,
+} from '@/services/bootGuard';
 import { TabBarProvider }  from '@/contexts/TabBarContext';
 import { CosmeticProvider } from '@/contexts/CosmeticContext';
 import { useAppSync }      from '@/hooks/useAppSync';
 import { ONBOARDING_DONE_KEY, WELCOME_COMPLETE_KEY } from '@/constants/onboardingKeys';
-
-// ═══════════════════════════════════════════════════════════════════
-// ERROR BOUNDARY
-// ═══════════════════════════════════════════════════════════════════
-interface EBState { error: Error | null; resetCount: number; }
-class GlobalErrorBoundary extends Component<{ children: ReactNode }, EBState> {
-  state: EBState = { error: null, resetCount: 0 };
-  static getDerivedStateFromError(error: Error): any { return { error }; }
-  componentDidCatch(error: Error) {
-    recordBoundaryCrash(error);
-    console.error('[GlobalErrorBoundary]', error?.message);
-  }
-  private reinit = () => this.setState(s => ({ error: null, resetCount: s.resetCount + 1 }));
-  render() {
-    if (!this.state.error) {
-      return <React.Fragment key={`eb-${this.state.resetCount}`}>{this.props.children}</React.Fragment>;
-    }
-    return (
-      <View style={eb.root}>
-        <View style={eb.iconWrap}>
-          <MaterialIcons name="warning" size={38} color="#ef4444" />
-        </View>
-        <Text style={eb.title}>SYSTEM FAULT</Text>
-        <View style={eb.errBox}>
-          <Text style={eb.errMsg} numberOfLines={6}>{this.state.error.message}</Text>
-        </View>
-        <TouchableOpacity style={eb.btn} onPress={this.reinit} activeOpacity={0.8}>
-          <MaterialIcons name="refresh" size={16} color="#ef4444" />
-          <Text style={eb.btnTxt}>REINITIALIZE</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-}
-
-const eb = StyleSheet.create({
-  root:     { flex: 1, backgroundColor: '#000', alignItems: 'center', justifyContent: 'center', padding: 28 },
-  iconWrap: { width: 70, height: 70, borderRadius: 35, borderWidth: 1.5, borderColor: '#ef444499', alignItems: 'center', justifyContent: 'center', marginBottom: 18, backgroundColor: '#ef444415' },
-  title:    { fontSize: 22, fontWeight: '900', color: '#ef4444', letterSpacing: 4, marginBottom: 18, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-  errBox:   { width: '100%', maxWidth: 360, borderWidth: 1, borderRadius: 10, borderColor: '#ef444433', backgroundColor: '#ef44440a', padding: 14, marginBottom: 22 },
-  errMsg:   { fontSize: 12, color: '#fecaca', lineHeight: 19 },
-  btn:      { flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1.5, borderColor: '#ef4444', borderRadius: 10, paddingHorizontal: 22, paddingVertical: 12, backgroundColor: '#ef444415' },
-  btnTxt:   { fontSize: 13, fontWeight: '900', color: '#ef4444', letterSpacing: 2, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-});
 
 // ═══════════════════════════════════════════════════════════════════
 // APP-SYNC RUNNER (one hook, mounted once)
@@ -149,28 +94,9 @@ async function bootstrapServices() {
 // ═══════════════════════════════════════════════════════════════════
 export default function RootLayout() {
   const bootRef = useRef(false);
-  const [prevCrash, setPrevCrash] = useState<null | { message: string; stack?: string }>(null);
 
-  // Hide splash with FIVE layered strategies — at least one will
-  // always fire (immediate, RAF, hard-cap 1.5 s).
-  useLayoutEffect(() => {
-    const cleanup = armAllHideStrategies({ hardCapMs: 1500 });
-    return cleanup;
-  }, []);
-
-  // Read any crash from the previous session (fire-and-forget).
-  useEffect(() => {
-    readAndClearLastCrash().then(c => {
-      if (c?.message) setPrevCrash({ message: c.message, stack: c.stack });
-    }).catch(() => {});
-  }, []);
-
-  // If we've been alive 3s without dying, mark home reached so we
-  // don't show stale crashes to a user whose problem is fixed.
-  useEffect(() => {
-    const t = setTimeout(() => { markHomeReached().catch(() => {}); }, 3000);
-    return () => clearTimeout(t);
-  }, []);
+  // Hide native splash on first commit (with hard 1.5 s cap fallback).
+  useSplashHide(1500);
 
   // Background services start 1500ms after mount.
   useEffect(() => {
@@ -181,7 +107,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <GlobalErrorBoundary>
+    <BootErrorBoundary>
       <CosmeticProvider>
         <TabBarProvider>
           <AppSyncRunner />
@@ -198,46 +124,16 @@ export default function RootLayout() {
               <Stack.Screen name="+not-found"     options={{ headerShown: false }} />
             </Stack>
 
-            {/* Previous-launch crash banner — only ever shows if the
-                last cold start crashed. Dismissible. Gives the user a
-                visible error message without ever needing logcat. */}
-            {prevCrash ? (
-              <View pointerEvents="box-none" style={pcb.wrap}>
-                <View style={pcb.card}>
-                  <Text style={pcb.title}>PREVIOUS LAUNCH CRASHED</Text>
-                  <Text style={pcb.msg} numberOfLines={6}>{prevCrash.message}</Text>
-                  {prevCrash.stack ? (
-                    <Text style={pcb.stack} numberOfLines={8}>
-                      {prevCrash.stack.split('\n').slice(0, 8).join('\n')}
-                    </Text>
-                  ) : null}
-                  <TouchableOpacity
-                    style={pcb.btn}
-                    onPress={() => setPrevCrash(null)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={pcb.btnTxt}>DISMISS</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : null}
+            {/* Previous-launch crash banner — only ever shows if the last
+                cold start crashed. Dismissible. Auto-clears after 3 s alive. */}
+            <PreviousCrashBanner />
           </View>
         </TabBarProvider>
       </CosmeticProvider>
-    </GlobalErrorBoundary>
+    </BootErrorBoundary>
   );
 }
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-});
-
-const pcb = StyleSheet.create({
-  wrap:  { position: 'absolute', top: 0, left: 0, right: 0, padding: 12, paddingTop: Platform.OS === 'ios' ? 48 : 24, zIndex: 9999 },
-  card:  { backgroundColor: '#1a0204', borderWidth: 1.5, borderColor: '#ef4444', borderRadius: 10, padding: 14 },
-  title: { fontSize: 12, fontWeight: '900', color: '#ef4444', letterSpacing: 2, marginBottom: 8, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-  msg:   { fontSize: 13, color: '#FFCCCC', lineHeight: 18, marginBottom: 6 },
-  stack: { fontSize: 10, color: '#FFAAAA88', lineHeight: 14, marginBottom: 10, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-  btn:   { alignSelf: 'flex-end', borderWidth: 1, borderColor: '#ef4444', borderRadius: 6, paddingHorizontal: 14, paddingVertical: 6 },
-  btnTxt:{ fontSize: 11, fontWeight: '900', color: '#ef4444', letterSpacing: 1.5, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 });
