@@ -29,7 +29,7 @@ const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 export const MECH = {
   // metals
   steel:        '#0F1115',  // deeper gunmetal base (endoskeleton chassis)
-  steelHi:      '#1A1D24',  // raised metal
+  steelHi:      '#141823',  // raised metal
   steelLo:      '#06070A',  // recessed shadow
   brushed:      '#262A33',  // brushed titanium highlight
   chrome:       '#7A8392',  // chrome edge (brighter for endo skeleton sheen)
@@ -37,11 +37,11 @@ export const MECH = {
   rivet:        '#3C424D',  // bolt head
   rivetHi:      '#697283',  // bolt highlight
   // signal colors — TERMINATOR / ENDOSKELETON
-  arc:          '#FF2A1F',  // endo red (primary — the glowing-eyes color)
+  arc:          '#3b82f6',  // endo red (primary — the glowing-eyes color)
   arcDim:       '#7A0F08',
-  plasma:       '#FF6A1F',  // plasma orange (secondary / standby)
+  plasma:       '#a855f7',  // plasma orange (secondary / standby)
   plasmaDim:    '#A03A05',
-  hazard:       '#FFC400',  // hazard amber-yellow (caution stripes)
+  hazard:       '#f59e0b',  // hazard amber-yellow (caution stripes)
   hazardDim:    '#7A5E00',
   emerald:      '#00FF88',  // status OK green (rarely used)
   bloodRed:     '#FF0040',  // critical red

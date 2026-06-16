@@ -28,7 +28,7 @@ const C = {
   bg:       '#070A0E',
   surface:  '#0E141C',
   border:   '#1A2230',
-  accent:   '#FF2A1F',
+  accent:   '#3b82f6',
   amber:    '#FF9F1F',
   green:    '#44FF88',
   cyan:     '#5BD4FF',

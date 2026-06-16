@@ -13,7 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const C = {
-  accent:   '#FF2A1F',
+  accent:   '#3b82f6',
   textBrt:  '#E8EEF5',
   textMid:  '#8FA3B8',
   textDim:  '#4A5F75',
@@ -86,7 +86,7 @@ const s = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: C.accent + '40',
-    backgroundColor: 'rgba(255,42,31,0.05)',
+    backgroundColor: 'rgba(59,130,246,0.05)',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',

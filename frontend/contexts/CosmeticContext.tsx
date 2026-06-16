@@ -73,17 +73,17 @@ export interface AppTheme {
 export const PACK_THEMES: Record<string, AppTheme> = {
 
   nexus: {
-    id: 'nexus', name: 'ENDO CORE', isDefault: true, tier: 'free',
-    tagline: 'Industrial endoframe — gunmetal · plasma red', category: 'SYSTEM',
-    icon: 'robot-angry-outline', badge: 'DEFAULT',
-    // Industrial endoframe palette — plasma-red glow on brushed gunmetal
-    primary: '#FF2A1F', secondary: '#FF6A1F', tertiary: '#FFC400',
-    bg: '#050505', panel: '#0E0F12', panelBrt: '#1A1D24',
-    textAccent: '#FFB3AD', textDim: '#4A5366', textHi: '#F4F6F9', textMid: '#8C95A6',
-    glowColor: '#FF2A1F', borderColor: '#3C424D', borderBrt: '#FF2A1F',
-    userBubble: '#241312', aiBubble: '#0C0D10', aiBorder: 'rgba(255,42,31,0.22)',
-    chatBarBg: '#0A0B0E', chatBarTopGlow: '#FF2A1F', chatBarBorderTop: 'rgba(255,42,31,0.32)',
-    promptGlyph: '#FF2A1F',
+    id: 'nexus', name: 'NEXUS CORE', isDefault: true, tier: 'free',
+    tagline: 'Professional command grid — electric blue · violet sweep', category: 'SYSTEM',
+    icon: 'hexagon-outline', badge: 'DEFAULT',
+    // NEXUS v5 palette — extracted from nexus-ultimate-v5 mockup
+    primary: '#3b82f6', secondary: '#a855f7', tertiary: '#f59e0b',
+    bg: '#07090f', panel: '#0f1219', panelBrt: '#141823',
+    textAccent: '#93c5fd', textDim: '#4a5270', textHi: '#dde2f0', textMid: '#8c95a6',
+    glowColor: '#3b82f6', borderColor: '#1e2538', borderBrt: '#3b82f6',
+    userBubble: '#0c2547', aiBubble: '#0f1219', aiBorder: 'rgba(59,130,246,0.22)',
+    chatBarBg: '#0a0d14', chatBarTopGlow: '#3b82f6', chatBarBorderTop: 'rgba(59,130,246,0.32)',
+    promptGlyph: '#3b82f6',
     defaultExtras: { notifSound: 'chime', bubbleAnim: 'slide', sendEffect: 'ripple', headerGlow: true, tabPulse: true, typingStyle: 'dots', chatShimmer: false },
   },
 

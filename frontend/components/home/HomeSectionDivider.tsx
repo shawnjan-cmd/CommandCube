@@ -14,7 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 const MONO: any = Platform.OS === 'ios' ? 'Courier New' : 'monospace';
 
 const C = {
-  accent:  '#FF2A1F',
+  accent:  '#3b82f6',
   textDim: '#5A6B7A',
 };
 

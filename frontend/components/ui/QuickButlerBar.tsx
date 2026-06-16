@@ -24,7 +24,7 @@ export const BUTLER_PREFILL_KEY = '@butler_prefill_prompt';
 
 const BAR_H = 64;
 
-const RED      = '#FF2A1F';
+const RED      = '#3b82f6';
 const RED_HI   = '#FF6A52';
 const STEEL    = '#3C424D';
 const DECK     = '#0A0B0E';
@@ -133,7 +133,7 @@ export default function QuickButlerBar() {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               placeholder="ASK BUTLER"
-              placeholderTextColor="rgba(255,106,82,0.45)"
+              placeholderTextColor="rgba(147,197,253,0.45)"
               style={styles.input}
               returnKeyType="send"
               onSubmitEditing={handleSend}
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   },
   bottomStatusTxt: {
     fontFamily: MONO, fontSize: 7,
-    color: 'rgba(255,106,82,0.55)',
+    color: 'rgba(147,197,253,0.55)',
     fontWeight: '700',
     letterSpacing: 1.6,
   },
@@ -270,9 +270,9 @@ const styles = StyleSheet.create({
   robotBadge: {
     width: 30, height: 30, borderRadius: 7,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,42,31,0.08)',
+    backgroundColor: 'rgba(59,130,246,0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(255,42,31,0.45)',
+    borderColor: 'rgba(59,130,246,0.45)',
     position: 'relative',
   },
   promptBlock: {
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
       : { elevation: 8 }),
   },
   sendBtnIdle: {
-    backgroundColor: 'rgba(255,42,31,0.06)',
-    borderColor: 'rgba(255,42,31,0.40)',
+    backgroundColor: 'rgba(59,130,246,0.06)',
+    borderColor: 'rgba(59,130,246,0.40)',
   },
 });
