@@ -1,0 +1,82 @@
+# ─────────────────────────────────────────────────────────────────
+# .dockerignore — keep the Docker build context lean.
+#
+# Why this file exists:
+#   The deploy pipeline copies the whole repo into the build image
+#   (`COPY . /app`). Without this file the frontend `node_modules`
+#   (≈ 650 MB!) was being sent over, pushing the image manifest past
+#   Artifact Registry's allowed size and failing with
+#   `manifest invalid: Request contains an invalid argument.`
+#
+#   The backend image only needs:
+#     - /app/backend/**  (Python + requirements.txt)
+#     - /app/frontend/.env  (read by the build step for URL rewriting)
+#     - top-level configs (entrypoint.sh, nginx.conf, package.json)
+#
+#   The frontend bundle is built separately by the EAS update step,
+#   so node_modules / native projects must NOT travel with the
+#   backend image.
+# ─────────────────────────────────────────────────────────────────
+
+# ── Frontend deps & build artifacts (the big offender) ────────────
+frontend/node_modules/
+frontend/.expo/
+frontend/.expo-shared/
+frontend/dist/
+frontend/web-build/
+frontend/android/
+frontend/ios/
+frontend/.metro-cache/
+frontend/.cache/
+
+# ── Native SDK / Gradle / Xcode caches ────────────────────────────
+android-sdk/
+**/.gradle/
+**/build/
+**/DerivedData/
+
+# ── Common dev clutter ────────────────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/node_modules/
+**/.DS_Store
+**/Thumbs.db
+*.log
+*.swp
+*.tmp
+
+# ── Source control & editor ───────────────────────────────────────
+.git/
+.gitignore
+.vscode/
+.idea/
+.emergent/
+
+# ── Local-only directories ────────────────────────────────────────
+test_reports/
+tests/
+memory/test_credentials.md
+
+# ── Archive / binary files that should never be in a build ────────
+**/*.zip
+**/*.tar
+**/*.tar.gz
+**/*.tgz
+**/*.7z
+**/*.rar
+**/*.apk
+**/*.aab
+**/*.ipa
+**/*.dmg
+**/*.deb
+**/*.pack
+**/*.dylib
+
+# ── Keep these explicitly (just in case) ──────────────────────────
+# (.dockerignore supports negation with !path; leaving the .env files
+#  in the context because the backend build sed-rewrites them.)
+!backend/.env
+!frontend/.env

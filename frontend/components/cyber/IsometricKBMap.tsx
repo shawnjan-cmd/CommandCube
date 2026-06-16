@@ -6,7 +6,8 @@ import React, { useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Platform, Animated, Dimensions } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 
-const { width: SW } = Dimensions.get('window');
+const _DIM_IKB = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_IKB.width > 0 ? _DIM_IKB.width : 414;
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 const CYAN    = '#FF2A1F';

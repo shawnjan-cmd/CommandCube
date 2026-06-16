@@ -15,7 +15,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { haptics } from '@/services/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width: SW } = Dimensions.get('window');
+const _DIM_AHD = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_AHD.width > 0 ? _DIM_AHD.width : 414;
 
 // ── Teal Design Tokens ──────────────────────────────────────────
 const C = {

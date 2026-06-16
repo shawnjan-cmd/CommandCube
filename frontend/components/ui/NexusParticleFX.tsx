@@ -7,7 +7,9 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { View, Animated, Dimensions, StyleSheet, Platform } from 'react-native';
 
-const { width: SW, height: SH } = Dimensions.get('window');
+const _DIM_NPF = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_NPF.width  > 0 ? _DIM_NPF.width  : 414;
+const SH = _DIM_NPF.height > 0 ? _DIM_NPF.height : 896;
 
 export type ParticleStyle =
   | 'drift'      // HOME — gentle teal hexagons drifting up

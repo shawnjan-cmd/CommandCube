@@ -13,7 +13,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, Platform, Animated, Easing } from 'react-native';
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+const _DIM_W = Dimensions.get('window'); /* native cold-start safe — falls back to standard phone size if 0 */
+const SCREEN_W = _DIM_W.width  > 0 ? _DIM_W.width  : 414;
+const SCREEN_H = _DIM_W.height > 0 ? _DIM_W.height : 896;
 
 const C = {
   red:     '#FF2A1F',

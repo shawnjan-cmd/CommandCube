@@ -12,7 +12,9 @@ import {
 import { autoErrorLogger } from '@/services/autoErrorLogger';
 import { haptics } from '@/services/haptics';
 
-const { width: SW, height: SH } = Dimensions.get('window');
+const _DIM_NFX = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_NFX.width  > 0 ? _DIM_NFX.width  : 414;
+const SH = _DIM_NFX.height > 0 ? _DIM_NFX.height : 896;
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
 // ─── NEXUS palette ─────────────────────────────────────────────────

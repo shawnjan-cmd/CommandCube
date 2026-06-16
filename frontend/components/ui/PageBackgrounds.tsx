@@ -6,7 +6,9 @@
 import React, { useRef, useEffect, memo } from 'react';
 import { View, StyleSheet, Platform, Animated, Dimensions } from 'react-native';
 
-const { width: SW, height: SH } = Dimensions.get('window');
+const _DIM_PBG = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_PBG.width  > 0 ? _DIM_PBG.width  : 414;
+const SH = _DIM_PBG.height > 0 ? _DIM_PBG.height : 896;
 const TEAL = '#FF2A1F';
 const TEAL_DIM = '#002233';
 

@@ -51,7 +51,8 @@ import { useRouter } from 'expo-router';
 import { ONBOARDING_DONE_KEY } from '@/constants/onboardingKeys';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
-const { width: SW } = Dimensions.get('window');
+const _DIM_NH = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_NH.width > 0 ? _DIM_NH.width : 414;
 
 // ─── DESIGN TOKENS (NEXUS v5 — professional blue) ────────────────
 const D = {

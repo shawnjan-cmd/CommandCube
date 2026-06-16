@@ -10,7 +10,8 @@ import { serverConnection } from '@/services/serverConnection';
 import { autoConnectEngine } from '@/services/autoConnectEngine';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
-const { width: SW } = Dimensions.get('window');
+const _DIM_SMB = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_SMB.width > 0 ? _DIM_SMB.width : 414;
 
 interface MetricsState {
   cpu: number;

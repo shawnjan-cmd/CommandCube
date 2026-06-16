@@ -16,7 +16,8 @@ import { serverConnection } from '@/services/serverConnection';
 import { haptics } from '@/services/haptics';
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
-const { width: SW } = Dimensions.get('window');
+const _DIM_PMW = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_PMW.width > 0 ? _DIM_PMW.width : 414;
 
 // ─── Palette — matches app's dark NEXUS theme ──────────────────
 const PM = {

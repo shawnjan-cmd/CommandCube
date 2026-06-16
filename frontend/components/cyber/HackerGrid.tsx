@@ -22,7 +22,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { DesignSystem } from '@/constants/designSystem';
 
-const { width, height } = Dimensions.get('window');
+const _DIM_HG = Dimensions.get('window'); /* cold-start safe */
+const width  = _DIM_HG.width  > 0 ? _DIM_HG.width  : 414;
+const height = _DIM_HG.height > 0 ? _DIM_HG.height : 896;
 const GRID_SIZE = 40;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 

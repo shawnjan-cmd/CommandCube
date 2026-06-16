@@ -34,7 +34,8 @@ try {
 } catch {}
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
-const { width: SW } = Dimensions.get('window');
+const _DIM_WLR = Dimensions.get('window'); /* cold-start safe */
+const SW = _DIM_WLR.width > 0 ? _DIM_WLR.width : 414;
 
 const C = {
   bg:      '#0E0F12',
