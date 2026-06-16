@@ -13,6 +13,15 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
+// Persist the derived key so cold starts skip the 1000-iteration KDF chain.
+// `expo-secure-store` is the right vault (Android Keystore / iOS Keychain)
+// but lazy-loaded so a module-level failure here can never block boot.
+let _SecureStore: any = null;
+function getSecureStore() {
+  if (_SecureStore) return _SecureStore;
+  try { _SecureStore = require('expo-secure-store'); } catch { _SecureStore = null; }
+  return _SecureStore;
+}
 
 // ── Keys that hold sensitive data and must be encrypted ─────────
 const SENSITIVE_KEYS = new Set([
@@ -34,19 +43,56 @@ const SENSITIVE_KEYS = new Set([
 const ENC_PREFIX = '__ENC__';
 const SALT       = 'butler-ai-local-v1-salt-2025';
 
+// SecureStore vault keys for the persistent derived key (skips KDF on boot)
+const DERIVED_KEY_STORE        = 'butler_derived_key_v1';
+const DERIVED_DEVICE_ID_STORE  = 'butler_derived_device_id_v1';
+
 // ── Derive a 32-byte key from device ID ─────────────────────────
 let _keyCache: string | null = null;
 let _deviceIdForKey: string | null = null;
 
 async function deriveKey(deviceId: string): Promise<string> {
+  // 1. In-memory cache — fastest, same JS session.
   if (_keyCache && _deviceIdForKey === deviceId) return _keyCache;
-  // Stretch: hash the seed 1000 times (lightweight PBKDF2 approximation)
+
+  // 2. Persistent cache via SecureStore — survives app restarts.
+  //    1000 SHA-256 iterations cost 300–1000ms on Android. Without
+  //    this, that work runs on EVERY cold start inside bootstrap()
+  //    and contributes directly to "app feels sluggish on first
+  //    open" reports.
+  try {
+    const ss = getSecureStore();
+    if (ss?.getItemAsync) {
+      const [cachedKey, cachedId] = await Promise.all([
+        ss.getItemAsync(DERIVED_KEY_STORE).catch(() => null),
+        ss.getItemAsync(DERIVED_DEVICE_ID_STORE).catch(() => null),
+      ]);
+      if (cachedKey && cachedId === deviceId) {
+        _keyCache = cachedKey;
+        _deviceIdForKey = deviceId;
+        return cachedKey;
+      }
+    }
+  } catch { /* SecureStore unavailable — fall through to derive */ }
+
+  // 3. First-ever install (or device-id changed): run the full KDF.
+  //    Stretch: hash the seed 1000 times (lightweight PBKDF2 approximation)
   let seed = `${deviceId}:${SALT}`;
   for (let i = 0; i < 1000; i++) {
     seed = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, seed);
   }
   _keyCache = seed;
   _deviceIdForKey = deviceId;
+
+  // Persist for next launch — fire-and-forget, never blocks.
+  try {
+    const ss = getSecureStore();
+    if (ss?.setItemAsync) {
+      ss.setItemAsync(DERIVED_KEY_STORE, seed).catch(() => {});
+      ss.setItemAsync(DERIVED_DEVICE_ID_STORE, deviceId).catch(() => {});
+    }
+  } catch {}
+
   return seed;
 }
 

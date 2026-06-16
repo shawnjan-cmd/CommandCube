@@ -34,9 +34,6 @@ import { useChatHistory } from '@/hooks/useChatHistory';
 import { buildHistoryOnly } from '@/utils/contextManager';
 import { BUTLER_STARTER_KNOWLEDGE, BUTLER_KNOWLEDGE_COMPACT } from '@/constants/butlerKnowledge';
 import { serverConnection } from '@/services/serverConnection';
-function isAuthDisabled(): boolean {
-  try { return (serverConnection as any).isAuthDisabled?.() === true; } catch { return false; }
-}
 import { serverMetrics } from '@/services/serverMetrics';
 import { taskMemory } from '@/services/taskMemory';
 import { autoErrorLogger } from '@/services/autoErrorLogger';
@@ -47,6 +44,12 @@ import { knowledgeGrowthEngine } from '@/services/knowledgeGrowthEngine';
 import { autoConnectEngine, EngineEvent } from '@/services/autoConnectEngine';
 import { runSynapseHeal, makeBrokenScript, SynapseState, SynapseLog } from '@/services/synapseHeal';
 // nexusWS / WsState removed — autoConnectEngine is the single source of truth
+
+// Helper — must be defined AFTER all imports (Metro/Babel strict-mode
+// requires every `import` to appear before any other statement).
+function isAuthDisabled(): boolean {
+  try { return (serverConnection as any).isAuthDisabled?.() === true; } catch { return false; }
+}
 
 const { width: SW } = Dimensions.get('window');
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';

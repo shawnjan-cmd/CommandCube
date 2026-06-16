@@ -18,8 +18,6 @@ import SectionTitle3D from '@/components/ui/SectionTitle3D';
 import Svg, { Circle, Path, Defs, RadialGradient, Stop, Rect, Line, Polygon, LinearGradient as SvgLinearGradient, G, Text as SvgText } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system/legacy';
-import * as Sharing from 'expo-sharing';
 // ⚠ DO NOT add `expo-camera` imports here. They get lazy-loaded via the
 // `QRCameraScanner` component (see imports below). Top-level expo-camera
 // imports cause Android cold-start black screens on New Architecture.

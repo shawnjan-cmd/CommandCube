@@ -96,9 +96,15 @@ const eb = StyleSheet.create({
   btnTxt:    { fontSize: 13, fontWeight: '900', color: '#FF3131', letterSpacing: 2 },
 });
 
-// ── Safe wrapper for the app-sync hook (Rules of Hooks compliant) ─────
+// ── App-sync hook runner ────────────────────────────────────────────
+// NEVER wrap a hook call in try/catch — React tracks hooks by call order
+// via an internal fiber linked list. If `useAppSync` throws mid-render,
+// React's hook pointer ends up out-of-sync with the next render, which
+// causes a Rules-of-Hooks violation that re-throws → caught → re-renders
+// → infinite silent loop. The outer `GlobalErrorBoundary` already
+// handles any render crashes correctly via React's error-boundary path.
 function AppSyncRunner() {
-  try { useAppSync(); } catch (e) { console.warn('[_layout] useAppSync failed:', e); }
+  useAppSync();
   return null;
 }
 
