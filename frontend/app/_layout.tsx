@@ -227,8 +227,22 @@ export default function RootLayout() {
     // Stage 2: useEffect fired
     mark('effect_fired');
 
+    // ── BELT-AND-SUSPENDERS SPLASH HIDE ──────────────────────────────────
+    // Hide the splash THE MOMENT this effect fires — independent of the
+    // root View's onLayout. If the View paints, onLayout's hideAsync()
+    // runs first (no-op here). If the View NEVER paints (e.g. a layout
+    // error inside a child), this still hides the splash, preventing the
+    // "blue screen" forever state. Wrapped in try/catch + .catch() so it
+    // can NEVER throw and abort the bootstrap chain.
+    try { SplashScreen.hideAsync().catch(() => {}); } catch {}
+
     const t = setTimeout(() => {
       (async () => {
+        // FINAL-RESORT SPLASH HIDE before any potentially-failing import.
+        // Guarantees the splash is gone even if one of the bootstrap steps
+        // below somehow blocks for longer than expected.
+        try { SplashScreen.hideAsync().catch(() => {}); } catch {}
+
         // Error interceptor
         try {
           const mod = await withTimeout(import('@/services/errorInterceptor'), 2500, 'errorInterceptor import');
@@ -273,10 +287,13 @@ export default function RootLayout() {
           }
         } catch (e) { console.warn('[_layout] encryptedStorage init failed:', e); }
 
-        // Conditionally start auto-connect (only if onboarded)
+        // Conditionally start auto-connect (only if onboarded — checks BOTH keys)
         try {
-          const v = await withTimeout(AsyncStorage.getItem(ONBOARDING_DONE_KEY), 1500, 'AsyncStorage onboarding flag');
-          const onboarded = v === '1' || v === 'true';
+          const [v2, v1] = await Promise.all([
+            withTimeout(AsyncStorage.getItem(ONBOARDING_DONE_KEY), 1500, 'AsyncStorage onboarding v2 flag'),
+            withTimeout(AsyncStorage.getItem('@butler_welcome_complete_v1'), 1500, 'AsyncStorage onboarding v1 flag'),
+          ]);
+          const onboarded = v2 === '1' || v2 === 'true' || v1 === '1' || v1 === 'true';
           if (onboarded) {
             const mod = await withTimeout(import('@/services/autoConnectEngine'), 2500, 'autoConnectEngine import');
             (mod as any)?.autoConnectEngine?.start?.().catch(() => {});
@@ -285,7 +302,21 @@ export default function RootLayout() {
 
         // Stage 3: All boot services attempted.
         mark('services_done');
-      })().catch((e) => console.warn('[_layout] bootstrap chain failed:', e));
+      })()
+        // FINALLY-style guarantee: NO MATTER WHAT happens in the chain
+        // above — exception, timeout, hang, anything — make absolutely
+        // sure the splash is hidden. This is the user-requested triple
+        // safety net on top of:
+        //   • onRootLayout (line 207)
+        //   • 3s hard timeout at module load (line 80)
+        //   • componentDidCatch in GlobalErrorBoundary (line 96)
+        //   • 4s entry-point timeout in /index.js
+        //   • boot watchdog 8s + RECOVERY MODE screen
+        .catch((e) => console.warn('[_layout] bootstrap chain failed:', e))
+        .finally(() => {
+          try { SplashScreen.hideAsync().catch(() => {}); } catch {}
+          mark('bootstrap_finally');
+        });
     }, 0);
 
     return () => clearTimeout(t);
