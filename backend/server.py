@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -102,6 +103,21 @@ async def root():
 @api_router.get("/health")
 async def api_health():
     return {"status": "ok"}
+
+
+# ── Upgrade bundle download (one-shot, manually triggered) ───────────────────
+# Serves the curated bundle of "better flow / sequence code" so it can be
+# downloaded by the user. The file lives at /app/backend/static/.
+@api_router.get("/download/upgrade-bundle")
+async def download_upgrade_bundle():
+    bundle_path = ROOT_DIR / "static" / "butler-ai-upgrade-bundle.zip"
+    if not bundle_path.exists():
+        raise HTTPException(status_code=404, detail="bundle not found")
+    return FileResponse(
+        path=str(bundle_path),
+        filename="butler-ai-upgrade-bundle.zip",
+        media_type="application/zip",
+    )
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
