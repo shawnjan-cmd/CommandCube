@@ -92,6 +92,15 @@ function NexusTopStatusBarInner({
 
   return (
     <View style={s.wrap}>
+      {/* Subtle blue→purple sheen lifted from chat-header-bar */}
+      <LinearGradient
+        colors={['rgba(59,130,246,0.07)', 'rgba(168,85,247,0.03)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={StyleSheet.absoluteFillObject}
+        pointerEvents="none"
+      />
+
       {/* ─── LEFT: hex logo + title ──────────────────────────── */}
       <View style={s.leftGroup}>
         <View style={s.hexWrap}>

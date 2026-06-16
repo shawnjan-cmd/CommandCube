@@ -23,6 +23,7 @@ import { haptics } from '@/services/haptics';
 import { logger } from '@/utils/logger';
 import * as Clipboard from 'expo-clipboard';
 import { InlineWidgetSlot, WidgetLayer } from '@/components/ui/WidgetLayer';
+import NexusQuickChips, { BUTLER_DEFAULT_CHIPS } from '@/components/butler/NexusQuickChips';
 import { useCosmetic } from '@/contexts/CosmeticContext';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -1689,6 +1690,15 @@ export default function ButlerScreen() {
       </ScrollView>
 
       {/* Input bar */}
+      <NexusQuickChips
+        chips={BUTLER_DEFAULT_CHIPS}
+        onPick={(prompt) => {
+          // Drop the prompt into the input via the existing AsyncStorage
+          // handoff key — CommandConsoleBarThemed already drains it.
+          AsyncStorage.setItem('@butler_prefill_prompt', prompt).catch(() => {});
+        }}
+        disabled={isLoading}
+      />
       <CommandConsoleBarThemed
         onSend={sendMessage}
         isConnected={isConnected}
