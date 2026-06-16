@@ -55,6 +55,26 @@ export function extractAllPythonBlocks(content: string): string[] {
 }
 
 /**
+ * Extract ALL Python code blocks from a message AS structured objects.
+ * Each object includes the `raw` original markdown block (for replace ops)
+ * and the cleaned `code`. Used by chat UI to render and strip code blocks.
+ * NEVER returns null — empty array when nothing found.
+ */
+export function extractPythonCodeBlocks(content: string): Array<{ raw: string; code: string }> {
+  const out: Array<{ raw: string; code: string }> = [];
+  if (!content || typeof content !== 'string') return out;
+  const regex = /```(?:python)?\s*\n([\s\S]*?)```/g;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(content)) !== null) {
+    const code = (match[1] || '').trim();
+    if (code.length > 20 && /import |def |class |print\(|#/.test(code)) {
+      out.push({ raw: match[0], code });
+    }
+  }
+  return out;
+}
+
+/**
  * Guess a title from code content (first meaningful comment or first import).
  */
 function guessTitleFromCode(code: string, fallback?: string): string {

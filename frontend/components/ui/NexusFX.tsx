@@ -489,7 +489,7 @@ export function AutoHealthButton({
       try {
         const ok = await onCheck();
         setLastStatus(ok ? 'ok' : 'fail');
-        autoErrorLogger.log(ok ? 'info' : 'warning', 'AutoHealthButton', `Health check for ${label}: ${ok ? 'PASS' : 'FAIL'}`);
+        autoErrorLogger.log(ok ? 'info' : 'warn', 'AutoHealthButton', `Health check for ${label}: ${ok ? 'PASS' : 'FAIL'}`);
       } catch (e: any) {
         setLastStatus('fail');
         autoErrorLogger.log('error', 'AutoHealthButton', `Health check error for ${label}: ${e?.message}`);

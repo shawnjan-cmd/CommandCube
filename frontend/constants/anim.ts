@@ -325,7 +325,7 @@ export function interp(
   inputRange: number[],
   outputRange: (string | number)[]
 ): Animated.AnimatedInterpolation<string | number> {
-  return value.interpolate({ inputRange, outputRange, extrapolate: 'clamp' });
+  return value.interpolate({ inputRange, outputRange: outputRange as any, extrapolate: 'clamp' });
 }
 
 /** Opacity interpolation between two alpha values (0-1). */

@@ -38,7 +38,7 @@ import { serverMetrics } from '@/services/serverMetrics';
 import { taskMemory } from '@/services/taskMemory';
 import { autoErrorLogger } from '@/services/autoErrorLogger';
 import { knowledgeAccumulator } from '@/services/knowledgeAccumulator';
-import { extractPythonCode, saveButlerScript, loadButlerScripts } from '@/services/butlerScripts';
+import { extractPythonCodeBlocks, saveButlerScript, loadButlerScripts } from '@/services/butlerScripts';
 import { nexusBridge } from '@/services/nexusBridge';
 import { knowledgeGrowthEngine } from '@/services/knowledgeGrowthEngine';
 import { autoConnectEngine, EngineEvent } from '@/services/autoConnectEngine';
@@ -736,7 +736,7 @@ function MessageBubble({ msg, onCopy, onReact, onSave, onSuggest, isLast, accent
   const pr = accentColor;
   const sc = themeSecondary;
 
-  const codeBlocks = useMemo(() => extractPythonCode(msg.content), [msg.content]);
+  const codeBlocks = useMemo(() => extractPythonCodeBlocks(msg.content), [msg.content]);
   const hasCode = codeBlocks.length > 0;
   const displayText = useMemo(() => {
     let t = msg.content;

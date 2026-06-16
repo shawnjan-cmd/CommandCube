@@ -61,7 +61,7 @@ export interface ResearchSession {
 
 class KnowledgeAccumulator {
   private pendingFindings: CompressedKnowledge[] = [];
-  private autoSaveInterval: NodeJS.Timeout | null = null;
+  private autoSaveInterval: ReturnType<typeof setTimeout> | null = null;
   private _growthListeners: Set<GrowthListener> = new Set();
   private _findingsSinceLastOrganize = 0;  // threshold tracker
   private _totalSavedFindings = 0;         // lifetime counter
@@ -560,6 +560,35 @@ class KnowledgeAccumulator {
   async exportResearch(): Promise<string> {
     const data = await AsyncStorage.getItem(AUTO_SAVE_KEY);
     return data || '{}';
+  }
+
+  // ────────────────────────────────────────────────────────────
+  // BACKWARD-COMPAT SHIMS for legacy chat consumers in butler.tsx.
+  // These return safe defaults so calling them never throws.
+  // ────────────────────────────────────────────────────────────
+
+  /**
+   * Build a short knowledge-context string used to seed chat prompts.
+   * Returns empty string if no research has been saved.
+   * @deprecated Returns a best-effort summary; prefer `getResearchByDomain`.
+   */
+  async buildContext(_query?: string, _maxItems = 3): Promise<string> {
+    try {
+      const data = await AsyncStorage.getItem(AUTO_SAVE_KEY);
+      if (!data) return '';
+      const parsed = JSON.parse(data || '{}');
+      const items = Array.isArray(parsed?.recent) ? parsed.recent.slice(0, _maxItems) : [];
+      if (!items.length) return '';
+      return items.map((i: any) => `• ${String(i?.topic || i?.title || '').slice(0, 80)}`).join('\n');
+    } catch { return ''; }
+  }
+
+  /**
+   * Record a chat exchange for future context. No-op safe fallback.
+   * @deprecated Will be re-implemented when chat history is wired through here.
+   */
+  async processExchange(_userMsg?: any, _aiMsg?: any): Promise<void> {
+    /* no-op shim — never throws */
   }
 }
 

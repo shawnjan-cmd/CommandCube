@@ -15,7 +15,7 @@ export interface ProLicenseState {
   isPro:       boolean;
   purchaseId:  string | null;
   purchasedAt: number | null;
-  source:      'iap' | 'restore' | 'debug' | null;
+  source:      'iap' | 'restore' | 'debug' | 'free' | null;
 }
 
 // App is fully free — always unlocked

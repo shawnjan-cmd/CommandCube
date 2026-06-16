@@ -87,7 +87,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       <Animated.View
         style={[
           styles.skeleton,
-          { width, height },
+          { width: width as any, height: height as any },
           pulseStyle,
           style,
         ]}
@@ -96,7 +96,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   }
   
   return (
-    <View style={[styles.skeleton, { width, height }, style]}>
+    <View style={[styles.skeleton, { width: width as any, height: height as any }, style]}>
       <Animated.View style={[StyleSheet.absoluteFill, shimmerStyle]}>
         <LinearGradient
           colors={[

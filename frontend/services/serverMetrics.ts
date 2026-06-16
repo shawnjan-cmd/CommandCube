@@ -130,6 +130,21 @@ class ServerMetricsService {
 
   getHistory() { return this.history; }
   getCache()   { return this.cache; }
+
+  /**
+   * Backward-compat shim for legacy chat code in butler.tsx.
+   * Returns a short human-readable summary of the latest metrics,
+   * or empty string if no metrics have been fetched yet.
+   */
+  getContextString(): string {
+    const m: any = this.cache;
+    if (!m) return '';
+    const parts: string[] = [];
+    if (m.cpu !== undefined)    parts.push(`CPU ${m.cpu}%`);
+    if (m.memory !== undefined) parts.push(`MEM ${m.memory}%`);
+    if (m.disk !== undefined)   parts.push(`DISK ${m.disk}%`);
+    return parts.length ? `PC: ${parts.join(' · ')}` : '';
+  }
 }
 
 export const serverMetrics = new ServerMetricsService();

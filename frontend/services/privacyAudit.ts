@@ -200,7 +200,7 @@ export const privacyAudit = {
           const method = (init?.method as string) || (input as any)?.method || 'GET';
           const started = Date.now();
           try {
-            const res = await _origFetch.call(this, input as any, init);
+            const res = await _origFetch.call(this as any, input as any, init);
             // We don't read the body to avoid consuming the stream; size is unknown.
             _record(url, method, started, { status: res.status });
             return res;

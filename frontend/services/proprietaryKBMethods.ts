@@ -188,7 +188,7 @@ except Exception as e:
         `File: ${filename}`,
         `Imports: ${imports.slice(0, 5).join(', ')}`,
         `Functions: ${functions.slice(0, 4).join(', ')}`,
-        docstrings.length > 0 ? `Docs: ${docstrings[0].replace(/"""|'''/g, '').trim().slice(0, 200)}` : '',
+        docstrings.length > 0 ? `Docs: ${(docstrings[0] || '').replace(/"""|'''/g, '').trim().slice(0, 200)}` : '',
       ].filter(Boolean).join('\n');
 
       if (summary.length < 40) return 0;

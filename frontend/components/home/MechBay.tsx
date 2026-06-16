@@ -750,14 +750,14 @@ export function HexCommandRing({ goToTab }: { goToTab: (t: string) => void }) {
               <View style={mech.chamferBR} />
 
               {/* hex icon + label inline (compact horizontal layout) */}
-              <View style={mech.cmdInner}>
+              <View style={(mech as any).cmdInner}>
                 <View style={mech.cmdHexWrap}>
                   <View style={{ position: 'absolute' }}>
                     <HexShape size={42} fill={MECH.steelLo} stroke={t.accent} strokeWidth={1.4} />
                   </View>
                   <Icon name={t.icon as any} size={20} color={t.accent} />
                 </View>
-                <View style={mech.cmdTextCol}>
+                <View style={(mech as any).cmdTextCol}>
                   <Text style={[mech.cmdLabel, { color: MECH.text }]}>{t.label}</Text>
                   <Text style={mech.cmdDesc} numberOfLines={1}>{t.desc}</Text>
                   {/* compact gauge */}

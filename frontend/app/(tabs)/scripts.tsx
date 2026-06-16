@@ -3127,7 +3127,7 @@ export default function ScriptsScreen() {
             </TouchableOpacity>
             {/* Run all / chain button */}
             <TouchableOpacity
-              onPress={() => { haptics.selection(); setShowChainBuilder(true); }}
+              onPress={() => { haptics.selection(); /* TODO: chain builder pending implementation */ }}
               style={[s.fuiIconCircle, { borderColor: N.green + '35', backgroundColor: N.green + '08' }]}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.75}

@@ -61,6 +61,43 @@ class AutoErrorLogger {
     this.log('warn', source, message, meta);
   }
 
+  /**
+   * Backward-compat alias used by older callers (serverMetrics, etc).
+   * @deprecated use warn() instead.
+   */
+  logWarning(source: string, message: string, meta?: Record<string, any>): void {
+    this.log('warn', source, message, meta);
+  }
+
+  /**
+   * Quick statistics about the in-memory log buffer.
+   * Returns both the legacy shape (errorCount/warningCount/totalLogs) used
+   * by services like appScanner, AND the new (total/byLevel) shape.
+   */
+  getStats(): {
+    total: number;
+    byLevel: Record<LogLevel, number>;
+    errorCount: number;
+    warningCount: number;
+    infoCount: number;
+    totalLogs: number;
+  } {
+    const byLevel: Record<LogLevel, number> = { error: 0, warn: 0, info: 0, debug: 0 };
+    for (const entry of this._buffer) {
+      if (entry && entry.level && byLevel[entry.level] !== undefined) {
+        byLevel[entry.level]++;
+      }
+    }
+    return {
+      total: this._buffer.length,
+      byLevel,
+      errorCount:   byLevel.error,
+      warningCount: byLevel.warn,
+      infoCount:    byLevel.info,
+      totalLogs:    this._buffer.length,
+    };
+  }
+
   info(source: string, message: string, meta?: Record<string, any>): void {
     this.log('info', source, message, meta);
   }

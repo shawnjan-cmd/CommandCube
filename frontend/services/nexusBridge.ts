@@ -100,7 +100,7 @@ function scoreRelevance(finding: CompressedKnowledge, queryKws: string[]): numbe
   score *= (finding.metadata?.confidence ?? 0.7);
   // Decay by age (recency bonus)
   const ageDays = finding.metadata?.timestamp
-    ? (Date.now() - finding.metadata.timestamp) / 86400000
+    ? (Date.now() - Number(finding.metadata.timestamp)) / 86400000
     : 30;
   score *= Math.max(0.5, 1 - ageDays / 90); // decay over 90 days
 
@@ -422,6 +422,18 @@ class NexusBridgeService {
                ctx.channel === 'LOCAL_ONLY'   ? 'ΔNEX' :
                ctx.channel === 'RELAY_ONLY'   ? 'ΣNET' : '--';
     return `[${ch}] ${ctx.localFindings.length}L+${ctx.relayFindings.length}R · Δ${ctx.deltaScore} · ${ctx.latencyMs}ms`;
+  }
+
+  /**
+   * Backward-compat shim for legacy butler.tsx chat flow.
+   * Returns a safe disconnect stub so calling never throws.
+   * @deprecated Use the real bridge methods (queryBridge, etc.) instead.
+   */
+  async chat(_messages: any[] = [], _opts?: any): Promise<{ content: string; ok: boolean }> {
+    return {
+      content: 'Chat bridge is not yet wired to this method. Please use the script execution flow.',
+      ok: false,
+    };
   }
 }
 

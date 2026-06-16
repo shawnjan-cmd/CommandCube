@@ -23,7 +23,7 @@
 import Constants from 'expo-constants';
 
 /** Hard fallback — only used if expo-constants returns undefined. */
-const FALLBACK_VERSION = '2.1.28';
+const FALLBACK_VERSION = '2.1.30';
 
 /** Raw version string from app.json (e.g. "2.1.25"). */
 export const APP_VERSION: string =
