@@ -1,7 +1,7 @@
 {
   "name": "butler-ai",
   "main": "./index.js",
-  "version": "2.1.26",
+  "version": "2.1.27",
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
@@ -104,5 +104,15 @@
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "resolutions": {
+    "xmldom": "npm:@xmldom/xmldom@^0.9.3",
+    "@xmldom/xmldom": "^0.9.3",
+    "uuid": "^10.0.0"
+  },
+  "overrides": {
+    "xmldom": "npm:@xmldom/xmldom@^0.9.3",
+    "@xmldom/xmldom": "^0.9.3",
+    "uuid": "^10.0.0"
+  }
 }
