@@ -80,9 +80,8 @@ memory/test_credentials.md
 
 # Mobile development
 android-sdk/
-.env
-.env.*
-*.env
+# NOTE: .env files MUST be committed for Emergent deployment — the platform
+# reads them at build time. Do NOT re-add `.env` / `.env.*` / `*.env` here.
 credentials.json
 *.key
 .credentials
