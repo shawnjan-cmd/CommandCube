@@ -88,6 +88,7 @@
             "enableShrinkResourcesInReleaseBuilds": false,
             "networkInspector": false,
             "abiFilters": ["arm64-v8a", "armeabi-v7a"],
+            "ndkVersion": "26.1.10909125",
             "extraMavenRepos": [],
             "extraProguardRules": "# React Native core\n-keep class com.facebook.react.** { *; }\n-keep class com.facebook.hermes.** { *; }\n-keep class com.facebook.jni.** { *; }\n# Expo\n-keep class expo.modules.** { *; }\n-keep class host.exp.exponent.** { *; }\n# AsyncStorage\n-keep class com.reactnativecommunity.asyncstorage.** { *; }\n# Reanimated\n-keep class com.swmansion.reanimated.** { *; }\n# Gesture Handler\n-keep class com.swmansion.gesturehandler.** { *; }\n# Camera / QR\n-keep class androidx.camera.** { *; }\n# WebSocket\n-keep class okhttp3.** { *; }\n-keep class okio.** { *; }\n# Keep annotations & line numbers (helps crash logs)\n-keepattributes *Annotation*\n-keepattributes SourceFile,LineNumberTable\n-keepattributes EnclosingMethod,InnerClasses\n# Don't warn about unused okio/okhttp internals\n-dontwarn okhttp3.**\n-dontwarn okio.**"
           },
