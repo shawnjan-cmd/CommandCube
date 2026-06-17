@@ -1,31 +1,36 @@
 /**
  * Butler AI — Root Boot Route  (`/`)
  * ──────────────────────────────────────────────────────────────────
- * v6 — INTERACTION-MANAGER-AWARE AUTO-REDIRECT
+ * v7 — DECLARATIVE <Redirect> BOOT  (Android-safe)
+ *
+ * WHY THIS REWRITE?
+ *   v6 used `router.replace()` from inside an InteractionManager
+ *   callback. On native Android cold-start the (tabs) navigator was
+ *   not yet fully mounted at the moment the callback fired, so the
+ *   imperative navigation silently no-op'd — which then tripped the
+ *   2.5 s escape-hatch ("BOOT TIMEOUT · TAP TO CONTINUE") because
+ *   the user appeared stuck.
+ *
+ * THE FIX
+ *   Use Expo Router's <Redirect> component instead of `router.replace()`.
+ *   <Redirect> is declarative — it integrates with the navigator's own
+ *   mount lifecycle, so it waits until the router is ready before
+ *   actually navigating. No timing race, no InteractionManager.
  *
  * BEHAVIOR
- *   1. Read the boot-target from the in-memory userSession cache (the
- *      cache is hydrated by `_layout.tsx` at module-eval; this read is
- *      almost always a single-tick lookup).
- *   2. Wait for `InteractionManager.runAfterInteractions` so the router
- *      animation/transition system is guaranteed-ready before we fire
- *      a navigation. This eliminates the `setTimeout(50)` race that
- *      previous versions used.
- *   3. Triple-fallback navigation (`replace` → `push` → `navigate`).
- *   4. Manual ESCAPE HATCH after 2.5 s in case anything goes weird.
- *
- * WHY THIS FILE EXISTS
- *   The route `/` is the cold-start entry on web AND native. It must
- *   never block, never throw, and always end with either an automatic
- *   redirect or a manual recovery button visible to the user.
+ *   1. Read the boot-target from userSession (1.8 s hard cap inside).
+ *   2. As soon as we have it, render <Redirect href={target} />.
+ *   3. Until then, show a black "INITIALISING…" card.
+ *   4. If we're STILL here 3.5 s after mount, show the manual escape
+ *      hatch with CONTINUE → HOME / SHOW TUTORIAL buttons so the user
+ *      is NEVER permanently stuck.
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, Platform, TouchableOpacity, ActivityIndicator,
-  InteractionManager,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import {
   getBootTarget,
   HOME_ROUTE,
@@ -35,12 +40,12 @@ import {
 
 const MONO: any = Platform.OS === 'ios' ? 'Courier' : 'monospace';
 
-// ── Triple-fallback navigation — never throws ─────────────────────
+// ── Triple-fallback imperative navigation — used ONLY by the escape
+//    hatch buttons (the auto path uses <Redirect>).
 function safeNavigate(router: ReturnType<typeof useRouter>, route: string) {
   try { router.replace(route as any); return; } catch (e1) { try { console.warn('[root] replace failed:', e1); } catch {} }
   try { router.push(route as any);    return; } catch (e2) { try { console.warn('[root] push failed:',    e2); } catch {} }
   try { (router as any).navigate?.(route); return; } catch (e3) { try { console.warn('[root] navigate failed:', e3); } catch {} }
-  try { router.replace('/(tabs)/nexushome' as any); } catch {}
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -48,50 +53,48 @@ function safeNavigate(router: ReturnType<typeof useRouter>, route: string) {
 // ──────────────────────────────────────────────────────────────────
 export default function Index() {
   const router = useRouter();
-  const [stuck, setStuck] = useState(false);
+  const [target, setTarget] = useState<BootTarget | null>(null);
+  const [stuck, setStuck]   = useState(false);
 
-  // Auto-redirect on mount — driven by InteractionManager.
+  // Resolve the boot target on mount.
   useEffect(() => {
     let cancelled = false;
-    let interactionHandle: { cancel: () => void } | null = null;
-
     (async () => {
-      let target: BootTarget;
+      let resolved: BootTarget;
       try {
-        target = await getBootTarget();
+        resolved = await getBootTarget();
       } catch {
-        target = ONBOARDING_ROUTE; // safest fallback for new users
+        resolved = ONBOARDING_ROUTE; // safest fallback for new users
       }
-      if (cancelled) return;
-
-      // InteractionManager.runAfterInteractions guarantees the JS
-      // thread is idle (no in-flight animations, no batched renders).
-      // This is the canonical way to defer navigation until the
-      // router is fully painted on screen — drastically better than
-      // a setTimeout race.
-      interactionHandle = InteractionManager.runAfterInteractions(() => {
-        if (!cancelled) safeNavigate(router, target);
-      });
+      if (!cancelled) setTarget(resolved);
     })();
 
-    // ESCAPE HATCH — if we're still on this route after 2.5 s, show
-    // manual buttons so the user is NEVER permanently stuck.
+    // Defensive escape hatch — fires if for ANY reason we haven't
+    // navigated after 3.5 s (e.g. <Redirect> blocked by a navigator
+    // suspension, or the screen got re-mounted and the auto path was
+    // cancelled). 3.5 s is comfortably > the 1.8 s storage cap.
     const stuckTimer = setTimeout(() => {
       if (!cancelled) setStuck(true);
-    }, 2500);
+    }, 3500);
 
     return () => {
       cancelled = true;
-      try { interactionHandle?.cancel?.(); } catch {}
       clearTimeout(stuckTimer);
     };
-  }, [router]);
+  }, []);
 
-  // Manual escape hatch handlers ─────────────────────────────────
-  const goHome = useCallback(() => safeNavigate(router, HOME_ROUTE),       [router]);
-  const goTut  = useCallback(() => safeNavigate(router, ONBOARDING_ROUTE), [router]);
+  // ── HAPPY PATH ─────────────────────────────────────────────────
+  // Once we know the target AND we haven't already shown the stuck
+  // screen, render <Redirect>. Expo Router handles all the navigator-
+  // ready timing for us.
+  if (target && !stuck) {
+    return <Redirect href={target as any} />;
+  }
 
+  // ── ESCAPE HATCH ───────────────────────────────────────────────
   if (stuck) {
+    const goHome = () => safeNavigate(router, HOME_ROUTE);
+    const goTut  = () => safeNavigate(router, ONBOARDING_ROUTE);
     return (
       <View style={styles.root}>
         <Text style={styles.brand}>NEXUS</Text>
@@ -117,7 +120,8 @@ export default function Index() {
     );
   }
 
-  // Normal boot card — quietly shown for ~50–300 ms before the redirect.
+  // ── NORMAL LOADING CARD ────────────────────────────────────────
+  // Shown for ~50–300 ms while userSession hydrates.
   return (
     <View style={styles.root}>
       <Text style={styles.brand}>NEXUS</Text>
